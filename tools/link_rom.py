@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """docs/MEMORY_MAP.md の表どおりに ASCII8 メガROM を組み立てる（仕様 §2.2）。
 
-    link_rom.py header <out.h>                    PAGE_<名前> の #define を生成
+    link_rom.py header <out.h> <banks.mk>         PAGE_<名前> の #define と、ソース→バンク表を生成
     link_rom.py rom <kernel.ihx> <out.rom>        ROM イメージを生成
 
-ihx の 0x4000-0x5FFF はページ 0（カーネル）、0x6010-0x7FFF は表で `bank1` と書いたページへ置く。
+ihx の 0x4000-0x5FFF はページ 0（カーネル）。コードバンク n の領域 _BANKn は 0xn6010 に
+リンクされ（24bit 番地, ihx の型 04 レコード）、ページ n の 6000h 窓の位置に置く。
 ページ 0 以外は先頭 16 バイトに見出し [page,'T','G','P',種別,FF..] を置き、中身はオフセット 16 から。
 同じ番地への二重書き込みはエラーにする（黙って後勝ちにしない）。
 """
@@ -17,7 +18,7 @@ MAP = ROOT / "docs" / "MEMORY_MAP.md"
 PAGE = 0x2000
 HDR = 16
 KERNEL_BASE, KERNEL_END = 0x4000, 0x6000
-BANK1_WIN, BANK1_BASE, BANK1_END = 0x6000, 0x6010, 0x8000
+CODE_WIN, CODE_BASE, CODE_END = 0x6000, 0x6010, 0x8000
 KIND = {"コード": 1, "データA": 2, "データB": 3}
 
 
@@ -40,8 +41,23 @@ def page_count(rows):
     return max(r["hi"] for r in rows) + 1
 
 
-def cmd_header(out):
+def code_files(r):
+    return r["src"][5:].split() if r["src"].startswith("code:") else []
+
+
+def cmd_header(out, banks_mk):
     rows = parse_map()
+    mk = ["# banks.mk — tools/link_rom.py が docs/MEMORY_MAP.md から生成"]
+    pages = []
+    for r in rows:
+        for f in code_files(r):
+            if not (ROOT / f).exists():
+                sys.exit(f"link_rom: MEMORY_MAP のページ {r['lo']} に載っている {f} が無い")
+            mk.append(f"BANK_OF_{f} := {r['lo']}")
+        if code_files(r):
+            pages.append(str(r["lo"]))
+    mk.append(f"CODE_BANKS := {' '.join(pages)}")
+    write_if_changed(banks_mk, "\n".join(mk) + "\n")
     lines = ["/* rompages.h — tools/link_rom.py が docs/MEMORY_MAP.md から生成。手で編集しない */",
              "#ifndef DATA_ROMPAGES_H", "#define DATA_ROMPAGES_H",
              f"#define ROM_PAGE_COUNT {page_count(rows)}"]
@@ -49,21 +65,30 @@ def cmd_header(out):
         if r["name"] not in ("-", "") and r["lo"] == r["hi"]:
             lines.append(f"#define PAGE_{r['name']} {r['lo']}")
     lines += ["#endif", ""]
-    text = "\n".join(lines)
-    p = Path(out)
-    if not p.exists() or p.read_text(encoding="utf-8") != text:   # 変化が無ければ触らない（再コンパイル回避）
+    write_if_changed(out, "\n".join(lines))
+
+
+def write_if_changed(path, text):
+    p = Path(path)    # 変化が無ければ触らない（再コンパイル回避）
+    p.parent.mkdir(parents=True, exist_ok=True)
+    if not p.exists() or p.read_text(encoding="utf-8") != text:
         p.write_text(text, encoding="utf-8")
 
 
 def parse_ihx(path):
     mem = {}
+    upper = 0
     for ln, line in enumerate(Path(path).read_text().splitlines(), 1):
         if not line.startswith(":"):
             continue
         raw = bytes.fromhex(line[1:])
-        n, addr, typ = raw[0], (raw[1] << 8) | raw[2], raw[3]
+        n, typ = raw[0], raw[3]
+        addr = upper | (raw[1] << 8) | raw[2]
         if typ == 1:
             break
+        if typ == 4:
+            upper = ((raw[4] << 8) | raw[5]) << 16
+            continue
         if typ != 0:
             sys.exit(f"link_rom: {path}:{ln}: 未対応のレコード {typ}")
         for i in range(n):
@@ -74,16 +99,19 @@ def parse_ihx(path):
 
 
 def split_code(mem, rows):
-    bad = [a for a in mem if not (KERNEL_BASE <= a < KERNEL_END or BANK1_BASE <= a < BANK1_END)]
-    if bad:
-        sys.exit(f"link_rom: 0x{min(bad):04X} にリンクされた"
-                 "（カーネルは 0x4000-0x5FFF の 8KB、バンク1 は 0x6010-0x7FFF）")
-    kern = {a: v for a, v in mem.items() if a < KERNEL_END}
-    bank1 = {a: v for a, v in mem.items() if a >= BANK1_BASE}
-    page1 = next((r["lo"] for r in rows if r["src"] == "bank1"), None)
-    if bank1 and page1 is None:
-        sys.exit("link_rom: BANK1 のコードがあるのに MEMORY_MAP に bank1 のページが無い")
-    return kern, bank1, page1
+    """カーネル {addr: v} と、コードバンク {page: {addr16: v}} に分ける。"""
+    code_pages = {r["lo"] for r in rows if code_files(r)}
+    kern, banks = {}, {}
+    for a, v in mem.items():
+        page, a16 = a >> 16, a & 0xFFFF
+        if page == 0 and KERNEL_BASE <= a16 < KERNEL_END:
+            kern[a16] = v
+        elif page in code_pages and CODE_BASE <= a16 < CODE_END:
+            banks.setdefault(page, {})[a16] = v
+        else:
+            sys.exit(f"link_rom: 0x{a:06X} にリンクされた（カーネルは 0x4000-0x5FFF の 8KB、"
+                     f"コードバンク n は 0xn6010-0xn7FFF。溢れていないか）")
+    return kern, banks
 
 
 def cmd_rom(ihx, out):
@@ -100,18 +128,19 @@ def cmd_rom(ihx, out):
             owner[o] = what
             rom[o] = b
 
-    kern, bank1, page1 = split_code(parse_ihx(ihx), rows)
+    kern, banks = split_code(parse_ihx(ihx), rows)
     for a, v in kern.items():
         put(a - KERNEL_BASE, [v], "kernel")
-    for a, v in bank1.items():
-        put(page1 * PAGE + (a - BANK1_WIN), [v], "bank1")
+    for page, mem in banks.items():
+        for a, v in mem.items():
+            put(page * PAGE + (a - CODE_WIN), [v], f"bank{page}")
 
     for r in rows:
         for p in range(r["lo"], r["hi"] + 1):
             if p == 0:
                 continue
             put(p * PAGE, bytes([p, ord("T"), ord("G"), ord("P"), r["kind"]]) + b"\xFF" * 11, "header")
-            if r["src"] not in ("-", "", "kernel", "bank1"):
+            if r["src"] not in ("-", "", "kernel") and not code_files(r):
                 data = (ROOT / r["src"]).read_bytes()
                 if len(data) > PAGE - HDR:
                     sys.exit(f"link_rom: {r['src']} が {len(data)} B で 1 ページに入らない")
@@ -120,15 +149,16 @@ def cmd_rom(ihx, out):
     Path(out).parent.mkdir(parents=True, exist_ok=True)
     Path(out).write_bytes(rom)
     used0 = max(kern) - KERNEL_BASE + 1
-    used1 = (max(bank1) - BANK1_WIN + 1) if bank1 else HDR
     print(f"link_rom: {out} {len(rom)//1024}KB ASCII8 ({npages} ページ)")
-    print(f"  kernel 0x4000-0x{KERNEL_BASE+used0-1:04X}  {used0} / 8192 B (残り {8192-used0} B)")
-    print(f"  bank1  0x6000-0x{BANK1_WIN+used1-1:04X}  {used1} / 8192 B (残り {8192-used1} B)")
+    print(f"  kernel 0x4000-0x{KERNEL_BASE+used0-1:04X}  {used0:5d} / 8192 B (残り {8192-used0} B)")
+    for page in sorted(banks):
+        used = max(banks[page]) - CODE_WIN + 1
+        print(f"  bank{page:<2d} 0x6000-0x{CODE_WIN+used-1:04X}  {used:5d} / 8192 B (残り {8192-used} B)")
 
 
 def main(argv):
-    if len(argv) == 3 and argv[1] == "header":
-        cmd_header(argv[2])
+    if len(argv) == 4 and argv[1] == "header":
+        cmd_header(argv[2], argv[3])
     elif len(argv) == 4 and argv[1] == "rom":
         cmd_rom(argv[2], argv[3])
     else:

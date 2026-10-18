@@ -5,13 +5,14 @@
 #include "sys/psg.h"
 #include "ui/screen.h"
 #include "ui/savedisk.h"
+#include "data/screens.h"
 
 void main(void)
 {
     vdp_init_screen5();
     psg_init();
     savedisk_boot();
-    screen_change(&scr_p0menu);
+    screen_change(&scr_title);
     g_boot_magic = BOOT_MAGIC;
     screen_run();
 }

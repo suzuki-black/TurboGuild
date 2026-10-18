@@ -1,6 +1,9 @@
 /* p0save.c — Phase0 のセーブ試験。起動時ロードの結果と RTC 差分の加算量を見せ、OK で保存する。
  * 受け入れ: 保存 → リセット → 起動で、止まっていた現実時間 × TIME_SCALE が g_time に足される。 */
 #include "screen.h"
+#include "../far.h"
+#include "../data/screens.h"
+#include "../sys/vdp.h"
 #include "savedisk.h"
 #include "../ram.h"
 #include "../core/time.h"
@@ -43,7 +46,7 @@ static void draw_state(void)
     font_puts(1, 12, "SAVE SIZE", 7, 1); font_putdec(12, 12, sizeof(SaveData), 15, 1);
 }
 
-static void update(void)
+FAR(void, p0save_update, (void))
 {
     u8 p = input_pressed();
     if (rtc_sec() != g_ui_prev) draw_clock();
@@ -59,14 +62,14 @@ static void update(void)
     if (p & BTN_CANCEL) screen_change(&scr_p0menu);
 }
 
-static void draw(void)
+FAR(void, p0save_draw, (void))
 {
-    ui_clear();
-    ui_header("SAVE / RTC");
+    vdp_fill(0, 0, SCREEN_W, SCREEN_H, 1);
+    dbg_header("SAVE / RTC");
     font_puts(1, 3, "RTC", 7, 1);
     draw_clock();
     draw_state();
-    ui_footer("SPACE:SAVE  ESC:BACK");
+    dbg_footer("SPACE:SAVE  ESC:BACK");
 }
 
-const Screen scr_savetest = { 0, update, draw, 0 };
+SCREEN(scr_savetest, 0, p0save_update, p0save_draw, 0)

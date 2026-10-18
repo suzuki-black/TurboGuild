@@ -23,7 +23,14 @@ void font_putc(u8 cx, u8 cy, u8 ch, u8 fg, u8 bg)
             bits <<= 2;
         }
     }
-    vdp_put8x8((u16)(cy * 1024 + cx * 4), g_fontbuf);
+    {
+        VdpRect r;
+        r.addr = (u16)(cy * 1024 + cx * 4);
+        r.buf = g_fontbuf;
+        r.w = 4;
+        r.h = 8;
+        vdp_put_rect(&r);
+    }
 }
 
 void font_puts(u8 cx, u8 cy, const char *s, u8 fg, u8 bg)

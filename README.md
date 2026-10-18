@@ -42,30 +42,59 @@ openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild.rom -romtype ASCII8 -di
 | `make check` | ヘッドレス起動 → 各試験画面のスクショ → 保存 → リセット → 再起動で RTC 差分 × 10 が `g_time` に加算される |
 | `make check-nodisk` | ディスク無しで起動し、保存しようとすると `NO DISK` を出して続行できる |
 | `make check-msx2` | MSX2（C-BIOS）では「turboR 専用」を出して止まる |
+| `make play` | 新規開始から 30 分（エミュレータ時間）自動で遊び、保存→リセット→読み込みで進行が一致するか。`DURATION=秒` `TRACE=1` |
 
 結果は `build/run*/check.txt` とスクリーンショット `build/run*/*.png`。
 openMSX の後始末は自分の実行ディレクトリのパスで絞って行う（`pkill -f openmsx` は使わない）。
+
+## 遊び方
+
+| キー | 操作 |
+|---|---|
+| カーソル / ジョイスティック | 選ぶ（一覧では ←→ で 1 画面ぶん送る） |
+| SPACE / RETURN / トリガA | 決定 |
+| ESC / トリガB | 戻る（名前入力では 1 文字消す） |
+
+タイトル →（はじめから）名前 → 最初の 10 連（何度でも引き直せる）→ ホーム。
+ホームから クエスト・ガチャ・カード（デッキ編成）・ショップ・セーブ。
+ゲーム内の時間は現実の 10 倍で進み、AP は現実 5 分で 1 回復、ゲーム内の日付が変わるとログインボーナス。
+タイトルで ESC を押すと Phase0 の診断画面に入る。
 
 ## Phase 0 の状況
 
 | 項目 | 状態 | 確認方法 |
 |---|---|---|
-| `make` で ROM、`make run` で turboR + FDD が起動し SCREEN5 に「TurboGuild」 | 済 | `make check` の `menu.png` |
-| H.STKE 方式で起動し、HIMEM と空き RAM を表示 | 済 | 起動画面。実測 HIMEM=DE67h、C000h〜HIMEM = 7,783 B |
+| `make` で ROM、`make run` で turboR + FDD が起動し SCREEN5 に「TurboGuild」 | 済 | `make check` の `title.png` |
+| H.STKE 方式で起動し、HIMEM と空き RAM を表示 | 済 | 診断画面。実測 HIMEM=DE67h、C000h〜HIMEM = 7,783 B |
 | バンク切替テスト画面（全ページの見出しを 3 つの窓で照合） | 済 | `bank.png`: 31/31 OK × 3 窓 |
 | `sys/` 各モジュールの最小実装と動作確認 | 済 | ROM 内の試験画面で代替（DECISIONS #4） |
-| `build_data.py` → `link_rom.py` で cards.csv（10 枚）を ROM から読む | 済 | `cards.png` |
+| `build_data.py` → `link_rom.py` でカードを ROM から読む | 済 | `cards.png` |
 | `tests/` で `core/rng.c` と `core/time.c` が gcc で通る | 済 | `make test` |
 | セーブ → リセット → ロードで RTC 差分が加算、ディスク無しでも遊べる | 済 | `make check` / `make check-nodisk` |
 | turboR 以外では専用メッセージを出して止まる | 済 | `make check-msx2` |
-| 実機（フラッシュカートリッジ＋FD）での確認 | 未 | 仕様では各フェーズ末の受け入れ時 |
+
+## Phase 1 の状況
+
+| 項目 | 状態 | 確認方法 |
+|---|---|---|
+| 500 ステージ自動生成、エリア 5 まで遊べる | 済 | `tools/gen_stages.py`。自動プレイでエリア 10（ステージ 92）まで到達 |
+| カード 40 枚、デッキ編成、戦闘式 §6 | 済 | `make test`（戦闘・属性・デッキ）、カード画面 |
+| AP 回復、回復薬 | 済 | `make test`（AP）、ショップ・AP 不足時の確認 |
+| ガチャ（無料・ゴールド・プレミア＋チケット 2 種）、初回 10 連リセマラ | 済 | `make test`（確率・10 連確定・天井・1 日 1 回） |
+| ログインボーナス 7 日 | 済 | `make test`（7 日周期・同じ日は 1 回） |
+| 新規開始から 30 分遊んで落ちない。セーブ/ロード往復で所持カード・進行が一致 | 済（エミュレータ） | `make play`: 168 クエスト・46 回の保存→リセット→読み込みが全て一致 |
+| 同じことを実機（フラッシュカートリッジ＋FD）で確認 | **未** | 実機が要る |
+
+既知の課題（Phase3 の `sim_economy.py` で調整する）:
+- 自動プレイではステージ 92 前後で勝てなくなり、石が尽きて進行が止まる。数値はすべて仮。
+- 文字描画は C で書いていて遅い（名前入力の全面描画で 1 秒弱）。体感が悪ければ RAM 実行の asm に置き換える。
 
 ## 構成
 
 ```
-src/sys/   ハード依存（crt0・VDP・フォント・入力・PSG・RTC・ディスク・バンク）
+src/sys/   ハード依存（crt0・VDP・文字・漢字ROM・入力・PSG・RTC・ディスク・バンク・中継）
 src/core/  ゲームロジック（ハード非依存。PC でテストする）
-src/ui/    画面（Screen 表）とセーブディスク管理（大半はコードバンク 1 に載る）
+src/ui/    画面（Screen 表）・共通部品・セーブディスク管理
 src/data/  生成ヘッダ（手で編集しない）
 data/      元データ（UTF-8 の CSV）
 tools/     Python ビルドツール
@@ -83,7 +112,13 @@ openmsx/   自動確認用 Tcl
 - **セーブ構造体（882 B）をセクタ単位（512 B × 2）で直接読み書きすると、後ろの RAM 変数まで
   保存・復元される。** リセットしたのにメニュー位置が前回のまま、という形で出た。
   1 セクタずつ `g_sector` 経由でコピーする（`src/ui/savedisk.c`）。
-- SDCC の `--codeseg BANK1` が作る領域名は `_BANK1`。リンカには `-Wl-b_BANK1=0x6010` と書く。
+- SDCC の `--codeseg BANK1` が作る領域名は `_BANK1`。リンカには `-Wl-b_BANK1=0x16010` のように書く。
+- **SDCC は別バンクの関数を直接 `call` してもリンクを通す**（24bit 番地の下位 16bit で命令を作る）。
+  実行すると今の窓の中の別物に飛ぶ。`FAR` の中継を通し、`tools/check_banks.py` で検査する。
+- **EXTROM（CALSLT）は割り込み禁止のまま戻る。** RTC を読んだあと `ei` しないと、
+  何も描かない待ち画面で JIFFY が止まり、フレーム待ちで永久に固まる（自動プレイで発覚）。
+- 自動テストの「いま押してよいか」の判定に、毎フレーム一瞬しか立たない状態を使うと、
+  サンプリングでは見えない。押下待ちの間ずっと立てておく（`g_ui_state`）。
 - openMSX の Tcl で `after` から呼ぶ手順に空の要素を混ぜると「invalid command name ""」で
   連鎖が無言で止まる。
 

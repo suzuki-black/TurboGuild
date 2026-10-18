@@ -2,7 +2,7 @@
 #include "check.h"
 #include "core/save.h"
 
-static SaveData s;
+static SaveData s;  /* g_save は tables_pc.c */
 
 int main(void)
 {

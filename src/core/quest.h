@@ -1,0 +1,27 @@
+/* quest.h — 1 ステージ分のクエスト実行（AP 消費 → 戦闘 → 報酬 → ドロップ → 進行） */
+#ifndef CORE_QUEST_H
+#define CORE_QUEST_H
+#include "../types.h"
+#include "battle.h"
+
+#define Q_OK      0
+#define Q_LOCKED  1
+#define Q_NO_AP   2
+
+typedef struct {
+    u8  status;
+    u8  ap_used;
+    u8  enemy_elem;
+    u16 player_hp;
+    BattleOut b;
+    u16 exp, gold;
+    u8  levels;          /* 上がったレベル数 */
+    u16 drop_card;       /* 0 = なし */
+    u8  drop_lost;       /* 満杯で受け取れなかった */
+    u8  area_cleared;    /* このボスを初めて倒した */
+} QuestResult;
+
+void quest_run(u16 stage, QuestResult *r);
+u16  quest_max_stage(void);          /* 挑戦できる最大のステージ番号 */
+u8   quest_ap_cost(u16 stage);       /* スキル込みの AP 消費 */
+#endif

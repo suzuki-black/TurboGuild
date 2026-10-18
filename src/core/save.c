@@ -48,5 +48,10 @@ void save_new(SaveData *s, u32 real_now)
     s->rng_gacha = real_now | 1;
     s->level = 1;
     s->ap = AP_MAX;
+    s->gold = START_GOLD;
+    s->gems = START_GEMS;
     s->login_day = 1;
+    s->last_login_gday = DAY_NEVER;
+    s->last_free_gacha_gday = DAY_NEVER;
+    for (i = 0; i < DECK_SIZE; i++) s->deck[i] = DECK_EMPTY;
 }

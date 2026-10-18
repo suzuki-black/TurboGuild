@@ -1,5 +1,8 @@
 /* p0menu.c — Phase0 の起動画面。タイトルと起動診断（HIMEM・空き RAM・CPU）と試験メニュー */
 #include "screen.h"
+#include "../far.h"
+#include "../data/screens.h"
+#include "../sys/vdp.h"
 #include "../ram.h"
 #include "../config.h"
 #include "../sys/font.h"
@@ -39,9 +42,9 @@ static void draw_items(void)
     }
 }
 
-static void init(void) { g_cursor = g_menu_pos; }
+FAR(void, p0menu_init, (void)) { g_cursor = g_menu_pos; }
 
-static void update(void)
+FAR(void, p0menu_update, (void))
 {
     u8 p = input_pressed();
     if (p & BTN_UP)   { g_cursor = (u8)((g_cursor + ITEMS - 1) % ITEMS); psg_beep(0x100, 2); draw_items(); }
@@ -49,15 +52,15 @@ static void update(void)
     if (p & BTN_OK)   { psg_beep(0x80, 4); g_menu_pos = g_cursor; screen_change(targets[g_cursor]); }
 }
 
-static void draw(void)
+FAR(void, p0menu_draw, (void))
 {
-    ui_clear();
-    ui_header("TurboGuild  Phase0");
+    vdp_fill(0, 0, SCREEN_W, SCREEN_H, 1);
+    dbg_header("TurboGuild  Phase0");
     vdp_fill(64, 16, 128, 8, 9);
     font_puts(11, 2, "TurboGuild", 15, 9);
     draw_diag();
     draw_items();
-    ui_footer("UP/DOWN:SELECT  SPACE:OK");
+    dbg_footer("UP/DOWN:SELECT  SPACE:OK");
 }
 
-const Screen scr_p0menu = { init, update, draw, 0 };
+SCREEN(scr_p0menu, p0menu_init, p0menu_update, p0menu_draw, 0)

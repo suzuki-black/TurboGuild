@@ -1,0 +1,11 @@
+key,value,note
+hp_base,200,enemy_hp = hp_base * stage_no ^ hp_exp
+hp_exp,1.3,
+def_mul,10,enemy_def = def_mul * stage_no
+atk_mul,30,enemy_atk = atk_mul * stage_no（仕様に無いので仮決め DECISIONS #19）
+exp_mul,5,exp = exp_mul * stage_no
+gold_mul,20,gold = gold_mul * stage_no
+ap_base,3,ap_cost = ap_base + area / ap_div
+ap_div,5,
+drop_normal,10,ドロップ率(%) s<10
+drop_boss,100,ドロップ率(%) s==10（エリアボス）

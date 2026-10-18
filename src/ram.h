@@ -7,12 +7,17 @@
 #include "sys/bios.h"
 #include "core/save.h"
 #include "ui/screen.h"
+#include "ui/widget.h"
+#include "core/gacha.h"
+#include "core/quest.h"
+#include "core/login.h"
 
 /* sys/ */
 extern u8 g_cart_slot;
 extern u8 g_bank_code, g_bank_dataA, g_bank_dataB;
 extern VdpCmd g_vdpcmd;
 extern u8 g_fontbuf[32];
+extern u8 g_glyph[128];      /* 1 文字ぶんの 4bpp（16x16 なら 8 バイト × 16 行） */
 extern u8 g_input_held, g_input_pressed;
 extern u8 g_beep_frames;
 extern DiskReq g_diskreq;
@@ -29,6 +34,20 @@ extern u32 g_time_added;       /* 起動時に加算したゲーム秒 */
 extern const Screen *g_screen_cur, *g_screen_next;
 extern u8 g_dirty;
 extern u16 g_boot_magic;      /* 起動完了の目印（自動テストが待つ） */
+extern u8 g_test_keys;        /* 自動テストが書くボタン（次のフレームで 1 回だけ押したことになる） */
+extern u8 g_ui_state;         /* UIS_*: 自動テストが「いま押してよいか」を知るため */
+extern u8 g_frames;           /* 時刻同期までのフレーム数 */
+extern u8 g_save_dirty;       /* 保存していない変更がある */
+extern u16 g_sel_area;        /* 画面をまたいで渡す選択（エリア・ステージ・カード・ガチャ） */
+extern u16 g_sel_stage;
+extern u16 g_sel_card;
+extern u8 g_sel_gacha;
+extern UiList g_list;         /* 一覧画面の状態（同時に使うのは 1 画面だけ） */
+extern u8 g_deck_slot;
+extern u8 g_nosave_warned;    /* 「セーブできません」は 1 回だけ出す */
+extern GachaReq g_gacha;
+extern QuestResult g_qr;
+extern LoginResult g_login;
 extern u8 g_cursor;
 extern u8 g_menu_pos;         /* メニューへ戻ったときのカーソル位置 */
 extern u8 g_ui_prev;         /* 画面ごとの前回値（再描画の判定用） */

@@ -26,7 +26,7 @@ proc logstate {tag} {
     set gt [rd32 [expr {$::A_SAVE + 12}]]
     puts $::log [format "%s himem=%04X status=%d tstat=%d added=%d g_time=%d save_count=%d mode=%s" \
         $tag [rd16 0xFC4A] [debug read memory $::A_STAT] [debug read memory $::A_TSTAT] \
-        [rd32 $::A_ADDED] $gt [rd16 [expr {$::A_SAVE + 880}]] [get_screen_mode]]
+        [rd32 $::A_ADDED] $gt [rd16 [expr {$::A_SAVE + 885}]] [get_screen_mode]]
     flush $::log
 }
 
@@ -63,6 +63,8 @@ proc finish {} {
 proc phase2 {} {
     logstate BOOT2
     step nop ; step nop
+    step key 7 0x04                       ;# タイトルで ESC → 診断メニュー
+    step nop
     step key 8 0x40 ; step key 8 0x40     ;# DOWN DOWN -> SAVE/RTC
     step key 8 0x01
     step shot save3
@@ -81,6 +83,7 @@ proc do_reset {} {
 
 proc phase_nodisk {} {
     logstate NODISK
+    step key 7 0x04 ; step nop
     step key 8 0x40 ; step key 8 0x40 ; step key 8 0x01 ; step shot nodisk
     step key 8 0x01 ; step nop ; step nop ; step shot nodisk_save
     step logstate NODISK_SAVE
@@ -90,6 +93,8 @@ proc phase_nodisk {} {
 
 proc phase1 {} {
     logstate BOOT1
+    step shot title
+    step key 7 0x04 ; step nop             ;# タイトルで ESC → 診断メニュー
     step shot menu
     step key 8 0x01 ; step shot bank ; step key 7 0x04
     step key 8 0x40 ; step key 8 0x01 ; step shot cards ; step key 7 0x04

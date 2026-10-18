@@ -6,6 +6,7 @@
 #   make check    ヘッドレスで起動しスクリーンショットと自己診断を取る
 #   make check-nodisk  ディスク無しでも起動して遊べることを確認
 #   make check-msx2  MSX2 機種で「turboR 専用」表示を確認
+#   make play     30 分の自動プレイ（Phase1 の受け入れ）。DURATION=秒 で短くできる
 #   make clean
 .DELETE_ON_ERROR:
 
@@ -20,37 +21,57 @@ B        := build
 ROM      := bin/TurboGuild.rom
 DSK      := bin/save.dsk
 IHX      := $(B)/kernel.ihx
+BANKSMK  := $(B)/banks.mk
+
+# ソース→コードバンクの対応は docs/MEMORY_MAP.md が唯一の定義。そこから banks.mk を作って読む
+-include $(BANKSMK)
 
 CFLAGS   := -mz80 --std-c99 --sdcccall 1 --opt-code-size -Isrc
-LDFLAGS  := -mz80 --no-std-crt0 --code-loc 0x4010 --data-loc 0xC000 -Wl-b_BANK1=0x6010
-
-# 常駐コードバンク 1（窓 6000h）に載せるソース。カーネル 8KB に入らないものをここへ
-BANK1_SRC := src/ui/p0menu.c src/ui/p0tests.c src/ui/p0save.c src/ui/savedisk.c
+LDFLAGS  := -mz80 --no-std-crt0 --code-loc 0x4010 --data-loc 0xC000 \
+            $(foreach n,$(CODE_BANKS),-Wl-b_BANK$(n)=0x$(shell printf %X $(n))6010)
 
 CSRC     := $(wildcard src/*.c src/sys/*.c src/core/*.c src/ui/*.c)
 ASRC     := $(filter-out src/sys/crt0.s,$(wildcard src/sys/*.s))
-GENH     := src/data/cards.h src/data/rompages.h
+GENH     := src/data/cards.h src/data/rompages.h src/data/screens.h src/data/tables.h src/data/text_ids.h
 HDRS     := $(wildcard src/*.h src/*/*.h) $(GENH)
 COBJ     := $(patsubst src/%.c,$(B)/obj/%.rel,$(CSRC))
-AOBJ     := $(patsubst src/%.s,$(B)/obj/%.rel,$(ASRC))
+AOBJ     := $(patsubst src/%.s,$(B)/obj/%.rel,$(ASRC)) $(B)/obj/far_stubs.rel
 CRT0     := $(B)/obj/sys/crt0.rel
-DATABIN  := $(B)/cards.bin $(B)/text.dat
+DATABIN  := $(wildcard $(B)/*.bin $(B)/*.dat)
+DATASRC  := $(wildcard data/*.csv data/text/*.txt)
 
-.PHONY: all test run check check-nodisk check-msx2 clean
+.PHONY: all test run check check-nodisk check-msx2 play clean
 
 all: $(ROM) $(DSK)
 
-$(B)/cards.bin $(B)/text.dat src/data/cards.h &: tools/build_data.py data/cards.csv
+# 1 回の実行で複数のファイルを作るものは、代表 1 つを本当の目標にして残りはそれに従わせる
+# （macOS の make 3.81 は &: を知らない）
+$(B)/data.stamp: tools/build_data.py tools/gen_stages.py $(DATASRC)
+	@mkdir -p $(B)
 	$(PYTHON) tools/build_data.py
+	@touch $@
+src/data/cards.h src/data/tables.h src/data/text_ids.h: $(B)/data.stamp
+	@:
 
-src/data/rompages.h: docs/MEMORY_MAP.md tools/link_rom.py
-	$(PYTHON) tools/link_rom.py header $@
+$(BANKSMK): docs/MEMORY_MAP.md tools/link_rom.py
+	$(PYTHON) tools/link_rom.py header src/data/rompages.h $(BANKSMK)
+src/data/rompages.h: $(BANKSMK)
+	@:
 
-$(B)/obj/%.rel: src/%.c $(HDRS) Makefile
+$(B)/far_stubs.s: $(BANKSMK) tools/gen_far.py $(CSRC)
+	$(PYTHON) tools/gen_far.py $(BANKSMK) $(B)/far_stubs.s src/data/screens.h
+src/data/screens.h: $(B)/far_stubs.s
+	@:
+
+$(B)/obj/%.rel: src/%.c $(HDRS) Makefile $(BANKSMK)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(if $(filter $<,$(BANK1_SRC)),--codeseg BANK1 --constseg BANK1) -c -o $@ $<
+	$(CC) $(CFLAGS) $(if $(BANK_OF_$<),--codeseg BANK$(BANK_OF_$<) --constseg BANK$(BANK_OF_$<)) -c -o $@ $<
 
 $(B)/obj/%.rel: src/%.s
+	@mkdir -p $(dir $@)
+	$(AS) -g -o $@ $<
+
+$(B)/obj/far_stubs.rel: $(B)/far_stubs.s
 	@mkdir -p $(dir $@)
 	$(AS) -g -o $@ $<
 
@@ -58,7 +79,8 @@ $(B)/obj/%.rel: src/%.s
 $(IHX): $(CRT0) $(AOBJ) $(COBJ)
 	$(CC) $(LDFLAGS) -o $@ $(CRT0) $(AOBJ) $(COBJ)
 
-$(ROM): $(IHX) $(DATABIN) docs/MEMORY_MAP.md tools/link_rom.py tools/ram_used.py
+$(ROM): $(IHX) $(B)/data.stamp docs/MEMORY_MAP.md tools/link_rom.py tools/ram_used.py tools/check_banks.py
+	$(PYTHON) tools/check_banks.py $(B)/kernel.map $(BANKSMK) $(B)/obj
 	$(PYTHON) tools/link_rom.py rom $(IHX) $@
 	@$(PYTHON) tools/ram_used.py $(B)/kernel.map
 
@@ -67,11 +89,11 @@ $(DSK): tools/mkblank_dsk.py
 
 # ---- PC 単体テスト ----
 TESTS := $(wildcard tests/test_*.c)
-test:
+test: $(B)/data.stamp
 	@mkdir -p $(B)/tests
 	@set -e; for t in $(TESTS); do \
 	  n=$$(basename $$t .c); \
-	  gcc -std=c99 -Wall -Wextra -Werror -Isrc -o $(B)/tests/$$n $$t src/core/*.c; \
+	  gcc -std=c99 -Wall -Wextra -Werror -Isrc -o $(B)/tests/$$n $$t src/core/*.c tests/tables_pc.c; \
 	  $(B)/tests/$$n; \
 	done
 
@@ -100,6 +122,19 @@ check-nodisk: all
 	  -script $(abspath openmsx/check.tcl) >/dev/null 2>&1
 	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run3" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
 	@cat $(B)/run3/check.txt
+
+# Phase1 の受け入れ: 30 分（エミュレータ時間）自動で遊び、保存・リセット・読み込みを繰り返す
+DURATION ?= 1800
+play: all
+	@rm -rf $(B)/run4 && mkdir -p $(B)/run4
+	@cp $(ROM) $(B)/run4/TurboGuild.rom
+	@$(PYTHON) tools/mkblank_dsk.py $(B)/run4/save.dsk >/dev/null
+	-OUT=$(abspath $(B))/run4/play.txt MAP=$(abspath $(B))/kernel.map DURATION=$(DURATION) $(if $(TRACE),TRACE=1) timeout 1500 \
+	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run4/TurboGuild.rom -romtype ASCII8 \
+	  -diska $(abspath $(B))/run4/save.dsk -script $(abspath openmsx/play.tcl) >/dev/null 2>&1
+	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run4" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
+	@cat $(B)/run4/play.txt
+	@tail -1 $(B)/run4/play.txt | grep -q "RESULT PASS"
 
 check-msx2: all
 	@rm -rf $(B)/run2 && mkdir -p $(B)/run2

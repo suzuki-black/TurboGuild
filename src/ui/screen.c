@@ -1,10 +1,12 @@
-/* screen.c — 画面遷移と、どの画面でも使う見出し・帯の描画 */
+/* screen.c — 画面遷移とメインループ。1 秒ごとに RTC からゲーム時間を進める */
 #include "screen.h"
 #include "../ram.h"
+#include "../config.h"
+#include "../core/time.h"
 #include "../sys/vdp.h"
-#include "../sys/font.h"
 #include "../sys/input.h"
 #include "../sys/psg.h"
+#include "../sys/rtc.h"
 
 #define cur      g_screen_cur
 #define next_scr g_screen_next
@@ -21,34 +23,31 @@ static void apply_change(void)
     g_dirty = 1;
 }
 
+void time_sync(void)
+{
+    u32 now = rtc_now_secs();
+    u8 st;
+    g_save.g_time = time_advance(g_save.g_time, g_save.real_time_last, now, &st);
+    g_save.real_time_last = now;
+}
+
 void screen_run(void)
 {
     for (;;) {
         vdp_wait_vsync();
         input_update();
         psg_tick();
+        if (++g_frames >= 60) {
+            g_frames = 0;
+            time_sync();
+        }
         if (next_scr) apply_change();
+        g_ui_state = UIS_IDLE;
         cur->update();
-        if (g_dirty) {
+        if (g_dirty && !next_scr) {
             g_dirty = 0;
+            g_ui_state = UIS_BUSY;
             cur->draw();
         }
     }
-}
-
-void ui_clear(void)
-{
-    vdp_fill(0, 0, SCREEN_W, SCREEN_H, 1);
-}
-
-void ui_header(const char *title)
-{
-    vdp_fill(0, 0, SCREEN_W, 8, 4);
-    font_puts(0, 0, title, 15, 4);
-}
-
-void ui_footer(const char *help)
-{
-    vdp_fill(0, 200, SCREEN_W, 12, 4);
-    font_puts(0, 25, help, 15, 4);
 }

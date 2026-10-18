@@ -45,6 +45,7 @@ _bios_redclk:
 	and	a, #0x0F
 	pop	iy
 	pop	ix
+	ei			; ★EXTROM(CALSLT) は割り込み禁止のまま戻る。戻さないと JIFFY が止まりフレーム待ちで固まる
 	ret
 
 ; u8 bios_phydio(DiskReq *r)  HL -> { u8 write; u8 drive; u8 count; u8 media;

@@ -1,0 +1,195 @@
+/* test_game.c — 戦闘・AP・クエスト・ガチャ・ログインボーナス・デッキ（表は build/ の .bin の実物） */
+#include "check.h"
+#include "core/battle.h"
+#include "core/deck.h"
+#include "core/gacha.h"
+#include "core/inventory.h"
+#include "core/login.h"
+#include "core/player.h"
+#include "core/quest.h"
+#include "core/save.h"
+#include "core/tables.h"
+#include "core/time.h"
+
+static void fresh(void) { save_new(&g_save, 1000); }
+
+static void test_struct_sizes(void)
+{
+    /* 生成ヘッダは PC でも詰めて並べる（ROM のバイナリをそのまま読むため） */
+    CHECK(sizeof(CardRec) == 18);
+    CHECK(sizeof(StageRec) == 15);
+    CHECK(sizeof(GachaRec) == 18);
+}
+
+static void test_battle(void)
+{
+    BattleIn in = { 1000, 500, 300, 3990, 100, 300 };
+    BattleOut o;
+    battle_run(&in, &o);
+    CHECK(o.dmg_per_turn == 900 && o.turns == 5 && o.taken_total == 0 && o.win);
+    in.enemy_atk = 600;                       /* 毎ターン 100 × 5 = 500 >= 300 → 負け */
+    battle_run(&in, &o);
+    CHECK(o.taken_total == 500 && !o.win);
+    in.deck_atk = 50;                         /* 防御を抜けなくても最低 1 */
+    in.enemy_atk = 0;
+    battle_run(&in, &o);
+    CHECK(o.dmg_per_turn == 1 && o.turns == 3990 && o.win);
+}
+
+static void test_elem(void)
+{
+    CHECK(elem_pct(0, 2) == 120);   /* 炎 > 雷 */
+    CHECK(elem_pct(2, 1) == 120);   /* 雷 > 水 */
+    CHECK(elem_pct(1, 0) == 120);   /* 水 > 炎 */
+    CHECK(elem_pct(2, 0) == 80);    /* 雷 < 炎 */
+    CHECK(elem_pct(3, 4) == 120 && elem_pct(4, 3) == 120);
+    CHECK(elem_pct(3, 3) == 100 && elem_pct(0, 3) == 100);
+    CHECK(elem_pct(0, ELEM_NONE) == 100);
+}
+
+static void test_ap(void)
+{
+    fresh();
+    g_save.ap = 10;
+    g_save.ap_gtime = 0;
+    g_save.g_time = AP_RECOVER_GSEC * 3 + 5;   /* 3 回復 + 端数 */
+    player_ap_update();
+    CHECK(g_save.ap == 13 && g_save.ap_gtime == AP_RECOVER_GSEC * 3);
+    g_save.g_time += AP_RECOVER_GSEC * 1000;
+    player_ap_update();
+    CHECK(g_save.ap == AP_MAX);
+    /* レベルアップで全回復 */
+    g_save.ap = 0;
+    CHECK(player_add_exp(EXP_NEED(1)) == 1 && g_save.level == 2 && g_save.ap == AP_MAX);
+    CHECK(player_add_exp(EXP_NEED(2) + EXP_NEED(3)) == 2 && g_save.level == 4 && g_save.exp == 0);
+}
+
+static void test_inventory(void)
+{
+    u16 i;
+    fresh();
+    for (i = 0; i < CARD_MAX; i++) CHECK(inv_add(1) == i);
+    CHECK(inv_add(1) == INV_FULL);
+    g_save.deck[0] = 5; g_save.deck[1] = 10; g_save.deck[2] = 199;
+    inv_remove(5);
+    CHECK(g_save.deck[0] == DECK_EMPTY && g_save.deck[1] == 9 && g_save.deck[2] == 198);
+    CHECK(g_save.card_count == CARD_MAX - 1 && inv_in_deck(9) == 2);
+}
+
+static void test_quest(void)
+{
+    QuestResult r;
+    u16 n;
+    fresh();
+    inv_add(39); inv_add(40); inv_add(33);    /* SSR 2 枚 + SR */
+    deck_auto();
+    CHECK(g_save.deck[0] != DECK_EMPTY);
+    quest_run(2, &r);
+    CHECK(r.status == Q_LOCKED);              /* まだ 1 しか挑戦できない */
+    quest_run(1, &r);
+    CHECK(r.status == Q_OK && r.b.win && g_save.stage_cleared == 1);
+    CHECK(r.ap_used == 3 && g_save.ap == AP_MAX - 3);
+    CHECK(r.gold == 20 && g_save.gold == START_GOLD + 20);
+    /* AP 切れ */
+    g_save.ap = 2;
+    quest_run(2, &r);
+    CHECK(r.status == Q_NO_AP && g_save.ap == 2 && g_save.stage_cleared == 1);
+    /* エリア 1 のボスまで進むとエリアクリア、ボスは R を 100% 落とす */
+    g_save.ap = AP_MAX;
+    for (n = 2; n <= 10; n++) { g_save.ap = AP_MAX; quest_run(n, &r); CHECK(r.b.win); }
+    CHECK(r.area_cleared && r.drop_card >= 21 && r.drop_card <= 32);
+    CHECK(quest_max_stage() == 11);
+}
+
+static void test_gacha(void)
+{
+    GachaReq g;
+    long hist[4] = {0};
+    CardRec c;
+    int i, j;
+    fresh();
+    g_save.gems = 1000000;
+    /* プレミア 1 回 × 20000: SSR 1% / SR 5% / R 20% / N 74%（天井で SSR が少し増える） */
+    for (i = 0; i < 20000; i++) {
+        g.gacha = 3; g.count = 1;
+        gacha_roll(&g);
+        tbl_card(g.ids[0], &c);
+        hist[c.rarity]++;
+    }
+    CHECK(hist[3] > 150 && hist[3] < 350);
+    CHECK(hist[2] > 800 && hist[2] < 1200);
+    CHECK(hist[0] > 14000 && hist[0] < 15600);
+    /* 10 連は SR 以上が必ず 1 枚 */
+    for (i = 0; i < 2000; i++) {
+        int best = 0;
+        g.gacha = 1; g.count = 10;
+        gacha_roll(&g);
+        for (j = 0; j < 10; j++) { tbl_card(g.ids[j], &c); if (c.rarity > best) best = c.rarity; }
+        CHECK(best >= RARITY_SR);
+    }
+    /* 天井: 100 連目までに必ず SSR */
+    g_save.pity_count = 0;
+    g_save.rng_gacha = 12345;
+    for (i = 0; i < 200; i++) {
+        g.gacha = 3; g.count = 1;
+        gacha_roll(&g);
+        CHECK(g_save.pity_count < 100);
+    }
+    /* 支払いと所持 */
+    fresh();
+    g.gacha = 3; g.count = 10;
+    gacha_pull(&g);
+    CHECK(g.status == G_OK && g.got == 10 && g_save.card_count == 10 && g_save.gems == START_GEMS - 2700);
+    g.gacha = 2; g.count = 10;
+    gacha_pull(&g);
+    CHECK(g.status == G_UNAVAILABLE);         /* ゴールドに 10 連は無い */
+    g.gacha = 1; g.count = 1;
+    gacha_pull(&g);
+    CHECK(g.status == G_OK);
+    gacha_pull(&g);
+    CHECK(g.status == G_FREE_USED);           /* 同じゲーム日にもう 1 回は不可 */
+    g_save.g_time += GSEC_PER_DAY;
+    gacha_pull(&g);
+    CHECK(g.status == G_OK);
+    g.gacha = 6; g.count = 1;
+    gacha_pull(&g);
+    CHECK(g.status == G_NO_MONEY);            /* SR 確定チケットが無い */
+    g_save.sr_tickets = 1;
+    gacha_pull(&g);
+    tbl_card(g.ids[0], &c);
+    CHECK(g.status == G_OK && c.rarity >= RARITY_SR && g_save.sr_tickets == 0);
+}
+
+static void test_login(void)
+{
+    LoginResult r;
+    int d;
+    fresh();
+    login_check(&r);
+    CHECK(r.given && r.day == 1 && r.item == ITEM_GOLD && g_save.gold == START_GOLD + 1000);
+    login_check(&r);
+    CHECK(!r.given);                           /* 同じ日は 1 回 */
+    for (d = 2; d <= 8; d++) {
+        g_save.g_time += GSEC_PER_DAY;
+        login_check(&r);
+        CHECK(r.given && r.day == (d - 1) % 7 + 1);
+    }
+    CHECK(g_save.sr_tickets == 1 && g_save.potions == 4 && g_save.gacha_tickets == 1);
+    g_save.g_time += GSEC_PER_DAY * 30;        /* 何日空いても 1 回分 */
+    login_check(&r);
+    CHECK(r.given && r.day == 2);
+}
+
+int main(void)
+{
+    test_struct_sizes();
+    test_battle();
+    test_elem();
+    test_ap();
+    test_inventory();
+    test_quest();
+    test_gacha();
+    test_login();
+    CHECK_DONE("game");
+    return 0;
+}

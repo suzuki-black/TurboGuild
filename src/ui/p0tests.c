@@ -1,5 +1,8 @@
 /* p0tests.c — Phase0 の試験画面（カード表・入力/音）。コードバンク 1 に載る */
 #include "screen.h"
+#include "../far.h"
+#include "../data/screens.h"
+#include "../sys/vdp.h"
 #include "../ram.h"
 #include "../config.h"
 #include "../data/cards.h"
@@ -15,13 +18,13 @@
 
 static const char * const rar_names[4] = { "N", "R", "SR", "SSR" };
 
-static void card_draw(void)
+FAR(void, p0card_draw, (void))
 {
     const u16 *count;
     const CardRec *c;
     u16 i;
-    ui_clear();
-    ui_header("CARD TABLE (ROM)");
+    vdp_fill(0, 0, SCREEN_W, SCREEN_H, 1);
+    dbg_header("CARD TABLE (ROM)");
     bank_dataA(PAGE_CARDS);
     count = (const u16 *)(WIN_DATAA + PAGE_HDR_SIZE);
     c = (const CardRec *)(WIN_DATAA + PAGE_HDR_SIZE + 2);
@@ -39,10 +42,11 @@ static void card_draw(void)
         font_putdec(24, y, c->skill, 15, 1);
         font_putdec(27, y, c->max_lv, 15, 1);
     }
-    ui_footer("ESC:BACK");
+    dbg_footer("ESC:BACK");
 }
 
-const Screen scr_cardtest = { 0, back_on_cancel, card_draw, 0 };
+FAR(void, p0_back, (void)) { back_on_cancel(); }
+SCREEN(scr_cardtest, 0, p0_back, p0card_draw, 0)
 
 /* ---- 入力と音: 押されているボタンを表示し、押した瞬間に音を鳴らす ---- */
 
@@ -58,7 +62,7 @@ static void input_draw_state(void)
     }
 }
 
-static void input_update_scr(void)
+FAR(void, p0input_update, (void))
 {
     u8 p = input_pressed();
     if (p & ~BTN_CANCEL) psg_beep((u16)(0x80 + (p << 4)), 4);
@@ -69,12 +73,12 @@ static void input_update_scr(void)
     back_on_cancel();
 }
 
-static void input_draw(void)
+FAR(void, p0input_draw, (void))
 {
-    ui_clear();
-    ui_header("INPUT / SOUND");
+    vdp_fill(0, 0, SCREEN_W, SCREEN_H, 1);
+    dbg_header("INPUT / SOUND");
     input_draw_state();
-    ui_footer("ESC:BACK (KEYS / JOY1)");
+    dbg_footer("ESC:BACK (KEYS / JOY1)");
 }
 
-const Screen scr_inputtest = { 0, input_update_scr, input_draw, 0 };
+SCREEN(scr_inputtest, 0, p0input_update, p0input_draw, 0)

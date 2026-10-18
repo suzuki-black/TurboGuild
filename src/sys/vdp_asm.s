@@ -13,7 +13,7 @@ VDP_IND  = 0x9B
 	.globl	_vdp_cmd
 	.globl	_vdp_wait_cmd
 	.globl	_vdp_palette
-	.globl	_vdp_put8x8
+	.globl	_vdp_put_rect
 
 	.area	_CODE
 
@@ -119,16 +119,31 @@ _vdp_palette:
 	ei
 	ret
 
-; void vdp_put8x8(u16 addr, const u8 *buf)   HL=左上の VRAM アドレス, DE=4 バイト × 8 行
-; SCREEN5 は 1 行 128 バイトなので行ごとにアドレスを設定し直す。1 文字 = 1 回の di 区間。
-_vdp_put8x8:
+; void vdp_put_rect(const VdpRect *r)   HL -> { u16 addr; const u8 *buf; u8 w; u8 h; }
+; SCREEN5 の矩形（w バイト × h 行）を CPU で書く。1 行 128 バイトなので行ごとにアドレスを設定し直す。
+; 1 回の呼び出し = 1 つの di 区間。
+_vdp_put_rect:
+	ld	e, (hl)
+	inc	hl
+	ld	d, (hl)			; DE = VRAM アドレス
+	inc	hl
+	ld	a, (hl)
+	inc	hl
+	ld	b, (hl)
+	inc	hl
+	push	bc			; B = buf 上位
+	ld	c, a			; C = buf 下位
+	ld	a, (hl)			; w
+	ld	(r_w), a
+	inc	hl
+	ld	a, (hl)			; h
+	pop	hl
+	ld	l, c			; HL = buf
 	di
+	push	af
 	call	wait_cmd_raw
-	ex	de, hl			; HL=buf, DE=addr
-	ld	c, #VDP_DATA
-	ld	a, #8
+	pop	af
 1$:	push	af
-	push	hl
 	ex	de, hl
 	call	setw_raw
 	ld	a, #128
@@ -137,11 +152,15 @@ _vdp_put8x8:
 	jr	nc, 2$
 	inc	h
 2$:	ex	de, hl
-	pop	hl
-	ld	b, #4
+	ld	a, (r_w)
+	ld	b, a
+	ld	c, #VDP_DATA
 	otir
 	pop	af
 	dec	a
 	jr	nz, 1$
 	ei
 	ret
+
+	.area	_DATA
+r_w:	.ds	1

@@ -34,7 +34,8 @@ static u8 read_joy(void)
 
 void input_update(void)
 {
-    u8 now = read_keys() | read_joy();
+    u8 now = read_keys() | read_joy() | g_test_keys;   /* g_test_keys: 自動テストが 1 フレームだけ押す */
+    g_test_keys = 0;
     g_input_pressed = now & (u8)~g_input_held;
     g_input_held = now;
 }

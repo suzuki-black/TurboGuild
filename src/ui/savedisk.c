@@ -2,6 +2,7 @@
  * 書くたびに A/B を交互にし、読むときは CRC が通るうち g_time の大きい方を採る。
  * セーブ用バッファは g_save 1 面だけなので、比較のために読み直すことがある。 */
 #include "savedisk.h"
+#include "../far.h"
 #include "../ram.h"
 #include "../sys/disk.h"
 #include "../sys/rtc.h"
@@ -70,7 +71,7 @@ static u8 load_best(void)
     return 1;
 }
 
-void savedisk_boot(void)
+FAR(void, savedisk_boot, (void))
 {
     u32 now = rtc_now_secs();
     u8 e = disk_read(SEC_ID, 1, g_sector);
@@ -101,7 +102,7 @@ static u8 write_id(void)
     return disk_write(SEC_ID, 1, g_sector);
 }
 
-u8 savedisk_save(void)
+FAR(u8, savedisk_save, (void))
 {
     u8 e;
     if (g_save_status == SD_NOID || g_save_status == SD_NODISK) {
