@@ -1,0 +1,4 @@
+build/
+bin/
+.claude/settings.local.json
+src/data/*.h
