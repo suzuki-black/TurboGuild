@@ -32,8 +32,22 @@ static u8 read_joy(void)
     return b;
 }
 
+/* キーマトリクス行 0 = 0〜7, 行 1 の bit0/1 = 8, 9 */
+static u16 read_digits(void)
+{
+    return (u16)((u8)~bios_snsmat(0) | (((u8)~bios_snsmat(1) & 3) << 8));
+}
+
 void input_update(void)
 {
+    u16 d = read_digits();
+    u16 edge = d & (u16)~g_digit_held;
+    u8 i;
+    g_digit_held = d;
+    g_digit_pressed = NO_DIGIT;
+    for (i = 0; i < 10; i++) {
+        if (edge & (1u << i)) { g_digit_pressed = i; break; }
+    }
     u8 now = read_keys() | read_joy() | g_test_keys;   /* g_test_keys: 自動テストが 1 フレームだけ押す */
     g_test_keys = 0;
     g_input_pressed = now & (u8)~g_input_held;
@@ -42,3 +56,4 @@ void input_update(void)
 
 u8 input_held(void)    { return g_input_held; }
 u8 input_pressed(void) { return g_input_pressed; }
+u8 input_digit(void)   { return g_digit_pressed; }

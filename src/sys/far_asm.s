@@ -1,7 +1,8 @@
 ; far_asm.s — コードバンク間呼び出しのトランポリン（DECISIONS #14）
 ; 窓 6000h を呼び先のバンクに切り替えて呼び、戻ったら呼び出し元のバンクに戻す。
-; スタブ（tools/gen_far.py が生成）は次の形で来る:
-;     push hl / ld hl,#desc / jp far_tramp      desc = { .dw 関数, .db バンク }
+; スタブ（tools/gen_far.py が生成）は 6 バイト:
+;     call far_tramp / .dw 関数 / .db バンク
+; call の戻り番地がそのまま {関数, バンク} を指すので、それを読んで本当の戻り番地は 1 段上。
 ; 引数はレジスタだけ（A, L, HL, DE）。スタック引数があると位置がずれるので gen_far.py が禁止する。
 ; 戻り値 A / DE / HLDE を壊さないよう、戻り道では BC と退避用 RAM だけを使う。
 
@@ -15,6 +16,7 @@ BANK_CODE = 0x6800
 	.area	_CODE
 
 far_tramp:
+	ex	(sp), hl		; HL = {関数, バンク} の位置、スタック = 引数の HL
 	ld	(t_a), a
 	ld	a, (hl)
 	ld	(t_fn), a

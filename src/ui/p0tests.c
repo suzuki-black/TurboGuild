@@ -28,19 +28,19 @@ FAR(void, p0card_draw, (void))
     bank_dataA(PAGE_CARDS);
     count = (const u16 *)(WIN_DATAA + PAGE_HDR_SIZE);
     c = (const CardRec *)(WIN_DATAA + PAGE_HDR_SIZE + 2);
-    font_puts(1, 2, "COUNT", 7, 1);
-    font_putdec(7, 2, *count, 15, 1);
-    font_puts(1, 4, "ID RAR EL  ATK  DEF CO SK LV", 7, 1);
+    font_puts(1, 2, "COUNT", 3, 1);
+    font_putdec(7, 2, *count, 4, 1);
+    font_puts(1, 4, "ID RAR EL  ATK  DEF CO SK LV", 3, 1);
     for (i = 0; i < *count && i < 18; i++, c++) {
         u8 y = (u8)(5 + i);
-        font_putdec(1, y, c->id, 15, 1);
-        font_puts(4, y, c->rarity < 4 ? rar_names[c->rarity] : "?", c->rarity >= 2 ? 11 : 15, 1);
-        font_putdec(8, y, c->element, 15, 1);
-        font_putdec(11, y, c->atk, 15, 1);
-        font_putdec(16, y, c->def, 15, 1);
-        font_putdec(21, y, c->cost, 15, 1);
-        font_putdec(24, y, c->skill, 15, 1);
-        font_putdec(27, y, c->max_lv, 15, 1);
+        font_putdec(1, y, c->id, 4, 1);
+        font_puts(4, y, c->rarity < 4 ? rar_names[c->rarity] : "?", c->rarity >= 2 ? 9 : 4, 1);
+        font_putdec(8, y, c->element, 4, 1);
+        font_putdec(11, y, c->atk, 4, 1);
+        font_putdec(16, y, c->def, 4, 1);
+        font_putdec(21, y, c->cost, 4, 1);
+        font_putdec(24, y, c->skill, 4, 1);
+        font_putdec(27, y, c->max_lv, 4, 1);
     }
     dbg_footer("ESC:BACK");
 }
@@ -58,7 +58,7 @@ static void input_draw_state(void)
     u8 i;
     for (i = 0; i < 6; i++) {
         u8 on = (u8)(h & (1 << i));
-        font_puts(2, (u8)(4 + i), btn_names[i], on ? 11 : 14, 1);
+        font_puts(2, (u8)(4 + i), btn_names[i], on ? 9 : 3, 1);
     }
 }
 

@@ -1,5 +1,5 @@
-/* home.c — ホーム。上に名前・Lv・AP と所持金、中央にメニュー、下にお知らせ（仕様 §9）。
- * 入るたびにログインボーナスを確かめ、保存していない変更があれば「通信中…」で保存する。 */
+/* home.c — マイページ。左にリーダーカードの絵、右に状態のゲージ、中段にバナー、
+ * 下に数字キーつきのアイコンメニュー（携帯の 1〜8 キーで直接選べる）、最下段に流れるお知らせ。 */
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
@@ -7,44 +7,86 @@
 #include "../core/login.h"
 #include "../core/player.h"
 #include "../core/time.h"
+#include "../core/wallet.h"
 #include "../data/screens.h"
 #include "../data/text_ids.h"
+#include "../sys/gfx.h"
 #include "../sys/input.h"
 #include "../sys/psg.h"
 #include "../sys/text.h"
+#include "../sys/vdp.h"
 
-#define ITEMS  6
-#define MENU_Y ROW(4)
+#define ITEMS    8
+#define MENU_Y   118
+#define CELL_W   64
+#define CELL_H   39
+#define BANNER_Y 92
+#define TICK_Y   ROW_LAST
 
-static const u16 items[ITEMS] = {
-    T_HOME_QUEST, T_HOME_GACHA, T_HOME_CARD, T_HOME_SHOP, T_HOME_SAVE, T_HOME_TITLE,
+static const u16 labels[ITEMS] = {
+    T_M_QUEST, T_M_GACHA, T_M_CARD, T_M_DECK, T_M_SHOP, T_M_LOGIN, T_M_SAVE, T_M_TITLE,
+};
+/* アイコンはアトラスの位置（x, y）。並びは labels と同じ */
+static const u8 icons[ITEMS][2] = {
+    { ATL_ICON_QUEST_X, ATL_ICON_QUEST_Y }, { ATL_ICON_GACHA_X, ATL_ICON_GACHA_Y },
+    { ATL_ICON_CARDS_X, ATL_ICON_CARDS_Y }, { ATL_ICON_DECK_X, ATL_ICON_DECK_Y },
+    { ATL_ICON_SHOP_X, ATL_ICON_SHOP_Y },   { ATL_ICON_LOGIN_X, ATL_ICON_LOGIN_Y },
+    { ATL_ICON_SAVE_X, ATL_ICON_SAVE_Y },   { ATL_ICON_TITLE_X, ATL_ICON_TITLE_Y },
 };
 
-static void draw_info(void)
+static void cell(u8 i)
 {
-    u8 cx;
-    ui_fill_rows(ROW(10), 1, COL_BLACK);
-    cx = txt_num(1, ROW(10), time_gday(g_save.g_time) + 1, COL_WHITE, COL_BLACK);
-    cx = txt_id(cx, ROW(10), T_DAY, COL_GRAY, COL_BLACK);
-    cx = txt_id((u8)(cx + 2), ROW(10), T_CARDS, COL_GRAY, COL_BLACK);
-    cx = txt_num((u8)(cx + 1), ROW(10), g_save.card_count, COL_WHITE, COL_BLACK);
-    cx = txt_draw(cx, ROW(10), "/", COL_GRAY, COL_BLACK);
-    txt_num(cx, ROW(10), CARD_MAX, COL_GRAY, COL_BLACK);
+    u8 x = (u8)((i % 4) * CELL_W), y = (u8)(MENU_Y + (i / 4) * CELL_H);
+    u8 on = (u8)(i == g_cursor);
+    u8 bg = on ? COL_BLUE : COL_DBLUE;
+    u8 w = txt_id_width(labels[i]);
+    ui_box(x, y, CELL_W, CELL_H, bg, on ? COL_YELLOW : COL_DGRAY);
+    gfx_sprite(icons[i][0], icons[i][1], 24, 24, (u8)(x + 20), (u8)(y + 2));
+    ui_key((u8)(i + 1), (u8)(x + 4), (u8)(y + 4));
+    txt_id((u8)((x + (CELL_W - w * 8) / 2) / 8), (u8)(y + 22), labels[i], on ? COL_YELLOW : COL_WHITE, bg);
+}
+
+static void leader(void)
+{
+    u8 i = g_save.deck[0];
+    ui_box(0, 16, 64, 76, COL_BLACK, COL_DGRAY);
+    if (i != DECK_EMPTY && i < g_save.card_count) gfx_card(g_save.cards[i].id, 4, 18);
+}
+
+/* 開催中のイベントのバナー（Phase2 でイベントが入る）。今はサービス開始記念の告知 */
+static void banner(void)
+{
+    u8 k;
+    for (k = 0; k < 4; k++) vdp_fill(0, (u16)(BANNER_Y + k * 6), SCREEN_W, 6, (u8)(k & 1 ? COL_RED : COL_DRED));
+    vdp_fill(0, BANNER_Y + 24, SCREEN_W, 2, COL_YELLOW);
+    gfx_sprite(ATL_ICON_GACHA, 4, BANNER_Y);
+    txt_id(4, BANNER_Y + 4, T_NEWS_0, COL_YELLOW, COL_DRED);
+    gfx_sprite(ATL_SPARK, 240, BANNER_Y + 2);
+}
+
+/* お知らせを右から左へ流す（携帯サイトの「マーキー」）。1 回に 1 文字ぶん送り、右端に次の字を足す。
+ * 文の終わりのあとは数文字ぶん空けてから先頭に戻る */
+static void ticker(void)
+{
+    const char *s = txt_ptr(T_NEWS_0);
+    char ch[3];
+    u8 c, w;
+    c = (u8)s[g_ticker];
+    if (c == 0) {
+        if (++g_ticker_gap < 6) { c = ' '; } else { g_ticker = 0; g_ticker_gap = 0; c = (u8)s[0]; }
+    }
+    w = (c >= 0x81 && c <= 0x9F) || c >= 0xE0 ? 2 : 1;
+    gfx_move((u8)(w * 8), TICK_Y, (u8)(SCREEN_W - w * 8), 16, 0, TICK_Y);
+    ch[0] = (char)c;
+    ch[1] = w == 2 ? s[g_ticker + 1] : 0;
+    ch[2] = 0;
+    txt_draw((u8)(32 - w), TICK_Y, ch, COL_YELLOW, COL_DGRAY);
+    if (c != ' ' || g_ticker_gap == 0) g_ticker = (u8)(g_ticker + w);
 }
 
 static void show_login_bonus(void)
 {
-    u8 cx;
-    ui_fill_rows(ROW(4), 5, COL_BLACK);
-    ui_fill_rows(ROW(4), 1, COL_DRED);
-    txt_id(1, ROW(4), T_LOGIN_TITLE, COL_LYELLOW, COL_DRED);
-    cx = txt_num(3, ROW(6), g_login.day, COL_WHITE, COL_BLACK);
-    txt_id(cx, ROW(6), T_LOGIN_DAY, COL_WHITE, COL_BLACK);
-    cx = txt_id(3, ROW(7), (u16)(T_ITEM_0 + g_login.item), COL_LYELLOW, COL_BLACK);
-    cx = txt_draw((u8)(cx + 1), ROW(7), "x", COL_GRAY, COL_BLACK);
-    txt_num(cx, ROW(7), g_login.amount, COL_WHITE, COL_BLACK);
-    psg_beep(0x060, 12);
-    ui_wait_key();
+    screen_change(&scr_login);
 }
 
 FAR(void, home_init, (void))
@@ -52,43 +94,44 @@ FAR(void, home_init, (void))
     g_cursor = g_menu_pos;
     player_ap_update();
     login_check(&g_login);
-    if (g_login.given) g_save_dirty = 1;
-    g_ui_prev = g_save.ap;
+    g_paid = wallet_payday();
+    if (g_login.given || g_paid) g_save_dirty = 1;
+    if (g_save_dirty) ui_saving();
 }
 
 FAR(void, home_draw, (void))
 {
+    u8 i, cx;
     ui_clear();
-    ui_status(ROW(0));
-    ui_money(ROW(1));
-    ui_fill_rows(ROW(2), 1, COL_DRED);
-    txt_id(1, ROW(2), T_BANNER_NONE, COL_WHITE, COL_DRED);
-    if (g_login.given) {
-        show_login_bonus();
-        g_login.given = 0;
-        ui_money(ROW(1));
-        ui_fill_rows(ROW(4), 5, COL_BLACK);
-    }
-    ui_menu_draw(9, MENU_Y, items, ITEMS, g_cursor);
-    draw_info();
-    ui_footer(T_HELP_SELECT);
-    if (g_save_dirty) ui_saving();     /* 「通信中…」は ROW(11) を使うので、お知らせはその後 */
-    txt_id(0, ROW(11), T_NEWS_0, COL_GRAY, COL_BLACK);
+    ui_header(T_MYPAGE);
+    cx = txt_num(24, 0, time_gday(g_save.g_time) + 1, COL_YELLOW, COL_DBLUE);
+    txt_id(cx, 0, T_DAY, COL_WHITE, COL_DBLUE);
+    leader();
+    ui_status_block(20);
+    banner();
+    for (i = 0; i < ITEMS; i++) cell(i);
+    vdp_fill(0, TICK_Y, SCREEN_W, 16, COL_DGRAY);
+    g_ticker = 0;
+    g_ticker_gap = 0;
+    if (g_paid) { g_paid = 0; ui_msg(T_PAYDAY); return; }
+    if (g_login.given) show_login_bonus();
 }
 
 static void open(u8 i)
 {
     g_menu_pos = i;
+    psg_beep(0x80, 4);
     switch (i) {
     case 0: screen_change(&scr_area); break;
     case 1: screen_change(&scr_gacha); break;
     case 2: screen_change(&scr_cardlist); break;
-    case 3: screen_change(&scr_shop); break;
-    case 4:
+    case 3: screen_change(&scr_deck); break;
+    case 4: screen_change(&scr_shop); break;
+    case 5: screen_change(&scr_login); break;
+    case 6:
         g_save_dirty = 1;
         ui_saving();
         if (!g_save_dirty) ui_msg(T_SAVED);
-        txt_id(0, ROW(11), T_NEWS_0, COL_GRAY, COL_BLACK);
         break;
     default: screen_change(&scr_title); break;
     }
@@ -97,17 +140,19 @@ static void open(u8 i)
 FAR(void, home_update, (void))
 {
     u8 p = input_pressed();
-    if (ui_menu_input(&g_cursor, ITEMS, p)) ui_menu_draw(9, MENU_Y, items, ITEMS, g_cursor);
-    if (p & BTN_OK) {
-        psg_beep(0x80, 4);
-        open(g_cursor);
-    }
+    u8 d = input_digit();
+    u8 old = g_cursor;
+    if (p & BTN_LEFT)  g_cursor = (u8)((g_cursor + ITEMS - 1) % ITEMS);
+    if (p & BTN_RIGHT) g_cursor = (u8)((g_cursor + 1) % ITEMS);
+    if (p & (BTN_UP | BTN_DOWN)) g_cursor = (u8)((g_cursor + 4) % ITEMS);
+    if (old != g_cursor) { psg_beep(0x100, 2); cell(old); cell(g_cursor); }
+    if (d >= 1 && d <= ITEMS) { g_cursor = (u8)(d - 1); cell(old); cell(g_cursor); open(g_cursor); return; }
+    if (p & BTN_OK) { open(g_cursor); return; }
+    if ((g_frames & 15) == 0) ticker();
     if (g_frames == 0) {           /* 1 秒に 1 回: AP の回復を反映 */
+        u8 ap = g_save.ap;
         player_ap_update();
-        if (g_save.ap != g_ui_prev) {
-            g_ui_prev = g_save.ap;
-            ui_status(ROW(0));
-        }
+        if (g_save.ap != ap) ui_status_block(20);
     }
 }
 

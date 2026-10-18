@@ -44,3 +44,5 @@ void tbl_area(u8 a, AreaRec *out)    { rec("areas.bin", a - 1, out, sizeof *out)
 void tbl_stage(u16 n, StageRec *out) { rec("stages.bin", n - 1, out, sizeof *out); }
 void tbl_gacha(u8 id, GachaRec *out) { rec("gacha.bin", id - 1, out, sizeof *out); }
 void tbl_login(u8 d, LoginRec *out)  { rec("login.bin", d - 1, out, sizeof *out); }
+void tbl_course(u8 id, CourseRec *out) { rec("courses.bin", id - 1, out, sizeof *out); }
+void tbl_pack(u8 id, PackRec *out)     { rec("packs.bin", id - 1, out, sizeof *out); }

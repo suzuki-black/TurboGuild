@@ -1,87 +1,114 @@
-/* gacha_ui.c — ガチャの選択 → 1 回 / 10 連 → 結果（仕様 §4.3）。
- * イベントガチャ（id 4）はイベントが始まる Phase2 まで一覧に出さない。 */
+/* gacha_ui.c — ガチャのバナー一覧（数字キー 1〜5）→ 1 回 / 10 連 → 開封演出 → 結果。
+ * イベントガチャ（id 4）はイベントが始まる Phase2 まで出さない。 */
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
 #include "../ram.h"
 #include "../core/gacha.h"
 #include "../core/tables.h"
+#include "../core/time.h"
 #include "../data/screens.h"
 #include "../data/text_ids.h"
+#include "../sys/gfx.h"
 #include "../sys/input.h"
 #include "../sys/psg.h"
 #include "../sys/text.h"
+#include "../sys/vdp.h"
 
-#define KINDS   5
-#define MENU_Y  ROW(3)
+void gacha_show(u8 kind);
+
+#define KINDS    5
+#define BANNER_Y 18
+#define BANNER_H 34
 
 static const u8 kinds[KINDS] = { 1, 2, 3, 5, 6 };
-static const u16 cur_name[5] = { 0, T_GOLD, T_GEMS, T_TICKET, T_SRTICKET };
+/* バナーの 2 色（縞）と、左の絵 */
+static const u8 stripe[KINDS][2] = {
+    { COL_DGREEN, COL_GREEN }, { COL_DRED, COL_ORANGE }, { COL_DBLUE, COL_PURPLE },
+    { COL_DBLUE, COL_BLUE }, { COL_ORANGE, COL_YELLOW },
+};
+static const u8 art[KINDS][4] = {
+    { ATL_ICON_GACHA }, { ATL_ITEM_GOLD }, { ATL_CIRCLE }, { ATL_SCROLL }, { ATL_ITEM_SRTICKET },
+};
+static const u8 cur_icon[5][2] = {
+    { 0, 0 }, { ATL_ITEM_GOLD_X, ATL_ITEM_GOLD_Y }, { ATL_ITEM_GEMS_X, ATL_ITEM_GEMS_Y },
+    { ATL_ITEM_TICKET_X, ATL_ITEM_TICKET_Y }, { ATL_ITEM_SRTICKET_X, ATL_ITEM_SRTICKET_Y },
+};
 
-static void draw_tickets(void)
-{
-    u8 cx;
-    ui_fill_rows(ROW(10), 1, COL_BLACK);
-    cx = txt_id(1, ROW(10), T_TICKET, COL_GREEN, COL_BLACK);
-    cx = txt_num(cx, ROW(10), g_save.gacha_tickets, COL_WHITE, COL_BLACK);
-    cx = txt_id((u8)(cx + 2), ROW(10), T_SRTICKET, COL_LYELLOW, COL_BLACK);
-    txt_num(cx, ROW(10), g_save.sr_tickets, COL_WHITE, COL_BLACK);
-}
-
-static void kind_row(u8 i)
+static void banner(u8 i)
 {
     GachaRec g;
-    u8 y = (u8)(MENU_Y + i * LINE_H * 1);
-    u8 on = (u8)(i == g_cursor);
-    u8 cx;
+    u8 y = (u8)(BANNER_Y + i * BANNER_H);
+    u8 on = (u8)(i == g_cursor), k, cx;
+    u8 a = stripe[i][0], b = stripe[i][1];
     tbl_gacha(kinds[i], &g);
-    ui_fill_rows(y, 1, COL_BLACK);
-    ui_cursor(0, y, on);
-    txt_id(2, y, g.name_text, on ? COL_LYELLOW : COL_WHITE, COL_BLACK);
-    if (g.currency == CUR_FREE) return;
-    cx = txt_id(18, y, cur_name[g.currency], COL_GRAY, COL_BLACK);
-    cx = txt_num(cx, y, g.price, COL_WHITE, COL_BLACK);
-    if (g.price10) {
-        cx = txt_draw(cx, y, "/", COL_GRAY, COL_BLACK);
-        txt_num(cx, y, g.price10, COL_WHITE, COL_BLACK);
+    vdp_fill(0, y, SCREEN_W, BANNER_H - 2, on ? COL_YELLOW : COL_DGRAY);
+    for (k = 0; k < 5; k++) vdp_fill(2, (u16)(y + 2 + k * 6), SCREEN_W - 4, 6, (u8)(k & 1 ? b : a));
+    gfx_sprite(art[i][0], art[i][1], art[i][2] > 40 ? 40 : art[i][2], art[i][3] > 28 ? 28 : art[i][3], 6, (u8)(y + 2));
+    ui_key((u8)(i + 1), 2, (u8)(y + 2));
+    txt_id(6, (u8)(y + 1), g.name_text, on ? COL_YELLOW : COL_WHITE, a);
+    if (g.currency == CUR_FREE) {
+        u8 used = (u8)(g_save.last_free_gacha_gday == time_gday(g_save.g_time));
+        txt_id(6, (u8)(y + 16), used ? T_GACHA_FREE_USED : T_TODAY_FREE, used ? COL_LGRAY : COL_YELLOW, b);
+        return;
     }
+    gfx_sprite(cur_icon[g.currency][0], cur_icon[g.currency][1], 14, 14, 48, (u8)(y + 18));
+    cx = txt_num(8, (u8)(y + 16), g.price, COL_WHITE, b);
+    if (g.price10) {
+        cx = txt_id((u8)(cx + 2), (u8)(y + 16), T_GACHA_10, COL_YELLOW, b);
+        txt_num(cx, (u8)(y + 16), g.price10, COL_WHITE, b);
+    }
+    if (g.currency == CUR_SRTICKET) txt_id(20, (u8)(y + 16), T_SR_UP, COL_RED, b);
+}
+
+static void owned(void)
+{
+    u8 cx;
+    vdp_fill(0, 188, SCREEN_W, 4, COL_BLACK);
+    vdp_fill(0, ROW_LAST, SCREEN_W, 20, COL_DGRAY);
+    gfx_sprite(ATL_ITEM_GOLD, 2, ROW_LAST + 1);
+    cx = txt_num(2, ROW_LAST, g_save.gold, COL_YELLOW, COL_DGRAY);
+    gfx_sprite(ATL_ITEM_GEMS, (u8)(cx * 8 + 8), ROW_LAST + 1);
+    cx = txt_num((u8)(cx + 3), ROW_LAST, g_save.gems, COL_CYAN, COL_DGRAY);
+    gfx_sprite(ATL_ITEM_TICKET, (u8)(cx * 8 + 8), ROW_LAST + 1);
+    cx = txt_num((u8)(cx + 3), ROW_LAST, g_save.gacha_tickets, COL_WHITE, COL_DGRAY);
+    gfx_sprite(ATL_ITEM_SRTICKET, (u8)(cx * 8 + 8), ROW_LAST + 1);
+    txt_num((u8)(cx + 3), ROW_LAST, g_save.sr_tickets, COL_WHITE, COL_DGRAY);
+}
+
+FAR(void, gacha_init, (void))
+{
+    g_cursor = (u8)(g_sel_gacha < KINDS ? g_sel_gacha : 2);
 }
 
 FAR(void, gacha_draw, (void))
 {
     u8 i;
     ui_clear();
-    ui_title(T_GACHA_TITLE);
-    ui_money(ROW(1));
-    for (i = 0; i < KINDS; i++) kind_row(i);
-    draw_tickets();
-    ui_footer(T_HELP_SELECT);
-}
-
-FAR(void, gacha_init, (void))
-{
-    g_cursor = (u8)(g_sel_gacha < KINDS ? g_sel_gacha : 0);
+    ui_header(T_GACHA_TITLE);
+    for (i = 0; i < KINDS; i++) banner(i);
+    owned();
 }
 
 static u8 ask_count(void)
 {
-    static const u16 counts[2] = { T_GACHA_1, T_GACHA_10 };
     GachaRec g;
-    u8 cur = 0;
+    u8 cur = 1, k;
     tbl_gacha(kinds[g_cursor], &g);
     if (!g.price10) return 1;
-    ui_fill_rows(ROW(8), 2, COL_BLACK);
-    ui_menu_draw(20, ROW(8), counts, 2, cur);
-    g_ui_state = UIS_WAITKEY;
     for (;;) {
         u8 p;
-        ui_frame();
-        p = input_pressed();
-        if (ui_menu_input(&cur, 2, p)) ui_menu_draw(20, ROW(8), counts, 2, cur);
-        if (p & BTN_CANCEL) { ui_fill_rows(ROW(8), 2, COL_BLACK); return 0; }
+        for (k = 0; k < 2; k++) {
+            u8 x = (u8)(40 + k * 92);
+            ui_box(x, 96, 84, 22, k == cur ? COL_BLUE : COL_DBLUE, k == cur ? COL_YELLOW : COL_LGRAY);
+            txt_id((u8)(x / 8 + 1), 99, k ? T_PULL_10 : T_PULL_1, COL_WHITE, k == cur ? COL_BLUE : COL_DBLUE);
+        }
+        g_ui_state = UIS_WAITKEY;
+        do { ui_frame(); p = input_pressed(); } while (!p);
+        if (p & (BTN_LEFT | BTN_RIGHT | BTN_UP | BTN_DOWN)) { cur ^= 1; psg_beep(0x100, 2); }
+        if (p & BTN_CANCEL) { g_dirty = 1; return 0; }
         if (p & BTN_OK) break;
     }
-    ui_fill_rows(ROW(8), 2, COL_BLACK);
     return (u8)(cur ? GACHA_ONE_MAX : 1);
 }
 
@@ -102,23 +129,25 @@ static void pull(void)
 FAR(void, gacha_update, (void))
 {
     u8 p = input_pressed();
+    u8 d = input_digit();
     u8 old = g_cursor;
-    if (ui_menu_input(&g_cursor, KINDS, p)) { kind_row(old); kind_row(g_cursor); }
+    if (ui_menu_input(&g_cursor, KINDS, p)) { banner(old); banner(g_cursor); }
+    if (d >= 1 && d <= KINDS) { g_cursor = (u8)(d - 1); banner(old); banner(g_cursor); pull(); return; }
     if (p & BTN_OK) pull();
     if (p & BTN_CANCEL) screen_change(&scr_home);
 }
 
 SCREEN(scr_gacha, gacha_init, gacha_update, gacha_draw, 0)
 
-/* ---- 結果 ---- */
+/* ---- 結果: 演出を流して、最後の画面のまま押下を待つ ---- */
 
 FAR(void, gacharesult_draw, (void))
 {
     ui_clear();
-    ui_title(T_GACHA_RESULT);
-    ui_footer(T_HELP_ANY);
-    ui_reveal();
-    if (g_gacha.pity_hit) txt_id(1, ROW(11), T_GACHA_PITY, COL_PINK, COL_BLACK);
+    ui_header(T_GACHA_RESULT);
+    ui_guide(T_GUIDE_ANY);
+    gacha_show(g_gacha.gacha);
+    if (g_gacha.pity_hit) txt_id(1, 168, T_GACHA_PITY, COL_PURPLE, COL_BLACK);
 }
 
 FAR(void, gacharesult_update, (void))

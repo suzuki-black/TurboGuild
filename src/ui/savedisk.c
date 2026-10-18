@@ -117,3 +117,12 @@ FAR(u8, savedisk_save, (void))
     if (e == DISK_OK) g_save_slot ^= 1;
     return e;
 }
+
+/* RTC を読んでゲーム時間を進める（メインループから 1 秒に 1 回） */
+FAR(void, time_sync, (void))
+{
+    u32 now = rtc_now_secs();
+    u8 st;
+    g_save.g_time = time_advance(g_save.g_time, g_save.real_time_last, now, &st);
+    g_save.real_time_last = now;
+}

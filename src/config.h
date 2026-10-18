@@ -44,21 +44,29 @@
 #define WIN_DATAA           0x8000
 #define WIN_DATAB           0xA000
 
-/* 色（パレット番号, sys/vdp.c） */
+/* 色（パレット番号。tools/art/palette.py と一致させる） */
+#define COL_CLEAR   0
 #define COL_BLACK   1
-#define COL_GREEN   3
-#define COL_BLUE    4
-#define COL_LBLUE   5
+#define COL_DGRAY   2
+#define COL_LGRAY   3
+#define COL_WHITE   4
+#define COL_SKIN    5
 #define COL_DRED    6
-#define COL_CYAN    7
-#define COL_RED     8
-#define COL_PINK    9
-#define COL_YELLOW  10
-#define COL_LYELLOW 11
-#define COL_DGREEN  12
-#define COL_MAGENTA 13
-#define COL_GRAY    14
-#define COL_WHITE   15
+#define COL_RED     7
+#define COL_ORANGE  8
+#define COL_YELLOW  9
+#define COL_DGREEN  10
+#define COL_GREEN   11
+#define COL_DBLUE   12
+#define COL_BLUE    13
+#define COL_CYAN    14
+#define COL_PURPLE  15
+/* Phase1 までの名前（新パレットの近い色へ） */
+#define COL_LBLUE   COL_CYAN
+#define COL_PINK    COL_PURPLE
+#define COL_LYELLOW COL_YELLOW
+#define COL_MAGENTA COL_PURPLE
+#define COL_GRAY    COL_LGRAY
 
 /* 自動テスト用 */
 #define BOOT_MAGIC          0x4754      /* "TG" */

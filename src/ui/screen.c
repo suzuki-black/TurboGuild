@@ -2,11 +2,9 @@
 #include "screen.h"
 #include "../ram.h"
 #include "../config.h"
-#include "../core/time.h"
 #include "../sys/vdp.h"
 #include "../sys/input.h"
 #include "../sys/psg.h"
-#include "../sys/rtc.h"
 
 #define cur      g_screen_cur
 #define next_scr g_screen_next
@@ -21,14 +19,6 @@ static void apply_change(void)
     g_cursor = 0;
     if (cur->init) cur->init();
     g_dirty = 1;
-}
-
-void time_sync(void)
-{
-    u32 now = rtc_now_secs();
-    u8 st;
-    g_save.g_time = time_advance(g_save.g_time, g_save.real_time_last, now, &st);
-    g_save.real_time_last = now;
 }
 
 void screen_run(void)

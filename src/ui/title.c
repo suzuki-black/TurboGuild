@@ -12,16 +12,26 @@
 #include "../sys/rtc.h"
 #include "../sys/text.h"
 #include "../sys/vdp.h"
+#include "../sys/gfx.h"
 
 static u8 can_continue(void)
 {
     return (u8)(g_save.flags & SF_STARTED);
 }
 
+/* 看板のカード（SSR と SR を並べて見せる） */
+static const u8 parade[4] = { 39, 33, 34, 40 };
+
 static void draw_menu(void)
 {
     static const u16 items[2] = { T_TITLE_NEW, T_TITLE_CONT };
-    ui_menu_draw(10, ROW(8), items, can_continue() ? 2 : 1, g_cursor);
+    u8 i, n = can_continue() ? 2 : 1;
+    for (i = 0; i < n; i++) {
+        u8 y = (u8)(146 + i * 22), on = (u8)(i == g_cursor);
+        ui_box(64, y, 128, 20, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
+        ui_key((u8)(i + 1), 68, (u8)(y + 4));
+        txt_id(11, (u8)(y + 2), items[i], on ? COL_YELLOW : COL_WHITE, on ? COL_BLUE : COL_DBLUE);
+    }
 }
 
 FAR(void, title_init, (void))
@@ -31,20 +41,22 @@ FAR(void, title_init, (void))
 
 FAR(void, title_draw, (void))
 {
+    u8 i, k;
     ui_clear();
-    vdp_fill(0, ROW(2), SCREEN_W, 48, COL_DRED);
-    vdp_fill(0, ROW(2) + 4, SCREEN_W, 2, COL_LYELLOW);
-    vdp_fill(0, ROW(2) + 42, SCREEN_W, 2, COL_LYELLOW);
-    txt_draw(11, ROW(3), "TurboGuild", COL_LYELLOW, COL_DRED);
-    txt_id(5, ROW(5) + 4, T_TITLE_SUB, COL_WHITE, COL_BLACK);
+    for (k = 0; k < 6; k++) vdp_fill(0, (u16)(k * 4), SCREEN_W, 4, (u8)(k & 1 ? COL_RED : COL_DRED));
+    vdp_fill(0, 24, SCREEN_W, 2, COL_YELLOW);
+    txt_draw(11, 4, "TurboGuild", COL_YELLOW, COL_DRED);
+    gfx_sprite(ATL_SPARK, 76, 2);
+    gfx_sprite(ATL_SPARK, 172, 10);
+    for (i = 0; i < 4; i++) gfx_card(parade[i], (u8)(10 + i * 60), (u8)(32 + (i & 1) * 6));
+    txt_id(5, 116, T_TITLE_SUB, COL_WHITE, COL_BLACK);
     if (can_continue()) {
-        u8 cx = txt_id(6, ROW(6) + 8, T_TITLE_DAY, COL_GRAY, COL_BLACK);
-        cx = txt_num((u8)(cx + 1), ROW(6) + 8, time_gday(g_save.g_time) + 1, COL_WHITE, COL_BLACK);
-        txt_id(cx, ROW(6) + 8, T_DAY, COL_GRAY, COL_BLACK);
+        u8 cx = txt_id(6, 130, T_TITLE_DAY, COL_LGRAY, COL_BLACK);
+        cx = txt_num((u8)(cx + 1), 130, time_gday(g_save.g_time) + 1, COL_WHITE, COL_BLACK);
+        txt_id(cx, 130, T_DAY, COL_LGRAY, COL_BLACK);
     }
     draw_menu();
-    if (g_save_status == SD_NODISK) txt_id(1, ROW(11), T_TITLE_NOSAVE, COL_GRAY, COL_BLACK);
-    ui_footer(T_HELP_SELECT);
+    if (g_save_status == SD_NODISK) txt_id(1, 190, T_TITLE_NOSAVE, COL_LGRAY, COL_BLACK);
 }
 
 static void start_new(void)
@@ -60,7 +72,9 @@ static void start_new(void)
 FAR(void, title_update, (void))
 {
     u8 p = input_pressed();
+    u8 d = input_digit();
     if (can_continue() && ui_menu_input(&g_cursor, 2, p)) draw_menu();
+    if (d == 1 || (d == 2 && can_continue())) { g_cursor = (u8)(d - 1); p = BTN_OK; }
     if (p & BTN_OK) {
         psg_beep(0x80, 4);
         if (g_cursor == 0) start_new();

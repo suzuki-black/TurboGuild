@@ -14,6 +14,8 @@ VDP_IND  = 0x9B
 	.globl	_vdp_wait_cmd
 	.globl	_vdp_palette
 	.globl	_vdp_put_rect
+	.globl	_vdp_load
+	.globl	_vdp_pal1
 
 	.area	_CODE
 
@@ -164,3 +166,54 @@ _vdp_put_rect:
 
 	.area	_DATA
 r_w:	.ds	1
+
+	.area	_CODE
+
+; void vdp_load(const VdpXfer16 *x)   HL -> { u16 addr; const u8 *src; u16 len; }
+; 連続した len バイトを VRAM へ（アトラスの読み込み用）。256 バイトずつ OTIR。
+_vdp_load:
+	ld	e, (hl)
+	inc	hl
+	ld	d, (hl)
+	inc	hl
+	ld	c, (hl)
+	inc	hl
+	ld	b, (hl)
+	inc	hl
+	push	bc			; src
+	ld	c, (hl)
+	inc	hl
+	ld	b, (hl)			; BC = len
+	ex	de, hl
+	di
+	call	wait_cmd_raw
+	call	setw_raw
+	pop	hl			; HL = src
+	ld	a, c			; 端数
+	ld	d, b			; 256 バイトの回数
+	ld	c, #VDP_DATA
+	or	a, a
+	jr	z, 2$
+	ld	b, a
+	otir
+2$:	ld	a, d
+	or	a, a
+	jr	z, 3$
+1$:	ld	b, #0
+	otir
+	dec	d
+	jr	nz, 1$
+3$:	ei
+	ret
+
+; void vdp_pal1(u8 index, const u8 *pal)   A=番号, DE -> 2 バイト（演出でパレットを 1 色だけ変える）
+_vdp_pal1:
+	di
+	out	(VDP_ADDR), a
+	ld	a, #0x90		; R#16 = 番号
+	out	(VDP_ADDR), a
+	ex	de, hl
+	ld	bc, #(2 * 256 + 0x9A)
+	otir
+	ei
+	ret

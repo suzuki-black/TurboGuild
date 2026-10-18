@@ -2,6 +2,7 @@
 #ifndef CORE_TIME_H
 #define CORE_TIME_H
 #include "../types.h"
+#include "../config.h"
 
 typedef struct { u16 year; u8 mon, day, hour, min, sec; } DateTime;
 
@@ -11,5 +12,5 @@ typedef struct { u16 year; u8 mon, day, hour, min, sec; } DateTime;
 
 u32 time_to_secs(const DateTime *dt);       /* 1980-01-01 00:00:00 からの秒 */
 u32 time_advance(u32 gtime, u32 real_last, u32 real_now, u8 *status);
-u32 time_gday(u32 gtime);
+#define time_gday(t) ((u32)(t) / GSEC_PER_DAY)
 #endif

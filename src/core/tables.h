@@ -14,4 +14,6 @@ void tbl_area(u8 area, AreaRec *out);         /* 1..AREA_COUNT */
 void tbl_stage(u16 no, StageRec *out);        /* 1..STAGE_COUNT */
 void tbl_gacha(u8 id, GachaRec *out);         /* 1..GACHA_COUNT */
 void tbl_login(u8 day, LoginRec *out);        /* 1..7 */
+void tbl_course(u8 id, CourseRec *out);       /* 1..COURSE_COUNT */
+void tbl_pack(u8 id, PackRec *out);           /* 1..PACK_COUNT */
 #endif

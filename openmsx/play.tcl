@@ -30,11 +30,11 @@ set ::A_SAVE  [sym _g_save]
 set ::A_SAVEST [sym _g_save_status]
 set ::A_QR    [sym _g_qr]
 set ::SCR {}
-foreach n {title name firstgacha home area stage gacha gacharesult cardlist carddetail deck deckpick shop p0menu} {
+foreach n {title name course firstgacha home login area explore boss gacha gacharesult cardlist carddetail deck deckpick shop p0menu} {
     dict set ::SCR [sym _scr_$n] $n
 }
 # SaveData のオフセット（src/core/save.h の並び。SDCC は詰めて並べる）
-array set ::O {level 36 gold 39 gems 43 ap 47 potions 48 stage 56 cards_n 69 cards 71 deck 871 savecnt 885}
+array set ::O {level 36 gold 39 gems 43 ap 47 potions 48 stage 56 cards_n 69 cards 71 deck 871 savecnt 885 funds 888 spent 892}
 proc sv {k} { expr {$::A_SAVE + $::O($k)} }
 
 set BTN_UP 1 ; set BTN_DOWN 2 ; set BTN_LEFT 4 ; set BTN_RIGHT 8 ; set BTN_OK 16 ; set BTN_CANCEL 32
@@ -52,9 +52,9 @@ proc fail {why} {
     finish
 }
 proc finish {} {
-    say [format "STATS quests=%d wins=%d gachas=%d resets=%d presses=%d level=%d stage=%d cards=%d gold=%d gems=%d" \
-        $::quests $::wins $::gachas $::resets $::presses [rd8 [sv level]] [rd16 [sv stage]] [rd16 [sv cards_n]] \
-        [rd32 [sv gold]] [rd32 [sv gems]]]
+    say [format "STATS quests=%d gachas=%d resets=%d presses=%d level=%d stage=%d cards=%d gold=%d gems=%d funds=%d spent=%d" \
+        $::quests $::gachas $::resets $::presses [rd8 [sv level]] [rd16 [sv stage]] [rd16 [sv cards_n]] \
+        [rd32 [sv gold]] [rd32 [sv gems]] [rd32 [sv funds]] [rd32 [sv spent]]]
     if {$::fails == 0} { say "RESULT PASS" } else { say "RESULT FAIL" }
     close $::log
     exit
@@ -65,13 +65,13 @@ proc snapshot {} {
     set n [rd16 [sv cards_n]]
     set sum 0
     for {set i 0} {$i < $n * 4} {incr i} { set sum [expr {($sum * 31 + [rd8 [expr {[sv cards] + $i}]]) & 0xFFFFFF}] }
-    return [list stage [rd16 [sv stage]] cards $n sum $sum level [rd8 [sv level]] gold [rd32 [sv gold]] gems [rd32 [sv gems]]]
+    return [list stage [rd16 [sv stage]] cards $n sum $sum level [rd8 [sv level]] gold [rd32 [sv gold]] gems [rd32 [sv gems]] funds [rd32 [sv funds]]]
 }
 
 proc goto_menu {target} {
     set c [rd8 $::A_CURSOR]
     if {$c == $target} { press $::BTN_OK ; return 1 }
-    press $::BTN_DOWN
+    press $::BTN_RIGHT
     return 0
 }
 
@@ -82,9 +82,9 @@ proc act_home {} {
     switch $a {
         quest { if {[goto_menu 0]} { incr ::plan_i ; set ::session 0 } }
         gacha { if {[goto_menu 1]} { incr ::plan_i ; set ::session 0 } }
-        card  { if {[goto_menu 2]} { incr ::plan_i } }
-        shop  { if {[goto_menu 3]} { incr ::plan_i } }
-        save  { if {[goto_menu 4]} { incr ::plan_i ; set ::pending_check 1 } }
+        card  { if {[goto_menu 3]} { incr ::plan_i ; set ::session 1 } }
+        shop  { if {[goto_menu 4]} { incr ::plan_i ; set ::session 0 } }
+        save  { if {[goto_menu 6]} { incr ::plan_i ; set ::pending_check 1 } }
     }
 }
 
@@ -101,7 +101,7 @@ proc do_reset {} {
 
 proc check_loaded {} {
     set now [snapshot]
-    foreach k {stage cards sum level gold gems} {
+    foreach k {stage cards sum level gold gems funds} {
         if {[dict get $now $k] != [dict get $::snap $k]} { fail "reload mismatch $k: saved [dict get $::snap $k] loaded [dict get $now $k]" ; return }
     }
     say "reload OK $now"
@@ -109,12 +109,6 @@ proc check_loaded {} {
 
 proc act {scr st} {
     if {$st == 2} {                                   ;# メッセージ・確認・結果
-        if {$scr eq "stage" && $::in_quest} {
-            set ::in_quest 0
-            incr ::quests ; incr ::session
-            if {[rd8 [expr {$::A_QR + 5}]]} { incr ::wins }    ;# QuestResult.b.win
-        }
-        if {$scr eq "gacha"} { press $::BTN_OK ; return }     ;# 1回 を選ぶ
         press $::BTN_OK ; return
     }
     switch $scr {
@@ -124,38 +118,42 @@ proc act {scr st} {
             press $::BTN_OK
         }
         name { press $::BTN_OK }
+        course { press $::BTN_OK }
         firstgacha {
-            if {!$::did_reroll} { set ::did_reroll 1 ; press $::BTN_OK ; return }   ;# 1 回は引き直す
+            if {!$::did_reroll} { set ::did_reroll 1 ; press $::BTN_LEFT ; return }   ;# 1 回は引き直す
+            if {$::did_reroll == 1} { set ::did_reroll 2 ; press $::BTN_OK ; return }
             if {[rd8 $::A_CURSOR] == 0} { press $::BTN_RIGHT } else { press $::BTN_OK }
         }
         home { act_home }
+        login { press $::BTN_OK }
         area { if {$::leaving} { press $::BTN_CANCEL } else { press $::BTN_OK } }
-        stage {
+        explore {
             if {$::leaving || $::session >= 6 || ([rd8 [sv ap]] < 14 && [rd8 [sv potions]] == 0)} {
                 set ::leaving 1 ; press $::BTN_CANCEL ; return
             }
-            set ::in_quest 1
+            set before [rd16 [sv stage]]
+            incr ::quests ; incr ::session
             press $::BTN_OK
         }
+        boss { incr ::quests ; press $::BTN_OK }
         gacha {
             if {$::session >= 1} { press $::BTN_CANCEL ; return }
             set want [expr {[rd32 [sv gems]] >= 300 ? 2 : 0}]
-            if {[rd8 $::A_CURSOR] != $want} { press $::BTN_DOWN ; return }
+            if {[rd8 $::A_CURSOR] != $want} { press [expr {[rd8 $::A_CURSOR] < $want ? $::BTN_DOWN : $::BTN_UP}] ; return }
             incr ::session ; incr ::gachas
             press $::BTN_OK
         }
         gacharesult { press $::BTN_OK }
-        cardlist {
-            if {$::session == 0} { set ::session 1 ; press $::BTN_OK } else { set ::session 0 ; press $::BTN_CANCEL }
-        }
         deck {
             if {$::session == 1} {
-                if {[rd8 $::A_CURSOR] != 5} { press $::BTN_UP ; return }
+                if {[rd8 $::A_CURSOR] != 5} { press $::BTN_LEFT ; return }
                 set ::session 2 ; press $::BTN_OK
             } else { press $::BTN_CANCEL }
         }
         shop {
-            if {[rd32 [sv gems]] > 1000 && [rd8 [sv potions]] < 3} { press $::BTN_OK } else { press $::BTN_CANCEL }
+            if {$::session == 0 && [rd32 [sv gems]] < 3000 && [rd32 [sv funds]] >= 1000} { set ::session 1 ; press $::BTN_OK ; return }  ;# 石を買う（課金）
+            set ::session 2
+            press $::BTN_CANCEL
         }
         default { press $::BTN_CANCEL }
     }

@@ -10,6 +10,7 @@
 #include "core/save.h"
 #include "core/tables.h"
 #include "core/time.h"
+#include "core/wallet.h"
 
 static void fresh(void) { save_new(&g_save, 1000); }
 
@@ -180,8 +181,29 @@ static void test_login(void)
     CHECK(r.given && r.day == 2);
 }
 
+static void test_wallet(void)
+{
+    fresh();
+    wallet_start(1);                           /* おこづかい: 3000 円, 月 3000 円 */
+    CHECK(g_save.funds == 3000 && !wallet_infinite());
+    CHECK(wallet_buy_gems(2) == W_OK && g_save.funds == 2000 && g_save.gems == START_GEMS + 1000);
+    CHECK(wallet_buy_gems(3) == W_NO_FUNDS && g_save.funds == 2000);   /* 1 万円は払えない */
+    CHECK(g_save.spent == 1000);
+    CHECK(wallet_payday() == 0);
+    g_save.g_time += GSEC_PER_DAY * 30;        /* 1 か月後: 給料日 */
+    CHECK(wallet_payday() == 1 && g_save.funds == 5000);
+    CHECK(wallet_payday() == 0);
+    g_save.g_time += GSEC_PER_DAY * 90;        /* 3 か月放置しても 3 回分 */
+    CHECK(wallet_payday() == 3 && g_save.funds == 14000);
+    wallet_start(4);                           /* 無敵モード: 減らない、累計は数える */
+    CHECK(wallet_infinite());
+    CHECK(wallet_buy_gems(3) == W_OK && wallet_buy_gems(3) == W_OK && g_save.funds == 0);
+    CHECK(g_save.spent == 20000 && g_save.gems >= 20000);
+}
+
 int main(void)
 {
+    test_wallet();
     test_struct_sizes();
     test_battle();
     test_elem();

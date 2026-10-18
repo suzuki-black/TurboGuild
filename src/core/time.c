@@ -1,6 +1,7 @@
 /* time.c — RTC の日時を通算秒にし、前回保存からの差分を TIME_SCALE 倍してゲーム時間へ足す。
  * 起点は RTC の年の下限に合わせて 1980 年。逆行は 0、30 日超は切り捨て。 */
 #include "time.h"
+#include "../far.h"
 #include "../config.h"
 
 static const u16 days_before_month[12] = {
@@ -44,9 +45,4 @@ u32 time_advance(u32 gtime, u32 real_last, u32 real_now, u8 *status)
         *status = TIME_CLAMPED;
     }
     return gtime + delta * TIME_SCALE;
-}
-
-u32 time_gday(u32 gtime)
-{
-    return gtime / GSEC_PER_DAY;
 }

@@ -9,46 +9,16 @@
 #include "../sys/text.h"
 #include "../sys/input.h"
 #include "../sys/psg.h"
+#include "../sys/gfx.h"
 
-static const u8 rar_col[4] = { COL_GRAY, COL_LBLUE, COL_LYELLOW, COL_PINK };
-static const u8 elem_col[5] = { COL_RED, COL_LBLUE, COL_YELLOW, COL_WHITE, COL_MAGENTA };
+static const u8 rar_col[4] = { COL_LGRAY, COL_CYAN, COL_YELLOW, COL_PURPLE };
+static const u8 elem_col[5] = { COL_RED, COL_CYAN, COL_YELLOW, COL_WHITE, COL_PURPLE };
 
 u8 rarity_color(u8 r) { return r < 4 ? rar_col[r] : COL_WHITE; }
 u8 elem_color(u8 e)   { return e < 5 ? elem_col[e] : COL_WHITE; }
 
-void ui_fill_rows(u8 y, u8 lines, u8 color)
-{
-    vdp_fill(0, y, SCREEN_W, (u16)lines * LINE_H, color);
-}
-
 void ui_clear(void) { vdp_fill(0, 0, SCREEN_W, SCREEN_H, COL_BLACK); }
 
-void ui_title(u16 id)
-{
-    ui_fill_rows(0, 1, COL_BLUE);
-    txt_id(1, 0, id, COL_WHITE, COL_BLUE);
-}
-
-void ui_footer(u16 id)
-{
-    vdp_fill(0, ROW_LAST, SCREEN_W, SCREEN_H - ROW_LAST, COL_BLUE);
-    txt_id(1, ROW_LAST, id, COL_WHITE, COL_BLUE);
-}
-
-void ui_cursor(u8 cx, u8 y, u8 on)
-{
-    txt_draw(cx, y, on ? ">" : " ", COL_LYELLOW, COL_BLACK);
-}
-
-void ui_menu_draw(u8 cx, u8 y, const u16 *ids, u8 n, u8 cursor)
-{
-    u8 i;
-    for (i = 0; i < n; i++) {
-        u8 yy = (u8)(y + i * LINE_H);
-        ui_cursor(cx, yy, (u8)(i == cursor));
-        txt_id((u8)(cx + 2), yy, ids[i], i == cursor ? COL_LYELLOW : COL_WHITE, COL_BLACK);
-    }
-}
 
 u8 ui_menu_input(u8 *cursor, u8 n, u8 pressed)
 {
@@ -106,17 +76,13 @@ u8 ui_rarity(u8 cx, u8 y, u8 rarity, u8 bg)
     return txt_id(cx, y, (u16)(T_RAR_0 + rarity), rarity_color(rarity), bg);
 }
 
-/* ★[SSR]炎 名前…………  攻撃 */
-void ui_card_row(u8 y, u16 card_id, u8 lv, u8 mark, u8 bg)
+void ui_box(u8 x, u8 y, u8 w, u8 h, u8 bg, u8 border)
 {
-    CardRec c;
-    u8 cx;
-    ui_fill_rows(y, 1, bg);
-    if (!tbl_card(card_id, &c)) return;
-    if (mark) txt_id(1, y, T_IN_DECK, COL_LYELLOW, bg);
-    ui_rarity(3, y, c.rarity, bg);
-    txt_id(7, y, (u16)(T_ELEM_0 + c.element), elem_color(c.element), bg);
-    cx = txt_id(10, y, c.name_text, COL_WHITE, bg);
-    (void)cx;
-    txt_num_r(26, y, (u32)c.atk * (100 + (u16)lv * 5) / 100, 6, COL_GRAY, bg);
+    vdp_fill(x, y, w, h, border);
+    vdp_fill((u16)x + 2, (u16)y + 2, (u16)(w - 4), (u16)(h - 4), bg);
+}
+
+void ui_key(u8 digit, u8 x, u8 y)
+{
+    gfx_sprite((u8)(ATL_KEYS_X + digit * 12), ATL_KEYS_Y, 12, ATL_KEYS_H, x, y);
 }

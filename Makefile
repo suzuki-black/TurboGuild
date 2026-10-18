@@ -26,13 +26,17 @@ BANKSMK  := $(B)/banks.mk
 # ソース→コードバンクの対応は docs/MEMORY_MAP.md が唯一の定義。そこから banks.mk を作って読む
 -include $(BANKSMK)
 
-CFLAGS   := -mz80 --std-c99 --sdcccall 1 --opt-code-size -Isrc
+# --disable-warning 158: SDCC 4.6 は「定数 + 定数」が 127 を超えて u8 の引数に渡ると、
+#   値は正しく渡すのに桁あふれ警告を出す（124+8 → 0x84 を確認済み）。誤検知なので止める
+# --disable-warning 110: 「最適化で条件の流れを変えた」の通知。a ? 定数 : 定数 などで毎回出るだけ
+CFLAGS   := -mz80 --std-c99 --sdcccall 1 --opt-code-size --disable-warning 158 --disable-warning 110 -Isrc
 LDFLAGS  := -mz80 --no-std-crt0 --code-loc 0x4010 --data-loc 0xC000 \
             $(foreach n,$(CODE_BANKS),-Wl-b_BANK$(n)=0x$(shell printf %X $(n))6010)
 
 CSRC     := $(wildcard src/*.c src/sys/*.c src/core/*.c src/ui/*.c)
 ASRC     := $(filter-out src/sys/crt0.s,$(wildcard src/sys/*.s))
-GENH     := src/data/cards.h src/data/rompages.h src/data/screens.h src/data/tables.h src/data/text_ids.h
+GENH     := src/data/cards.h src/data/rompages.h src/data/screens.h src/data/tables.h src/data/text_ids.h \
+            src/data/art.h src/data/palette.h
 HDRS     := $(wildcard src/*.h src/*/*.h) $(GENH)
 COBJ     := $(patsubst src/%.c,$(B)/obj/%.rel,$(CSRC))
 AOBJ     := $(patsubst src/%.s,$(B)/obj/%.rel,$(ASRC)) $(B)/obj/far_stubs.rel
@@ -51,6 +55,14 @@ $(B)/data.stamp: tools/build_data.py tools/gen_stages.py $(DATASRC)
 	$(PYTHON) tools/build_data.py
 	@touch $@
 src/data/cards.h src/data/tables.h src/data/text_ids.h: $(B)/data.stamp
+	@:
+
+ARTSRC   := $(wildcard tools/art/*.py) tools/gen_art.py data/card_art.csv data/cards.csv
+$(B)/art.stamp: $(ARTSRC)
+	@mkdir -p $(B)
+	$(PYTHON) tools/gen_art.py --preview
+	@touch $@
+src/data/art.h src/data/palette.h: $(B)/art.stamp
 	@:
 
 $(BANKSMK): docs/MEMORY_MAP.md tools/link_rom.py
@@ -79,7 +91,7 @@ $(B)/obj/far_stubs.rel: $(B)/far_stubs.s
 $(IHX): $(CRT0) $(AOBJ) $(COBJ)
 	$(CC) $(LDFLAGS) -o $@ $(CRT0) $(AOBJ) $(COBJ)
 
-$(ROM): $(IHX) $(B)/data.stamp docs/MEMORY_MAP.md tools/link_rom.py tools/ram_used.py tools/check_banks.py
+$(ROM): $(IHX) $(B)/data.stamp $(B)/art.stamp docs/MEMORY_MAP.md tools/link_rom.py tools/ram_used.py tools/check_banks.py
 	$(PYTHON) tools/check_banks.py $(B)/kernel.map $(BANKSMK) $(B)/obj
 	$(PYTHON) tools/link_rom.py rom $(IHX) $@
 	@$(PYTHON) tools/ram_used.py $(B)/kernel.map

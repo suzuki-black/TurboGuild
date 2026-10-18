@@ -23,13 +23,13 @@ static void draw_diag(void)
 {
     u16 himem = SYS_HIMEM;
     u8 cpu = bios_getcpu();
-    font_puts(1, 4, "HIMEM", 7, 1);      font_puthex(12, 4, himem, 4, 15, 1);
-    font_puts(1, 5, "RAM C000-HIMEM", 7, 1); font_putdec(17, 5, (u32)(himem - RAM_BASE), 15, 1);
-    font_puts(1, 6, "STATIC USED", 7, 1);    font_putdec(17, 6, (u32)(ram_end - RAM_BASE), 15, 1);
-    font_puts(1, 7, "FREE (STACK)", 7, 1);   font_putdec(17, 7, (u32)(himem - ram_end), 15, 1);
-    font_puts(1, 8, "MSXVER", 7, 1);         font_putdec(12, 8, BIOS_MSXVER, 15, 1);
-    font_puts(1, 9, "CPU", 7, 1);            font_puts(12, 9, cpu < 3 ? cpu_names[cpu] : "?", 15, 1);
-    font_puts(1, 10, "CART SLOT", 7, 1);     font_puthex(12, 10, g_cart_slot, 2, 15, 1);
+    font_puts(1, 4, "HIMEM", 7, 1);      font_puthex(12, 4, himem, 4, 4, 1);
+    font_puts(1, 5, "RAM C000-HIMEM", 7, 1); font_putdec(17, 5, (u32)(himem - RAM_BASE), 4, 1);
+    font_puts(1, 6, "STATIC USED", 7, 1);    font_putdec(17, 6, (u32)(ram_end - RAM_BASE), 4, 1);
+    font_puts(1, 7, "FREE (STACK)", 7, 1);   font_putdec(17, 7, (u32)(himem - ram_end), 4, 1);
+    font_puts(1, 8, "MSXVER", 7, 1);         font_putdec(12, 8, BIOS_MSXVER, 4, 1);
+    font_puts(1, 9, "CPU", 7, 1);            font_puts(12, 9, cpu < 3 ? cpu_names[cpu] : "?", 4, 1);
+    font_puts(1, 10, "CART SLOT", 7, 1);     font_puthex(12, 10, g_cart_slot, 2, 4, 1);
 }
 
 static void draw_items(void)
@@ -37,8 +37,8 @@ static void draw_items(void)
     u8 i;
     for (i = 0; i < ITEMS; i++) {
         u8 sel = (u8)(i == g_cursor);
-        font_puts(2, (u8)(13 + i), sel ? ">" : " ", 11, 1);
-        font_puts(4, (u8)(13 + i), items[i], sel ? 11 : 15, 1);
+        font_puts(2, (u8)(13 + i), sel ? ">" : " ", 9, 1);
+        font_puts(4, (u8)(13 + i), items[i], sel ? 9 : 4, 1);
     }
 }
 
@@ -56,8 +56,8 @@ FAR(void, p0menu_draw, (void))
 {
     vdp_fill(0, 0, SCREEN_W, SCREEN_H, 1);
     dbg_header("TurboGuild  Phase0");
-    vdp_fill(64, 16, 128, 8, 9);
-    font_puts(11, 2, "TurboGuild", 15, 9);
+    vdp_fill(64, 16, 128, 7, 7);
+    font_puts(11, 2, "TurboGuild", 4, 7);
     draw_diag();
     draw_items();
     dbg_footer("UP/DOWN:SELECT  SPACE:OK");

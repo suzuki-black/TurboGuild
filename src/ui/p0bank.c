@@ -29,26 +29,26 @@ static void bank_draw_row(u8 row, const char *name, u8 window)
         if (bank_probe(window, p)) ok++;
         else if (bad == 0xFF) bad = p;
     }
-    font_puts(1, row, name, 7, 1);
-    font_putdec(14, row, ok, 15, 1);
-    font_puts(17, row, "/", 7, 1);
-    font_putdec(18, row, ROM_PAGE_COUNT - 1, 15, 1);
-    font_puts(22, row, bad == 0xFF ? "OK" : "NG", bad == 0xFF ? 3 : 8, 1);
-    if (bad != 0xFF) font_putdec(25, row, bad, 8, 1);
+    font_puts(1, row, name, 3, 1);
+    font_putdec(14, row, ok, 4, 1);
+    font_puts(17, row, "/", 3, 1);
+    font_putdec(18, row, ROM_PAGE_COUNT - 1, 4, 1);
+    font_puts(22, row, bad == 0xFF ? "OK" : "NG", bad == 0xFF ? 11 : 7, 1);
+    if (bad != 0xFF) font_putdec(25, row, bad, 7, 1);
 }
 
 FAR(void, p0bank_draw, (void))
 {
     vdp_fill(0, 0, SCREEN_W, SCREEN_H, 1);
     dbg_header("BANK SWITCH TEST");
-    font_puts(1, 3, "WINDOW       PAGES", 7, 1);
+    font_puts(1, 3, "WINDOW       PAGES", 3, 1);
     bank_draw_row(5, "CODE  6000H", 0);
     bank_draw_row(6, "DATAA 8000H", 1);
     bank_draw_row(7, "DATAB A000H", 2);
-    font_puts(1, 9, "MIRROR", 7, 1);
-    font_putdec(8, 9, g_bank_code, 15, 1);
-    font_putdec(11, 9, g_bank_dataA, 15, 1);
-    font_putdec(14, 9, g_bank_dataB, 15, 1);
+    font_puts(1, 9, "MIRROR", 3, 1);
+    font_putdec(8, 9, g_bank_code, 4, 1);
+    font_putdec(11, 9, g_bank_dataA, 4, 1);
+    font_putdec(14, 9, g_bank_dataB, 4, 1);
     dbg_footer("ESC:BACK");
 }
 
@@ -58,12 +58,12 @@ SCREEN(scr_banktest, 0, p0bank_update, p0bank_draw, 0)
 
 void dbg_header(const char *title)
 {
-    vdp_fill(0, 0, SCREEN_W, 8, 4);
-    font_puts(0, 0, title, 15, 4);
+    vdp_fill(0, 0, SCREEN_W, 7, 12);
+    font_puts(0, 0, title, 4, 12);
 }
 
 void dbg_footer(const char *help)
 {
-    vdp_fill(0, 200, SCREEN_W, 12, 4);
-    font_puts(0, 25, help, 15, 4);
+    vdp_fill(0, 200, SCREEN_W, 10, 12);
+    font_puts(0, 25, help, 4, 12);
 }

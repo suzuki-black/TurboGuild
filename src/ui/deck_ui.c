@@ -1,7 +1,9 @@
-/* deck_ui.c — デッキ編成。5 枠 + 「おまかせ編成」。枠を選ぶとカードを選ぶ一覧へ。
- * コスト上限を超える入れ替えは断る。別の枠にいるカードを選んだら入れ替える。 */
+/* deck_ui.c — デッキ編成。上に 5 枠の絵（1 枠目がリーダー＝マイページの顔）、
+ * 下に選んだ枠のカードと、デッキの攻撃・防御・コストのゲージ。[6] でおまかせ編成。
+ * 枠を選ぶとカードの一覧（cardgrid）から入れるカードを選ぶ。コスト超過は断る。 */
 #include "screen.h"
 #include "widget.h"
+#include "cardgrid.h"
 #include "../far.h"
 #include "../ram.h"
 #include "../core/deck.h"
@@ -10,49 +12,68 @@
 #include "../core/tables.h"
 #include "../data/screens.h"
 #include "../data/text_ids.h"
+#include "../sys/gfx.h"
 #include "../sys/input.h"
 #include "../sys/psg.h"
 #include "../sys/text.h"
+#include "../sys/vdp.h"
 
-#define SLOT_Y ROW(2)
+#define SLOT_Y 20
 #define ITEMS  (DECK_SIZE + 1)
 
-static void slot_row(u8 i)
+static void slot(u8 i)
 {
-    u8 y = (u8)(SLOT_Y + i * LINE_H);
-    u8 on = (u8)(i == g_cursor);
-    u8 bg = on ? COL_BLUE : COL_BLACK;
+    u8 x = (u8)(4 + i * 42), on = (u8)(i == g_cursor);
     u8 idx;
     if (i == DECK_SIZE) {
-        ui_fill_rows((u8)(y + LINE_H), 1, bg);
-        txt_id(3, (u8)(y + LINE_H), T_DECK_AUTO, COL_LYELLOW, bg);
+        ui_box(214, SLOT_Y, 40, 48, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
+        ui_key(6, 218, SLOT_Y + 4);
+        gfx_sprite(ATL_ICON_DECK, 222, SLOT_Y + 18);
         return;
     }
+    ui_box(x, SLOT_Y, 40, 48, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
+    ui_key((u8)(i + 1), (u8)(x + 2), SLOT_Y + 2);
     idx = g_save.deck[i];
-    if (idx == DECK_EMPTY) {
-        ui_fill_rows(y, 1, bg);
-        txt_id(10, y, T_EMPTY, COL_GRAY, bg);
-    } else {
-        ui_card_row(y, g_save.cards[idx].id, g_save.cards[idx].lv, 0, bg);
-    }
-    txt_num(0, y, i + 1, COL_GRAY, bg);
+    if (idx != DECK_EMPTY && idx < g_save.card_count) gfx_thumb(g_save.cards[idx].id, (u8)(x + 6), SLOT_Y + 8);
+    else gfx_part(ATL_CARDBACK_S, (u8)(x + 6), SLOT_Y + 8);
+}
+
+static void detail(void)
+{
+    CardRec c;
+    u8 idx = g_cursor < DECK_SIZE ? g_save.deck[g_cursor] : DECK_EMPTY, cx;
+    vdp_fill(0, 72, SCREEN_W, 76, COL_BLACK);
+    if (g_cursor == DECK_SIZE) { txt_id(2, 80, T_DECK_AUTO, COL_YELLOW, COL_BLACK); return; }
+    if (g_cursor == 0) txt_id(9, 74, T_LEADER, COL_YELLOW, COL_BLACK);
+    if (idx == DECK_EMPTY || idx >= g_save.card_count) { txt_id(9, 92, T_EMPTY, COL_LGRAY, COL_BLACK); return; }
+    tbl_card(g_save.cards[idx].id, &c);
+    gfx_card(c.id, 4, 74);
+    cx = ui_rarity(9, 92, c.rarity, COL_BLACK);
+    txt_id((u8)(cx + 1), 92, c.name_text, COL_WHITE, COL_BLACK);
+    cx = txt_id(9, 110, T_ATK, COL_LGRAY, COL_BLACK);
+    cx = txt_num_r(cx, 110, card_atk_of(idx), 6, COL_YELLOW, COL_BLACK);
+    cx = txt_id((u8)(cx + 1), 110, T_COST, COL_LGRAY, COL_BLACK);
+    txt_num(cx, 110, c.cost, COL_WHITE, COL_BLACK);
+    txt_id(9, 128, (u16)(T_SKILL_0 + c.skill), COL_CYAN, COL_BLACK);
 }
 
 static void totals(void)
 {
     DeckStats d;
+    u16 cmax = PLAYER_COST_MAX(g_save.level);
     u8 cx;
     d.enemy_elem = ELEM_NONE;
     deck_calc(&d);
-    ui_fill_rows(ROW(9), 2, COL_BLACK);
-    cx = txt_id(1, ROW(9), T_ATK, COL_GRAY, COL_BLACK);
-    cx = txt_num((u8)(cx + 1), ROW(9), d.atk, COL_WHITE, COL_BLACK);
-    cx = txt_id((u8)(cx + 2), ROW(9), T_DEF, COL_GRAY, COL_BLACK);
-    txt_num((u8)(cx + 1), ROW(9), d.def, COL_WHITE, COL_BLACK);
-    cx = txt_id(1, ROW(10), T_COST, COL_GRAY, COL_BLACK);
-    cx = txt_num((u8)(cx + 1), ROW(10), d.cost, COL_WHITE, COL_BLACK);
-    cx = txt_draw(cx, ROW(10), "/", COL_GRAY, COL_BLACK);
-    txt_num(cx, ROW(10), PLAYER_COST_MAX(g_save.level), COL_GRAY, COL_BLACK);
+    vdp_fill(0, 150, SCREEN_W, 42, COL_BLACK);
+    cx = txt_id(0, 150, T_ATK, COL_RED, COL_BLACK);
+    txt_num_r(cx, 150, d.atk, 6, COL_WHITE, COL_BLACK);
+    cx = txt_id(16, 150, T_DEF, COL_BLUE, COL_BLACK);
+    txt_num_r(cx, 150, d.def, 6, COL_WHITE, COL_BLACK);
+    cx = txt_id(0, 170, T_COST, COL_LGRAY, COL_BLACK);
+    cx = txt_num(cx, 170, d.cost, d.cost > cmax ? COL_RED : COL_WHITE, COL_BLACK);
+    cx = txt_draw(cx, 170, "/", COL_LGRAY, COL_BLACK);
+    txt_num(cx, 170, cmax, COL_LGRAY, COL_BLACK);
+    gfx_gauge(96, 175, 152, d.cost, cmax, COL_ORANGE);
 }
 
 FAR(void, deck_init, (void))
@@ -64,84 +85,53 @@ FAR(void, deck_draw, (void))
 {
     u8 i;
     ui_clear();
-    ui_title(T_DECK_TITLE);
-    for (i = 0; i < ITEMS; i++) slot_row(i);
+    ui_header(T_DECK_TITLE);
+    for (i = 0; i < ITEMS; i++) slot(i);
+    detail();
     totals();
-    ui_footer(T_HELP_SELECT);
+    ui_guide(T_GUIDE_DECK);
+}
+
+static void choose(u8 i)
+{
+    g_deck_slot = i;
+    if (i == DECK_SIZE) {
+        deck_auto();
+        g_save_dirty = 1;
+        psg_beep(0x060, 8);
+        g_dirty = 1;
+        return;
+    }
+    g_list.cursor = 0;
+    screen_change(&scr_deckpick);
 }
 
 FAR(void, deck_update, (void))
 {
     u8 p = input_pressed();
+    u8 d = input_digit();
     u8 old = g_cursor;
-    if (ui_menu_input(&g_cursor, ITEMS, p)) { slot_row(old); slot_row(g_cursor); }
-    if (p & BTN_OK) {
-        g_deck_slot = g_cursor;
-        if (g_cursor == DECK_SIZE) {
-            deck_auto();
-            g_save_dirty = 1;
-            psg_beep(0x080, 6);
-            g_dirty = 1;
-        } else {
-            screen_change(&scr_deckpick);
-        }
-    }
-    if (p & BTN_CANCEL) { g_deck_slot = 0; screen_change(&scr_cardlist); }
+    if (p & (BTN_LEFT | BTN_UP)) g_cursor = (u8)((g_cursor + ITEMS - 1) % ITEMS);
+    if (p & (BTN_RIGHT | BTN_DOWN)) g_cursor = (u8)((g_cursor + 1) % ITEMS);
+    if (d >= 1 && d <= ITEMS) g_cursor = (u8)(d - 1);
+    if (old != g_cursor) { psg_beep(0x100, 2); slot(old); slot(g_cursor); detail(); }
+    if ((p & BTN_OK) || (d >= 1 && d <= ITEMS)) { choose(g_cursor); return; }
+    if (p & BTN_CANCEL) { g_deck_slot = 0; screen_change(&scr_home); }
 }
 
 SCREEN(scr_deck, deck_init, deck_update, deck_draw, 0)
 
-/* ---- カードを選ぶ: 先頭は「はずす」 ---- */
-
-#define PICK_Y ROW(2)
-#define PICK_N 9
-
-static void pick_row(u16 i)
-{
-    u8 y = (u8)(PICK_Y + (i - g_list.top) * LINE_H);
-    u8 bg = (i == g_list.cursor) ? COL_BLUE : COL_BLACK;
-    if (i == 0) {
-        ui_fill_rows(y, 1, bg);
-        txt_id(3, y, T_DECK_CLEAR, COL_LYELLOW, bg);
-        return;
-    }
-    ui_card_row(y, g_save.cards[i - 1].id, g_save.cards[i - 1].lv, inv_in_deck(i - 1), bg);
-}
-
-static void pick_rows(void)
-{
-    u16 i;
-    ui_fill_rows(PICK_Y, PICK_N, COL_BLACK);
-    for (i = g_list.top; i < g_list.count && i < g_list.top + PICK_N; i++) pick_row(i);
-}
-
-FAR(void, deckpick_init, (void))
-{
-    g_list.count = g_save.card_count + 1;
-    g_list.rows = PICK_N;
-    g_list.cursor = 0;
-    g_list.top = 0;
-}
-
-FAR(void, deckpick_draw, (void))
-{
-    ui_clear();
-    ui_title(T_DECK_PICK);
-    ui_fill_rows(ROW(1), 1, COL_BLACK);
-    pick_rows();
-    totals();
-    ui_footer(T_HELP_SELECT);
-}
+/* ---- 入れるカードを選ぶ ---- */
 
 /* idx を枠 slot へ。別の枠にいれば入れ替え。コスト超過なら元に戻して 0 */
-static u8 assign(u8 slot, u8 idx)
+static u8 assign(u8 s, u8 idx)
 {
     DeckStats d;
     u8 before[DECK_SIZE];
     u8 i;
     for (i = 0; i < DECK_SIZE; i++) before[i] = g_save.deck[i];
-    for (i = 0; i < DECK_SIZE; i++) if (g_save.deck[i] == idx) g_save.deck[i] = g_save.deck[slot];
-    g_save.deck[slot] = idx;
+    for (i = 0; i < DECK_SIZE; i++) if (g_save.deck[i] == idx) g_save.deck[i] = g_save.deck[s];
+    g_save.deck[s] = idx;
     d.enemy_elem = ELEM_NONE;
     deck_calc(&d);
     if (d.cost <= PLAYER_COST_MAX(g_save.level)) return 1;
@@ -149,21 +139,33 @@ static u8 assign(u8 slot, u8 idx)
     return 0;
 }
 
+FAR(void, deckpick_init, (void))
+{
+    grid_setup(1);
+}
+
+FAR(void, deckpick_draw, (void))
+{
+    ui_clear();
+    ui_header(T_DECK_PICK);
+    grid_draw();
+    ui_guide(T_GUIDE_LIST);
+}
+
 FAR(void, deckpick_update, (void))
 {
     u8 p = input_pressed();
-    u16 old = g_list.cursor;
-    u8 r = ui_list_input(&g_list, p);
-    if (r == UL_PAGE) pick_rows();
-    if (r == UL_MOVED) { pick_row(old); pick_row(g_list.cursor); }
+    grid_input(p);
     if (p & BTN_OK) {
-        if (g_list.cursor == 0) {
+        s16 i = grid_card();
+        if (i < 0) {
             g_save.deck[g_deck_slot] = DECK_EMPTY;
-        } else if (!assign(g_deck_slot, (u8)(g_list.cursor - 1))) {
+        } else if (!assign(g_deck_slot, (u8)i)) {
             ui_msg(T_DECK_OVER);
             return;
         }
         g_save_dirty = 1;
+        psg_beep(0x080, 4);
         screen_change(&scr_deck);
     }
     if (p & BTN_CANCEL) screen_change(&scr_deck);

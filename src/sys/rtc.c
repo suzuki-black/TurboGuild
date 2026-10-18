@@ -2,6 +2,7 @@
  * 秒の桁上がりを跨ぐと値が崩れるので、2 回読んで一致するまで繰り返す。 */
 #include "rtc.h"
 #include "bios.h"
+#include "../far.h"
 
 static u8 bcd2(u8 reg_lo)
 {
@@ -18,7 +19,7 @@ static void read_once(DateTime *dt)
     dt->year = (u16)(1980 + bcd2(11));
 }
 
-void rtc_read(DateTime *dt)
+FAR(void, rtc_read, (DateTime *dt))
 {
     DateTime b;
     do {
@@ -27,14 +28,14 @@ void rtc_read(DateTime *dt)
     } while (dt->sec != b.sec || dt->min != b.min);
 }
 
-u32 rtc_now_secs(void)
+FAR(u32, rtc_now_secs, (void))
 {
     DateTime dt;
     rtc_read(&dt);
     return time_to_secs(&dt);
 }
 
-u8 rtc_sec(void)
+FAR(u8, rtc_sec, (void))
 {
     return bcd2(0);
 }

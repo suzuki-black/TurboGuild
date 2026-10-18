@@ -19,6 +19,8 @@ extern VdpCmd g_vdpcmd;
 extern u8 g_fontbuf[32];
 extern u8 g_glyph[128];      /* 1 文字ぶんの 4bpp（16x16 なら 8 バイト × 16 行） */
 extern u8 g_input_held, g_input_pressed;
+extern u16 g_digit_held;
+extern u8 g_digit_pressed;
 extern u8 g_beep_frames;
 extern DiskReq g_diskreq;
 extern u8 g_sector[512];
@@ -44,6 +46,10 @@ extern u16 g_sel_card;
 extern u8 g_sel_gacha;
 extern UiList g_list;         /* 一覧画面の状態（同時に使うのは 1 画面だけ） */
 extern u8 g_deck_slot;
+extern u8 g_replay;
+extern u8 g_grid_remove;
+extern u8 g_paid;             /* 給料日の知らせを出すか */      /* カードの一覧の先頭に「はずす」を置くか */           /* クリア済みエリアを周回するときの位置 */
+extern u8 g_ticker, g_ticker_gap;   /* お知らせの流し位置 */
 extern u8 g_nosave_warned;    /* 「セーブできません」は 1 回だけ出す */
 extern GachaReq g_gacha;
 extern QuestResult g_qr;

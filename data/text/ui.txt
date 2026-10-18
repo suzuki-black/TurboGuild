@@ -15,7 +15,7 @@ T_NAME_DEFAULT	ﾎﾞｳｹﾝｼｬ
 T_FG_TITLE	はじめての10連ガチャ！
 T_FG_SUB	SR以上1枚確定・引き直し自由
 T_FG_REROLL	引き直す
-T_FG_DECIDE	このカードで始める
+T_FG_DECIDE	これで始める
 T_FG_CONFIRM	このカードで冒険を始めますか？
 T_HOME_QUEST	クエスト
 T_HOME_GACHA	ガチャ
@@ -53,13 +53,13 @@ T_EXP	経験値
 T_GET	獲得
 T_DROP	カードを手に入れた！
 T_DROP_LOST	カードがいっぱいで受け取れなかった
-T_LEVELUP	レベルアップ！APが全回復した
+T_LEVELUP	レベルアップ！AP全回復
 T_AREA_CLEAR	エリアクリア！次のエリアが開いた
 T_NEXT	次へ
 T_GACHA_TITLE	ガチャ
 T_GACHA_1	1回
 T_GACHA_10	10連
-T_GACHA_FREE_USED	今日の無料ガチャは引きました
+T_GACHA_FREE_USED	本日分は引きました
 T_GACHA_NO_MONEY	足りません
 T_GACHA_FULL	カードがいっぱいです
 T_GACHA_NA	今は引けません
@@ -115,3 +115,54 @@ T_SKILL_4	ドロップ率+10%
 T_HELP_SELECT	SPACE:決定 ESC:戻る
 T_HELP_BACK	ESC:戻る
 T_HELP_ANY	SPACEキーを押してください
+# ---- Phase1.5: 絵が主役の画面（DECISIONS #31）
+T_MYPAGE	マイページ
+T_M_QUEST	冒険
+T_M_GACHA	ガチャ
+T_M_CARD	カード
+T_M_DECK	デッキ
+T_M_SHOP	お店
+T_M_LOGIN	ログボ
+T_M_SAVE	保存
+T_M_TITLE	終了
+T_GUIDE_HOME	1〜8:メニュー SPACE:決定
+T_GUIDE_LIST	SPACE:決定 ESC:戻る
+T_GUIDE_EXPLORE	SPACE:進む ESC:エリアへ
+T_GUIDE_GACHA	1〜5:えらぶ SPACE:引く ESC:戻る
+T_GUIDE_CARD	カーソル:えらぶ SPACE:詳細
+T_GUIDE_DECK	SPACE:入れかえ ESC:戻る
+T_GUIDE_ANY	SPACEで次へ
+T_EXPLORE	探索度
+T_DEFEAT	を倒した！
+T_TOO_STRONG	強すぎる…撤退した
+T_TREASURE	宝箱を見つけた！
+T_GOT	を手に入れた！
+T_BOSS_APPEAR	ボス出現！
+T_BOSS_BATTLE	ボス戦
+T_HP	HP
+T_CLEAR	クリア
+T_NEWAREA	NEW
+T_PULL_1	1回引く
+T_PULL_10	10連で引く
+T_TODAY_FREE	本日無料！
+T_SR_UP	SR以上確定
+T_STAMP_TITLE	ログインスタンプ
+T_STAMP_NEXT	明日もログインしよう！
+T_FOR_SALE	回復薬　石100
+T_BUY	[1]買う
+T_USE	[2]使う
+T_LEADER	リーダー
+T_TOTAL	合計
+# ---- 軍資金（DECISIONS #33）
+T_FUNDS	軍資金
+T_YEN	円
+T_INFINITE	無尽蔵
+T_COURSE_TITLE	あなたのお財布を選んでください
+T_COURSE_NOTE	軍資金で石を買って使います
+T_PAYDAY	給料日！軍資金が入った
+T_SHOP_GEMS	石を買う（課金）
+T_SHOP_POTION	回復薬を買う（石100）
+T_SPENT	累計課金
+T_NO_FUNDS	軍資金が足りません
+T_PACK_TITLE	どの石を買いますか？
+T_GEMS_BOUGHT	石を購入しました

@@ -11,4 +11,6 @@
 void input_update(void);          /* 1 フレーム 1 回 */
 u8   input_held(void);
 u8   input_pressed(void);         /* 押した瞬間だけ立つ */
+u8   input_digit(void);           /* 数字キーを押した瞬間なら 0..9、それ以外は 0xFF（携帯の数字キー操作） */
+#define NO_DIGIT 0xFF
 #endif

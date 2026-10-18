@@ -42,6 +42,8 @@ GACHA_FIELDS = [("u16", "name_text"), ("u8", "currency"), ("u16", "price"), ("u1
                 ("u16", "rate_n"), ("u16", "rate_r"), ("u16", "rate_sr"), ("u16", "rate_ssr"),
                 ("u16", "pity"), ("u8", "pool")]
 LOGIN_FIELDS = [("u8", "item"), ("u16", "amount")]
+COURSE_FIELDS = [("u16", "name_text"), ("u32", "start"), ("u32", "monthly"), ("u8", "infinite")]
+PACK_FIELDS = [("u16", "gems"), ("u16", "price")]
 FMT = {"u8": "B", "u16": "H", "u32": "I"}
 
 
@@ -200,6 +202,24 @@ PACK_ON = ["#ifndef __SDCC", "#pragma pack(push, 1)", "#endif", ""]
 PACK_OFF = ["#ifndef __SDCC", "#pragma pack(pop)", "#endif", ""]
 
 
+def load_courses(text):
+    rows = []
+    for ln, r in read_csv("courses.csv"):
+        if int(r["id"]) != len(rows) + 1:
+            die(f"courses.csv:{ln}: id は 1 から連番")
+        rows.append((text.add(r["name"]), int(r["start"]), int(r["monthly"]), int(r["infinite"])))
+    return rows
+
+
+def load_packs():
+    rows = []
+    for ln, r in read_csv("gem_packs.csv"):
+        if int(r["id"]) != len(rows) + 1:
+            die(f"gem_packs.csv:{ln}: id は 1 から連番")
+        rows.append((int(r["gems"]), int(r["price"])))
+    return rows
+
+
 def c_struct(name, fields):
     return ["typedef struct {"] + [f"    {t} {n};" for t, n in fields] + [f"}} {name};", ""]
 
@@ -209,7 +229,7 @@ def write_if_changed(path, text):
         path.write_text(text, encoding="utf-8")
 
 
-def write_headers(cards, areas, stages, gacha, text):
+def write_headers(cards, areas, stages, gacha, text, courses, packs):
     h = ["/* cards.h — tools/build_data.py の生成物。手で編集しない */",
          "#ifndef DATA_CARDS_H", "#define DATA_CARDS_H", '#include "../types.h"', ""] + PACK_ON
     h += c_struct("CardRec", CARD_FIELDS) + PACK_OFF
@@ -221,12 +241,14 @@ def write_headers(cards, areas, stages, gacha, text):
     t = ["/* tables.h — tools/build_data.py の生成物。手で編集しない */",
          "#ifndef DATA_TABLES_H", "#define DATA_TABLES_H", '#include "../types.h"', ""] + PACK_ON
     for name, fields in (("AreaRec", AREA_FIELDS), ("StageRec", STAGE_FIELDS),
-                         ("GachaRec", GACHA_FIELDS), ("LoginRec", LOGIN_FIELDS)):
+                         ("GachaRec", GACHA_FIELDS), ("LoginRec", LOGIN_FIELDS),
+                         ("CourseRec", COURSE_FIELDS), ("PackRec", PACK_FIELDS)):
         t += c_struct(name, fields)
     t += PACK_OFF
     t += [f"#define AREA_COUNT {len(areas)}", f"#define STAGE_COUNT {len(stages)}",
           f"#define STAGES_PER_AREA {gen_stages.STAGES_PER_AREA}",
-          f"#define GACHA_COUNT {len(gacha)}", "#define LOGIN_DAYS 7"]
+          f"#define GACHA_COUNT {len(gacha)}", "#define LOGIN_DAYS 7",
+          f"#define COURSE_COUNT {len(courses)}", f"#define PACK_COUNT {len(packs)}"]
     t += [f"#define CUR_{k.upper()} {v}" for k, v in CURRENCY.items()]
     t += [f"#define POOL_{k.upper()} {v}" for k, v in POOL.items()]
     t += [f"#define ITEM_{k.upper()} {v}" for k, v in ITEM.items()]
@@ -252,12 +274,16 @@ def main():
     stages = gen_stages.generate(ROOT / "data" / "stages_rule.csv", areas)
     gacha = load_gacha(text)
     login = load_login()
+    courses = load_courses(text)
+    packs = load_packs()
     blobs = {
         "cards.bin": pack_table(CARD_FIELDS, cards),
         "areas.bin": pack_table(AREA_FIELDS, areas),
         "stages.bin": pack_table(STAGE_FIELDS, stages),
         "gacha.bin": pack_table(GACHA_FIELDS, gacha),
         "login.bin": pack_table(LOGIN_FIELDS, login),
+        "courses.bin": pack_table(COURSE_FIELDS, courses),
+        "packs.bin": pack_table(PACK_FIELDS, packs),
     }
     pages = text.pack()
     for i in range(TEXT_PAGES):
@@ -266,7 +292,7 @@ def main():
         if len(b) > PAGE_PAYLOAD:
             die(f"{name} が {len(b)} B で 1 ページ ({PAGE_PAYLOAD} B) を超えた")
         (OUT / name).write_bytes(b)
-    write_headers(cards, areas, stages, gacha, text)
+    write_headers(cards, areas, stages, gacha, text, courses, packs)
     print(f"build_data: cards {len(cards)}, areas {len(areas)}, stages {len(stages)} "
           f"({len(blobs['stages.bin'])} B), gacha {len(gacha)}, text {len(text.items)} 件")
 

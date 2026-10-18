@@ -9,6 +9,7 @@
 #include "../sys/input.h"
 #include "../sys/psg.h"
 #include "../sys/text.h"
+#include "../sys/vdp.h"
 
 #define NAME_MAX   8
 #define COLS       16
@@ -55,7 +56,7 @@ static u8 name_len(void)
 
 static void draw_name(void)
 {
-    ui_fill_rows(ROW(2), 1, COL_DGREEN);
+    vdp_fill(0, ROW(2), SCREEN_W, LINE_H, COL_DGREEN);
     txt_draw(8, ROW(2), g_save.name, COL_WHITE, COL_DGREEN);
 }
 
@@ -74,10 +75,10 @@ FAR(void, name_draw, (void))
 {
     u8 i;
     ui_clear();
-    ui_title(T_NAME_PROMPT);
+    ui_header(T_NAME_PROMPT);
     draw_name();
     for (i = 0; i < CELLS; i++) draw_cell(i, (u8)(i == g_cursor));
-    ui_footer(T_NAME_HELP);
+    ui_guide(T_NAME_HELP);
 }
 
 static void move(u8 p)
@@ -106,7 +107,7 @@ FAR(void, name_update, (void))
     if (!(p & BTN_OK)) return;
     psg_beep(0x80, 4);
     if (g_cursor == CELL_END) {
-        if (n) screen_change(&scr_firstgacha);
+        if (n) screen_change(&scr_course);
         return;
     }
     if (n < NAME_MAX) {

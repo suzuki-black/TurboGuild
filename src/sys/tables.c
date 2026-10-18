@@ -36,3 +36,5 @@ void tbl_area(u8 area, AreaRec *out)   { copy(out, rec(PAGE_AREAS, area - 1, siz
 void tbl_stage(u16 no, StageRec *out)  { copy(out, rec(PAGE_STAGES, no - 1, sizeof(StageRec)), sizeof(StageRec)); }
 void tbl_gacha(u8 id, GachaRec *out)   { copy(out, rec(PAGE_GACHA, id - 1, sizeof(GachaRec)), sizeof(GachaRec)); }
 void tbl_login(u8 day, LoginRec *out)  { copy(out, rec(PAGE_LOGIN, day - 1, sizeof(LoginRec)), sizeof(LoginRec)); }
+void tbl_course(u8 id, CourseRec *out) { copy(out, rec(PAGE_COURSES, id - 1, sizeof(CourseRec)), sizeof(CourseRec)); }
+void tbl_pack(u8 id, PackRec *out)     { copy(out, rec(PAGE_PACKS, id - 1, sizeof(PackRec)), sizeof(PackRec)); }

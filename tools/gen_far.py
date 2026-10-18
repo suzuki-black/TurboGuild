@@ -77,8 +77,7 @@ def main(banks_mk, out_s, out_h):
          "\t.globl\tfar_tramp", "\t.area\t_CODE", ""]
     for name, bank, src in fars:
         s += [f"\t.globl\t_{name}", f"\t.globl\t_{name}_b",
-              f"_{name}:\t\t\t; {src}", "\tpush\thl", f"\tld\thl, #d_{name}", "\tjp\tfar_tramp",
-              f"d_{name}:", f"\t.dw\t_{name}_b", f"\t.db\t{bank}", ""]
+              f"_{name}:\t\t\t; {src}", "\tcall\tfar_tramp", f"\t.dw\t_{name}_b", f"\t.db\t{bank}", ""]
     for var, *fns in screens:
         for fn in fns:
             if fn != "0" and fn not in known:

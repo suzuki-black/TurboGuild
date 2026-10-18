@@ -5,7 +5,7 @@
 #include "../config.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  2
+#define SAVE_VERSION  3
 
 #define DECK_EMPTY    0xFF
 #define SF_STARTED    0x01   /* 名前と最初の 10 連が済んだ */
@@ -31,6 +31,11 @@ typedef struct {
     u16 event_id; u32 event_pt; u8 event_rewards_claimed;
     u16 timeline_cursor;
     u16 save_count;      /* 保存回数。動作確認と A/B 交互の目安 */
+    /* 軍資金（リアルマネーの代わりにプレイヤーが持つお財布, DECISIONS #33） */
+    u8  course;          /* courses.csv の id。0 = まだ選んでいない */
+    u32 funds;           /* 軍資金（円） */
+    u32 spent;           /* 累計課金額（円） */
+    u16 payday_month;    /* 最後に給料が入った月（ゲーム内 30 日 = 1 か月） */
 } SaveData;
 
 u16 save_crc(const SaveData *s);
