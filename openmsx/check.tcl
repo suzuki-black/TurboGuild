@@ -4,6 +4,7 @@
 # ★after time は相対時間。proc 名か list で登録する（"..." は登録時に評価される）。
 
 set ::log [open $::env(OUT) w]
+source [file join [file dirname $::env(OUT)] .. save_offsets.tcl]
 set ::map [file join [file dirname $::env(OUT)] .. kernel.map]
 
 proc sym {name} {
@@ -23,10 +24,10 @@ set ::A_ADDED  [sym _g_time_added]
 set ::A_SAVE   [sym _g_save]
 
 proc logstate {tag} {
-    set gt [rd32 [expr {$::A_SAVE + 12}]]
+    set gt [rd32 [expr {$::A_SAVE + $::O(gtime)}]]
     puts $::log [format "%s himem=%04X status=%d tstat=%d added=%d g_time=%d save_count=%d mode=%s" \
         $tag [rd16 0xFC4A] [debug read memory $::A_STAT] [debug read memory $::A_TSTAT] \
-        [rd32 $::A_ADDED] $gt [rd16 [expr {$::A_SAVE + 885}]] [get_screen_mode]]
+        [rd32 $::A_ADDED] $gt [rd16 [expr {$::A_SAVE + $::O(savecnt)}]] [get_screen_mode]]
     flush $::log
 }
 

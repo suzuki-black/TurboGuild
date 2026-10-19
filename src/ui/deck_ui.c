@@ -62,7 +62,7 @@ static void totals(void)
     DeckStats d;
     u16 cmax = PLAYER_COST_MAX(g_save.level);
     u8 cx;
-    d.enemy_elem = ELEM_NONE;
+    deck_stats_init(&d, ELEM_NONE);
     deck_calc(&d);
     vdp_fill(0, 150, SCREEN_W, 42, COL_BLACK);
     cx = txt_id(0, 150, T_ATK, COL_RED, COL_BLACK);
@@ -132,7 +132,7 @@ static u8 assign(u8 s, u8 idx)
     for (i = 0; i < DECK_SIZE; i++) before[i] = g_save.deck[i];
     for (i = 0; i < DECK_SIZE; i++) if (g_save.deck[i] == idx) g_save.deck[i] = g_save.deck[s];
     g_save.deck[s] = idx;
-    d.enemy_elem = ELEM_NONE;
+    deck_stats_init(&d, ELEM_NONE);
     deck_calc(&d);
     if (d.cost <= PLAYER_COST_MAX(g_save.level)) return 1;
     for (i = 0; i < DECK_SIZE; i++) g_save.deck[i] = before[i];

@@ -17,18 +17,19 @@
 
 void gacha_show(u8 kind);
 
-#define KINDS    5
+#define KINDS    g_kind_n            /* イベント開催中は 6 種（イベントガチャが加わる） */
 #define BANNER_Y 18
-#define BANNER_H 34
+#define BANNER_H (g_kind_n > 5 ? 28 : 34)
+#define kinds    g_kinds
 
-static const u8 kinds[KINDS] = { 1, 2, 3, 5, 6 };
-/* バナーの 2 色（縞）と、左の絵 */
-static const u8 stripe[KINDS][2] = {
-    { COL_DGREEN, COL_GREEN }, { COL_DRED, COL_ORANGE }, { COL_DBLUE, COL_PURPLE },
-    { COL_DBLUE, COL_BLUE }, { COL_ORANGE, COL_YELLOW },
+/* ガチャ id ごとのバナーの 2 色（縞）と、左の絵（添字 = id） */
+static const u8 stripe[7][2] = {
+    { 0, 0 }, { COL_DGREEN, COL_GREEN }, { COL_DRED, COL_ORANGE }, { COL_DBLUE, COL_PURPLE },
+    { COL_DRED, COL_PURPLE }, { COL_DBLUE, COL_BLUE }, { COL_ORANGE, COL_YELLOW },
 };
-static const u8 art[KINDS][4] = {
-    { ATL_ICON_GACHA }, { ATL_ITEM_GOLD }, { ATL_CIRCLE }, { ATL_SCROLL }, { ATL_ITEM_SRTICKET },
+static const u8 art[7][4] = {
+    { ATL_ICON_GACHA }, { ATL_ICON_GACHA }, { ATL_ITEM_GOLD }, { ATL_CIRCLE }, { ATL_CIRCLE },
+    { ATL_SCROLL }, { ATL_ITEM_SRTICKET },
 };
 static const u8 cur_icon[5][2] = {
     { 0, 0 }, { ATL_ITEM_GOLD_X, ATL_ITEM_GOLD_Y }, { ATL_ITEM_GEMS_X, ATL_ITEM_GEMS_Y },
@@ -40,13 +41,15 @@ static void banner(u8 i)
     GachaRec g;
     u8 y = (u8)(BANNER_Y + i * BANNER_H);
     u8 on = (u8)(i == g_cursor), k, cx;
-    u8 a = stripe[i][0], b = stripe[i][1];
+    u8 id = kinds[i];
+    u8 a = stripe[id][0], b = stripe[id][1];
     tbl_gacha(kinds[i], &g);
     vdp_fill(0, y, SCREEN_W, BANNER_H - 2, on ? COL_YELLOW : COL_DGRAY);
-    for (k = 0; k < 5; k++) vdp_fill(2, (u16)(y + 2 + k * 6), SCREEN_W - 4, 6, (u8)(k & 1 ? b : a));
-    gfx_sprite(art[i][0], art[i][1], art[i][2] > 40 ? 40 : art[i][2], art[i][3] > 28 ? 28 : art[i][3], 6, (u8)(y + 2));
+    for (k = 0; k < 4; k++) vdp_fill(2, (u16)(y + 2 + k * 6), SCREEN_W - 4, (u16)(k == 3 ? BANNER_H - 22 : 6), (u8)(k & 1 ? b : a));
+    gfx_sprite(art[id][0], art[id][1], art[id][2] > 40 ? 40 : art[id][2], art[id][3] > 24 ? 24 : art[id][3], 6, (u8)(y + 2));
     ui_key((u8)(i + 1), 2, (u8)(y + 2));
     txt_id(6, (u8)(y + 1), g.name_text, on ? COL_YELLOW : COL_WHITE, a);
+    y = (u8)(y + BANNER_H - 34);           /* 6 種のときは 2 行目を詰める */
     if (g.currency == CUR_FREE) {
         u8 used = (u8)(g_save.last_free_gacha_gday == time_gday(g_save.g_time));
         txt_id(6, (u8)(y + 16), used ? T_GACHA_FREE_USED : T_TODAY_FREE, used ? COL_LGRAY : COL_YELLOW, b);
@@ -78,6 +81,13 @@ static void owned(void)
 
 FAR(void, gacha_init, (void))
 {
+    static const u8 base[5] = { 1, 2, 3, 5, 6 };
+    u8 i;
+    g_kind_n = 0;
+    for (i = 0; i < 5; i++) {
+        kinds[g_kind_n++] = base[i];
+        if (base[i] == 3 && g_save.event_id) kinds[g_kind_n++] = 4;   /* プレミアの次にイベントガチャ */
+    }
     g_cursor = (u8)(g_sel_gacha < KINDS ? g_sel_gacha : 2);
 }
 

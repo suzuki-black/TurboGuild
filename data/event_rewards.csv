@@ -1,0 +1,10 @@
+tbl,kind,threshold,item,amount
+1,point,100,potion,2
+1,point,500,gems,300
+1,point,1500,card,41
+1,point,4000,card,41
+1,point,10000,srticket,1
+1,rank,1,card,43
+1,rank,10,gems,3000
+1,rank,100,gems,1000
+1,rank,1000,gems,100

@@ -11,6 +11,9 @@
 #include "core/gacha.h"
 #include "core/quest.h"
 #include "core/login.h"
+#include "core/fusion.h"
+#include "core/event.h"
+#include "core/ranking.h"
 
 /* sys/ */
 extern u8 g_cart_slot;
@@ -37,6 +40,7 @@ extern const Screen *g_screen_cur, *g_screen_next;
 extern u8 g_dirty;
 extern u16 g_boot_magic;      /* 起動完了の目印（自動テストが待つ） */
 extern u8 g_test_keys;        /* 自動テストが書くボタン（次のフレームで 1 回だけ押したことになる） */
+extern u8 g_test_digit;       /* 自動テストが書く数字キー（数字 + 1。0 = なし） */
 extern u8 g_ui_state;         /* UIS_*: 自動テストが「いま押してよいか」を知るため */
 extern u8 g_frames;           /* 時刻同期までのフレーム数 */
 extern u8 g_save_dirty;       /* 保存していない変更がある */
@@ -48,7 +52,11 @@ extern UiList g_list;         /* 一覧画面の状態（同時に使うのは 1
 extern u8 g_deck_slot;
 extern u8 g_replay;
 extern u8 g_grid_remove;
-extern u8 g_paid;             /* 給料日の知らせを出すか */      /* カードの一覧の先頭に「はずす」を置くか */           /* クリア済みエリアを周回するときの位置 */
+extern u8 g_paid;
+extern FuseReq g_fuse;         /* 合成の選択 */
+extern EventResult g_evres;    /* イベントの開幕・終了のお知らせ */
+extern RankList g_rank;        /* ランキングの表示 */
+extern u8 g_kinds[6], g_kind_n; /* いま出すガチャの種類 */             /* 給料日の知らせを出すか */      /* カードの一覧の先頭に「はずす」を置くか */           /* クリア済みエリアを周回するときの位置 */
 extern u8 g_ticker, g_ticker_gap;   /* お知らせの流し位置 */
 extern u8 g_nosave_warned;    /* 「セーブできません」は 1 回だけ出す */
 extern GachaReq g_gacha;

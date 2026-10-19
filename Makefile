@@ -99,6 +99,12 @@ $(ROM): $(IHX) $(B)/data.stamp $(B)/art.stamp docs/MEMORY_MAP.md tools/link_rom.
 $(DSK): tools/mkblank_dsk.py
 	@if [ ! -f $@ ]; then $(PYTHON) tools/mkblank_dsk.py $@; fi
 
+# 自動試験（Tcl）が使う SaveData の欄の位置
+$(B)/save_offsets.tcl: tests/save_offsets.c src/core/save.h src/config.h src/types.h
+	@mkdir -p $(B)
+	gcc -std=c99 -Isrc -o $(B)/save_offsets tests/save_offsets.c
+	$(B)/save_offsets > $@
+
 # ---- PC 単体テスト ----
 TESTS := $(wildcard tests/test_*.c)
 test: $(B)/data.stamp
@@ -116,7 +122,7 @@ run: all
 # 後始末はこの ROM のパスで絞る（pkill -f openmsx は他プロジェクトを巻き込む）
 KILL_MINE = for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
 
-check: all
+check: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run && mkdir -p $(B)/run
 	@cp $(ROM) $(B)/run/TurboGuild.rom
 	@cp $(DSK) $(B)/run/save.dsk
@@ -126,7 +132,7 @@ check: all
 	@$(KILL_MINE)
 	@cat $(B)/run/check.txt
 
-check-nodisk: all
+check-nodisk: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run3 && mkdir -p $(B)/run3
 	@cp $(ROM) $(B)/run3/TurboGuild.rom
 	-NODISK=1 OUT=$(abspath $(B))/run3/check.txt SHOTDIR=$(abspath $(B))/run3 timeout 90 \
@@ -137,7 +143,7 @@ check-nodisk: all
 
 # Phase1 の受け入れ: 30 分（エミュレータ時間）自動で遊び、保存・リセット・読み込みを繰り返す
 DURATION ?= 1800
-play: all
+play: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run4 && mkdir -p $(B)/run4
 	@cp $(ROM) $(B)/run4/TurboGuild.rom
 	@$(PYTHON) tools/mkblank_dsk.py $(B)/run4/save.dsk >/dev/null

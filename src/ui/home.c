@@ -8,6 +8,8 @@
 #include "../core/player.h"
 #include "../core/time.h"
 #include "../core/wallet.h"
+#include "../core/event.h"
+#include "../core/tables.h"
 #include "../data/screens.h"
 #include "../data/text_ids.h"
 #include "../sys/gfx.h"
@@ -24,13 +26,13 @@
 #define TICK_Y   ROW_LAST
 
 static const u16 labels[ITEMS] = {
-    T_M_QUEST, T_M_GACHA, T_M_CARD, T_M_DECK, T_M_SHOP, T_M_LOGIN, T_M_SAVE, T_M_TITLE,
+    T_M_QUEST, T_M_GACHA, T_M_CARD, T_M_DECK, T_M_SHOP, T_M_RANK, T_M_SAVE, T_M_TITLE,
 };
 /* アイコンはアトラスの位置（x, y）。並びは labels と同じ */
 static const u8 icons[ITEMS][2] = {
     { ATL_ICON_QUEST_X, ATL_ICON_QUEST_Y }, { ATL_ICON_GACHA_X, ATL_ICON_GACHA_Y },
     { ATL_ICON_CARDS_X, ATL_ICON_CARDS_Y }, { ATL_ICON_DECK_X, ATL_ICON_DECK_Y },
-    { ATL_ICON_SHOP_X, ATL_ICON_SHOP_Y },   { ATL_ICON_LOGIN_X, ATL_ICON_LOGIN_Y },
+    { ATL_ICON_SHOP_X, ATL_ICON_SHOP_Y },   { ATL_ICON_NEWS_X, ATL_ICON_NEWS_Y },
     { ATL_ICON_SAVE_X, ATL_ICON_SAVE_Y },   { ATL_ICON_TITLE_X, ATL_ICON_TITLE_Y },
 };
 
@@ -46,6 +48,13 @@ static void cell(u8 i)
     txt_id((u8)((x + (CELL_W - w * 8) / 2) / 8), (u8)(y + 22), labels[i], on ? COL_YELLOW : COL_WHITE, bg);
 }
 
+static void banner(void);
+
+static void redraw_sel(u8 i)
+{
+    if (i == ITEMS) banner(); else cell(i);
+}
+
 static void leader(void)
 {
     u8 i = g_save.deck[0];
@@ -53,15 +62,26 @@ static void leader(void)
     if (i != DECK_EMPTY && i < g_save.card_count) gfx_card(g_save.cards[i].id, 4, 18);
 }
 
-/* 開催中のイベントのバナー（Phase2 でイベントが入る）。今はサービス開始記念の告知 */
+/* 開催中のイベントのバナー（[9] か上で選べる入口）。無ければサービス開始記念の告知 */
 static void banner(void)
 {
-    u8 k;
-    for (k = 0; k < 4; k++) vdp_fill(0, (u16)(BANNER_Y + k * 6), SCREEN_W, 6, (u8)(k & 1 ? COL_RED : COL_DRED));
-    vdp_fill(0, BANNER_Y + 24, SCREEN_W, 2, COL_YELLOW);
-    gfx_sprite(ATL_ICON_GACHA, 4, BANNER_Y);
-    txt_id(4, BANNER_Y + 4, T_NEWS_0, COL_YELLOW, COL_DRED);
-    gfx_sprite(ATL_SPARK, 240, BANNER_Y + 2);
+    u8 k, on = (u8)(g_cursor == ITEMS);
+    vdp_fill(0, BANNER_Y, SCREEN_W, 26, on ? COL_YELLOW : COL_BLACK);
+    for (k = 0; k < 4; k++) vdp_fill(1, (u16)(BANNER_Y + 1 + k * 6), SCREEN_W - 2, 6, (u8)(k & 1 ? COL_RED : COL_DRED));
+    if (g_save.event_id) {
+        EventRec e;
+        u8 cx;
+        tbl_event((u8)g_save.event_id, &e);
+        ui_key(9, 2, BANNER_Y + 7);
+        cx = txt_id(2, BANNER_Y + 4, e.name_text, COL_YELLOW, COL_DRED);
+        cx = txt_id((u8)(cx + 1), BANNER_Y + 4, T_EV_LEFT, COL_WHITE, COL_DRED);
+        cx = txt_num(cx, BANNER_Y + 4, event_days_left(), COL_YELLOW, COL_DRED);
+        txt_id(cx, BANNER_Y + 4, T_DAYS, COL_WHITE, COL_DRED);
+    } else {
+        gfx_sprite(ATL_ICON_GACHA, 4, BANNER_Y);
+        txt_id(4, BANNER_Y + 4, T_NEWS_0, COL_YELLOW, COL_DRED);
+    }
+    gfx_sprite(ATL_SPARK, 244, BANNER_Y + 2);
 }
 
 /* お知らせを右から左へ流す（携帯サイトの「マーキー」）。1 回に 1 文字ぶん送り、右端に次の字を足す。
@@ -95,7 +115,9 @@ FAR(void, home_init, (void))
     player_ap_update();
     login_check(&g_login);
     g_paid = wallet_payday();
-    if (g_login.given || g_paid) g_save_dirty = 1;
+    event_update(&g_evres);
+    if (g_login.given || g_paid || g_evres.started || g_evres.ended) g_save_dirty = 1;
+    if (g_cursor == ITEMS && !g_save.event_id) g_cursor = 0;
     if (g_save_dirty) ui_saving();
 }
 
@@ -114,6 +136,7 @@ FAR(void, home_draw, (void))
     g_ticker = 0;
     g_ticker_gap = 0;
     if (g_paid) { g_paid = 0; ui_msg(T_PAYDAY); return; }
+    if (g_evres.started || g_evres.ended) { screen_change(&scr_evresult); return; }
     if (g_login.given) show_login_bonus();
 }
 
@@ -127,12 +150,13 @@ static void open(u8 i)
     case 2: screen_change(&scr_cardlist); break;
     case 3: screen_change(&scr_deck); break;
     case 4: screen_change(&scr_shop); break;
-    case 5: screen_change(&scr_login); break;
+    case 5: screen_change(&scr_ranking); break;
     case 6:
         g_save_dirty = 1;
         ui_saving();
         if (!g_save_dirty) ui_msg(T_SAVED);
         break;
+    case ITEMS: screen_change(&scr_event); break;
     default: screen_change(&scr_title); break;
     }
 }
@@ -142,11 +166,17 @@ FAR(void, home_update, (void))
     u8 p = input_pressed();
     u8 d = input_digit();
     u8 old = g_cursor;
-    if (p & BTN_LEFT)  g_cursor = (u8)((g_cursor + ITEMS - 1) % ITEMS);
-    if (p & BTN_RIGHT) g_cursor = (u8)((g_cursor + 1) % ITEMS);
-    if (p & (BTN_UP | BTN_DOWN)) g_cursor = (u8)((g_cursor + 4) % ITEMS);
-    if (old != g_cursor) { psg_beep(0x100, 2); cell(old); cell(g_cursor); }
-    if (d >= 1 && d <= ITEMS) { g_cursor = (u8)(d - 1); cell(old); cell(g_cursor); open(g_cursor); return; }
+    if (g_cursor == ITEMS) {                       /* バナーから下へ戻る */
+        if (p & (BTN_DOWN | BTN_LEFT | BTN_RIGHT)) g_cursor = 0;
+    } else {
+        if (p & BTN_LEFT)  g_cursor = (u8)((g_cursor + ITEMS - 1) % ITEMS);
+        if (p & BTN_RIGHT) g_cursor = (u8)((g_cursor + 1) % ITEMS);
+        if (p & BTN_DOWN) g_cursor = (u8)((g_cursor + 4) % ITEMS);
+        if (p & BTN_UP) g_cursor = (u8)(g_cursor < 4 && g_save.event_id ? ITEMS : (g_cursor + 4) % ITEMS);
+    }
+    if (old != g_cursor) { psg_beep(0x100, 2); redraw_sel(old); redraw_sel(g_cursor); }
+    if (d == 9 && g_save.event_id) { g_cursor = ITEMS; open(ITEMS); return; }
+    if (d >= 1 && d <= ITEMS) { g_cursor = (u8)(d - 1); redraw_sel(old); redraw_sel(g_cursor); open(g_cursor); return; }
     if (p & BTN_OK) { open(g_cursor); return; }
     if ((g_frames & 15) == 0) ticker();
     if (g_frames == 0) {           /* 1 秒に 1 回: AP の回復を反映 */

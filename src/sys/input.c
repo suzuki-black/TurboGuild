@@ -48,6 +48,10 @@ void input_update(void)
     for (i = 0; i < 10; i++) {
         if (edge & (1u << i)) { g_digit_pressed = i; break; }
     }
+    if (g_test_digit) {                    /* 自動試験の数字キー（数字 + 1。0 = なし） */
+        g_digit_pressed = (u8)(g_test_digit - 1);
+        g_test_digit = 0;
+    }
     u8 now = read_keys() | read_joy() | g_test_keys;   /* g_test_keys: 自動テストが 1 フレームだけ押す */
     g_test_keys = 0;
     g_input_pressed = now & (u8)~g_input_held;

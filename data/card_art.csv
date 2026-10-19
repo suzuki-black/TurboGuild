@@ -39,3 +39,8 @@ id,kind,hair,hair_col,head,head_col,outfit,outfit_col,weapon,weapon_col,extra,ex
 38,human,none,WHITE,veil,GREEN,robe,GREEN,staff,GREEN,aura,GREEN,smile,1
 39,human,long,YELLOW,crown,,dress,WHITE,staff,YELLOW,wings,YELLOW,smile,
 40,human,short,DGRAY,horns,,armor,PURPLE,greatsword,PURPLE,cape,BLACK,fierce,
+41,human,twin,PURPLE,band,RED,dress,RED,bell,YELLOW,,,smile,
+42,human,twin,PURPLE,crown,,dress,RED,bell,YELLOW,aura,YELLOW,smile,
+43,human,spiky,RED,horns,,armor,DRED,greatsword,ORANGE,cape,RED,fierce,
+44,human,spiky,ORANGE,helmet,LGRAY,tunic,RED,sword,CYAN,cape,ORANGE,fierce,
+45,rabbit,,YELLOW,,,,WHITE,,,,,,

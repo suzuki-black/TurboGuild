@@ -2,6 +2,7 @@
  * 上限に達している間は時計だけ進める（満タン放置ぶんを後で貯金しない）。 */
 #include "player.h"
 #include "save.h"
+#include "inventory.h"
 #include "../far.h"
 #include "../data/tables.h"
 
@@ -63,6 +64,7 @@ FAR(void, player_add_item, (u16 item, u16 amount))
     case ITEM_TICKET:   g_save.gacha_tickets = add_u8(g_save.gacha_tickets, amount); break;
     case ITEM_GEMS:     g_save.gems += amount; break;
     case ITEM_SRTICKET: g_save.sr_tickets = add_u8(g_save.sr_tickets, amount); break;
+    case ITEM_CARD:     inv_add(amount); break;      /* amount はカード id */
     default: break;
     }
 }

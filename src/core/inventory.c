@@ -11,6 +11,7 @@ FAR(u16, inv_add, (u16 card_id))
     g_save.cards[i].id = card_id;
     g_save.cards[i].lv = 1;
     g_save.cards[i].flags = 0;
+    g_save.cards[i].exp = 0;
     g_save.card_count++;
     return i;
 }

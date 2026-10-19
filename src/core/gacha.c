@@ -9,10 +9,12 @@
 #include "time.h"
 #include "../far.h"
 
-static u8 in_pool(const CardRec *c, u8 pool)
+/* プールに入るときの重み。0 = 入らない。イベントガチャはイベント限定を 2 倍（仕様 §4.3） */
+static u8 weight(const CardRec *c, u8 pool)
 {
     if (c->event_id == 0) return 1;
-    return (u8)(pool != POOL_NORMAL && c->event_id == g_save.event_id);
+    if (pool == POOL_NORMAL || c->event_id != g_save.event_id) return 0;
+    return (u8)(pool == POOL_EVENT2X ? 2 : 1);
 }
 
 static u16 pick(u8 rarity, u8 pool)
@@ -22,7 +24,7 @@ static u16 pick(u8 rarity, u8 pool)
     for (;;) {
         for (id = 1; id <= n; id++) {
             tbl_card(id, &c);
-            if (c.rarity == rarity && in_pool(&c, pool)) hits++;
+            if (c.rarity == rarity) hits += weight(&c, pool);
         }
         if (hits || rarity == 0) break;
         rarity--;                    /* そのレアリティが空なら 1 段下げる */
@@ -30,8 +32,12 @@ static u16 pick(u8 rarity, u8 pool)
     if (hits == 0) return 1;
     k = rng_range(&g_save.rng_gacha, hits);
     for (id = 1; id <= n; id++) {
+        u8 w;
         tbl_card(id, &c);
-        if (c.rarity == rarity && in_pool(&c, pool) && k-- == 0) return id;
+        if (c.rarity != rarity) continue;
+        w = weight(&c, pool);
+        if (k < w) return id;
+        k -= w;
     }
     return 1;
 }

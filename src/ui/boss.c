@@ -5,6 +5,7 @@
 #include "widget.h"
 #include "../far.h"
 #include "../ram.h"
+#include "../core/event.h"
 #include "../core/quest.h"
 #include "../core/tables.h"
 #include "../data/palette.h"
@@ -22,11 +23,32 @@
 #define DECK_Y  170
 #define HP_Y    40
 
+void event_gain_show(void);
+
+static u8 is_event(void) { return (u8)(g_sel_stage >= EVENT_STAGE_BASE); }
+
 static u16 boss_card(void)
 {
     AreaRec a;
+    if (is_event()) {
+        EventStage es;
+        event_stage(g_sel_stage - EVENT_STAGE_BASE, &es);
+        return es.boss_card;
+    }
     tbl_area((u8)((g_sel_stage - 1) / STAGES_PER_AREA + 1), &a);
     return a.boss_card;
+}
+
+static u32 boss_hp(void)
+{
+    StageRec st;
+    if (is_event()) {
+        EventStage es;
+        event_stage(g_sel_stage - EVENT_STAGE_BASE, &es);
+        return es.hp;
+    }
+    tbl_stage(g_sel_stage, &st);
+    return st.hp;
 }
 
 static void deck_row(u8 lift)
@@ -109,29 +131,29 @@ FAR(void, boss_init, (void))
 FAR(void, boss_draw, (void))
 {
     CardRec c;
-    StageRec st;
-    u32 left;
+    u32 left, max;
     u16 t, shown = 0;
     tbl_card(boss_card(), &c);
-    tbl_stage(g_sel_stage, &st);
+    max = boss_hp();
     ui_clear();
     ui_header(T_BOSS_BATTLE);
     gfx_card2x(boss_card(), BOSS_X, BOSS_Y);
     txt_id(16, 20, c.name_text, rarity_color(c.rarity), COL_BLACK);
-    left = st.hp;
-    hp(left, st.hp);
+    left = max;
+    hp(left, max);
     deck_row(0);
     if (g_qr.status != Q_OK) return;
     ui_wait(30);
     for (t = 0; t < g_qr.b.turns && shown < BATTLE_LOG_MAX; t++, shown++) {
         if (shown == BATTLE_LOG_MAX - 1) {           /* 長い戦いは最後の一撃まで飛ばす */
             left = g_qr.b.dmg_per_turn < left && g_qr.b.win ? g_qr.b.dmg_per_turn : left;
-            if (!g_qr.b.win) left = st.hp - (u32)(st.hp / 2);
+            if (!g_qr.b.win) left = max - (u32)(max / 2);
         }
-        turn((u8)(t % DECK_SIZE), &left, st.hp);
+        turn((u8)(t % DECK_SIZE), &left, max);
     }
-    if (g_qr.b.win) hp(0, st.hp);
+    if (g_qr.b.win) hp(0, max);
     outcome();
+    if (g_qr.event && g_qr.b.win) event_gain_show();
     if (g_qr.levels) ui_msg(T_LEVELUP);
     if (g_qr.area_cleared) ui_msg(T_AREA_CLEAR);
     g_dirty = 0;
@@ -140,7 +162,9 @@ FAR(void, boss_draw, (void))
 FAR(void, boss_update, (void))
 {
     if (!(input_pressed() & (BTN_OK | BTN_CANCEL))) return;
-    if (g_qr.area_cleared) {
+    if (is_event() || g_qr.event) {
+        screen_change(&scr_event);
+    } else if (g_qr.area_cleared) {
         g_sel_area++;
         screen_change(&scr_area);
     } else {

@@ -24,7 +24,8 @@ static u32 scale(u32 v, u8 pct)
     return v * pct / 100;
 }
 
-static u32 card_value(u16 index, u8 want_def, u8 enemy, CardRec *c)
+/* bonus: イベントの特効の指定（無ければ 0） */
+static u32 card_value(u16 index, u8 want_def, u8 enemy, const DeckStats *bonus, CardRec *c)
 {
     const OwnedCard *o = &g_save.cards[index];
     u32 v;
@@ -33,19 +34,31 @@ static u32 card_value(u16 index, u8 want_def, u8 enemy, CardRec *c)
     v = v * (100 + (u16)o->lv * 5) / 100;
     if (c->skill == (want_def ? 2 : 1)) v = scale(v, 100 + SKILL_PCT);
     if (!want_def && enemy != ELEM_NONE) v = scale(v, elem_pct(c->element, enemy));
+    if (!want_def && bonus) {
+        if (bonus->bonus_card && c->id == bonus->bonus_card) v *= bonus->bonus_mul;
+        if (bonus->evo_card && c->id == bonus->evo_card) v *= bonus->evo_mul;
+    }
     return scale(v, INFLATION_PCT);
 }
 
 FAR(u32, card_atk_of, (u16 index))
 {
     CardRec c;
-    return card_value(index, 0, ELEM_NONE, &c);
+    return card_value(index, 0, ELEM_NONE, 0, &c);
 }
 
 FAR(u32, card_def_of, (u16 index))
 {
     CardRec c;
-    return card_value(index, 1, ELEM_NONE, &c);
+    return card_value(index, 1, ELEM_NONE, 0, &c);
+}
+
+FAR(void, deck_stats_init, (DeckStats *st, u16 enemy_elem))
+{
+    u8 *p = (u8 *)st;
+    u8 i;
+    for (i = 0; i < sizeof(DeckStats); i++) p[i] = 0;
+    st->enemy_elem = (u8)enemy_elem;
 }
 
 FAR(void, deck_calc, (DeckStats *st))
@@ -58,8 +71,8 @@ FAR(void, deck_calc, (DeckStats *st))
     for (d = 0; d < DECK_SIZE; d++) {
         u8 i = g_save.deck[d];
         if (i == DECK_EMPTY || i >= g_save.card_count) continue;
-        st->atk += card_value(i, 0, st->enemy_elem, &c);
-        st->def += card_value(i, 1, st->enemy_elem, &c);
+        st->atk += card_value(i, 0, st->enemy_elem, st, &c);
+        st->def += card_value(i, 1, st->enemy_elem, st, &c);
         st->cost += c.cost;
         st->count++;
         if (c.skill == 3) st->ap_minus = 1;
@@ -89,7 +102,7 @@ FAR(void, deck_auto, (void))
         for (i = 0; i < g_save.card_count; i++) {
             u32 v;
             if (used(i, d)) continue;
-            v = card_value(i, 0, ELEM_NONE, &c);
+            v = card_value(i, 0, ELEM_NONE, 0, &c);
             if (cost + c.cost <= cost_max && v > best) {
                 best = v;
                 pick = i;

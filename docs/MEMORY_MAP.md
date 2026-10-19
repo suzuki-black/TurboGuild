@@ -16,7 +16,7 @@
 
 | page | 窓 | 名前 | ソース | 説明 |
 |---|---|---|---|---|
-| 0 | 4000h 固定 | KERNEL | kernel | 起動・sys/・文字描画・表の読み出し・画面の共通部品・中継 |
+| 0 | 4000h 固定 | KERNEL | kernel | 起動・sys/・文字描画・絵の描画・表の読み出し・画面の共通部品・中継 |
 | 1 | 6000h コード | CORE | code: src/core/player.c src/core/inventory.c src/core/deck.c src/core/battle.c src/core/quest.c src/core/gacha.c src/core/login.c src/core/wallet.c | ゲームロジック |
 | 2 | 6000h コード | UI_START | code: src/ui/title.c src/ui/name.c src/ui/course.c src/ui/firstgacha.c src/ui/savedisk.c src/core/save.c src/core/time.c src/sys/rtc.c | タイトル・名前・お財布・最初の 10 連・セーブディスク・時計 |
 | 3 | 6000h コード | UI_HOME | code: src/ui/home.c src/ui/shop.c src/ui/login_ui.c | マイページ・ショップ・ログインスタンプ |
@@ -25,35 +25,46 @@
 | 6 | 6000h コード | UI_CARD | code: src/ui/card_ui.c src/ui/deck_ui.c | カード一覧・詳細・デッキ編成 |
 | 7 | 6000h コード | UI_DEBUG | code: src/ui/p0menu.c src/ui/p0tests.c src/ui/p0save.c src/ui/p0bank.c src/sys/font.c | Phase0 の診断画面（タイトルで ESC） |
 | 8 | 6000h コード | UI_COMMON | code: src/ui/common.c | 共通部品（上下の帯・状態欄・箱・保存） |
-| 9 | 6000h コード | UI_BOSS | code: src/ui/boss.c | ボス戦 |
+| 9 | 6000h コード | UI_BOSS | code: src/ui/boss.c | ボス戦・イベントのボス戦 |
 | 10 | 6000h コード | UI_ANIM | code: src/ui/gacha_anim.c | ガチャの開封演出とカードめくり |
-| 11 | 8000h データA | CARDS | build/cards.bin | カード |
-| 12 | 8000h データA | AREAS | build/areas.bin | エリア |
-| 13 | 8000h データA | STAGES | build/stages.bin | 500 ステージ（tools/gen_stages.py） |
-| 14 | 8000h データA | GACHA | build/gacha.bin | ガチャ |
-| 15 | 8000h データA | LOGIN | build/login.bin | ログインボーナス |
-| 16 | A000h データB | TEXT0 | build/text0.dat | 文字列の目次と本体 |
-| 17 | A000h データB | TEXT1 | build/text1.dat | 文字列（溢れ） |
-| 18 | A000h データB | TEXT2 | build/text2.dat | 文字列（溢れ） |
-| 19 | A000h データB | TEXT3 | build/text3.dat | 文字列（溢れ） |
-| 20 | VRAM へ | ATLAS0 | build/atlas0.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
-| 21 | VRAM へ | ATLAS1 | build/atlas1.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
-| 22 | VRAM へ | ATLAS2 | build/atlas2.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
-| 23 | VRAM へ | ATLAS3 | build/atlas3.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
-| 24 | VRAM へ | ATLAS4 | build/atlas4.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
-| 25 | 8000h データA | CARDART0 | build/cardart0.bin | カード絵 56x72（4 枚/ページ） |
-| 26 | 8000h データA | CARDART1 | build/cardart1.bin | カード絵 56x72（4 枚/ページ） |
-| 27 | 8000h データA | CARDART2 | build/cardart2.bin | カード絵 56x72（4 枚/ページ） |
-| 28 | 8000h データA | CARDART3 | build/cardart3.bin | カード絵 56x72（4 枚/ページ） |
-| 29 | 8000h データA | CARDART4 | build/cardart4.bin | カード絵 56x72（4 枚/ページ） |
-| 30 | 8000h データA | CARDART5 | build/cardart5.bin | カード絵 56x72（4 枚/ページ） |
-| 31 | 8000h データA | CARDART6 | build/cardart6.bin | カード絵 56x72（4 枚/ページ） |
-| 32 | 8000h データA | CARDART7 | build/cardart7.bin | カード絵 56x72（4 枚/ページ） |
-| 33 | 8000h データA | CARDART8 | build/cardart8.bin | カード絵 56x72（4 枚/ページ） |
-| 34 | 8000h データA | CARDART9 | build/cardart9.bin | カード絵 56x72（4 枚/ページ） |
-| 35 | 8000h データA | THUMB0 | build/thumb0.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 36 | 8000h データA | THUMB1 | build/thumb1.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 37 | 8000h データA | THUMB2 | build/thumb2.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 38 | 8000h データA | COURSES | build/courses.bin | お財布のコース（軍資金） |
-| 39 | 8000h データA | PACKS | build/packs.bin | 石のパック（課金） |
-| 40-63 | - | - | - | 空き |
+| 11 | 6000h コード | CORE2 | code: src/core/fusion.c src/core/event.c src/core/ranking.c | 合成・進化・イベント・ランキング |
+| 12 | 6000h コード | UI_FUSION | code: src/ui/fusion_ui.c | 強化合成・進化合成 |
+| 13 | 6000h コード | UI_EVENT | code: src/ui/event_ui.c src/ui/ranking_ui.c | イベント・ランキング・イベント結果 |
+| 14 | 8000h データA | CARDS | build/cards.bin | カード |
+| 15 | 8000h データA | AREAS | build/areas.bin | エリア |
+| 16 | 8000h データA | STAGES | build/stages.bin | 500 ステージ（tools/gen_stages.py） |
+| 17 | 8000h データA | GACHA | build/gacha.bin | ガチャ |
+| 18 | 8000h データA | LOGIN | build/login.bin | ログインボーナス |
+| 19 | 8000h データA | COURSES | build/courses.bin | お財布のコース（軍資金） |
+| 20 | 8000h データA | PACKS | build/packs.bin | 石のパック（課金） |
+| 21 | 8000h データA | EVENTS | build/events.bin | イベント |
+| 22 | 8000h データA | EVSTAGES | build/evstages.bin | イベントの面 |
+| 23 | 8000h データA | EVREWARDS | build/evrewards.bin | イベント報酬（ポイント・順位） |
+| 24 | 8000h データA | NPC0 | build/npc0.bin | NPC 1000 人（前半, tools/gen_npc.py） |
+| 25 | 8000h データA | NPC1 | build/npc1.bin | NPC（後半） |
+| 26 | 8000h データA | NPCPOW | build/npcpow.bin | 総戦力順の NPC 添字 |
+| 27 | A000h データB | TEXT0 | build/text0.dat | 文字列の目次と本体 |
+| 28 | A000h データB | TEXT1 | build/text1.dat | 文字列（溢れ） |
+| 29 | A000h データB | TEXT2 | build/text2.dat | 文字列（溢れ） |
+| 30 | A000h データB | TEXT3 | build/text3.dat | 文字列（溢れ） |
+| 31 | VRAM へ | ATLAS0 | build/atlas0.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
+| 32 | VRAM へ | ATLAS1 | build/atlas1.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
+| 33 | VRAM へ | ATLAS2 | build/atlas2.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
+| 34 | VRAM へ | ATLAS3 | build/atlas3.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
+| 35 | VRAM へ | ATLAS4 | build/atlas4.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
+| 36 | 8000h データA | CARDART0 | build/cardart0.bin | カード絵 56x72（4 枚/ページ） |
+| 37 | 8000h データA | CARDART1 | build/cardart1.bin | カード絵 56x72（4 枚/ページ） |
+| 38 | 8000h データA | CARDART2 | build/cardart2.bin | カード絵 56x72（4 枚/ページ） |
+| 39 | 8000h データA | CARDART3 | build/cardart3.bin | カード絵 56x72（4 枚/ページ） |
+| 40 | 8000h データA | CARDART4 | build/cardart4.bin | カード絵 56x72（4 枚/ページ） |
+| 41 | 8000h データA | CARDART5 | build/cardart5.bin | カード絵 56x72（4 枚/ページ） |
+| 42 | 8000h データA | CARDART6 | build/cardart6.bin | カード絵 56x72（4 枚/ページ） |
+| 43 | 8000h データA | CARDART7 | build/cardart7.bin | カード絵 56x72（4 枚/ページ） |
+| 44 | 8000h データA | CARDART8 | build/cardart8.bin | カード絵 56x72（4 枚/ページ） |
+| 45 | 8000h データA | CARDART9 | build/cardart9.bin | カード絵 56x72（4 枚/ページ） |
+| 46 | 8000h データA | CARDART10 | build/cardart10.bin | カード絵 56x72（4 枚/ページ） |
+| 47 | 8000h データA | CARDART11 | build/cardart11.bin | カード絵 56x72（4 枚/ページ） |
+| 48 | 8000h データA | THUMB0 | build/thumb0.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 49 | 8000h データA | THUMB1 | build/thumb1.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 50 | 8000h データA | THUMB2 | build/thumb2.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 51-63 | - | - | - | 空き |

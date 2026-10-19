@@ -9,13 +9,13 @@ SaveData g_save;
 
 static unsigned char *load(const char *name)
 {
-    static unsigned char *cache[8];
-    static const char *names[8];
+    static unsigned char *cache[32];
+    static const char *names[32];
     char path[256];
     FILE *f;
     long n;
     int i;
-    for (i = 0; i < 8 && names[i]; i++) if (!strcmp(names[i], name)) return cache[i];
+    for (i = 0; i < 32 && names[i]; i++) if (!strcmp(names[i], name)) return cache[i];
     snprintf(path, sizeof path, "build/%s", name);
     f = fopen(path, "rb");
     if (!f) { fprintf(stderr, "tables_pc: %s が無い（make を先に）\n", path); exit(2); }
@@ -46,3 +46,12 @@ void tbl_gacha(u8 id, GachaRec *out) { rec("gacha.bin", id - 1, out, sizeof *out
 void tbl_login(u8 d, LoginRec *out)  { rec("login.bin", d - 1, out, sizeof *out); }
 void tbl_course(u8 id, CourseRec *out) { rec("courses.bin", id - 1, out, sizeof *out); }
 void tbl_pack(u8 id, PackRec *out)     { rec("packs.bin", id - 1, out, sizeof *out); }
+void tbl_event(u8 id, EventRec *out)   { rec("events.bin", id - 1, out, sizeof *out); }
+void tbl_evstage(u8 i, EvStageRec *out)   { rec("evstages.bin", i, out, sizeof *out); }
+void tbl_evreward(u8 i, EvRewardRec *out) { rec("evrewards.bin", i, out, sizeof *out); }
+void tbl_npc(u16 i, NpcRec *out)
+{
+    unsigned char *b = load(i < NPC_PER_PAGE ? "npc0.bin" : "npc1.bin");
+    memcpy(out, b + (i % NPC_PER_PAGE) * sizeof *out, sizeof *out);
+}
+u16 tbl_npc_by_power(u16 rank) { unsigned char *b = load("npcpow.bin"); return (u16)(b[rank * 2] | b[rank * 2 + 1] << 8); }

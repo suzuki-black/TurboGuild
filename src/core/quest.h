@@ -3,6 +3,7 @@
 #define CORE_QUEST_H
 #include "../types.h"
 #include "battle.h"
+#include "event.h"
 
 #define Q_OK      0
 #define Q_LOCKED  1
@@ -19,9 +20,12 @@ typedef struct {
     u16 drop_card;       /* 0 = なし */
     u8  drop_lost;       /* 満杯で受け取れなかった */
     u8  area_cleared;    /* このボスを初めて倒した */
+    u8  event;           /* イベントの面だった */
+    u16 points;          /* イベントポイント */
+    RewardList gain;     /* 届いた報酬ライン */
 } QuestResult;
 
-void quest_run(u16 stage, QuestResult *r);
+void quest_run(u16 stage, QuestResult *r);     /* stage >= EVENT_STAGE_BASE ならイベントの面 */
 u16  quest_max_stage(void);          /* 挑戦できる最大のステージ番号 */
 u8   quest_ap_cost(u16 stage);       /* スキル込みの AP 消費 */
 #endif

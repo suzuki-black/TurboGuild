@@ -1,5 +1,6 @@
 /* test_game.c — 戦闘・AP・クエスト・ガチャ・ログインボーナス・デッキ（表は build/ の .bin の実物） */
 #include "check.h"
+#include <string.h>
 #include "core/battle.h"
 #include "core/deck.h"
 #include "core/gacha.h"
@@ -11,6 +12,9 @@
 #include "core/tables.h"
 #include "core/time.h"
 #include "core/wallet.h"
+#include "core/fusion.h"
+#include "core/event.h"
+#include "core/ranking.h"
 
 static void fresh(void) { save_new(&g_save, 1000); }
 
@@ -201,9 +205,127 @@ static void test_wallet(void)
     CHECK(g_save.spent == 20000 && g_save.gems >= 20000);
 }
 
+static void test_fusion(void)
+{
+    FuseReq f;
+    u16 i;
+    fresh();
+    for (i = 0; i < 6; i++) inv_add(2);        /* N かまど番の少年 × 6 */
+    inv_add(21);                                /* R 紅蓮の槍騎士 */
+    memset(&f, 0, sizeof f);
+    f.base = 6;                                 /* R をベースに */
+    fusion_preview(&f);
+    CHECK(f.status == F_NONE);
+    fusion_select_all_n(&f);
+    fusion_preview(&f);
+    CHECK(f.count == 6 && f.gain == 60 && f.gold == 600 && f.status == F_OK);
+    /* R の Lv1→2 は 1*20*2=40、Lv2→3 は 80。60 なら Lv2 で余り 20 */
+    CHECK(f.lv_after == 2);
+    fusion_apply(&f);
+    CHECK(g_save.card_count == 1 && f.base == 0);
+    CHECK(g_save.cards[0].id == 21 && g_save.cards[0].lv == 2 && g_save.cards[0].exp == 20);
+    CHECK(g_save.gold == START_GOLD - 600);
+    /* 同じレアリティは +50%: R を素材に R へ = 75 */
+    inv_add(22);
+    memset(&f, 0, sizeof f);
+    f.base = 0;
+    SEL_SET(f.sel, 1);
+    fusion_preview(&f);
+    CHECK(f.gain == 75);
+    /* デッキのカードは素材にできない */
+    g_save.deck[0] = 1;
+    fusion_preview(&f);
+    CHECK(f.status == F_BAD);
+    g_save.deck[0] = DECK_EMPTY;
+    /* 進化: 同じ id の 2 枚（evo_to あり）→ 進化先 Lv1 */
+    fresh();
+    inv_add(1); inv_add(5); inv_add(1);
+    CHECK(!evolve_partner_ok(0, 1));            /* 違うカード */
+    CHECK(evolve_partner_ok(0, 2));
+    CHECK(evolve(0, 2) == F_OK && g_save.cards[0].id == 44 && g_save.cards[0].lv == 1 && g_save.card_count == 2);
+    CHECK(evolve(1, 0) == F_NOT_EVO);
+}
+
+static void test_event(void)
+{
+    EventResult r;
+    RewardList g;
+    QuestResult q;
+    u16 rank_mid;
+    fresh();
+    g_save.g_time = GSEC_PER_DAY * 2;           /* 2 日目: まだ */
+    event_update(&r);
+    CHECK(!r.started && event_active() == 0);
+    g_save.g_time = GSEC_PER_DAY * 3;           /* 3 日目: 開幕 → 自動で参加 */
+    event_update(&r);
+    CHECK(r.started && g_save.event_id == 1 && event_days_left() == 14);
+    /* ポイントの報酬ライン（100: 回復薬 2, 500: 石 300） */
+    memset(&g, 0, sizeof g);
+    event_add_points(120, &g);
+    CHECK(g.n == 1 && g.item[0] == ITEM_POTION && g_save.potions == 2);
+    memset(&g, 0, sizeof g);
+    event_add_points(400, &g);
+    CHECK(g.n == 1 && g.item[0] == ITEM_GEMS && event_next_line() == 1500);
+    memset(&g, 0, sizeof g);
+    event_add_points(10, &g);
+    CHECK(g.n == 0);                            /* 同じラインは 2 度出ない */
+    /* イベントの面は特効が効く: 特効カード（41）だけのデッキで初級に勝てる */
+    inv_add(41);
+    g_save.deck[0] = (u8)(g_save.card_count - 1);
+    quest_run(EVENT_STAGE_BASE + 1, &q);
+    CHECK(q.status == Q_OK && q.event && q.b.win && q.points == 10 && g_save.event_pt == 540);
+    /* 期間中の順位は NPC が伸びるにつれて下がる */
+    g_save.g_time = GSEC_PER_DAY * 4;
+    { RankList l; l.mode = RANK_EVENT; l.first = 0; ranking_list(&l); rank_mid = l.player_rank; }
+    g_save.g_time = GSEC_PER_DAY * 16;
+    { RankList l; l.mode = RANK_EVENT; l.first = 0; ranking_list(&l); CHECK(l.player_rank > rank_mid); }
+    /* ★期間をまたいだセーブ: 終わった後の日付で読み込むと、終了処理と順位報酬が走る */
+    g_save.g_time = GSEC_PER_DAY * 40;
+    {
+        u32 gems = g_save.gems;
+        event_update(&r);
+        CHECK(r.ended && r.id == 1 && r.points == 540 && r.rank == ranking_final_rank(540));
+        CHECK(r.gain.n == 1 && g_save.gems == gems + 100);   /* 1000 位以内: 石 100 */
+        CHECK(g_save.event_id == 0 && g_save.last_event == 1 && g_save.last_rank == r.rank);
+    }
+    event_update(&r);
+    CHECK(!r.ended && !r.started);              /* 2 度目は何も起きない */
+    quest_run(EVENT_STAGE_BASE + 1, &q);
+    CHECK(q.status == Q_LOCKED);                /* 終わったイベントの面には入れない */
+}
+
+static void test_ranking(void)
+{
+    RankList l;
+    NpcRec a, b;
+    u8 i;
+    fresh();
+    tbl_npc(0, &a); tbl_npc(999, &b);
+    CHECK(a.event_pt >= b.event_pt);            /* 表は大きい順 */
+    CHECK(ranking_final_rank(0xFFFFFFFFUL) == 1);
+    CHECK(ranking_final_rank(0) > 800);
+    /* 一覧: 自分の行が自分の順位の位置にあり、上から順位が続く */
+    inv_add(39); inv_add(40);
+    g_save.deck[0] = 0; g_save.deck[1] = 1;
+    l.mode = RANK_POWER; l.first = 0;
+    ranking_list(&l);
+    CHECK(l.n == RANK_ROWS && l.player_value == player_power());
+    for (i = 0; i < l.n; i++) {
+        CHECK(l.rows[i].rank == l.rows[0].rank + i);
+        if (l.rows[i].npc == RANK_PLAYER) CHECK(l.rows[i].rank == l.player_rank);
+        if (i) CHECK(l.rows[i - 1].value >= l.rows[i].value);
+    }
+    l.first = 1;
+    ranking_list(&l);
+    CHECK(l.rows[0].rank == 1);
+}
+
 int main(void)
 {
     test_wallet();
+    test_fusion();
+    test_event();
+    test_ranking();
     test_struct_sizes();
     test_battle();
     test_elem();

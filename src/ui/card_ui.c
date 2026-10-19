@@ -156,11 +156,14 @@ FAR(void, carddetail_draw, (void))
     cx = txt_id(16, 148, T_SKILL, COL_LGRAY, COL_BLACK);
     txt_id(16, 166, (u16)(T_SKILL_0 + c.skill), COL_YELLOW, COL_BLACK);
     if (inv_in_deck(g_sel_card)) gfx_sprite(ATL_SPARK, 104, 22);
-    ui_guide(T_HELP_BACK);
+    ui_guide(T_CARD_ACTIONS);
 }
 
 FAR(void, carddetail_update, (void))
 {
+    u8 d = input_digit();
+    if (d == 1) { screen_change(&scr_fuse); return; }
+    if (d == 2) { screen_change(&scr_evolve); return; }
     if (input_pressed() & (BTN_CANCEL | BTN_OK)) screen_change(&scr_cardlist);
 }
 

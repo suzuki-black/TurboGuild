@@ -16,6 +16,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import gen_npc  # noqa: E402
 import gen_stages  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -29,7 +30,8 @@ ELEMENT = {"炎": 0, "水": 1, "雷": 2, "光": 3, "闇": 4}
 MAX_LV = {0: 20, 1: 30, 2: 40, 3: 50}
 CURRENCY = {"free": 0, "gold": 1, "gems": 2, "ticket": 3, "srticket": 4}
 POOL = {"normal": 0, "normal_event": 1, "event2x": 2}
-ITEM = {"gold": 0, "potion": 1, "ticket": 2, "gems": 3, "srticket": 4}
+ITEM = {"gold": 0, "potion": 1, "ticket": 2, "gems": 3, "srticket": 4, "card": 5}
+REWARD_KIND = {"point": 0, "rank": 1}
 
 # (C の型, 名前)。struct の書式はこの表から作る
 CARD_FIELDS = [("u16", "id"), ("u16", "name_text"), ("u8", "rarity"), ("u8", "element"),
@@ -44,6 +46,14 @@ GACHA_FIELDS = [("u16", "name_text"), ("u8", "currency"), ("u16", "price"), ("u1
 LOGIN_FIELDS = [("u8", "item"), ("u16", "amount")]
 COURSE_FIELDS = [("u16", "name_text"), ("u32", "start"), ("u32", "monthly"), ("u8", "infinite")]
 PACK_FIELDS = [("u16", "gems"), ("u16", "price")]
+EVENT_FIELDS = [("u16", "name_text"), ("u16", "story_text"), ("u16", "boss_card"), ("u16", "bonus_card"),
+                ("u8", "bonus_mul"), ("u8", "evo_bonus_mul"), ("u8", "reward_tbl"), ("u8", "duration"),
+                ("u8", "kind"), ("u16", "start_day")]
+EVSTAGE_FIELDS = [("u8", "kind"), ("u8", "level"), ("u16", "name_text"), ("u8", "ap"), ("u32", "hp"),
+                  ("u16", "def"), ("u16", "atk"), ("u16", "points"), ("u16", "exp"), ("u16", "gold")]
+EVREWARD_FIELDS = [("u8", "tbl"), ("u8", "kind"), ("u32", "threshold"), ("u8", "item"), ("u16", "amount")]
+NPC_FIELDS = [("u16", "name_id"), ("u8", "guild"), ("u8", "level"), ("u16", "power"),
+              ("u32", "last_login"), ("u32", "event_pt"), ("u8", "activity"), ("u8", "flags")]
 FMT = {"u8": "B", "u16": "H", "u32": "I"}
 
 
@@ -220,6 +230,58 @@ def load_packs():
     return rows
 
 
+def load_events(text, ncards):
+    rows = []
+    for ln, r in read_csv("events.csv"):
+        where = f"events.csv:{ln}"
+        if int(r["id"]) != len(rows) + 1:
+            die(f"{where}: id は 1 から連番")
+        for k in ("boss_card_id", "bonus_card_id"):
+            if not 1 <= int(r[k]) <= ncards:
+                die(f"{where}: {k} のカードが無い")
+        rows.append((text.add(r["name"]), text.add(r["story"]), int(r["boss_card_id"]), int(r["bonus_card_id"]),
+                     int(r["bonus_mul"]), int(r["evo_bonus_mul"]), int(r["reward_tbl_id"]),
+                     int(r["duration_days"]), int(r["kind"]), int(r["start_day"])))
+    return rows
+
+
+def load_event_stages(text):
+    return [(int(r["kind"]), int(r["level"]), text.add(r["name"]), int(r["ap"]), int(r["hp"]), int(r["def"]),
+             int(r["atk"]), int(r["points"]), int(r["exp"]), int(r["gold"])) for _ln, r in read_csv("event_stages.csv")]
+
+
+def load_event_rewards(ncards):
+    rows = []
+    for ln, r in read_csv("event_rewards.csv"):
+        where = f"event_rewards.csv:{ln}"
+        item = lookup(ITEM, r["item"], where)
+        if item == ITEM["card"] and not 1 <= int(r["amount"]) <= ncards:
+            die(f"{where}: カード {r['amount']} が無い")
+        rows.append((int(r["tbl"]), lookup(REWARD_KIND, r["kind"], where), int(r["threshold"]), item, int(r["amount"])))
+    # 同じ表・同じ種類の中は閾値の昇順（C 側は前から見る）
+    rows.sort(key=lambda x: (x[0], x[1], x[2]))
+    return rows
+
+
+def load_npc_texts(text):
+    pre, suf = [], []
+    for ln, r in read_csv("npc_names.csv"):
+        (pre if r["part"] == "pre" else suf).append(r["text"])
+    if len(pre) * len(suf) < gen_npc.COUNT:
+        die("npc_names.csv: 前半 × 後半 が 1000 に足りない")
+    first_pre = len(text.items)
+    for i, s in enumerate(pre):
+        text.add(s, f"T_NPC_PRE{i}")
+    first_suf = len(text.items)
+    for i, s in enumerate(suf):
+        text.add(s, f"T_NPC_SUF{i}")
+    guilds = [r["name"] for _ln, r in read_csv("guilds.csv")]
+    first_guild = len(text.items)
+    for i, s in enumerate(guilds):
+        text.add(s, f"T_GUILD{i}")
+    return first_pre, len(pre), first_suf, len(suf), first_guild, len(guilds)
+
+
 def c_struct(name, fields):
     return ["typedef struct {"] + [f"    {t} {n};" for t, n in fields] + [f"}} {name};", ""]
 
@@ -229,7 +291,7 @@ def write_if_changed(path, text):
         path.write_text(text, encoding="utf-8")
 
 
-def write_headers(cards, areas, stages, gacha, text, courses, packs):
+def write_headers(cards, areas, stages, gacha, text, courses, packs, extra):
     h = ["/* cards.h — tools/build_data.py の生成物。手で編集しない */",
          "#ifndef DATA_CARDS_H", "#define DATA_CARDS_H", '#include "../types.h"', ""] + PACK_ON
     h += c_struct("CardRec", CARD_FIELDS) + PACK_OFF
@@ -242,13 +304,17 @@ def write_headers(cards, areas, stages, gacha, text, courses, packs):
          "#ifndef DATA_TABLES_H", "#define DATA_TABLES_H", '#include "../types.h"', ""] + PACK_ON
     for name, fields in (("AreaRec", AREA_FIELDS), ("StageRec", STAGE_FIELDS),
                          ("GachaRec", GACHA_FIELDS), ("LoginRec", LOGIN_FIELDS),
-                         ("CourseRec", COURSE_FIELDS), ("PackRec", PACK_FIELDS)):
+                         ("CourseRec", COURSE_FIELDS), ("PackRec", PACK_FIELDS),
+                         ("EventRec", EVENT_FIELDS), ("EvStageRec", EVSTAGE_FIELDS),
+                         ("EvRewardRec", EVREWARD_FIELDS), ("NpcRec", NPC_FIELDS)):
         t += c_struct(name, fields)
     t += PACK_OFF
     t += [f"#define AREA_COUNT {len(areas)}", f"#define STAGE_COUNT {len(stages)}",
           f"#define STAGES_PER_AREA {gen_stages.STAGES_PER_AREA}",
           f"#define GACHA_COUNT {len(gacha)}", "#define LOGIN_DAYS 7",
           f"#define COURSE_COUNT {len(courses)}", f"#define PACK_COUNT {len(packs)}"]
+    t += [f"#define {k} {v}" for k, v in extra.items()]
+    t += [f"#define REWARD_{k.upper()} {v}" for k, v in REWARD_KIND.items()]
     t += [f"#define CUR_{k.upper()} {v}" for k, v in CURRENCY.items()]
     t += [f"#define POOL_{k.upper()} {v}" for k, v in POOL.items()]
     t += [f"#define ITEM_{k.upper()} {v}" for k, v in ITEM.items()]
@@ -276,6 +342,16 @@ def main():
     login = load_login()
     courses = load_courses(text)
     packs = load_packs()
+    events = load_events(text, len(cards))
+    evstages = load_event_stages(text)
+    evrewards = load_event_rewards(len(cards))
+    fp, np_, fs, ns, fg, ng = load_npc_texts(text)
+    npcs, by_power = gen_npc.generate(np_, ns, ng)
+    npc_blob = gen_npc.pack(npcs)
+    per = PAGE_PAYLOAD // 16
+    extra = {"EVENT_COUNT": len(events), "EVSTAGE_COUNT": len(evstages), "EVREWARD_COUNT": len(evrewards),
+             "NPC_COUNT": len(npcs), "NPC_PER_PAGE": per, "NPC_PRE_TEXT": fp, "NPC_PRE_COUNT": np_,
+             "NPC_SUF_TEXT": fs, "NPC_SUF_COUNT": ns, "GUILD_TEXT": fg, "GUILD_COUNT": ng}
     blobs = {
         "cards.bin": pack_table(CARD_FIELDS, cards),
         "areas.bin": pack_table(AREA_FIELDS, areas),
@@ -284,6 +360,12 @@ def main():
         "login.bin": pack_table(LOGIN_FIELDS, login),
         "courses.bin": pack_table(COURSE_FIELDS, courses),
         "packs.bin": pack_table(PACK_FIELDS, packs),
+        "events.bin": pack_table(EVENT_FIELDS, events),
+        "evstages.bin": pack_table(EVSTAGE_FIELDS, evstages),
+        "evrewards.bin": pack_table(EVREWARD_FIELDS, evrewards),
+        "npc0.bin": npc_blob[:per * 16],
+        "npc1.bin": npc_blob[per * 16:],
+        "npcpow.bin": struct.pack(f"<{len(by_power)}H", *by_power),
     }
     pages = text.pack()
     for i in range(TEXT_PAGES):
@@ -292,7 +374,7 @@ def main():
         if len(b) > PAGE_PAYLOAD:
             die(f"{name} が {len(b)} B で 1 ページ ({PAGE_PAYLOAD} B) を超えた")
         (OUT / name).write_bytes(b)
-    write_headers(cards, areas, stages, gacha, text, courses, packs)
+    write_headers(cards, areas, stages, gacha, text, courses, packs, extra)
     print(f"build_data: cards {len(cards)}, areas {len(areas)}, stages {len(stages)} "
           f"({len(blobs['stages.bin'])} B), gacha {len(gacha)}, text {len(text.items)} 件")
 

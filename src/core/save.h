@@ -5,13 +5,13 @@
 #include "../config.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  3
+#define SAVE_VERSION  5
 
 #define DECK_EMPTY    0xFF
 #define SF_STARTED    0x01   /* 名前と最初の 10 連が済んだ */
 #define DAY_NEVER     0xFFFFFFFFUL
 
-typedef struct { u16 id; u8 lv; u8 flags; } OwnedCard;
+typedef struct { u16 id; u8 lv; u8 flags; u16 exp; } OwnedCard;   /* exp: 次の Lv までに貯めた合成経験値 */
 
 typedef struct {
     u32 magic;  u16 version; u16 crc;
@@ -36,6 +36,10 @@ typedef struct {
     u32 funds;           /* 軍資金（円） */
     u32 spent;           /* 累計課金額（円） */
     u16 payday_month;    /* 最後に給料が入った月（ゲーム内 30 日 = 1 か月） */
+    /* 終わったイベントの結果（同じイベントに入り直さない・お知らせに出す） */
+    u16 last_event;
+    u16 last_rank;
+    u32 last_event_pt;
 } SaveData;
 
 u16 save_crc(const SaveData *s);

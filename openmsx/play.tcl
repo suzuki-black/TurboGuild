@@ -29,22 +29,26 @@ set ::A_CURSOR [sym _g_cursor]
 set ::A_SAVE  [sym _g_save]
 set ::A_SAVEST [sym _g_save_status]
 set ::A_QR    [sym _g_qr]
+set ::A_DIGIT [sym _g_test_digit]
 set ::SCR {}
-foreach n {title name course firstgacha home login area explore boss gacha gacharesult cardlist carddetail deck deckpick shop p0menu} {
+foreach n {title name course firstgacha home login area explore boss gacha gacharesult cardlist carddetail deck deckpick shop p0menu event evresult ranking fuse evolve} {
     dict set ::SCR [sym _scr_$n] $n
 }
-# SaveData のオフセット（src/core/save.h の並び。SDCC は詰めて並べる）
-array set ::O {level 36 gold 39 gems 43 ap 47 potions 48 stage 56 cards_n 69 cards 71 deck 871 savecnt 885 funds 888 spent 892}
+# SaveData の欄の位置（tests/save_offsets.c が offsetof から生成する）
+source [file join [file dirname $::env(OUT)] .. save_offsets.tcl]
 proc sv {k} { expr {$::A_SAVE + $::O($k)} }
 
 set BTN_UP 1 ; set BTN_DOWN 2 ; set BTN_LEFT 4 ; set BTN_RIGHT 8 ; set BTN_OK 16 ; set BTN_CANCEL 32
 proc press {b} { debug write memory $::A_KEYS $b ; incr ::presses }
+proc digit {d} { debug write memory $::A_DIGIT [expr {$d + 1}] ; incr ::presses }
+proc wr32 {a v} { for {set i 0} {$i < 4} {incr i} { debug write memory [expr {$a + $i}] [expr {($v >> ($i * 8)) & 255}] } }
+proc set_day {d} { wr32 [sv gtime] [expr {$d * 86400 + 3600}] ; say "time jump to day $d" }
 
 set ::presses 0
 set ::quests 0 ; set ::wins 0 ; set ::gachas 0 ; set ::resets 0 ; set ::fails 0
 set ::plan_i 0 ; set ::session 0 ; set ::busy_since -1 ; set ::last_action 0
-set ::started_play 0 ; set ::leaving 0 ; set ::in_quest 0 ; set ::pending_check 0 ; set ::did_reroll 0
-set ::plan {quest quest gacha quest card quest shop save quest gacha quest save}
+set ::started_play 0 ; set ::expect_end 0 ; set ::event_started 0 ; set ::event_ends 0 ; set ::event_fights 0 ; set ::fusions 0 ; set ::leaving 0 ; set ::in_quest 0 ; set ::pending_check 0 ; set ::did_reroll 0
+set ::plan {quest event quest gacha fuse quest card event shop save quest rank gacha quest save}
 
 proc fail {why} {
     incr ::fails
@@ -55,6 +59,8 @@ proc finish {} {
     say [format "STATS quests=%d gachas=%d resets=%d presses=%d level=%d stage=%d cards=%d gold=%d gems=%d funds=%d spent=%d" \
         $::quests $::gachas $::resets $::presses [rd8 [sv level]] [rd16 [sv stage]] [rd16 [sv cards_n]] \
         [rd32 [sv gold]] [rd32 [sv gems]] [rd32 [sv funds]] [rd32 [sv spent]]]
+    say [format "PHASE2 event_fights=%d fusions=%d event_ends=%d last_rank=%d" $::event_fights $::fusions $::event_ends [rd16 [sv last_rank]]]
+    if {$::fails == 0 && $::event_ends == 0} { say "FAIL event end never checked" ; incr ::fails }
     if {$::fails == 0} { say "RESULT PASS" } else { say "RESULT FAIL" }
     close $::log
     exit
@@ -64,7 +70,7 @@ proc finish {} {
 proc snapshot {} {
     set n [rd16 [sv cards_n]]
     set sum 0
-    for {set i 0} {$i < $n * 4} {incr i} { set sum [expr {($sum * 31 + [rd8 [expr {[sv cards] + $i}]]) & 0xFFFFFF}] }
+    for {set i 0} {$i < $n * $::O(card_size)} {incr i} { set sum [expr {($sum * 31 + [rd8 [expr {[sv cards] + $i}]]) & 0xFFFFFF}] }
     return [list stage [rd16 [sv stage]] cards $n sum $sum level [rd8 [sv level]] gold [rd32 [sv gold]] gems [rd32 [sv gems]] funds [rd32 [sv funds]]]
 }
 
@@ -78,6 +84,16 @@ proc goto_menu {target} {
 proc act_home {} {
     set ::leaving 0
     if {$::pending_check} { return [do_reset] }
+    if {$::expect_end} {
+        set ::expect_end 0
+        if {[rd16 [sv last_event]] != 1 || [rd16 [sv event_id]] != 0 || [rd16 [sv last_rank]] == 0} {
+            fail "event end not processed: last_event=[rd16 [sv last_event]] event_id=[rd16 [sv event_id]] rank=[rd16 [sv last_rank]]"
+            return
+        }
+        say "EVENT END OK rank=[rd16 [sv last_rank]] gems=[rd32 [sv gems]]"
+        incr ::event_ends
+    }
+    if {!$::event_started && $::quests >= 5} { set ::event_started 1 ; set_day 3 }
     set a [lindex $::plan [expr {$::plan_i % [llength $::plan]}]]
     switch $a {
         quest { if {[goto_menu 0]} { incr ::plan_i ; set ::session 0 } }
@@ -85,6 +101,12 @@ proc act_home {} {
         card  { if {[goto_menu 3]} { incr ::plan_i ; set ::session 1 } }
         shop  { if {[goto_menu 4]} { incr ::plan_i ; set ::session 0 } }
         save  { if {[goto_menu 6]} { incr ::plan_i ; set ::pending_check 1 } }
+        rank  { if {[goto_menu 5]} { incr ::plan_i } }
+        fuse  { if {[goto_menu 2]} { incr ::plan_i ; set ::session 10 } }
+        event {
+            if {[rd16 [sv event_id]] == 0} { incr ::plan_i ; return }
+            incr ::plan_i ; set ::session 0 ; digit 9
+        }
     }
 }
 
@@ -113,7 +135,13 @@ proc act {scr st} {
     }
     switch $scr {
         title {
-            if {[info exists ::after_reset] && $::after_reset} { set ::after_reset 0 ; check_loaded }
+            if {[info exists ::after_reset] && $::after_reset} {
+                set ::after_reset 0 ; check_loaded
+                # ★受け入れ: 開催中に保存したセーブを、イベントが終わった後の日付で読み込む
+                if {$::resets == 2 && [rd16 [sv event_id]] != 0} {
+                    say "event pt at save: [rd32 [sv event_pt]]" ; set_day 20 ; set ::expect_end 1
+                }
+            }
             if {$::fails} return
             press $::BTN_OK
         }
@@ -144,6 +172,25 @@ proc act {scr st} {
             press $::BTN_OK
         }
         gacharesult { press $::BTN_OK }
+        evresult { press $::BTN_OK }
+        event {
+            if {$::session >= 4 || [rd8 [sv ap]] < 10} { press $::BTN_CANCEL ; return }
+            incr ::session ; incr ::event_fights ; digit 1
+        }
+        ranking { press $::BTN_CANCEL }
+        cardlist {
+            if {$::session == 10} { set ::session 11 ; press $::BTN_OK ; return }   ;# 1 枚目を詳細へ
+            set ::session 0 ; press $::BTN_CANCEL
+        }
+        carddetail {
+            if {$::session == 11} { set ::session 12 ; digit 1 ; return }         ;# 強化合成へ
+            press $::BTN_CANCEL
+        }
+        fuse {
+            if {$::session == 12} { set ::session 13 ; digit 1 ; return }         ;# N を全部
+            if {$::session == 13} { set ::session 14 ; incr ::fusions ; digit 2 ; return }   ;# 合成する
+            press $::BTN_CANCEL
+        }
         deck {
             if {$::session == 1} {
                 if {[rd8 $::A_CURSOR] != 5} { press $::BTN_LEFT ; return }

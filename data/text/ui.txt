@@ -166,3 +166,48 @@ T_SPENT	累計課金
 T_NO_FUNDS	軍資金が足りません
 T_PACK_TITLE	どの石を買いますか？
 T_GEMS_BOUGHT	石を購入しました
+# ---- Phase2: 合成・イベント・ランキング
+T_M_RANK	ランク
+T_FUSE	強化合成
+T_EVOLVE	進化合成
+T_FUSE_TITLE	強化合成　素材を選ぶ
+T_EVO_TITLE	進化合成　相方を選ぶ
+T_FUSE_ALLN	Nを全部
+T_FUSE_DO	合成する
+T_FUSE_GUIDE	SPACE:素材 1:Nを全部 2:合成
+T_FUSE_COUNT	素材
+T_FUSE_GAIN	経験値
+T_FUSE_CONFIRM	この素材で合成しますか？
+T_FUSE_DONE	合成成功！
+T_FUSE_NONE	素材を選んでください
+T_FUSE_MAX	これ以上強くなりません
+T_FUSE_BAD	デッキのカードは素材にできません
+T_EVO_NONE	進化できる相方がいません
+T_EVO_CONFIRM	2枚を合わせて進化させますか？
+T_EVO_DONE	進化した！
+T_NO_GOLD	ゴールドが足りません
+T_CARD_ACTIONS	1:強化 2:進化 ESC:戻る
+T_EVENT	イベント
+T_EV_LEFT	あと
+T_EV_PT	ポイント
+T_EV_RANK	順位
+T_EV_NEXT	次の報酬まで
+T_EV_BONUS	特効
+T_EV_GUIDE	1〜3:挑む 4:ランキング ESC:戻る
+T_EV_START	イベント開幕！
+T_EV_END	イベント終了！
+T_EV_FINAL	最終順位
+T_EV_REWARD	報酬
+T_EV_CLOSED	イベントは開催していません
+T_EV_GAINED	報酬ライン到達！
+T_RANK_TITLE	ランキング
+T_RANK_EVENT	イベント
+T_RANK_POWER	総戦力
+T_RANK_GUIDE	1:イベント 2:総戦力 0:自分 ESC:戻る
+T_RANK_YOU	あなた
+T_I	位
+T_ITEM_5	カード
+T_EV_LV1	初級
+T_EV_LV2	中級
+T_EV_LV3	上級
+T_DAYS	日
