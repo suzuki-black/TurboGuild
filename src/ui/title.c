@@ -3,8 +3,11 @@
 #include "widget.h"
 #include "savedisk.h"
 #include "../far.h"
+#include "../data/bgm_data.h"
+void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/time.h"
+#include "../core/timeline.h"
 #include "../data/screens.h"
 #include "../data/text_ids.h"
 #include "../sys/input.h"
@@ -22,9 +25,19 @@ static u8 can_continue(void)
 /* 看板のカード（SSR と SR を並べて見せる） */
 static const u8 parade[4] = { 39, 33, 34, 40 };
 
+static u8 ended(void)
+{
+    TlState tl;
+    if (!can_continue()) return 0;
+    timeline_state(&tl);
+    return tl.ended;
+}
+
 static void draw_menu(void)
 {
-    static const u16 items[2] = { T_TITLE_NEW, T_TITLE_CONT };
+    static const u16 normal[2] = { T_TITLE_NEW, T_TITLE_CONT };
+    static const u16 after[2] = { T_MEMORIES, T_RESET };     /* サービス終了後 */
+    const u16 *items = ended() ? after : normal;
     u8 i, n = can_continue() ? 2 : 1;
     for (i = 0; i < n; i++) {
         u8 y = (u8)(146 + i * 22), on = (u8)(i == g_cursor);
@@ -36,7 +49,9 @@ static void draw_menu(void)
 
 FAR(void, title_init, (void))
 {
-    g_cursor = can_continue();
+    g_cursor = (u8)(can_continue() && !ended());
+    bgm_play(BGM_HOME);
+    g_viewonly = 0;
 }
 
 FAR(void, title_draw, (void))
@@ -49,8 +64,11 @@ FAR(void, title_draw, (void))
     gfx_sprite(ATL_SPARK, 76, 2);
     gfx_sprite(ATL_SPARK, 172, 10);
     for (i = 0; i < 4; i++) gfx_card(parade[i], (u8)(10 + i * 60), (u8)(32 + (i & 1) * 6));
-    txt_id(5, 116, T_TITLE_SUB, COL_WHITE, COL_BLACK);
-    if (can_continue()) {
+    if (!ended()) txt_id(5, 116, T_TITLE_SUB, COL_WHITE, COL_BLACK);
+    if (ended()) {
+        txt_id(6, 122, T_ENDED_TITLE, COL_YELLOW, COL_BLACK);
+        txt_id(4, 190, T_THANKS, COL_LGRAY, COL_BLACK);
+    } else if (can_continue()) {
         u8 cx = txt_id(6, 130, T_TITLE_DAY, COL_LGRAY, COL_BLACK);
         cx = txt_num((u8)(cx + 1), 130, time_gday(g_save.g_time) + 1, COL_WHITE, COL_BLACK);
         txt_id(cx, 130, T_DAY, COL_LGRAY, COL_BLACK);
@@ -77,8 +95,12 @@ FAR(void, title_update, (void))
     if (d == 1 || (d == 2 && can_continue())) { g_cursor = (u8)(d - 1); p = BTN_OK; }
     if (p & BTN_OK) {
         psg_beep(0x80, 4);
-        if (g_cursor == 0) start_new();
-        else screen_change(&scr_home);
+        if (ended()) {
+            if (g_cursor == 0) { g_viewonly = 1; screen_change(&scr_cardlist); }    /* 思い出を見る */
+            else if (ui_confirm(T_RESET_CONFIRM)) { save_new(&g_save, rtc_now_secs()); screen_change(&scr_name); }
+            else g_dirty = 1;
+        } else if (g_cursor == 0) start_new();
+        else { g_from_title = 1; screen_change(&scr_home); }
     }
     if (p & BTN_CANCEL) screen_change(&scr_p0menu);
 }

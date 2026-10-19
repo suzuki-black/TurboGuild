@@ -36,7 +36,11 @@ REWARD_KIND = {"point": 0, "rank": 1}
 # (C の型, 名前)。struct の書式はこの表から作る
 CARD_FIELDS = [("u16", "id"), ("u16", "name_text"), ("u8", "rarity"), ("u8", "element"),
                ("u16", "atk"), ("u16", "def"), ("u8", "cost"), ("u8", "skill"),
-               ("u8", "max_lv"), ("u16", "evo_to"), ("u16", "event_id"), ("u8", "img")]
+               ("u8", "max_lv"), ("u16", "evo_to"), ("u16", "event_id"), ("u8", "img"),
+               ("u16", "release_day"), ("u16", "era_pct")]
+TIMELINE_KIND = {"SERVICE_START": 0, "NEWS": 1, "EVENT": 2, "GACHA_RATEUP": 3, "INFLATION": 4,
+                 "PLAYER_DROP": 5, "ANNOUNCE_END": 6, "SERVICE_END": 7, "GIFT": 8}
+TIMELINE_FIELDS = [("u16", "day"), ("u8", "kind"), ("u16", "param"), ("u16", "text")]
 AREA_FIELDS = [("u16", "name_text"), ("u8", "element"), ("u16", "enemy_text"), ("u16", "boss_card")]
 STAGE_FIELDS = [("u8", "ap"), ("u32", "hp"), ("u16", "def"), ("u16", "atk"), ("u16", "exp"),
                 ("u16", "gold"), ("u8", "drop_rate"), ("u8", "drop_tbl")]
@@ -48,7 +52,7 @@ COURSE_FIELDS = [("u16", "name_text"), ("u32", "start"), ("u32", "monthly"), ("u
 PACK_FIELDS = [("u16", "gems"), ("u16", "price")]
 EVENT_FIELDS = [("u16", "name_text"), ("u16", "story_text"), ("u16", "boss_card"), ("u16", "bonus_card"),
                 ("u8", "bonus_mul"), ("u8", "evo_bonus_mul"), ("u8", "reward_tbl"), ("u8", "duration"),
-                ("u8", "kind"), ("u16", "start_day")]
+                ("u8", "kind"), ("u16", "start_day"), ("u16", "era_pct")]
 EVSTAGE_FIELDS = [("u8", "kind"), ("u8", "level"), ("u16", "name_text"), ("u8", "ap"), ("u32", "hp"),
                   ("u16", "def"), ("u16", "atk"), ("u16", "points"), ("u16", "exp"), ("u16", "gold")]
 EVREWARD_FIELDS = [("u8", "tbl"), ("u8", "kind"), ("u32", "threshold"), ("u8", "item"), ("u16", "amount")]
@@ -146,7 +150,31 @@ def load_ui_text(text):
             text.add(s.replace("\\n", "\n"), key)
 
 
-def load_cards(text):
+def load_timeline(text):
+    rows = []
+    last = -1
+    for ln, r in read_csv("timeline.csv"):
+        where = f"timeline.csv:{ln}"
+        day = int(r["day"])
+        if day < last:
+            die(f"{where}: day は小さい順に並べる")
+        last = day
+        rows.append((day, lookup(TIMELINE_KIND, r["kind"], where), int(r["param"] or 0), text.add(r["text"])))
+    if not rows or rows[0][1] != 0 or rows[-1][1] != TIMELINE_KIND["SERVICE_END"]:
+        die("timeline.csv: SERVICE_START で始めて SERVICE_END で終える")
+    return rows
+
+
+def era_pct(timeline, day):
+    """その日の時点のインフレ倍率（%）。INFLATION 行の param のうち、その日までで最後のもの"""
+    pct = 100
+    for d, kind, param, _t in timeline:
+        if kind == TIMELINE_KIND["INFLATION"] and d <= day:
+            pct = param
+    return pct
+
+
+def load_cards(text, timeline):
     rows = []
     for ln, r in read_csv("cards.csv"):
         where = f"cards.csv:{ln}"
@@ -157,7 +185,8 @@ def load_cards(text):
         rows.append((int(r["id"]), text.add(r["name"]), rar, lookup(ELEMENT, r["element"], where),
                      int(r["atk"]), int(r["def"]), int(r["cost"]), skill,
                      int(r["max_lv"]) if r["max_lv"] else MAX_LV[rar],
-                     int(r["evo_to"]), int(r["event_id"]), int(r["img"] or 0)))
+                     int(r["evo_to"]), int(r["event_id"]), int(r["img"] or 0),
+                     int(r["release_day"] or 0), era_pct(timeline, int(r["release_day"] or 0))))
     ids = [r[0] for r in rows]
     if ids != list(range(1, len(rows) + 1)):
         die("cards.csv: id は 1 から連番で並べる")
@@ -230,7 +259,8 @@ def load_packs():
     return rows
 
 
-def load_events(text, ncards):
+def load_events(text, ncards, timeline):
+    starts = {param: day for day, kind, param, _t in timeline if kind == TIMELINE_KIND["EVENT"]}
     rows = []
     for ln, r in read_csv("events.csv"):
         where = f"events.csv:{ln}"
@@ -239,9 +269,12 @@ def load_events(text, ncards):
         for k in ("boss_card_id", "bonus_card_id"):
             if not 1 <= int(r[k]) <= ncards:
                 die(f"{where}: {k} のカードが無い")
+        eid = int(r["id"])
+        if eid not in starts:
+            die(f"{where}: timeline.csv に EVENT,{eid} の行が無い（開催日は年表で決める）")
         rows.append((text.add(r["name"]), text.add(r["story"]), int(r["boss_card_id"]), int(r["bonus_card_id"]),
                      int(r["bonus_mul"]), int(r["evo_bonus_mul"]), int(r["reward_tbl_id"]),
-                     int(r["duration_days"]), int(r["kind"]), int(r["start_day"])))
+                     int(r["duration_days"]), int(r["kind"]), starts[eid], era_pct(timeline, starts[eid])))
     return rows
 
 
@@ -306,7 +339,8 @@ def write_headers(cards, areas, stages, gacha, text, courses, packs, extra):
                          ("GachaRec", GACHA_FIELDS), ("LoginRec", LOGIN_FIELDS),
                          ("CourseRec", COURSE_FIELDS), ("PackRec", PACK_FIELDS),
                          ("EventRec", EVENT_FIELDS), ("EvStageRec", EVSTAGE_FIELDS),
-                         ("EvRewardRec", EVREWARD_FIELDS), ("NpcRec", NPC_FIELDS)):
+                         ("EvRewardRec", EVREWARD_FIELDS), ("NpcRec", NPC_FIELDS),
+                         ("TimelineRec", TIMELINE_FIELDS)):
         t += c_struct(name, fields)
     t += PACK_OFF
     t += [f"#define AREA_COUNT {len(areas)}", f"#define STAGE_COUNT {len(stages)}",
@@ -315,6 +349,7 @@ def write_headers(cards, areas, stages, gacha, text, courses, packs, extra):
           f"#define COURSE_COUNT {len(courses)}", f"#define PACK_COUNT {len(packs)}"]
     t += [f"#define {k} {v}" for k, v in extra.items()]
     t += [f"#define REWARD_{k.upper()} {v}" for k, v in REWARD_KIND.items()]
+    t += [f"#define TL_{k} {v}" for k, v in TIMELINE_KIND.items()]
     t += [f"#define CUR_{k.upper()} {v}" for k, v in CURRENCY.items()]
     t += [f"#define POOL_{k.upper()} {v}" for k, v in POOL.items()]
     t += [f"#define ITEM_{k.upper()} {v}" for k, v in ITEM.items()]
@@ -335,14 +370,15 @@ def main():
     GEN.mkdir(exist_ok=True)
     text = TextTable()
     load_ui_text(text)
-    cards = load_cards(text)
+    timeline = load_timeline(text)
+    cards = load_cards(text, timeline)
     areas = load_areas(text, len(cards))
     stages = gen_stages.generate(ROOT / "data" / "stages_rule.csv", areas)
     gacha = load_gacha(text)
     login = load_login()
     courses = load_courses(text)
     packs = load_packs()
-    events = load_events(text, len(cards))
+    events = load_events(text, len(cards), timeline)
     evstages = load_event_stages(text)
     evrewards = load_event_rewards(len(cards))
     fp, np_, fs, ns, fg, ng = load_npc_texts(text)
@@ -351,7 +387,8 @@ def main():
     per = PAGE_PAYLOAD // 16
     extra = {"EVENT_COUNT": len(events), "EVSTAGE_COUNT": len(evstages), "EVREWARD_COUNT": len(evrewards),
              "NPC_COUNT": len(npcs), "NPC_PER_PAGE": per, "NPC_PRE_TEXT": fp, "NPC_PRE_COUNT": np_,
-             "NPC_SUF_TEXT": fs, "NPC_SUF_COUNT": ns, "GUILD_TEXT": fg, "GUILD_COUNT": ng}
+             "NPC_SUF_TEXT": fs, "NPC_SUF_COUNT": ns, "GUILD_TEXT": fg, "GUILD_COUNT": ng,
+             "TIMELINE_COUNT": len(timeline), "SERVICE_END_DAY": timeline[-1][0]}
     blobs = {
         "cards.bin": pack_table(CARD_FIELDS, cards),
         "areas.bin": pack_table(AREA_FIELDS, areas),
@@ -366,6 +403,7 @@ def main():
         "npc0.bin": npc_blob[:per * 16],
         "npc1.bin": npc_blob[per * 16:],
         "npcpow.bin": struct.pack(f"<{len(by_power)}H", *by_power),
+        "timeline.bin": pack_table(TIMELINE_FIELDS, timeline),
     }
     pages = text.pack()
     for i in range(TEXT_PAGES):

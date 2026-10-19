@@ -21,4 +21,5 @@ void tbl_evstage(u8 index, EvStageRec *out);  /* 0..EVSTAGE_COUNT-1 */
 void tbl_evreward(u8 index, EvRewardRec *out);/* 0..EVREWARD_COUNT-1（表・種類・閾値の順に並ぶ） */
 void tbl_npc(u16 index, NpcRec *out);         /* 0..NPC_COUNT-1（最終イベントポイントの大きい順） */
 u16  tbl_npc_by_power(u16 rank);              /* 総戦力 rank 位（0 始まり）の NPC の添字 */
+void tbl_timeline(u8 index, TimelineRec *out);/* 0..TIMELINE_COUNT-1（日付順） */
 #endif

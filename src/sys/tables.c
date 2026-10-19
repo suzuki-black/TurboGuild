@@ -49,6 +49,8 @@ void tbl_npc(u16 index, NpcRec *out)
     copy(out, (const u8 *)(WIN_DATAA + PAGE_HDR_SIZE + (index % NPC_PER_PAGE) * sizeof(NpcRec)), sizeof(NpcRec));
 }
 
+void tbl_timeline(u8 i, TimelineRec *out) { copy(out, rec(PAGE_TIMELINE, i, sizeof(TimelineRec)), sizeof(TimelineRec)); }
+
 u16 tbl_npc_by_power(u16 rank)
 {
     bank_dataA(PAGE_NPCPOW);

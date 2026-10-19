@@ -20,7 +20,8 @@ extern u8 g_cart_slot;
 extern u8 g_bank_code, g_bank_dataA, g_bank_dataB;
 extern VdpCmd g_vdpcmd;
 extern u8 g_fontbuf[32];
-extern u8 g_glyph[128];      /* 1 文字ぶんの 4bpp（16x16 なら 8 バイト × 16 行） */
+extern u8 g_glyph[128];
+extern const char *g_txt_rest;  /* txt_draw が描き終えた位置（折り返し用） */      /* 1 文字ぶんの 4bpp（16x16 なら 8 バイト × 16 行） */
 extern u8 g_input_held, g_input_pressed;
 extern u16 g_digit_held;
 extern u8 g_digit_pressed;
@@ -58,6 +59,14 @@ extern EventResult g_evres;    /* イベントの開幕・終了のお知らせ 
 extern RankList g_rank;        /* ランキングの表示 */
 extern u8 g_kinds[6], g_kind_n; /* いま出すガチャの種類 */             /* 給料日の知らせを出すか */      /* カードの一覧の先頭に「はずす」を置くか */           /* クリア済みエリアを周回するときの位置 */
 extern u8 g_ticker, g_ticker_gap;   /* お知らせの流し位置 */
+extern char g_ticker_buf[96];  /* 流しているお知らせの 1 本（Shift-JIS） */
+extern u8 g_ticker_k;          /* 次に流す出来事の番号 */
+extern u8 g_viewonly;          /* サービス終了後の「思い出を見る」（カード一覧だけ） */
+extern u16 g_gift;             /* 年表の贈り物（知らせる石の数） */
+extern u8 g_from_title;        /* タイトルの「つづきから」でマイページへ来た（保存を後回しにする） */
+typedef struct { u16 pos, loop; u8 wait, inst, hi; } BgmCh;     /* BGM の 1 チャンネル（ui/bgm.c） */
+extern BgmCh g_bgm_ch[3];
+extern u8 g_bgm_song, g_bgm_nch;
 extern u8 g_nosave_warned;    /* 「セーブできません」は 1 回だけ出す */
 extern GachaReq g_gacha;
 extern QuestResult g_qr;

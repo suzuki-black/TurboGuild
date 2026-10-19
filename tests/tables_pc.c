@@ -49,6 +49,7 @@ void tbl_pack(u8 id, PackRec *out)     { rec("packs.bin", id - 1, out, sizeof *o
 void tbl_event(u8 id, EventRec *out)   { rec("events.bin", id - 1, out, sizeof *out); }
 void tbl_evstage(u8 i, EvStageRec *out)   { rec("evstages.bin", i, out, sizeof *out); }
 void tbl_evreward(u8 i, EvRewardRec *out) { rec("evrewards.bin", i, out, sizeof *out); }
+void tbl_timeline(u8 i, TimelineRec *out) { rec("timeline.bin", i, out, sizeof *out); }
 void tbl_npc(u16 i, NpcRec *out)
 {
     unsigned char *b = load(i < NPC_PER_PAGE ? "npc0.bin" : "npc1.bin");

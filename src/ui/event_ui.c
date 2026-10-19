@@ -3,6 +3,8 @@
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
+#include "../data/bgm_data.h"
+void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/event.h"
 #include "../core/quest.h"
@@ -139,7 +141,9 @@ FAR(void, evtop_update, (void))
     if (d == 4) screen_change(&scr_ranking);
 }
 
-SCREEN(scr_event, 0, evtop_update, evtop_draw, 0)
+FAR(void, evtop_init, (void)) { bgm_play(BGM_EVENT); }
+
+SCREEN(scr_event, evtop_init, evtop_update, evtop_draw, 0)
 
 /* ---- 開幕・終了のお知らせ（マイページに入ったときに出る） ---- */
 

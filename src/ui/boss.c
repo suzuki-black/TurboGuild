@@ -4,6 +4,8 @@
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
+#include "../data/bgm_data.h"
+void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/event.h"
 #include "../core/quest.h"
@@ -124,6 +126,7 @@ static void outcome(void)
 
 FAR(void, boss_init, (void))
 {
+    bgm_play(BGM_BOSS);
     quest_run(g_sel_stage, &g_qr);
     if (g_qr.status == Q_OK) g_save_dirty = 1;
 }

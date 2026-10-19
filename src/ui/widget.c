@@ -46,11 +46,14 @@ u8 ui_list_input(UiList *l, u8 pressed)
     return l->top != old_top ? UL_PAGE : UL_MOVED;
 }
 
+void bgm_tick(void);
+
 void ui_frame(void)
 {
     vdp_wait_vsync();
     input_update();
     psg_tick();
+    bgm_tick();
 }
 
 void ui_wait(u8 frames)

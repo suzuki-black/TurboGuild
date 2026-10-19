@@ -15,13 +15,14 @@
 #include "core/fusion.h"
 #include "core/event.h"
 #include "core/ranking.h"
+#include "core/timeline.h"
 
 static void fresh(void) { save_new(&g_save, 1000); }
 
 static void test_struct_sizes(void)
 {
     /* 生成ヘッダは PC でも詰めて並べる（ROM のバイナリをそのまま読むため） */
-    CHECK(sizeof(CardRec) == 18);
+    CHECK(sizeof(CardRec) == 22);
     CHECK(sizeof(StageRec) == 15);
     CHECK(sizeof(GachaRec) == 18);
 }
@@ -264,11 +265,12 @@ static void test_event(void)
     event_add_points(120, &g);
     CHECK(g.n == 1 && g.item[0] == ITEM_POTION && g_save.potions == 2);
     memset(&g, 0, sizeof g);
-    event_add_points(400, &g);
-    CHECK(g.n == 1 && g.item[0] == ITEM_GEMS && event_next_line() == 1500);
+    event_add_points(400, &g);                  /* 520 点: 300 の石 300 と 450 の SR 確定チケット */
+    CHECK(g.n == 2 && g.item[0] == ITEM_GEMS && g.item[1] == ITEM_SRTICKET && event_next_line() == 1500);
     memset(&g, 0, sizeof g);
     event_add_points(10, &g);
     CHECK(g.n == 0);                            /* 同じラインは 2 度出ない */
+    g_save.sr_tickets = 0;
     /* イベントの面は特効が効く: 特効カード（41）だけのデッキで初級に勝てる */
     inv_add(41);
     g_save.deck[0] = (u8)(g_save.card_count - 1);
@@ -283,8 +285,9 @@ static void test_event(void)
     g_save.g_time = GSEC_PER_DAY * 40;
     {
         u32 gems = g_save.gems;
+        u16 expect = ranking_final_rank();      /* 終了処理の前（参加中の id で NPC の点を数える） */
         event_update(&r);
-        CHECK(r.ended && r.id == 1 && r.points == 540 && r.rank == ranking_final_rank(540));
+        CHECK(r.ended && r.id == 1 && r.points == 540 && r.rank == expect);
         CHECK(r.gain.n == 1 && g_save.gems == gems + 100);   /* 1000 位以内: 石 100 */
         CHECK(g_save.event_id == 0 && g_save.last_event == 1 && g_save.last_rank == r.rank);
     }
@@ -302,8 +305,12 @@ static void test_ranking(void)
     fresh();
     tbl_npc(0, &a); tbl_npc(999, &b);
     CHECK(a.event_pt >= b.event_pt);            /* 表は大きい順 */
-    CHECK(ranking_final_rank(0xFFFFFFFFUL) == 1);
-    CHECK(ranking_final_rank(0) > 800);
+    g_save.event_id = 1;
+    g_save.event_pt = 0xFFFFFFFFUL;
+    CHECK(ranking_final_rank() == 1);
+    g_save.event_pt = 0;
+    CHECK(ranking_final_rank() > 800);
+    g_save.event_id = 0;
     /* 一覧: 自分の行が自分の順位の位置にあり、上から順位が続く */
     inv_add(39); inv_add(40);
     g_save.deck[0] = 0; g_save.deck[1] = 1;
@@ -315,13 +322,83 @@ static void test_ranking(void)
         if (l.rows[i].npc == RANK_PLAYER) CHECK(l.rows[i].rank == l.player_rank);
         if (i) CHECK(l.rows[i - 1].value >= l.rows[i].value);
     }
-    l.first = 1;
+    l.first = RANK_VIEW_TOP;
     ranking_list(&l);
-    CHECK(l.rows[0].rank == 1);
+    CHECK(l.rows[0].rank == 1 && l.n == RANK_ROWS);
+    for (i = 1; i < l.n; i++) CHECK(l.rows[i - 1].value >= l.rows[i].value);
+}
+
+static void test_timeline(void)
+{
+    TlState t;
+    TlResult r;
+    CardRec c;
+    NpcNow a, b;
+    u16 id;
+    fresh();
+    timeline_state(&t);
+    CHECK(t.day == 0 && t.rateup_pct == 100 && t.era_pct == 100 && t.drop_pct == 0 && !t.ended && t.days_to_end == 270);
+    g_save.g_time = GSEC_PER_DAY * 15;           /* 14 日目から 7 日間 SSR 2 倍 */
+    timeline_state(&t);
+    CHECK(t.rateup_pct == 200);
+    g_save.g_time = GSEC_PER_DAY * 22;
+    timeline_state(&t);
+    CHECK(t.rateup_pct == 100);
+    g_save.g_time = GSEC_PER_DAY * 100;          /* インフレ 2 回目まで */
+    timeline_state(&t);
+    CHECK(t.era_pct == 160);
+    g_save.g_time = GSEC_PER_DAY * 200;          /* 20% と 30% が辞めた → 残り 0.8 × 0.7 = 56% */
+    timeline_state(&t);
+    CHECK(t.drop_pct == 44 && !t.announce);
+    g_save.g_time = GSEC_PER_DAY * 250;
+    timeline_state(&t);
+    CHECK(t.announce && !t.ended && t.days_to_end == 20);
+    g_save.g_time = GSEC_PER_DAY * 270;
+    timeline_state(&t);
+    CHECK(t.ended);
+    /* 贈り物（110 日目の石 500）は 1 回だけ */
+    fresh();
+    g_save.g_time = GSEC_PER_DAY * 111;
+    timeline_update(&r);
+    CHECK(r.gift_gems == 500 && g_save.gems == START_GEMS + 500 && r.n_news > 5);
+    timeline_update(&r);
+    CHECK(r.gift_gems == 0 && r.n_news == 0);
+    { u16 tx; CHECK(timeline_news(0, &tx)); }
+    /* カードは出た時代の倍率を持つ（データを足すだけで新しい SSR が強くなる） */
+    tbl_card(39, &c); CHECK(c.era_pct == 100 && c.release_day == 0);
+    tbl_card(64, &c); CHECK(c.era_pct == 200 && c.release_day == 150);
+    /* 出ていないカードはガチャに出ない */
+    fresh();
+    g_save.gems = 1000000;
+    for (id = 0; id < 300; id++) {
+        GachaReq g; g.gacha = 3; g.count = 1;
+        gacha_roll(&g);
+        tbl_card(g.ids[0], &c);
+        CHECK(c.release_day == 0);
+    }
+    /* NPC は日が経つと強くなり、PLAYER_DROP の後は一部が辞める（何度計算しても同じ） */
+    fresh();
+    npc_now(10, &a);
+    g_save.g_time = GSEC_PER_DAY * 100;
+    npc_now(10, &b);
+    CHECK(b.level >= a.level && b.power > a.power && !a.retired);
+    g_save.g_time = GSEC_PER_DAY * 200;
+    {
+        u16 n = npc_active_count();
+        CHECK(n > 450 && n < 650);                   /* 1000 × 0.56 前後 */
+        CHECK(npc_active_count() == n);
+    }
+    /* 流れるお知らせは時刻で決まる */
+    {
+        FeedLine f1, f2;
+        feed_line(0, &f1); feed_line(0, &f2);
+        CHECK(f1.npc == f2.npc && f1.kind == f2.kind && f1.npc < NPC_COUNT);
+    }
 }
 
 int main(void)
 {
+    test_timeline();
     test_wallet();
     test_fusion();
     test_event();

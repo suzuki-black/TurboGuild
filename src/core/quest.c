@@ -7,6 +7,7 @@
 #include "rng.h"
 #include "save.h"
 #include "tables.h"
+#include "time.h"
 #include "../far.h"
 
 FAR(u16, quest_max_stage, (void))
@@ -59,19 +60,25 @@ FAR(u8, quest_ap_cost, (u16 stage))
     return (u8)(d.ap_minus && f.st.ap > 1 ? f.st.ap - 1 : f.st.ap);
 }
 
+static u8 droppable(const CardRec *c, u8 rarity, u8 element)
+{
+    return (u8)(c->rarity == rarity && c->element == element && c->event_id == 0 &&
+                c->release_day <= time_gday(g_save.g_time));
+}
+
 static u16 pick_drop(u8 rarity, u8 element)
 {
     CardRec c;
     u16 n = tbl_card_count(), id, hits = 0, k;
     for (id = 1; id <= n; id++) {
         tbl_card(id, &c);
-        if (c.rarity == rarity && c.element == element && c.event_id == 0) hits++;
+        if (droppable(&c, rarity, element)) hits++;
     }
     if (hits == 0) return 0;
     k = rng_range(&g_save.rng_gacha, hits);
     for (id = 1; id <= n; id++) {
         tbl_card(id, &c);
-        if (c.rarity == rarity && c.element == element && c.event_id == 0 && k-- == 0) return id;
+        if (droppable(&c, rarity, element) && k-- == 0) return id;
     }
     return 0;
 }

@@ -3,7 +3,7 @@
 #ifndef TEXT_H
 #define TEXT_H
 #include "../types.h"
-u8   txt_draw(u8 cx, u8 y, const char *s, u8 fg, u8 bg);
+u8   txt_draw(u8 cx, u8 y, const char *s, u8 fg, u8 bg);   /* 右端で止まったら g_txt_rest が続きを指す */
 u8   txt_id(u8 cx, u8 y, u16 id, u8 fg, u8 bg);       /* text.dat の文字列 */
 u8   txt_num(u8 cx, u8 y, u32 v, u8 fg, u8 bg);
 u8   txt_num_r(u8 cx, u8 y, u32 v, u8 width, u8 fg, u8 bg);  /* 右寄せ（空きは bg で埋める） */

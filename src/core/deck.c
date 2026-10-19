@@ -1,12 +1,12 @@
-/* deck.c — 1 枚の値 = 基礎 × (100 + Lv×5)/100 × 属性% × スキル% × インフレ%（仕様 §6）。
- * インフレ乗数は Phase3 で年表から入る。いまは 100%。 */
+/* deck.c — 1 枚の値 = 基礎 × (100 + Lv×5)/100 × 属性% × スキル% × 時代%（仕様 §6）。
+ * 時代% はそのカードが出た時点のインフレ倍率（年表の INFLATION, build_data.py がカードに写す）。
+ * 新しいカードほど強く、古いカードは見劣りしていく（DECISIONS #49）。 */
 #include "deck.h"
 #include "player.h"
 #include "save.h"
 #include "tables.h"
 #include "../far.h"
 
-#define INFLATION_PCT 100
 
 /* 炎(0)>雷(2)>水(1)>炎、光(3)⇔闇(4) は互いに有利 */
 static const u8 beats[ELEMENTS] = { 2, 0, 1, 4, 3 };
@@ -19,7 +19,7 @@ FAR(u8, elem_pct, (u8 mine, u8 enemy))
     return 100;
 }
 
-static u32 scale(u32 v, u8 pct)
+static u32 scale(u32 v, u16 pct)
 {
     return v * pct / 100;
 }
@@ -32,13 +32,13 @@ static u32 card_value(u16 index, u8 want_def, u8 enemy, const DeckStats *bonus, 
     tbl_card(o->id, c);
     v = want_def ? c->def : c->atk;
     v = v * (100 + (u16)o->lv * 5) / 100;
-    if (c->skill == (want_def ? 2 : 1)) v = scale(v, 100 + SKILL_PCT);
+    if (c->skill == (want_def ? 2 : 1)) v = scale(v, (u16)(100 + SKILL_PCT));
     if (!want_def && enemy != ELEM_NONE) v = scale(v, elem_pct(c->element, enemy));
     if (!want_def && bonus) {
         if (bonus->bonus_card && c->id == bonus->bonus_card) v *= bonus->bonus_mul;
         if (bonus->evo_card && c->id == bonus->evo_card) v *= bonus->evo_mul;
     }
-    return scale(v, INFLATION_PCT);
+    return scale(v, c->era_pct);
 }
 
 FAR(u32, card_atk_of, (u16 index))

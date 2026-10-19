@@ -3,6 +3,8 @@
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
+#include "../data/bgm_data.h"
+void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/deck.h"
 #include "../core/gacha.h"
@@ -40,6 +42,7 @@ static void draw_choice(void)
 
 FAR(void, firstgacha_init, (void))
 {
+    bgm_play(BGM_GACHA);
     roll();
     g_cursor = 1;
 }

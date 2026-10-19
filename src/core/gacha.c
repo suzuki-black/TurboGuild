@@ -7,11 +7,13 @@
 #include "save.h"
 #include "tables.h"
 #include "time.h"
+#include "timeline.h"
 #include "../far.h"
 
 /* プールに入るときの重み。0 = 入らない。イベントガチャはイベント限定を 2 倍（仕様 §4.3） */
 static u8 weight(const CardRec *c, u8 pool)
 {
+    if (c->release_day > time_gday(g_save.g_time)) return 0;    /* まだ実装されていないカード */
     if (c->event_id == 0) return 1;
     if (pool == POOL_NORMAL || c->event_id != g_save.event_id) return 0;
     return (u8)(pool == POOL_EVENT2X ? 2 : 1);
@@ -42,11 +44,13 @@ static u16 pick(u8 rarity, u8 pool)
     return 1;
 }
 
-static u8 roll_rarity(const GachaRec *gr)
+/* 年表の確率 UP キャンペーン中は SSR を倍に（N の分から回す） */
+static u8 roll_rarity(const GachaRec *gr, u16 rateup)
 {
     u16 r = rng_range(&g_save.rng_gacha, 10000);
-    if (r < gr->rate_ssr) return RARITY_SSR;
-    r -= gr->rate_ssr;
+    u16 ssr = (u16)((u32)gr->rate_ssr * rateup / 100);
+    if (r < ssr) return RARITY_SSR;
+    r -= ssr;
     if (r < gr->rate_sr) return RARITY_SR;
     r -= gr->rate_sr;
     if (r < gr->rate_r) return RARITY_R;
@@ -55,9 +59,11 @@ static u8 roll_rarity(const GachaRec *gr)
 
 static void draw_all(GachaReq *g, const GachaRec *gr)
 {
+    TlState tl;
     u8 i, best = 0;
+    timeline_state(&tl);
     for (i = 0; i < g->count; i++) {
-        u8 rar = roll_rarity(gr);
+        u8 rar = roll_rarity(gr, gr->rate_ssr ? tl.rateup_pct : 100);
         if (gr->pity) {
             if (++g_save.pity_count >= gr->pity) { rar = RARITY_SSR; g->pity_hit = 1; }
             if (rar == RARITY_SSR) g_save.pity_count = 0;

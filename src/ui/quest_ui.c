@@ -4,6 +4,8 @@
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
+#include "../data/bgm_data.h"
+void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/player.h"
 #include "../core/quest.h"
@@ -68,6 +70,7 @@ static void area_rows(void)
 FAR(void, area_init, (void))
 {
     u16 n = (u16)((quest_max_stage() - 1) / STAGES_PER_AREA + 1);
+    bgm_play(BGM_QUEST);
     if (g_sel_area == 0 || g_sel_area > n) g_sel_area = n;
     g_list.count = n;
     g_list.rows = ROWS;
@@ -325,4 +328,6 @@ FAR(void, explore_update, (void))
     if (p & BTN_CANCEL) screen_change(&scr_area);
 }
 
-SCREEN(scr_explore, 0, explore_update, explore_draw, 0)
+FAR(void, explore_init, (void)) { bgm_play(BGM_QUEST); }
+
+SCREEN(scr_explore, explore_init, explore_update, explore_draw, 0)

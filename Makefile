@@ -7,6 +7,7 @@
 #   make check-nodisk  ディスク無しでも起動して遊べることを確認
 #   make check-msx2  MSX2 機種で「turboR 専用」表示を確認
 #   make play     30 分の自動プレイ（Phase1 の受け入れ）。DURATION=秒 で短くできる
+#   make sim      経済シミュレーション（Phase3 の受け入れ）
 #   make clean
 .DELETE_ON_ERROR:
 
@@ -36,7 +37,7 @@ LDFLAGS  := -mz80 --no-std-crt0 --code-loc 0x4010 --data-loc 0xC000 \
 CSRC     := $(wildcard src/*.c src/sys/*.c src/core/*.c src/ui/*.c)
 ASRC     := $(filter-out src/sys/crt0.s,$(wildcard src/sys/*.s))
 GENH     := src/data/cards.h src/data/rompages.h src/data/screens.h src/data/tables.h src/data/text_ids.h \
-            src/data/art.h src/data/palette.h
+            src/data/art.h src/data/palette.h src/data/bgm_data.h
 HDRS     := $(wildcard src/*.h src/*/*.h) $(GENH)
 COBJ     := $(patsubst src/%.c,$(B)/obj/%.rel,$(CSRC))
 AOBJ     := $(patsubst src/%.s,$(B)/obj/%.rel,$(ASRC)) $(B)/obj/far_stubs.rel
@@ -44,7 +45,7 @@ CRT0     := $(B)/obj/sys/crt0.rel
 DATABIN  := $(wildcard $(B)/*.bin $(B)/*.dat)
 DATASRC  := $(wildcard data/*.csv data/text/*.txt)
 
-.PHONY: all test run check check-nodisk check-msx2 play clean
+.PHONY: all test run check check-nodisk check-msx2 check-offline check-timeline play sim clean
 
 all: $(ROM) $(DSK)
 
@@ -64,6 +65,9 @@ $(B)/art.stamp: $(ARTSRC)
 	@touch $@
 src/data/art.h src/data/palette.h: $(B)/art.stamp
 	@:
+
+src/data/bgm_data.h: tools/mml.py $(wildcard data/bgm/*.mml)
+	$(PYTHON) tools/mml.py $@ data/bgm/*.mml
 
 $(BANKSMK): docs/MEMORY_MAP.md tools/link_rom.py
 	$(PYTHON) tools/link_rom.py header src/data/rompages.h $(BANKSMK)
@@ -104,6 +108,10 @@ $(B)/save_offsets.tcl: tests/save_offsets.c src/core/save.h src/config.h src/typ
 	@mkdir -p $(B)
 	gcc -std=c99 -Isrc -o $(B)/save_offsets tests/save_offsets.c
 	$(B)/save_offsets > $@
+
+# ---- 経済シミュレーション（Phase3 の受け入れ: 課金しない人の SSR が終了時に 3〜8 枚） ----
+sim: $(B)/data.stamp
+	$(PYTHON) tools/sim_economy.py --csv $(B)/sim_economy.csv
 
 # ---- PC 単体テスト ----
 TESTS := $(wildcard tests/test_*.c)
@@ -153,6 +161,30 @@ play: all $(B)/save_offsets.tcl
 	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run4" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
 	@cat $(B)/run4/play.txt
 	@tail -1 $(B)/run4/play.txt | grep -q "RESULT PASS"
+
+# Phase3 の受け入れ: 1 週間放置して起動しても 3 秒以内にマイページへ
+check-offline: all $(B)/save_offsets.tcl
+	@rm -rf $(B)/run5 && mkdir -p $(B)/run5
+	@cp $(ROM) $(B)/run5/TurboGuild.rom
+	@$(PYTHON) tools/mkblank_dsk.py $(B)/run5/save.dsk >/dev/null
+	-OUT=$(abspath $(B))/run5/offline.txt MAP=$(abspath $(B))/kernel.map timeout 400 \
+	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run5/TurboGuild.rom -romtype ASCII8 \
+	  -diska $(abspath $(B))/run5/save.dsk -script $(abspath openmsx/offline.tcl) >/dev/null 2>&1
+	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run5" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
+	@cat $(B)/run5/offline.txt
+	@tail -1 $(B)/run5/offline.txt | grep -q "RESULT PASS"
+
+# Phase3: 運営年表をサービス終了まで通す（日付を進めながらマイページに入り直す）
+check-timeline: all $(B)/save_offsets.tcl
+	@rm -rf $(B)/run6 && mkdir -p $(B)/run6
+	@cp $(ROM) $(B)/run6/TurboGuild.rom
+	@$(PYTHON) tools/mkblank_dsk.py $(B)/run6/save.dsk >/dev/null
+	-OUT=$(abspath $(B))/run6/timeline.txt MAP=$(abspath $(B))/kernel.map SHOTDIR=$(abspath $(B))/run6 timeout 1000 \
+	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run6/TurboGuild.rom -romtype ASCII8 \
+	  -diska $(abspath $(B))/run6/save.dsk -script $(abspath openmsx/timeline.tcl) >/dev/null 2>&1
+	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run6" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
+	@cat $(B)/run6/timeline.txt
+	@tail -1 $(B)/run6/timeline.txt | grep -q "RESULT PASS"
 
 check-msx2: all
 	@rm -rf $(B)/run2 && mkdir -p $(B)/run2

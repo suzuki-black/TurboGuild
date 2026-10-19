@@ -3,6 +3,8 @@
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
+#include "../data/bgm_data.h"
+void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/gacha.h"
 #include "../core/tables.h"
@@ -83,6 +85,7 @@ FAR(void, gacha_init, (void))
 {
     static const u8 base[5] = { 1, 2, 3, 5, 6 };
     u8 i;
+    bgm_play(BGM_GACHA);
     g_kind_n = 0;
     for (i = 0; i < 5; i++) {
         kinds[g_kind_n++] = base[i];

@@ -92,16 +92,19 @@ u8 txt_draw(u8 cx, u8 y, const char *s, u8 fg, u8 bg)
     u8 lut[4];
     make_lut(fg, bg, lut);
     while (*s && cx < TEXT_COLS) {
-        u8 c = (u8)*s++;
-        if (is_lead(c) && *s) {
+        u8 c = (u8)*s;
+        if (is_lead(c) && s[1]) {
             if (cx + 1 >= TEXT_COLS) break;
+            s++;
             draw_wide(cx, y, sjis_index(c, (u8)*s++), lut);
             cx += 2;
         } else {
+            s++;
             draw_half(cx, y, c, lut);
             cx++;
         }
     }
+    g_txt_rest = s;                 /* 右端で止まったら続きの位置（折り返し用） */
     return cx;
 }
 

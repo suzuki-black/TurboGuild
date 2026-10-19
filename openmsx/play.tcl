@@ -86,11 +86,12 @@ proc act_home {} {
     if {$::pending_check} { return [do_reset] }
     if {$::expect_end} {
         set ::expect_end 0
-        if {[rd16 [sv last_event]] != 1 || [rd16 [sv event_id]] != 0 || [rd16 [sv last_rank]] == 0} {
+        # 終わった第 1 回が last_event に残り、参加中は第 1 回ではない（同じ日に次のイベントが始まっていれば自動で参加）
+        if {[rd16 [sv last_event]] != 1 || [rd16 [sv event_id]] == 1 || [rd16 [sv last_rank]] == 0} {
             fail "event end not processed: last_event=[rd16 [sv last_event]] event_id=[rd16 [sv event_id]] rank=[rd16 [sv last_rank]]"
             return
         }
-        say "EVENT END OK rank=[rd16 [sv last_rank]] gems=[rd32 [sv gems]]"
+        say "EVENT END OK rank=[rd16 [sv last_rank]] gems=[rd32 [sv gems]] next_event=[rd16 [sv event_id]]"
         incr ::event_ends
     }
     if {!$::event_started && $::quests >= 5} { set ::event_started 1 ; set_day 3 }

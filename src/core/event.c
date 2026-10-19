@@ -58,7 +58,7 @@ static void finish(EventResult *r)
     r->ended = 1;
     r->id = g_save.event_id;
     r->points = g_save.event_pt;
-    r->rank = ranking_final_rank(g_save.event_pt);
+    r->rank = ranking_final_rank();
     if (g_save.event_pt) rank_reward(e.reward_tbl, r->rank, &r->gain);
     g_save.last_event = g_save.event_id;
     g_save.last_rank = r->rank;
@@ -99,7 +99,10 @@ FAR(u8, event_stage, (u16 level, EventStage *s))
     if (i == EVSTAGE_COUNT) return 0;
     tbl_card(e.boss_card, &boss);
     tbl_card(e.bonus_card, &bonus);
-    s->ap = st.ap; s->hp = st.hp; s->def = st.def; s->atk = st.atk;
+    s->ap = st.ap;
+    s->hp = st.hp * e.era_pct / 100;                       /* 後のイベントほど敵も強い */
+    s->def = (u16)((u32)st.def * e.era_pct / 100);
+    s->atk = (u16)((u32)st.atk * e.era_pct / 100);
     s->exp = st.exp; s->gold = st.gold; s->points = st.points;
     s->element = boss.element;
     s->boss_card = e.boss_card;

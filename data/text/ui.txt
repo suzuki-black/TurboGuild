@@ -211,3 +211,27 @@ T_EV_LV1	初級
 T_EV_LV2	中級
 T_EV_LV3	上級
 T_DAYS	日
+# ---- Phase3: 運営年表・疑似オンライン
+T_M_NEWS	お知らせ
+T_NEWS_TITLE	お知らせ
+T_FEED_TITLE	みんなの動き
+T_PLAYERS	参加者
+T_PERSON	人
+T_FD_GA	が
+T_FD_SSR	を引き当てた！
+T_FD_BOSS	がボスを倒した！
+T_FD_LEVEL	がLv
+T_FD_LEVEL2	になった！
+T_FD_RANKUP	がランキング
+T_FD_RANKUP2	位に上昇！
+T_FD_LOGIN	がログインしました
+T_RATEUP_ON	SSR確率アップ中！
+T_END_SOON	サービス終了まで
+T_ENDED_TITLE	サービスは終了しました
+T_MEMORIES	思い出を見る
+T_RESET	思い出をリセット
+T_RESET_CONFIRM	本当に最初からやり直しますか？
+T_GIFT_GOT	運営から石が届きました
+T_TO_TITLE	タイトルへ戻りますか？
+T_GUIDE_HOME2	1〜8:メニュー 9:バナー ESC:タイトル
+T_THANKS	遊んでくれて、ありがとう！

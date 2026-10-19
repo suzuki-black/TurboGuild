@@ -11,11 +11,17 @@ void gfx_load_atlas(void);
 void gfx_part(u8 sx, u8 sy, u8 w, u8 h, u8 dx, u8 dy);
 void gfx_sprite(u8 sx, u8 sy, u8 w, u8 h, u8 dx, u8 dy);
 void gfx_move(u8 sx, u8 sy, u8 w, u8 h, u8 dx, u8 dy);    /* 画面内（ページ 0）の矩形コピー */
-void gfx_card(u16 id, u8 x, u8 y);        /* 56x72 */
-void gfx_thumb(u16 id, u8 x, u8 y);       /* 28x36 */
-void gfx_card2x(u16 id, u8 x, u8 y);      /* 112x144 */
+/* カード絵は UI_COMMON バンク（ui/gfx_card.c）。座標を 1 つの 16bit にまとめて中継を通す */
+void gfx_card_xy(u16 id, u16 xy);
+void gfx_thumb_xy(u16 id, u16 xy);
+void gfx_card2x_xy(u16 id, u16 xy);
+u8   gfx_num_xy(u16 xy, u16 v);
+#define GFX_XY(x, y)          ((u16)((u8)(x) | ((u16)(u8)(y) << 8)))
+#define gfx_card(id, x, y)    gfx_card_xy((id), GFX_XY(x, y))     /* 56x72 */
+#define gfx_thumb(id, x, y)   gfx_thumb_xy((id), GFX_XY(x, y))    /* 28x36 */
+#define gfx_card2x(id, x, y)  gfx_card2x_xy((id), GFX_XY(x, y))   /* 112x144 */
+#define gfx_num(x, y, v)      gfx_num_xy(GFX_XY(x, y), (u16)((v) > 65535UL ? 65535UL : (v)))
 void gfx_gauge(u8 x, u8 y, u8 w, u16 val, u16 max, u8 col);   /* 高さ 6 の棒 */
-u8   gfx_num(u8 x, u8 y, u32 v);          /* 大きい数字（8x11）。次の x を返す */
 void gfx_pal(u8 index, u8 r, u8 g, u8 b); /* パレット 1 色（演出用） */
 void gfx_pal_reset(void);
 #endif

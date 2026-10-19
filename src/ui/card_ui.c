@@ -119,7 +119,7 @@ FAR(void, cardlist_update, (void))
     u8 p = input_pressed();
     grid_input(p);
     if ((p & BTN_OK) && g_list.count) { g_sel_card = g_list.cursor; screen_change(&scr_carddetail); }
-    if (p & BTN_CANCEL) { g_list.cursor = 0; screen_change(&scr_home); }
+    if (p & BTN_CANCEL) { g_list.cursor = 0; screen_change(g_viewonly ? &scr_title : &scr_home); }
 }
 
 SCREEN(scr_cardlist, cardlist_init, cardlist_update, cardlist_draw, 0)
@@ -161,7 +161,7 @@ FAR(void, carddetail_draw, (void))
 
 FAR(void, carddetail_update, (void))
 {
-    u8 d = input_digit();
+    u8 d = g_viewonly ? NO_DIGIT : input_digit();      /* 思い出を見るときは合成させない */
     if (d == 1) { screen_change(&scr_fuse); return; }
     if (d == 2) { screen_change(&scr_evolve); return; }
     if (input_pressed() & (BTN_CANCEL | BTN_OK)) screen_change(&scr_cardlist);

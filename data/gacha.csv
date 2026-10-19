@@ -4,4 +4,4 @@ id,name,currency,price,price10,n,r,sr,ssr,pity,pool
 3,プレミアガチャ,gems,300,2700,74,20,5,1,100,normal_event
 4,イベントガチャ,gems,300,2700,74,20,5,1,100,event2x
 5,チケットガチャ,ticket,1,0,70,25,5,0,0,normal
-6,SR確定チケット,srticket,1,0,0,0,95,5,0,normal
+6,SR確定チケット,srticket,1,0,0,0,80,20,0,normal
