@@ -1,7 +1,7 @@
 id,name,currency,price,price10,n,r,sr,ssr,pity,pool
 1,無料ガチャ,free,0,0,80,18,2,0,0,normal
 2,ゴールドガチャ,gold,1000,0,70,25,5,0,0,normal
-3,プレミアガチャ,gems,300,2700,74,20,5,1,100,normal_event
-4,イベントガチャ,gems,300,2700,74,20,5,1,100,event2x
+3,プレミアガチャ,gems,300,2700,74,20,5,1,0,normal_event
+4,イベントBOXガチャ,gems,200,1800,60,30,9,1,0,box
 5,チケットガチャ,ticket,1,0,70,25,5,0,0,normal
-6,SR確定チケット,srticket,1,0,0,0,80,20,0,normal
+6,SR確定チケット,srticket,1,0,0,0,100,0,0,normal

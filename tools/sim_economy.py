@@ -6,7 +6,7 @@
 
     sim_economy.py [--seeds N] [--plays P] [--csv 出力.csv]
 
-受け入れ: 課金しないプレイヤーの終了時 SSR 所持の中央値が 3〜8 枚。外れたら終了コード 1。
+受け入れ: 課金しないプレイヤーの終了時 SSR 所持の中央値が 1〜3 枚（DECISIONS #61 で仕様の 3〜8 枚から下げた）。外れたら終了コード 1。
 """
 import argparse
 import statistics
@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 BIN = ROOT / "build" / "sim_economy"
 COURSES = [(0, "課金しない"), (1, "おこづかい"), (2, "社会人"), (3, "石油王"), (4, "無敵モード")]
-TARGET = (3, 8)
+TARGET = (1, 3)
 
 
 def build():

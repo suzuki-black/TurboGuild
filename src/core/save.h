@@ -5,7 +5,7 @@
 #include "../config.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  5
+#define SAVE_VERSION  6
 
 #define DECK_EMPTY    0xFF
 #define SF_STARTED    0x01   /* 名前と最初の 10 連が済んだ */
@@ -40,6 +40,10 @@ typedef struct {
     u16 last_event;
     u16 last_rank;
     u32 last_event_pt;
+    /* イベントの BOX ガチャ（DECISIONS #60）。箱の残りをレアリティ別に持つ */
+    u16 box_event;       /* この箱を作ったイベント。開催中のイベントと違えば箱を作り直す */
+    u8  box_left[4];     /* N, R, SR, SSR の残り */
+    u8  box_no;          /* 何箱目か（1 から） */
 } SaveData;
 
 u16 save_crc(const SaveData *s);

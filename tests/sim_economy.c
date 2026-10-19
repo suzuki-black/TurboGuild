@@ -1,11 +1,13 @@
 /* sim_economy.c — ゲームと同じ core/ を PC で動かし、サービス開始から終了（270 日）までを遊ばせる。
- * tools/sim_economy.py が何人分か走らせて表にする（Phase3 の受け入れ: 終了時に SSR 3〜8 枚）。
+ * tools/sim_economy.py が何人分か走らせて表にする（受け入れ: 課金しない人の終了時の SSR が 1〜3 枚）。
  *
  *   sim_economy <コース 0..4> <1 日のプレイ回数> <種>
  *   コース 0 = 課金しない（おこづかいコースを選ぶが石を買わない）、1..4 = courses.csv の id
  *
  * 1 回のプレイ: 回復した AP でクエスト（イベント中はイベントのボス）→ 無料・ゴールドガチャ →
- * 石が 10 連分あればプレミア 10 連 → N を素材に合成 → 進化 → おまかせ編成。 */
+ * 石が 10 連分あれば 10 連（イベント中で箱の SSR が残っていれば BOX、それ以外はプレミア）→
+ * N を素材に合成 → 進化 → おまかせ編成。課金する人は、イベント中は箱の SSR が出るまで石を買い足す
+ * （石油王・無敵モードは 3 箱目まで引き切る）。 */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -24,6 +26,9 @@
 #include "core/wallet.h"
 
 static u8 buy;   /* 課金するか */
+static u8 whale; /* 箱を何箱も引き切るか（石油王・無敵モード） */
+
+static void fuse(void);
 
 static u16 count_rarity(u8 r)
 {
@@ -48,18 +53,26 @@ static u8 pull(u8 id, u8 count)
 static void gachas(void)
 {
     GachaReq g;
-    u8 prem = g_save.event_id ? 4 : 3;
     pull(1, 1);
     while (g_save.gold >= 1000 && g_save.card_count < CARD_MAX - 20 && pull(2, 1)) { }
     while (g_save.gacha_tickets && g_save.card_count < CARD_MAX - 20 && pull(5, 1)) { }
     while (g_save.sr_tickets && pull(6, 1)) { }
+    if (g_save.event_id) gacha_box_sync(4);
     if (buy) {
         while (g_save.gems < 2700) {
             if (wallet_buy_gems(2) != W_OK) break;      /* 1000 円ずつ */
         }
     }
     for (;;) {
-        g.gacha = prem; g.count = 10;
+        u8 more = (u8)(whale && g_save.box_no <= 3);     /* 石油王は 3 箱まで引き切る */
+        u8 box = (u8)(g_save.event_id && (g_save.box_left[RARITY_SSR] || more));
+        if (buy && box) {                                /* 箱の SSR が出るまで買い足す */
+            while (g_save.gems < 1800) {
+                if (wallet_buy_gems(2) != W_OK) break;
+            }
+        }
+        g.gacha = box ? 4 : 3; g.count = 10;
+        if (g_save.card_count > CARD_MAX - 10) fuse();   /* 枠が埋まったら合成で空ける */
         if (gacha_can_pay(&g) != G_OK || g_save.card_count > CARD_MAX - 10) break;
         gacha_pull(&g);
     }
@@ -138,6 +151,7 @@ int main(int argc, char **argv)
     u32 next_report = 0;
     u8 i;
     buy = (u8)(course != 0);
+    whale = (u8)(course >= 3);
     save_new(&g_save, 0);
     g_save.rng_gacha = seed * 2654435761UL | 1;
     wallet_start(course ? course : 1);

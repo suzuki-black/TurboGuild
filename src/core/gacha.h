@@ -23,4 +23,5 @@ typedef struct {
 void gacha_pull(GachaReq *g);     /* 支払い → 抽選 → 所持に追加 */
 void gacha_roll(GachaReq *g);     /* 抽選だけ（最初の 10 連・リセマラ用。支払いも追加もしない） */
 u8   gacha_can_pay(GachaReq *g);  /* G_OK / G_NO_MONEY / G_FREE_USED / G_UNAVAILABLE */
+void gacha_box_sync(u8 gacha);    /* BOX ガチャの箱を開催中のイベントにそろえる（g_save.box_*） */
 #endif

@@ -107,6 +107,8 @@ static void test_quest(void)
     CHECK(quest_max_stage() == 11);
 }
 
+static void test_box(void);
+
 static void test_gacha(void)
 {
     GachaReq g;
@@ -133,13 +135,12 @@ static void test_gacha(void)
         for (j = 0; j < 10; j++) { tbl_card(g.ids[j], &c); if (c.rarity > best) best = c.rarity; }
         CHECK(best >= RARITY_SR);
     }
-    /* 天井: 100 連目までに必ず SSR */
-    g_save.pity_count = 0;
+    /* 天井は無い（当時のソシャゲに合わせた）: 何連しても天井で確定しない */
     g_save.rng_gacha = 12345;
-    for (i = 0; i < 200; i++) {
+    for (i = 0; i < 300; i++) {
         g.gacha = 3; g.count = 1;
         gacha_roll(&g);
-        CHECK(g_save.pity_count < 100);
+        CHECK(!g.pity_hit);
     }
     /* 支払いと所持 */
     fresh();
@@ -163,7 +164,43 @@ static void test_gacha(void)
     g_save.sr_tickets = 1;
     gacha_pull(&g);
     tbl_card(g.ids[0], &c);
-    CHECK(g.status == G_OK && c.rarity >= RARITY_SR && g_save.sr_tickets == 0);
+    CHECK(g.status == G_OK && c.rarity == RARITY_SR && g_save.sr_tickets == 0);   /* SR 確定は SR だけ */
+    test_box();
+}
+
+/* BOX ガチャ: 100 個入りの箱から引き切ると中身どおり（N60 R30 SR9 SSR1）。SSR はイベント限定 */
+static void test_box(void)
+{
+    GachaReq g;
+    CardRec c;
+    u16 hist[4] = { 0, 0, 0, 0 }, ssr = 0;
+    int i, j;
+    fresh();
+    g.gacha = 4; g.count = 1;
+    CHECK(gacha_can_pay(&g) == G_UNAVAILABLE);   /* イベントが無いときは引けない */
+    g_save.g_time = GSEC_PER_DAY * 5;
+    g_save.event_id = 1;
+    gacha_box_sync(4);
+    CHECK(g_save.box_no == 1 && g_save.box_left[RARITY_SSR] == 1 && g_save.box_left[RARITY_N] == 60);
+    for (i = 0; i < 10; i++) {
+        g.gacha = 4; g.count = 10;
+        gacha_roll(&g);
+        for (j = 0; j < 10; j++) {
+            tbl_card(g.ids[j], &c);
+            hist[c.rarity]++;
+            if (c.rarity == RARITY_SSR) ssr = g.ids[j];
+        }
+    }
+    CHECK(hist[0] == 60 && hist[1] == 30 && hist[2] == 9 && hist[3] == 1);
+    CHECK(ssr == 43);                           /* 第 1 回の限定 SSR「宵祭りの鬼神」 */
+    CHECK(g_save.box_no == 1 && !(g_save.box_left[0] | g_save.box_left[1] | g_save.box_left[2] | g_save.box_left[3]));
+    g.gacha = 4; g.count = 1;
+    gacha_roll(&g);
+    CHECK(g_save.box_no == 2 && g_save.box_left[RARITY_N] + g_save.box_left[RARITY_R] + g_save.box_left[RARITY_SR]
+          + g_save.box_left[RARITY_SSR] == 99);  /* 空になったら次の箱 */
+    g_save.event_id = 2;                        /* 別のイベントになったら 1 箱目から */
+    gacha_box_sync(4);
+    CHECK(g_save.box_no == 1 && g_save.box_event == 2 && g_save.box_left[RARITY_SSR] == 1);
 }
 
 static void test_login(void)
@@ -288,7 +325,7 @@ static void test_event(void)
         u16 expect = ranking_final_rank();      /* 終了処理の前（参加中の id で NPC の点を数える） */
         event_update(&r);
         CHECK(r.ended && r.id == 1 && r.points == 540 && r.rank == expect);
-        CHECK(r.gain.n == 1 && g_save.gems == gems + 100);   /* 1000 位以内: 石 100 */
+        CHECK(r.gain.n == 1 && g_save.gems == gems + 1000);  /* 1000 位以内: 石 1000 */
         CHECK(g_save.event_id == 0 && g_save.last_event == 1 && g_save.last_rank == r.rank);
     }
     event_update(&r);

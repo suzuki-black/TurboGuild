@@ -17,7 +17,7 @@
 | page | 窓 | 名前 | ソース | 説明 |
 |---|---|---|---|---|
 | 0 | 4000h 固定 | KERNEL | kernel | 起動・sys/・文字描画・絵の描画・表の読み出し・画面の共通部品・中継 |
-| 1 | 6000h コード | CORE | code: src/core/player.c src/core/inventory.c src/core/deck.c src/core/battle.c src/core/quest.c src/core/gacha.c src/core/login.c src/core/wallet.c | ゲームロジック |
+| 1 | 6000h コード | CORE | code: src/core/player.c src/core/inventory.c src/core/deck.c src/core/battle.c src/core/quest.c src/core/gacha.c src/core/login.c | ゲームロジック |
 | 2 | 6000h コード | UI_START | code: src/ui/title.c src/ui/name.c src/ui/course.c src/ui/firstgacha.c src/ui/savedisk.c src/core/save.c src/core/time.c src/sys/rtc.c | タイトル・名前・お財布・最初の 10 連・セーブディスク・時計 |
 | 3 | 6000h コード | UI_HOME | code: src/ui/home.c src/ui/shop.c src/ui/login_ui.c | マイページ・ショップ・ログインスタンプ |
 | 4 | 6000h コード | UI_QUEST | code: src/ui/quest_ui.c | エリア一覧・探索 |
@@ -30,7 +30,7 @@
 | 11 | 6000h コード | CORE2 | code: src/core/fusion.c src/core/event.c src/core/timeline.c | 合成・進化・イベント・ランキング・運営年表 |
 | 12 | 6000h コード | UI_FUSION | code: src/ui/fusion_ui.c | 強化合成・進化合成 |
 | 13 | 6000h コード | UI_EVENT | code: src/ui/event_ui.c src/ui/ranking_ui.c src/ui/news_ui.c | イベント・ランキング・イベント結果・お知らせ |
-| 14 | 6000h コード | CORE3 | code: src/core/ranking.c | NPC のいま・ランキング・みんなの動き |
+| 14 | 6000h コード | CORE3 | code: src/core/ranking.c src/core/wallet.c | NPC のいま・ランキング・みんなの動き、軍資金 |
 | 15 | 6000h コード | BGM | code: src/ui/bgm.c | FM 音源の BGM ドライバと曲（tools/mml.py） |
 | 16 | 8000h データA | CARDS | build/cards.bin | カード |
 | 17 | 8000h データA | AREAS | build/areas.bin | エリア |

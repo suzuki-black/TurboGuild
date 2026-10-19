@@ -29,7 +29,7 @@ RARITY = {"N": 0, "R": 1, "SR": 2, "SSR": 3}
 ELEMENT = {"炎": 0, "水": 1, "雷": 2, "光": 3, "闇": 4}
 MAX_LV = {0: 20, 1: 30, 2: 40, 3: 50}
 CURRENCY = {"free": 0, "gold": 1, "gems": 2, "ticket": 3, "srticket": 4}
-POOL = {"normal": 0, "normal_event": 1, "event2x": 2}
+POOL = {"normal": 0, "normal_event": 1, "event2x": 2, "box": 3}   # box: n/r/sr/ssr は 100 個の箱の中身の個数
 ITEM = {"gold": 0, "potion": 1, "ticket": 2, "gems": 3, "srticket": 4, "card": 5}
 REWARD_KIND = {"point": 0, "rank": 1}
 

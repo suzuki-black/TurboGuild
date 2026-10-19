@@ -145,7 +145,11 @@ T_NEWAREA	NEW
 T_PULL_1	1回引く
 T_PULL_10	10連で引く
 T_TODAY_FREE	本日無料！
-T_SR_UP	SR以上確定
+T_SR_UP	SR確定
+T_BOX_LEFT	のこり
+T_BOX_NO	箱目
+T_BOX_SSR	SSRのこり
+T_BOX_SSR_GOT	SSR獲得済み！
 T_STAMP_TITLE	ログインスタンプ
 T_STAMP_NEXT	明日もログインしよう！
 T_FOR_SALE	回復薬　石100

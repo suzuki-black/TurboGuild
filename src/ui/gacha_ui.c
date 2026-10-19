@@ -1,5 +1,5 @@
 /* gacha_ui.c — ガチャのバナー一覧（数字キー 1〜5）→ 1 回 / 10 連 → 開封演出 → 結果。
- * イベントガチャ（id 4）はイベントが始まる Phase2 まで出さない。 */
+ * イベント BOX ガチャ（id 4）はイベント開催中だけ出す。バナーと回数選びに箱の残りを出す。 */
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
@@ -23,6 +23,7 @@ void gacha_show(u8 kind);
 #define BANNER_Y 18
 #define BANNER_H (g_kind_n > 5 ? 28 : 34)
 #define kinds    g_kinds
+#define BOX_ID   4
 
 /* ガチャ id ごとのバナーの 2 色（縞）と、左の絵（添字 = id） */
 static const u8 stripe[7][2] = {
@@ -37,6 +38,8 @@ static const u8 cur_icon[5][2] = {
     { 0, 0 }, { ATL_ITEM_GOLD_X, ATL_ITEM_GOLD_Y }, { ATL_ITEM_GEMS_X, ATL_ITEM_GEMS_Y },
     { ATL_ITEM_TICKET_X, ATL_ITEM_TICKET_Y }, { ATL_ITEM_SRTICKET_X, ATL_ITEM_SRTICKET_Y },
 };
+
+static u8 box_total(void);
 
 static void banner(u8 i)
 {
@@ -64,6 +67,31 @@ static void banner(u8 i)
         txt_num(cx, (u8)(y + 16), g.price10, COL_WHITE, b);
     }
     if (g.currency == CUR_SRTICKET) txt_id(20, (u8)(y + 16), T_SR_UP, COL_RED, b);
+    if (id == BOX_ID) {
+        cx = txt_id(22, (u8)(y + 16), T_BOX_LEFT, COL_YELLOW, b);
+        txt_num(cx, (u8)(y + 16), box_total(), COL_YELLOW, b);
+    }
+}
+
+static u8 box_total(void)
+{
+    return (u8)(g_save.box_left[0] + g_save.box_left[1] + g_save.box_left[2] + g_save.box_left[3]);
+}
+
+/* 回数を選ぶ前に箱の中身を見せる: 「2箱目 のこり 87/100」「SSRのこり 1」 */
+static void box_panel(void)
+{
+    u8 cx;
+    ui_box(40, 52, 176, 40, COL_DRED, COL_YELLOW);
+    cx = txt_num(6, 55, g_save.box_no, COL_WHITE, COL_DRED);
+    cx = txt_id(cx, 55, T_BOX_NO, COL_WHITE, COL_DRED);
+    cx = txt_id((u8)(cx + 1), 55, T_BOX_LEFT, COL_WHITE, COL_DRED);
+    cx = txt_num((u8)(cx + 1), 55, box_total(), COL_YELLOW, COL_DRED);
+    cx = txt_draw(cx, 55, "/", COL_LGRAY, COL_DRED);
+    txt_num(cx, 55, 100, COL_LGRAY, COL_DRED);
+    if (!g_save.box_left[RARITY_SSR]) { txt_id(6, 72, T_BOX_SSR_GOT, COL_LGRAY, COL_DRED); return; }
+    cx = txt_id(6, 72, T_BOX_SSR, COL_WHITE, COL_DRED);
+    txt_num((u8)(cx + 1), 72, g_save.box_left[RARITY_SSR], COL_YELLOW, COL_DRED);
 }
 
 static void owned(void)
@@ -89,8 +117,9 @@ FAR(void, gacha_init, (void))
     g_kind_n = 0;
     for (i = 0; i < 5; i++) {
         kinds[g_kind_n++] = base[i];
-        if (base[i] == 3 && g_save.event_id) kinds[g_kind_n++] = 4;   /* プレミアの次にイベントガチャ */
+        if (base[i] == 3 && g_save.event_id) kinds[g_kind_n++] = BOX_ID;   /* プレミアの次にイベント BOX */
     }
+    if (g_save.event_id) gacha_box_sync(BOX_ID);
     g_cursor = (u8)(g_sel_gacha < KINDS ? g_sel_gacha : 2);
 }
 
@@ -109,6 +138,7 @@ static u8 ask_count(void)
     u8 cur = 1, k;
     tbl_gacha(kinds[g_cursor], &g);
     if (!g.price10) return 1;
+    if (kinds[g_cursor] == BOX_ID) box_panel();
     for (;;) {
         u8 p;
         for (k = 0; k < 2; k++) {
