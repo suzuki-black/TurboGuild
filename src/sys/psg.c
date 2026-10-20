@@ -21,11 +21,22 @@ void psg_init(void)
     psg_w(8, 0);
 }
 
+/* 効果音は「ピッ」と短く。音量はエンベロープ（形 0: 減衰して無音のまま）に任せるので、
+ * 長い描画でメインループが止まっても鳴り続けない。長さは最長 4 フレーム（約 0.07 秒） */
+#define BEEP_MAX_FRAMES 4
+#define EP_PER_FRAME    116      /* 1789773 Hz / 256 / 60 */
+
 void psg_beep(u16 tone, u8 frames)
 {
+    u16 ep;
+    if (frames > BEEP_MAX_FRAMES) frames = BEEP_MAX_FRAMES;
+    ep = (u16)(frames * EP_PER_FRAME);
     psg_w(0, (u8)tone);
     psg_w(1, (u8)(tone >> 8));
-    psg_w(8, 12);
+    psg_w(11, (u8)ep);
+    psg_w(12, (u8)(ep >> 8));
+    psg_w(8, 0x10);              /* 音量をエンベロープに */
+    psg_w(13, 0x00);             /* 書くとエンベロープが頭から始まる */
     g_beep_frames = frames;
 }
 
