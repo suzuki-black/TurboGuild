@@ -280,7 +280,7 @@ T_FD_BYE3	「最後にガチャ引いてくる」
 T_LICENSE_TITLE	ライセンス
 T_LICENSE_SRC	ソースコード
 T_LICENSE_NOTE	コード・絵・音楽もすべてMIT
-T_TITLE_LICENSE	0:ライセンス
+T_TITLE_LICENSE	0:MIT
 T_STAFFROLL	スタッフロール
 T_RATEUP_ON	SSR確率アップ中！
 T_END_SOON	サービス終了まで
@@ -291,4 +291,3 @@ T_RESET_CONFIRM	本当に最初からやり直しますか？
 T_GIFT_GOT	運営から石が届きました
 T_TO_TITLE	タイトルへ戻りますか？
 T_GUIDE_HOME2	1〜8:メニュー 9:バナー ESC:タイトル
-T_THANKS	遊んでくれて、ありがとう！
