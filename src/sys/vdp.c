@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* vdp.c — SCREEN5 の初期化と矩形塗り。I/O は vdp_asm.s だけが触る */
 #include "vdp.h"
 #include "bios.h"

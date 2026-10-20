@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* psg.c — チャンネル A で短い効果音を鳴らす。割り込みから呼ばず、メインループで tick する */
 #include "psg.h"
 #include "../ram.h"

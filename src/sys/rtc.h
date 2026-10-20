@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* rtc.h — 内蔵 RTC の現在時刻 */
 #ifndef RTC_H
 #define RTC_H

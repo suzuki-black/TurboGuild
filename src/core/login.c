@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* login.c — 何日空いても 1 回分だけ。連続が途切れても周期はリセットしない（当時風の緩さ） */
 #include "login.h"
 #include "player.h"

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* disk.c — 失敗は 3 回まで再試行し、エラーの種類を戻り値で返す。
  * ディスクROM が居ないと H.PHYD が空（C9h）なので、そのときは呼ばずに NOFDD を返す。 */
 #include "disk.h"

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* timeline.c — kind の処理はここの switch 1 つ（仕様 §3.1）。新しい kind を足すときだけコードを触る。
  * イベントの開催日は build_data.py が年表の EVENT 行から events の start_day に写してある。 */
 #include "timeline.h"

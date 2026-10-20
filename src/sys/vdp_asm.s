@@ -1,3 +1,4 @@
+; SPDX-License-Identifier: MIT
 ; vdp_asm.s — VDP I/O の唯一の入口（SDCC sdcccall(1): 第1引数 A/HL, 第2引数 L/DE）
 ; 1 操作を 1 つの di/ei 区間に閉じる。BIOS の割り込みが S#0 を読むので、
 ; アドレス設定の途中に割り込みが刺さるとラッチがずれる。

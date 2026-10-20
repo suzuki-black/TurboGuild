@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* quest.h — 1 ステージ分のクエスト実行（AP 消費 → 戦闘 → 報酬 → ドロップ → 進行） */
 #ifndef CORE_QUEST_H
 #define CORE_QUEST_H

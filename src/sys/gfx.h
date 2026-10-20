@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* gfx.h — 絵の描画。部品は VRAM ページ 1 のアトラスから VDP コマンドで、カード絵は ROM から CPU で。
  * 座標はドット。部品は ATL_<名前> をそのまま渡す（x, y, w, h の 4 つに展開される）:
  *     gfx_part(ATL_ICON_QUEST, 16, 120);     不透明（HMMM。x と幅は偶数）

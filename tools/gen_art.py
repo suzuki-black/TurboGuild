@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """絵の素材を作る（DECISIONS #31）。
 
     build/atlas0..N.bin     画面部品のアトラス 256x256（起動時に VRAM ページ 1 へ読み込む）

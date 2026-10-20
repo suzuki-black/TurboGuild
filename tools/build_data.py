@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """data/* を固定長レコードのバイナリと C ヘッダへ変換する（仕様 §4）。
 
     build/cards.bin  build/areas.bin  build/stages.bin  build/gacha.bin  build/login.bin
@@ -140,6 +141,8 @@ class TextTable:
 
 def load_ui_text(text):
     for path in sorted((ROOT / "data" / "text").glob("*.txt")):
+        if path.name == "credits.txt":          # スタッフロールは load_credits が読む
+            continue
         for ln, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
             if not line.strip() or line.startswith("#"):
                 continue
@@ -316,6 +319,20 @@ def load_npc_texts(text):
     return first_pre, len(pre), first_suf, len(suf), first_guild, len(guilds)
 
 
+def load_credits(text):
+    """スタッフロール（data/text/credits.txt）。# の行は注釈。空行も 1 行として流す"""
+    first = len(text.items)
+    n = 0
+    for ln, s in enumerate((ROOT / "data" / "text" / "credits.txt").read_text(encoding="utf-8").splitlines(), 1):
+        if s.startswith("#"):
+            continue
+        if sum(2 if ord(c) > 0x7F else 1 for c in s) > 32:
+            die(f"credits.txt:{ln}: 32 桁を超える")
+        text.add(s or " ", f"T_CREDIT{n}")
+        n += 1
+    return first, n
+
+
 def c_struct(name, fields):
     return ["typedef struct {"] + [f"    {t} {n};" for t, n in fields] + [f"}} {name};", ""]
 
@@ -383,13 +400,15 @@ def main():
     evstages = load_event_stages(text)
     evrewards = load_event_rewards(len(cards))
     fp, np_, fs, ns, fg, ng = load_npc_texts(text)
+    fc, nc = load_credits(text)
     npcs, by_power = gen_npc.generate(np_, ns, ng)
     npc_blob = gen_npc.pack(npcs)
     per = PAGE_PAYLOAD // 16
     extra = {"EVENT_COUNT": len(events), "EVSTAGE_COUNT": len(evstages), "EVREWARD_COUNT": len(evrewards),
              "NPC_COUNT": len(npcs), "NPC_PER_PAGE": per, "NPC_PRE_TEXT": fp, "NPC_PRE_COUNT": np_,
              "NPC_SUF_TEXT": fs, "NPC_SUF_COUNT": ns, "GUILD_TEXT": fg, "GUILD_COUNT": ng,
-             "TIMELINE_COUNT": len(timeline), "SERVICE_END_DAY": timeline[-1][0]}
+             "TIMELINE_COUNT": len(timeline), "SERVICE_END_DAY": timeline[-1][0],
+             "CREDIT_TEXT": fc, "CREDIT_COUNT": nc}
     blobs = {
         "cards.bin": pack_table(CARD_FIELDS, cards),
         "areas.bin": pack_table(AREA_FIELDS, areas),

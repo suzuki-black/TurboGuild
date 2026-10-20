@@ -1,0 +1,42 @@
+# credits.txt — スタッフロールの文言（1 行 = 画面の 1 行、32 桁まで。空行も 1 行として流す）
+# 役割の書き方は『真零の咆哮』の README に揃えた（仕様 §3.1, §11.5）
+TurboGuild
+
+― スタッフ ―
+
+
+原案・コンセプト
+ゲームデザイン・ディレクション
+
+suzuki-black
+
+
+実装
+プログラム／グラフィック
+サウンド
+
+Claude Code
+(Anthropic Claude)
+
+
+制作の道具
+
+SDCC  /  openMSX  /  Python
+
+
+そして
+
+遊んでくれた
+すべての冒険者のみなさん
+
+
+270日間
+ありがとうございました！
+
+
+
+
+MIT License
+(C) 2026 suzuki-black
+github.com/
+suzuki-black/TurboGuild

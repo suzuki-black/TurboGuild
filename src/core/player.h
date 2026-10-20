@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* player.h — レベル・経験値・AP（仕様 §3, 企画書「スタミナ」） */
 #ifndef CORE_PLAYER_H
 #define CORE_PLAYER_H

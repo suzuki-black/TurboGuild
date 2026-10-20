@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* save.h — セーブデータ構造体（仕様 §5）。CRC と A/B 採用判定はハード非依存 */
 #ifndef CORE_SAVE_H
 #define CORE_SAVE_H
@@ -5,7 +6,7 @@
 #include "../config.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  7
+#define SAVE_VERSION  8
 
 #define DECK_EMPTY    0xFF
 #define SF_STARTED    0x01   /* 名前と最初の 10 連が済んだ */
@@ -62,6 +63,7 @@ typedef struct {
     u8  gvg_cheer;       /* その戦で応援した */
     u8  gvg_last_war;    /* 最後に終わった回（同じ回に入り直さない） */
     u8  gvg_last_rank;
+    u8  credits_seen;    /* サービス終了のスタッフロールを流した */
 } SaveData;
 
 u16 save_crc(const SaveData *s);

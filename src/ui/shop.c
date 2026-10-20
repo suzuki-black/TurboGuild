@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* shop.c — [1] 石を買う（軍資金で課金）[2] 回復薬を買う（石 100）[3] 回復薬を使う。
  * 軍資金はリアルマネーの代わり（DECISIONS #33）。無料の石や回復薬を使い切ったら、ここで払うしかない。 */
 #include "screen.h"

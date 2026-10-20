@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* vdp.h — SCREEN5 の初期化・矩形塗り・パレット・VRAM 転送 */
 #ifndef VDP_H
 #define VDP_H

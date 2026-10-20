@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* common.c — 画面の共通部品のうち、引数がレジスタで済むもの（UI_COMMON バンク）。
  * 上下の帯・状態欄（ゲージ）・中央の箱（メッセージ／はい・いいえ）・保存。 */
 #include "widget.h"

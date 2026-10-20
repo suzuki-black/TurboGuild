@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* fusion.h — 合成（強化）と進化（仕様 §7）。素材は所持カードの添字のビット集合で選ぶ */
 #ifndef CORE_FUSION_H
 #define CORE_FUSION_H

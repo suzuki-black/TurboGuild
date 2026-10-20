@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* far.h — コードバンクに置く関数の定義に使う印（DECISIONS #14）
  *
  *   FAR(u8, battle_run, (const BattleIn *in)) { ... }

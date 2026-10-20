@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* battle.h — 戦闘は式 1 本で決める（仕様 §6）。演出は ui 側 */
 #ifndef CORE_BATTLE_H
 #define CORE_BATTLE_H

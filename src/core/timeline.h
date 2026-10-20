@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* timeline.h — 運営年表（仕様 §3.1）。ゲーム内の日付で「いま何が起きているか」を表から読む。
  * 状態は保存しない（日付が決まれば毎回同じ答え）。贈り物だけは 1 回きりなので timeline_cursor で数える。 */
 #ifndef CORE_TIMELINE_H

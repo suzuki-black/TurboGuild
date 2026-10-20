@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* gacha_ui.c — ガチャのバナー一覧（数字キー 1〜5）→ 1 回 / 10 連 → 開封演出 → 結果。
  * イベント BOX ガチャ（id 4）はイベント開催中だけ出す。バナーと回数選びに箱の残りを出す。 */
 #include "screen.h"

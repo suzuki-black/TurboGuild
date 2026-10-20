@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* bank.c — ASCII8 のバンクレジスタ 0x6800/0x7000/0x7800 を書く。
  * 窓 0x4000 (0x6000 レジスタ) はカーネルが乗っているので決して触らない。 */
 #include "bank.h"

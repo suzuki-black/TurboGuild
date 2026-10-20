@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* screen.h — 画面は関数ポインタ表 1 枚。main のループは update と draw を呼ぶだけ（仕様 §9）。
  * コードバンクの画面は SCREEN(...) の印で表をカーネルに生成させる（src/far.h）。 */
 #ifndef UI_SCREEN_H

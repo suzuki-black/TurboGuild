@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* gacha.h — ガチャ（仕様 §4.3）。抽選は rand(10000) と累積閾値、小数は使わない */
 #ifndef CORE_GACHA_H
 #define CORE_GACHA_H

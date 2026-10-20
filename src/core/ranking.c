@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* ranking.c — 乱数の代わりに「NPC 番号と種から決まるハッシュ」を使うので、何度計算しても同じ。
  * ★1000 人ぶん回すので 32bit の割り算を使わない（Z80 では 1 回数千サイクル。最初は 1 回の順位計算に
  *   5 秒かかっていた）。倍率は先に「× 128 / 256 の整数」にしておき、シフトで割る。 */
@@ -253,6 +254,8 @@ FAR(void, feed_line, (u16 k, FeedLine *f))
     }
     f->npc = i;
     f->kind = (u8)(hash(slot, SALT_FEED(2)) % FEED_KINDS);
+    if (c.day + 1 >= SERVICE_END_DAY) f->kind = FEED_BYE;  /* 最終日は全員が別れの挨拶 */
+    f->param = (u16)(hash(slot, SALT_FEED(5)) % 4);          /* 挨拶の言い回し */
     switch (f->kind) {
     case FEED_SSR: {
         CardRec cr;
@@ -269,6 +272,7 @@ FAR(void, feed_line, (u16 k, FeedLine *f))
     }
     case FEED_LEVEL:  f->param = n.level; break;
     case FEED_RANKUP: f->param = (u16)(1 + hash(slot, SALT_FEED(4)) % 100); break;
+    case FEED_BYE:    break;
     default:          f->param = 0; break;
     }
 }

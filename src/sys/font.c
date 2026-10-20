@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* font.c — 8x8 半角字形を 4bpp に展開して描く。座標は 8px グリッド（32 桁 x 26 行）。
  * 字形は本体 BIOS の CGTABL を読む。ROM に字形を持たず、半角カナもそのまま出せる。 */
 #include "font.h"

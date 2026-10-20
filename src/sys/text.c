@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* text.c — 文字列描画。text.dat の目次（TEXT0 ページ先頭）から文字列のページと位置を引く。
  * 漢字ROM の番地: 非漢字 (区+20h) は (hi-20h)*96+(lo-20h)、漢字は 1024+(hi-30h)*96+(lo-20h)。 */
 #include "text.h"

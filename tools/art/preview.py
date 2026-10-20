@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """カード絵の見本を 1 枚の PNG にまとめる（確認用）"""
 import csv
 import sys

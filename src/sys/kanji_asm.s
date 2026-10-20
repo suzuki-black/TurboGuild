@@ -1,3 +1,4 @@
+; SPDX-License-Identifier: MIT
 ; kanji_asm.s — 漢字ROM（JIS 第1水準, I/O D8h/D9h）から 16x16 の字形 32 バイトを読む。
 ; 番地 = 字番号 × 32。D8h に字番号の下位 6bit、D9h に上位 6bit を書き、D9h から 32 回読む。
 ; 字形は 8x8 の 4 ブロック（左上・右上・左下・右下）の順に並んでいる。

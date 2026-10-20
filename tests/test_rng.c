@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* test_rng.c — xorshift32 の既知値・系列の独立性・範囲 */
 #include "check.h"
 #include "core/rng.h"

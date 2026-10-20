@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* time.h — 現実時刻とゲーム内時刻 g_time の換算（仕様 §3）。ハード非依存 */
 #ifndef CORE_TIME_H
 #define CORE_TIME_H

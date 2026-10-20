@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* config.h — マジックナンバーの集約先（仕様 §11） */
 #ifndef CONFIG_H
 #define CONFIG_H

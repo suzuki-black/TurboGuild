@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* bios.h — BIOS ラッパ（bios_asm.s）。sys/ の外からは呼ばない */
 #ifndef BIOS_H
 #define BIOS_H

@@ -1,3 +1,4 @@
+; SPDX-License-Identifier: MIT
 ; far_asm.s — コードバンク間呼び出しのトランポリン（DECISIONS #14）
 ; 窓 6000h を呼び先のバンクに切り替えて呼び、戻ったら呼び出し元のバンクに戻す。
 ; スタブ（tools/gen_far.py が生成）は 6 バイト:

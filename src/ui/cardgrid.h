@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* cardgrid.h — カードの絵を 6 列 × 3 段に並べる一覧（UI_CARD バンクの中だけで使う） */
 #ifndef CARDGRID_H
 #define CARDGRID_H

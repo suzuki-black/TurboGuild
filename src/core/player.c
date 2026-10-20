@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* player.c — AP は ap_gtime からの経過で回復させ、端数は ap_gtime に残す（取りこぼさない）。
  * 上限に達している間は時計だけ進める（満タン放置ぶんを後で貯金しない）。 */
 #include "player.h"

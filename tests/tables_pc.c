@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* tables_pc.c — core/tables.h の PC 版。build/ の .bin（ROM に入るのと同じもの）を読む */
 #include <stdio.h>
 #include <stdlib.h>

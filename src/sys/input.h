@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* input.h — キー/ジョイスティックを論理ボタンにまとめる */
 #ifndef INPUT_H
 #define INPUT_H

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* tables.c — データ窓 8000h に表のページを出し、1 レコードを RAM へ写して返す。
  * 表は「u16 件数 + 固定長レコード」の形で、ページ見出しの直後（+10h）から置かれている。 */
 #include "../core/tables.h"

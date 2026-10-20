@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 # check.tcl — Phase0 のヘッドレス確認。起動 → 各試験画面のスクショ → 保存 → リセット → ロード。
 # 出力は $OUT（テキスト）と $SHOTDIR/*.png。
 # ★throttle は on のまま。off だと screenshot が古いフレームを返す。

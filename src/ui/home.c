@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* home.c — マイページ。左にリーダーカードの絵、右に状態のゲージ、中段にバナー、
  * 下に数字キーつきのアイコンメニュー（携帯の 1〜8 キーで直接選べる）、最下段に流れるお知らせ。 */
 #include "screen.h"
@@ -161,7 +162,7 @@ FAR(void, home_init, (void))
         g_gift = tr.gift_gems;
         if (tr.n_news) g_save_dirty = 1;
         timeline_state(&tl);
-        if (tl.ended) { g_save_dirty = 1; screen_change(&scr_title); }   /* サービス終了 */
+        if (tl.ended) { g_save_dirty = 1; screen_change(g_save.credits_seen ? &scr_title : &scr_credits); }   /* サービス終了 */
     }
     if (!g_save.guild) {                             /* 最初に来たとき、どこかのギルドに入る */
         g_save.guild = (u8)(1 + rng_range(&g_save.rng_sim, GUILD_COUNT));

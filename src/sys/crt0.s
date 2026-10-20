@@ -1,3 +1,4 @@
+; SPDX-License-Identifier: MIT
 ; crt0.s — ASCII8 メガROM のヘッダと起動（H.STKE 方式, 仕様 §2.3）
 ; INIT では H.STKE にフックを仕掛けて即 RET。ディスクROM 初期化後に
 ; BASIC 起動直前の H.STKE から boot_main へ入り、二度と戻らない。

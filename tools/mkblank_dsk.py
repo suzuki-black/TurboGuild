@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """openMSX 用の空のセーブディスク（2DD 720KB, FAT12 フォーマット済み）を作る（仕様 §5.1）。
 
     mkblank_dsk.py <out.dsk>

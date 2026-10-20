@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* widget.c — どの画面でも使う部品。カーネルに置くのでコードバンクからそのまま呼べる。
  * 呼び出し元のバンクの const（文言 id の表など）を読んでよい（窓を切り替えないので見える）。 */
 #include "widget.h"

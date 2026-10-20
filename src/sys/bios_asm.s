@@ -1,3 +1,4 @@
+; SPDX-License-Identifier: MIT
 ; bios_asm.s — BIOS 呼び出しの薄いラッパ。BIOS は IX/IY を壊すので必ず退避する。
 ; sdcccall(1): 第1引数 A(u8)/HL(ptr)、戻り値 A(u8)。
 

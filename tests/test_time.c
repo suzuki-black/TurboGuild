@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* test_time.c — 日時→通算秒、ゲーム時間の進め方（逆行・30 日上限） */
 #include "check.h"
 #include "core/time.h"

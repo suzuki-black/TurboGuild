@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """FAR(...) と SCREEN(...) の印を集めて、カーネル側の中継と画面表を生成する（DECISIONS #14）。
 
     gen_far.py <banks.mk> <out.s> <out_screens.h>

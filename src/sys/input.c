@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* input.c — キーマトリクス行 7/8 とジョイスティック 1 を読む。
  * ジョイスティックは PSG R#14 を直接読む（BIOS GTSTCK はキーと混ざるため）。 */
 #include "input.h"

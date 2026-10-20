@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* test_game.c — 戦闘・AP・クエスト・ガチャ・ログインボーナス・デッキ（表は build/ の .bin の実物） */
 #include "check.h"
 #include <string.h>

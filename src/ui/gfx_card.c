@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* gfx_card.c — カード絵（等倍・縮小・2 倍）と大きい数字。カーネル 8KB を空けるため UI_COMMON バンクに置く。
  * 呼ぶ側は sys/gfx.h のマクロ gfx_card(id, x, y) などで書ける（座標を 16bit 1 つにまとめて中継を通す）。 */
 #include "../sys/gfx.h"

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* font.h — 半角文字の描画（BIOS CGTABL の字形を SCREEN5 へ展開） */
 #ifndef FONT_H
 #define FONT_H

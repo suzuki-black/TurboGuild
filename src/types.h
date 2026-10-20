@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* types.h — 固定幅の整数型。int を使わないための唯一の定義元 */
 #ifndef TYPES_H
 #define TYPES_H

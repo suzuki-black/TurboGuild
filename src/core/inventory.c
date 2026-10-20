@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* inventory.c — 所持カードは cards[0..card_count-1] に詰めて持つ。
  * 抜いたら後ろを詰め、デッキが指す添字もずらす。 */
 #include "inventory.h"

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* deck.h — デッキの総攻撃・総防御・コスト・スキル効果（仕様 §6） */
 #ifndef CORE_DECK_H
 #define CORE_DECK_H

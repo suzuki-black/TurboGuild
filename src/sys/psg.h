@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* psg.h — PSG の最小ドライバ（効果音 1 音）。BGM は Phase1 以降 */
 #ifndef PSG_H
 #define PSG_H

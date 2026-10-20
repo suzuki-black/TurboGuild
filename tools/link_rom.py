@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """docs/MEMORY_MAP.md の表どおりに ASCII8 メガROM を組み立てる（仕様 §2.2）。
 
     link_rom.py header <out.h> <banks.mk>         PAGE_<名前> の #define と、ソース→バンク表を生成

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* quest.c — 負けても AP は減る（当時風）。報酬とドロップは勝ったときだけ。
  * ドロップはエリアの属性・レアリティ（通常 N / ボス R）の恒常カードから等確率。 */
 #include "quest.h"

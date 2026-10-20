@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 # TurboGuild — ASCII8 メガROM のビルド定義
 #
 #   make          bin/TurboGuild.rom と bin/save.dsk

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """別バンクの関数・定数を直接参照していないかをリンク後に調べる（DECISIONS #14）。
 
     check_banks.py <kernel.map> <banks.mk> <objdir>

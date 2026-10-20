@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """stages_rule.csv の式から 500 ステージ（50 エリア × 10）を生成する（仕様 §4.2）。
 
 build_data.py から呼ばれる。単体で実行すると先頭と各エリアボスの値を表で出す。

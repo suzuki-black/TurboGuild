@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* main.c — 起動後の初期化と画面ループ。crt0 の boot_main から呼ばれ、戻らない */
 #include "ram.h"
 #include "config.h"

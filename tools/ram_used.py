@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """リンクマップから静的 RAM（_DATA/_INITIALIZED/_BSS）の合計を出し、予算超過で失敗させる（仕様 §11）。"""
 import re
 import sys

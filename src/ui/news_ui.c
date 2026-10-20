@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* news_ui.c — お知らせ（運営年表）と「みんなの動き」（NPC の出来事）、流れるお知らせの文を作る。
  * 文は文言の部品と数字・名前を RAM の 1 本の文字列に組み立てる（マイページのマーキーが流す）。 */
 #include "screen.h"
@@ -54,6 +55,7 @@ static void feed_text(const FeedLine *f)
     case FEED_BOSS:   add_text(T_FD_BOSS); break;
     case FEED_LEVEL:  add_text(T_FD_LEVEL); add_num(f->param); add_text(T_FD_LEVEL2); break;
     case FEED_RANKUP: add_text(T_FD_RANKUP); add_num(f->param); add_text(T_FD_RANKUP2); break;
+    case FEED_BYE:    add_text((u16)(T_FD_BYE0 + f->param)); break;
     default:          add_text(T_FD_LOGIN); break;
     }
 }

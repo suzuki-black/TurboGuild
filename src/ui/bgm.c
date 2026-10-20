@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* bgm.c — FM 音源（MSX-MUSIC = YM2413/OPLL, I/O 7Ch/7Dh）の BGM ドライバ。3 チャンネル。
  * 曲は tools/mml.py が data/bgm/ の .mml から作る（bgm_data.h）。メインループが毎フレーム bgm_tick を呼ぶ。
  * 長い描画やディスクの読み書きの間は止まる（割り込みでは鳴らさない: バンクの窓を割り込みで触らないため）。 */

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """インフレ・ガチャ・報酬の経済シミュレーション（仕様 §10 Phase3 の受け入れ）。
 
 ゲームと同じ src/core/ を gcc で組んだ tests/sim_economy.c を、コース × 乱数の種ぶん走らせる。

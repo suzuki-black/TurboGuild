@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* ranking_ui.c — ランキング。[1] イベント [2] 総戦力 [0] 自分の位置、上下で 1 行、左右で 10 行送る。
  * 上位 3 人は金・銀・銅の印。自分の行は青。NPC の名前は「前半 + 後半」のハンドル名。 */
 #include "screen.h"

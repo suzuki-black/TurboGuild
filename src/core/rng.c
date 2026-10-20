@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* rng.c — xorshift32 (13,17,5)。状態 0 は不動点なので 1 に逃がす */
 #include "rng.h"
 

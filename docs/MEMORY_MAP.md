@@ -18,7 +18,7 @@
 |---|---|---|---|---|
 | 0 | 4000h 固定 | KERNEL | kernel | 起動・sys/・文字描画・絵の描画・表の読み出し・画面の共通部品・中継 |
 | 1 | 6000h コード | CORE | code: src/core/player.c src/core/inventory.c src/core/deck.c src/core/battle.c src/core/quest.c src/core/gacha.c src/core/login.c | ゲームロジック |
-| 2 | 6000h コード | UI_START | code: src/ui/title.c src/ui/name.c src/ui/course.c src/ui/firstgacha.c src/ui/savedisk.c src/core/save.c src/core/time.c src/sys/rtc.c | タイトル・名前・お財布・最初の 10 連・セーブディスク・時計 |
+| 2 | 6000h コード | UI_START | code: src/ui/title.c src/ui/credits_ui.c src/ui/name.c src/ui/course.c src/ui/firstgacha.c src/ui/savedisk.c src/core/save.c src/core/time.c src/sys/rtc.c | タイトル・名前・お財布・最初の 10 連・セーブディスク・時計 |
 | 3 | 6000h コード | UI_HOME | code: src/ui/home.c src/ui/shop.c src/ui/login_ui.c | マイページ・ショップ・ログインスタンプ |
 | 4 | 6000h コード | UI_QUEST | code: src/ui/quest_ui.c | エリア一覧・探索 |
 | 5 | 6000h コード | UI_GACHA | code: src/ui/gacha_ui.c | ガチャのバナー一覧・結果 |

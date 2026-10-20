@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* guildwar.c — ギルド対抗戦（guildwar.h）。
  * 組み合わせ: 第 m 戦はギルド g と g xor k（k = 1..15 を戦ごとに変える）。xor なので全ギルドが 1 対 1 になる。
  * ギルドの点 = 所属 NPC（辞めていない人）の戦力の合計 / 64 × 揺らぎ 80〜120%。

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* rtc.c — BIOS REDCLK でブロック 0 の BCD 桁を読む。
  * 秒の桁上がりを跨ぐと値が崩れるので、2 回読んで一致するまで繰り返す。 */
 #include "rtc.h"

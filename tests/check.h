@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* check.h — 最小のテスト用マクロ。失敗したら行番号を出して終了コード 1 */
 #ifndef CHECK_H
 #define CHECK_H

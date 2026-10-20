@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* bank.h — ASCII8 バンク切替。現在値は RAM に鏡写しする（仕様 §2.3） */
 #ifndef BANK_H
 #define BANK_H

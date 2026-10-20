@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 # check_msx2.tcl — turboR 以外の機種で「turboR 専用」を出して止まることを確認する。
 # テキスト画面なので get_screen で文字を読む。
 set ::log [open $::env(OUT) w]

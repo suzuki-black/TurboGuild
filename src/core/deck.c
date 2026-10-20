@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* deck.c — 1 枚の値 = 基礎 × (100 + Lv×5)/100 × 属性% × スキル% × 時代%（仕様 §6）。
  * 時代% はそのカードが出た時点のインフレ倍率（年表の INFLATION, build_data.py がカードに写す）。
  * 新しいカードほど強く、古いカードは見劣りしていく（DECISIONS #49）。 */

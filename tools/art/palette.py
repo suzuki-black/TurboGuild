@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 """TurboGuild の 16 色パレット（SCREEN5）。絵の生成と MSX 側（sys/vdp.c）で同じものを使う。
 
 各色は MSX の 3bit RGB (0..7)。番号は C の COL_* と一致させる（src/config.h）。

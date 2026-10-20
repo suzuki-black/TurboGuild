@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """BGM の MML（data/bgm/*.mml）を FM 音源（OPLL）ドライバ用のバイト列にして C の配列で出す。
 
     mml.py <out.h> <曲.mml>...

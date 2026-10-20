@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* save.c — CRC16-CCITT で封をし、読み戻したデータの真偽を判定する。
  * crc フィールドは 0 とみなして計算する（封をする前後で同じ値になるように）。 */
 #include "save.h"

@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: MIT
 """NPC 1000 人の初期状態を作る（仕様 §4.6）。build_data.py から呼ばれる。
 
 1 人 16 バイト: name_id u16, guild u8, level u8, power u16（総戦力/10）, last_login u32,

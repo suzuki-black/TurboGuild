@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* ram.h — RAM に置く変数はすべてここに宣言する（仕様 §11）。実体は ram.c。
  * 合計は make の最後に "RAM used" として表示される。 */
 #ifndef RAM_H
@@ -65,7 +66,8 @@ extern char g_ticker_buf[96];  /* 流しているお知らせの 1 本（Shift-J
 extern u8 g_ticker_k;          /* 次に流す出来事の番号 */
 extern u8 g_viewonly;          /* サービス終了後の「思い出を見る」（カード一覧だけ） */
 extern u16 g_gift;             /* 年表の贈り物（知らせる石の数） */
-extern u8  g_joined;            /* マイページ: ギルドに入ったばかり（知らせる） */
+extern u8  g_joined;
+extern u16 g_cred_pos;          /* スタッフロールの位置（流したドット数） */            /* マイページ: ギルドに入ったばかり（知らせる） */
 extern u8 g_from_title;        /* タイトルの「つづきから」でマイページへ来た（保存を後回しにする） */
 typedef struct { u16 pos, loop; u8 wait, inst, hi; } BgmCh;     /* BGM の 1 チャンネル（ui/bgm.c） */
 extern BgmCh g_bgm_ch[3];

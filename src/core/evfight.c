@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* evfight.c — レイドとバトルの 1 回の戦い（evfight.h）。結果は QuestResult に入れ、
  * 画面はボス戦の画面をそのまま使う（倒せなくても与えた分のポイントが入る）。 */
 #include "evfight.h"

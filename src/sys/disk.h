@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* disk.h — PHYDIO 経由の論理セクタ読み書き（仕様 §5.1）。ファイルシステムは使わない */
 #ifndef DISK_H
 #define DISK_H

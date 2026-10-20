@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* battle.c — damage = max(1, 攻撃 - 敵防御), turns = ceil(敵HP / damage),
  * 被ダメージ = max(0, 敵攻撃 - 防御) × turns。被ダメージ < 自分の HP なら勝ち。 */
 #include "battle.h"

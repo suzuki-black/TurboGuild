@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* course.c — 新規開始時にお財布（軍資金のコース）を選ぶ。1〜4 キーでも選べる。
  * 無敵モードは軍資金が減らない（ソシャゲで無双した気分だけ味わう, DECISIONS #33）。 */
 #include "screen.h"

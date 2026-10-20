@@ -1,3 +1,4 @@
+# SPDX-License-Identifier: MIT
 # timeline.tcl — Phase3: 運営年表を SERVICE_END まで通す。ゲーム内の日付を進めながらマイページに入り直し、
 # イベントの参加・終了、ギルド対抗戦 2 回、贈り物、終了の告知、サービス終了後のタイトルを確かめる。要所でスクリーンショット。
 set throttle off
@@ -44,8 +45,15 @@ proc tick {} {
         }
         leave { if {[rd8 $::ST] == 2} { press 16 } elseif {[at ranking]} { press 32 ; set ::phase back } elseif {[at home]} { digit 6 } else { press 16 } }
         back {
+            if {[at credits]} {                             ;# サービス終了: スタッフロールを最後まで流す
+                if {![info exists ::roll]} { set ::roll 1 ; say "day $::day: staff roll" ; after time 8 [list shot tl_staffroll] }
+                if {[rd8 $::ST] == 2} { press 16 }
+                after time 0.5 tick ; return
+            }
+            if {[at title] && ![info exists ::title_once]} { set ::title_once 1 ; after time 1 tick ; return }   ;# 一瞬のタイトルを見誤らない
             if {[at title]} {
-                say "day $::day: title (service ended)" ; shot tl_end_title
+                say "day $::day: title (service ended, credits_seen=[rd8 [sv credits_seen]])" ; shot tl_end_title
+                if {![info exists ::roll] || [rd8 [sv credits_seen]] != 1} { fail "staff roll not shown" }
                 if {$::day < 270} { fail "title before the end" }
                 after time 0.5 done ; return
             }

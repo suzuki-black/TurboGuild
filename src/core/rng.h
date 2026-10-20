@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* rng.h — xorshift32。系列ごとに状態を持つ（NPC 用とガチャ用を分ける, 仕様 §2） */
 #ifndef CORE_RNG_H
 #define CORE_RNG_H

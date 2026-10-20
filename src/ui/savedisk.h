@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* savedisk.h — セーブディスクの識別・A/B スロットの読み書き（仕様 §5.1） */
 #ifndef SAVEDISK_H
 #define SAVEDISK_H

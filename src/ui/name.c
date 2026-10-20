@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* name.c — 名前入力。半角カナ・英数字の表から選ぶ（8 文字まで）。
  * 半角カナは MSX の文字コードと Shift-JIS の 1 バイトカナが同じなので、そのまま名前にできる。 */
 #include "screen.h"

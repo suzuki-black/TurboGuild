@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* screen.c — 画面遷移とメインループ。1 秒ごとに RTC からゲーム時間を進める */
 #include "screen.h"
 #include "../ram.h"

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* p0menu.c — Phase0 の起動画面。タイトルと起動診断（HIMEM・空き RAM・CPU）と試験メニュー */
 #include "screen.h"
 #include "../far.h"

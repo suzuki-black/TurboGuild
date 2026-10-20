@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* p0bank.c — バンク切替テスト。全ページを 3 つの窓へ順に出し、見出しのページ番号を照合する。
  * 窓 6000h の切り替えはカーネルの bank_probe() がやる（自分のバンクを外さないため）。 */
 #include "screen.h"

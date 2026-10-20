@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* ranking.h — NPC 1000 人の「いま」と、ランキング・流れるお知らせ（仕様 §8）。
  * NPC の状態は保存しない。npc.dat の初期値とゲーム時刻から毎回同じ答えを計算する（閉じた式, ループしない）:
  *   Lv・総戦力は日数 × 活動度で伸び、年表の PLAYER_DROP で一部が辞める（辞めた日で止まる）。
@@ -38,6 +39,7 @@ typedef struct {
 #define FEED_RANKUP  3
 #define FEED_LOGIN   4
 #define FEED_KINDS   5
+#define FEED_BYE     5         /* サービス最終日: 別れの挨拶（FEED_KINDS の外） */
 #define FEED_SLOT_SECS 1800UL     /* ゲーム内 30 分に 1 件 */
 
 typedef struct { u16 npc; u8 kind; u16 param; } FeedLine;   /* param: カード id / Lv / 順位 */

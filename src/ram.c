@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* ram.c — RAM 変数の実体。初期値は crt0 がゼロ化するので書かない */
 #include "ram.h"
 
@@ -48,6 +49,7 @@ u8 g_ticker_k;
 u8 g_viewonly;
 u16 g_gift;
 u8  g_joined;
+u16 g_cred_pos;
 u8 g_from_title;
 BgmCh g_bgm_ch[3];
 u8 g_bgm_song, g_bgm_nch;

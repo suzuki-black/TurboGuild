@@ -1,237 +1,382 @@
+<!-- SPDX-License-Identifier: MIT -->
 # TurboGuild
 
-MSX turboR 専用の「2011 年頃のソシャゲ文化再現 RPG」。完全オフラインで、
-「オンラインっぽさ」（NPC・ランキング・運営年表）はすべてシミュレーションで再現する。
+<p align="center">
+  <img src="docs/img/title.png" width="640" alt="TurboGuild — タイトル画面 / title screen">
+</p>
 
-- 企画書: [docs/MSX_turboR_SocialRPG_Design.md](docs/MSX_turboR_SocialRPG_Design.md)
-- 実装指示書: [IMPLEMENTATION_SPEC.md](IMPLEMENTATION_SPEC.md)（企画書と矛盾したらこちらを優先）
-- 仮決めの記録: [docs/DECISIONS.md](docs/DECISIONS.md)
-- ROM ページ割り当て: [docs/MEMORY_MAP.md](docs/MEMORY_MAP.md)
+> ⚠️ **試作品（プロトタイプ・開発中）です。** フィードバックと実験のために公開しています。
+> テストプレイはまだ十分ではありません。数値やバランスは今後変わります。
+>
+> ⚠️ **This is a prototype** (work in progress), published for feedback and experimentation.
+> It has not been play-tested much yet; numbers and balance will change.
 
-配布形態は **ASCII8 メガROM（フラッシュカートリッジ）＋ セーブ専用フロッピー**。
+**原案・コンセプト・ゲームデザイン・ディレクション:** suzuki-black　／
+**実装（プログラム・グラフィック・サウンド）:** Claude Code（Anthropic Claude）
+<br>**Original concept / game design / direction:** suzuki-black　/
+**Implementation (program, graphics, sound):** Claude Code (Anthropic Claude)
 
-## 必要なもの
+**リポジトリ / Repository:** <https://github.com/suzuki-black/TurboGuild>
 
-- SDCC 4.x（`sdcc`, `sdasz80`）、Python 3.11+（絵の生成に Pillow）、gcc、GNU make
-- openMSX（動作確認は 21.0）と Panasonic FS-A1ST のシステムROM
-  （`~/.openMSX/share/systemroms/` に置く。リポジトリには含めない）
+<p align="center">
+  <img src="docs/img/screens_events.png" width="640" alt="レイド・バトル・ギルド対抗戦 / raid, battle and guild war">
+</p>
 
-## ビルドと実行
+**言語 / Language:** [🇯🇵 日本語](#japanese) · [🇬🇧 English](#english)
+
+---
+
+<a name="japanese"></a>
+## 日本語
+
+- [あらすじ](#あらすじ)
+- [概要](#概要)
+- [特徴](#特徴)
+- [操作](#操作)
+- [動作環境](#動作環境)
+- [ビルド](#ビルド)
+- [実行](#実行)
+- [自動確認](#自動確認)
+- [ディレクトリ構成](#ディレクトリ構成)
+- [ドキュメント](#ドキュメント)
+- [ここに至るまで](#ここに至るまで)
+- [位置づけ（正直な自己評価）](#位置づけ正直な自己評価)
+- [フィードバック](#フィードバック)
+- [クレジット](#クレジット)
+- [ライセンス](#ライセンス)
+- [免責](#免責)
+
+### あらすじ
+
+> 新人冒険者のあなたは、とある冒険者ギルドの門をくぐった。
+> 掲示板には毎日のログインボーナス、期間限定のイベント、そして「SSR 排出率アップ中！」の張り紙。
+> 隣のテーブルでは見知らぬ冒険者たちがレベルを上げ、ランキングを駆け上がり、ある日ふっと姿を消していく。
+> この世界には終わりの日が決まっている——サービス開始から 270 日目。
+> それまでに、あなたはどんな冒険者になっているだろうか。
+
+### 概要
+- **対応機種:** MSX turboR 用ソフト（8メガビット（1MB）の ASCII8 メガROM ＋ セーブ専用の 2DD フロッピー）。
+- **ジャンル:** 1人用・「2011 年頃のガラケーソシャゲ文化」を再現した RPG。
+- **完全オフライン。** 「オンラインっぽさ」——ほかのプレイヤー（NPC 1000 人）、ランキング、運営のお知らせ、
+  期間限定イベント、ギルド対抗戦——は、すべてゲーム内の日付から式で決まるシミュレーションです。
+- **時間は現実の 10 倍で進みます。** 現実の 27 日でゲーム内の 270 日が過ぎ、サービスは終了します。
+  何日放っておいても、起動すればその間のイベント・対抗戦の結果がまとめて出ます。
+
+### 特徴
+- **当時の携帯の手触り。** 数字キーで直接選ぶメニュー、マイページ中心の画面、流れるお知らせ（マーキー）、
+  「決定を押したら見ているだけ」の自動戦闘、スタミナ（AP）制の探索。
+- **ガチャは種類ごとに違う開封演出**（カプセルマシン・宝箱・魔法陣・巻物・黄金の扉）。
+  光の色で中身を察する、あの演出。イベントは **BOX ガチャ**（100 個入りの箱）。天井はありません。
+- **軍資金。** 現実のお金の代わりに、ゲームの中のお財布（おこづかい・社会人・石油王・無敵モード）で
+  石を買います。課金すれば強くなる——ソシャゲと同じ理屈を、懐を痛めずに味わえます。
+- **カード 120 枚**（手続き生成の絵）。強化合成・進化合成・デッキ編成。
+- **イベント 3 型:** 討伐（周回ボス）／ **レイド**（倒すまで HP が残るボス、救援依頼でギルドの仲間が削る）／
+  **バトル**（格下・同格・格上の冒険者と対戦）。
+- **ギルドとギルド対抗戦。** 1 日 2 回の「戦の時間」に相手ギルドを攻撃し、コンボと応援で押し切る。
+- **運営年表。** 確率アップ・インフレ（新しい SSR ほど強い）・お詫びの石・引退の波・終了の告知・
+  そしてサービス終了とスタッフロール。
+- **FM 音源（MSX-MUSIC）の BGM** 5 曲。
+- 経済は **PC 上のシミュレーション**（`make sim`）で合わせています。課金しない人は、終了時に SSR が 1〜3 枚。
+
+### 操作
+| 入力 | 動作 |
+|------|------|
+| カーソルキー／ジョイスティック | 選ぶ |
+| 数字キー 0〜9 | ボタンの左上の番号で直接選ぶ（携帯の数字キーのように） |
+| スペース／リターン／トリガA | 決定・探索で「進む」 |
+| ESC／トリガB | 戻る（名前入力では 1 文字消す） |
+| タイトルで 0 | ライセンスの画面 |
+| タイトルで ESC | 開発用の診断画面 |
+
+タイトル →（はじめから）名前 → お財布のコース → 最初の 10 連（何度でも引き直せる）→ マイページ。
+マイページから 冒険・ガチャ・カード・デッキ・お店・ランク・保存・お知らせ。
+イベントやギルド対抗戦の開催中は、バナー（[9]）から入ります。
+
+### 動作環境
+- **MSX turboR 専用**（FS-A1ST / FS-A1GT）。turboR 未満では「turboR 専用」と出して止まります。
+- セーブには、物理フォーマット済みの 2DD フロッピーを A ドライブに入れてください。
+  **このディスクはゲーム専用**です（DOS でファイルを書き込むとセーブ領域を壊します）。ディスクが無くても遊べます（保存はできません）。
+- turboR の本体 ROM は著作物のため**同梱していません**。開発と確認は [openMSX](https://openmsx.org/) で、
+  本体 ROM を吸い出した機種定義（Panasonic FS-A1ST）を使っています。
+- **実機での確認はまだです**（エミュレータでのみ確認しています）。
+
+### ビルド
+SDCC 4.x（`sdcc`, `sdasz80`）、Python 3.11 以上（絵の生成に Pillow）、gcc、GNU make が必要です。
 
 ```bash
 make
 ```
 
+`bin/TurboGuild.rom`（8メガビット（1MB）の ASCII8 メガROM）と `bin/save.dsk`（空の 2DD）ができます。
+
+### 実行
 ```bash
 make run
 ```
 
-`make` で `bin/TurboGuild.rom`（1MB, ASCII8）と `bin/save.dsk`（空の 2DD）ができる。
-`make run` は FS-A1ST（FDD 付き）で ROM とセーブディスクを挿して起動する。
-手で起動する場合は `-romtype ASCII8` を必ず付ける:
+手で起動する場合は `-romtype ASCII8` を必ず付けてください:
 
 ```bash
 openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild.rom -romtype ASCII8 -diska bin/save.dsk
 ```
 
-## 自動確認
+実機では、ASCII8 対応のフラッシュROMカートリッジに `bin/TurboGuild.rom` を**マッパ種別 ASCII8** で書き込みます。
 
+### 自動確認
 | コマンド | 確認すること |
 |---|---|
-| `make test` | `core/`（rng・time・save）の PC 単体テスト |
-| `make check` | ヘッドレス起動 → 各試験画面のスクショ → 保存 → リセット → 再起動で RTC 差分 × 10 が `g_time` に加算される |
-| `make check-nodisk` | ディスク無しで起動し、保存しようとすると `NO DISK` を出して続行できる |
-| `make check-msx2` | MSX2（C-BIOS）では「turboR 専用」を出して止まる |
-| `make play` | 新規開始から 30 分（エミュレータ時間）自動で遊び、保存→リセット→読み込みで進行が一致するか。イベント参加・合成・期間をまたいだ読み込みの終了処理も確認する。`DURATION=秒` `TRACE=1` |
-| `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内か |
-| `make check-timeline` | ゲーム内の日付を 0〜271 日目まで進め、イベント 7 本（討伐・レイド・バトル）の参加と終了、ギルド対抗戦 2 回、110 日目の贈り物、終了の告知、サービス終了後のタイトルまで通す |
-| `make sim` | 経済シミュレーション（PC）。課金コースごとに 270 日遊んで SSR の枚数を数える。受け入れは「課金しない人の中央値 1〜3 枚」（DECISIONS #61） |
+| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・レイド・バトル・対抗戦・年表・セーブ など） |
+| `make check` | 起動 → 保存 → リセット → 再起動で、RTC の差分 × 10 がゲーム内時間に足される |
+| `make check-nodisk` | ディスク無しで起動し、保存しようとしても続行できる |
+| `make check-msx2` | MSX2 では「turboR 専用」と出して止まる |
+| `make play` | 新規開始から 30 分（エミュレータ時間）自動で遊び、保存 → リセット → 読み込みで進行が一致する |
+| `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内（実測 2.66 秒） |
+| `make check-timeline` | 0〜271 日目まで進め、イベント 7 本・ギルド対抗戦 2 回・贈り物・終了の告知・スタッフロールまで通す |
+| `make sim` | 経済シミュレーション。課金コースごとに 270 日遊んで SSR の枚数を数える |
 
-結果は `build/run*/check.txt` とスクリーンショット `build/run*/*.png`。
-openMSX の後始末は自分の実行ディレクトリのパスで絞って行う（`pkill -f openmsx` は使わない）。
+結果は `build/run*/` にテキストとスクリーンショットで残ります。
 
-## 遊び方
-
-![主要な画面](docs/img/screens_phase1_5.png)
-
-| キー | 操作 |
-|---|---|
-| カーソル / ジョイスティック | 選ぶ |
-| 数字キー 1〜8 | 携帯の数字キーのように、ボタンの左上の番号で直接選ぶ |
-| SPACE / RETURN / トリガA | 決定・探索で「進む」 |
-| ESC / トリガB | 戻る（名前入力では 1 文字消す） |
-
-タイトル →（はじめから）名前 → お財布（軍資金のコース）→ 最初の 10 連（何度でも引き直せる）→ マイページ。
-マイページから 冒険（探索）・ガチャ・カード（[1] 強化合成 [2] 進化合成）・デッキ・お店・ランク・保存。
-イベント開催中はバナー（[9]）からイベントへ。初級・中級・上級のボスを倒してポイントを貯め、報酬ラインと最終順位で報酬がもらえる。
-探索は「進む」を押すたびに 1 ステージ進み、探索度 100% でボス戦。
-軍資金で石を買い（課金）、石でプレミアガチャや回復薬を買う。ゲーム内で月が変わると給料が入る。無敵モードなら減らない。
-ゲーム内の時間は現実の 10 倍で進み、AP は現実 5 分で 1 回復、ゲーム内の日付が変わるとログインボーナス。
-タイトルで ESC を押すと Phase0 の診断画面に入る。
-
-### 画面づくりの考え方（2010〜2012 年頃の携帯ソシャゲ）
-
-当時の携帯版は「十字キーでリンクを選び、色反転や囲みで選択を示す」「数字キー（accesskey）で直接選べる」
-「1 画面は 13 文字 × 10 行ほどの文字と小さな画像・バナー」「リッチな部分（ガチャ・バトル・強化）は Flash 演出」
-「決定を押したらあとは見ているだけの自動戦闘」「スタミナで探索・ボス」「マイページ中心」だった。
-本作はこれを「絵が主役、文字は添え物」に置き換えている（docs/DECISIONS.md #31〜#38）。
-調べた資料: [CEDEC 2011 グリーの講演記事（ファミ通）](https://www.famitsu.com/news/201109/09049960.html)、
-[『探検ドリランド』開発者インタビュー（電ファミ）](https://news.denfaminicogamer.jp/interview/200406d/3)、
-[ドリランドの思い出（ねとらぼ）](https://nlab.itmedia.co.jp/cont/articles/3293848/)、
-[携帯サイトのアクセスキー（All About）](https://allabout.co.jp/gm/gc/24002/2/)。
-
-ガチャは種類ごとに違う開封演出で、光の色が出た中で最も高いレアリティを示す:
-
-| ガチャ | 演出 |
-|---|---|
-| 無料 | カプセルマシンのハンドルを回し、カプセルが転がり出る |
-| ゴールド | 宝箱が揺れて開き、光が立ち上る |
-| プレミア | 魔法陣が明滅して光の柱。SSR なら虹色に変わり画面が白く光る（確定演出） |
-| チケット | 巻物が広がる |
-| SR 確定 | 黄金の扉が開いて白い光があふれる |
-
-カードの絵（120 枚、手続き生成）: ![カード](docs/img/cards_preview.png)
-
-## Phase 0 の状況
-
-| 項目 | 状態 | 確認方法 |
-|---|---|---|
-| `make` で ROM、`make run` で turboR + FDD が起動し SCREEN5 に「TurboGuild」 | 済 | `make check` の `title.png` |
-| H.STKE 方式で起動し、HIMEM と空き RAM を表示 | 済 | 診断画面。実測 HIMEM=DE67h、C000h〜HIMEM = 7,783 B |
-| バンク切替テスト画面（全ページの見出しを 3 つの窓で照合） | 済 | `bank.png`: 31/31 OK × 3 窓 |
-| `sys/` 各モジュールの最小実装と動作確認 | 済 | ROM 内の試験画面で代替（DECISIONS #4） |
-| `build_data.py` → `link_rom.py` でカードを ROM から読む | 済 | `cards.png` |
-| `tests/` で `core/rng.c` と `core/time.c` が gcc で通る | 済 | `make test` |
-| セーブ → リセット → ロードで RTC 差分が加算、ディスク無しでも遊べる | 済 | `make check` / `make check-nodisk` |
-| turboR 以外では専用メッセージを出して止まる | 済 | `make check-msx2` |
-
-## Phase 1 の状況
-
-| 項目 | 状態 | 確認方法 |
-|---|---|---|
-| 500 ステージ自動生成、エリア 5 まで遊べる | 済 | `tools/gen_stages.py`。自動プレイでエリア 10（ステージ 92）まで到達 |
-| カード 40 枚、デッキ編成、戦闘式 §6 | 済 | `make test`（戦闘・属性・デッキ）、カード画面 |
-| AP 回復、回復薬 | 済 | `make test`（AP）、ショップ・AP 不足時の確認 |
-| ガチャ（無料・ゴールド・プレミア＋チケット 2 種）、初回 10 連リセマラ | 済 | `make test`（確率・10 連確定・1 日 1 回。天井は DECISIONS #61 で撤廃） |
-| ログインボーナス 7 日 | 済 | `make test`（7 日周期・同じ日は 1 回） |
-| 新規開始から 30 分遊んで落ちない。セーブ/ロード往復で所持カード・進行が一致 | 済（エミュレータ） | `make play`: 168 クエスト・46 回の保存→リセット→読み込みが全て一致 |
-| 同じことを実機（フラッシュカートリッジ＋FD）で確認 | **未** | 実機が要る |
-
-### Phase 1.5（絵が主役の画面・軍資金）
-
-| 項目 | 状態 | 確認方法 |
-|---|---|---|
-| 全画面を絵とゲージ主体に（マイページ・探索・ボス戦・ガチャ・カード・デッキ・ログボ・お店・タイトル） | 済 | 紹介画像、`make play` |
-| ガチャの種類別の開封演出とカードめくり | 済 | コマ撮りで確認 |
-| 数字キーで直接選ぶ | 済 | 各画面のボタン |
-| 軍資金・課金ショップ・給料日・無敵モード | 済 | `make test`（wallet）、`make play`（課金して 2000 円使う） |
-| 30 分の自動プレイ・保存往復の一致 | 済（エミュレータ） | `make play`: 522 クエスト・40 回の保存→リセット→読み込みが一致 |
-
-### Phase 2（合成・進化・イベント・ランキング）
-
-![Phase 2 の画面](docs/img/screens_phase2.png)
-
-| 項目 | 状態 | 確認方法 |
-|---|---|---|
-| 合成・進化 §7、一括素材選択（[1] N を全部） | 済 | `make test`（経験値・同レア +50%・最大 Lv・デッキは素材不可・進化）、画面はカード詳細の [1]/[2] |
-| イベント kind=0 を 1 本、14 ゲーム日で開始→終了→報酬配布まで自動 | 済 | `make test`（開幕・報酬ライン・特効・終了・順位報酬・2 度目は何も起きない） |
-| ランキング（NPC は静的データ） | 済 | `make test`（順位・一覧の並び）、マイページの [6] とイベント画面の [4] |
-| **受け入れ**: イベント期間をまたいだセーブを読み込むと、正しく終了処理と報酬が走る | 済（エミュレータ） | `make play`: 3 日目に参加して戦い、保存→リセット→「20 日目」として読み込み → 最終順位と順位報酬を確認（`EVENT END OK`） |
-
-### Phase 3（運営年表・NPC・お知らせ・FM 音源）
-
-![Phase 3 の画面](docs/img/screens_phase3.png)
-
-| 項目 | 状態 | 確認方法 |
-|---|---|---|
-| 運営年表（`data/timeline.csv`）で 0〜270 日目を動かす。お知らせ・イベント 7 本・確率アップ・インフレ・贈り物・引退の波・終了の告知・サービス終了 | 済 | `make test`、`make check-timeline` |
-| インフレと新 SSR はデータだけで足す（カードの `release_day`、世代ごとの強さは年表のインフレから自動で決まる） | 済 | `make test`（未登場のカードはガチャ・ドロップに出ない） |
-| NPC 1000 人の成長・引退・イベントポイントを式で決める。ランキングは毎回並べ直す。マーキーと「みんなの動き」に流れる | 済 | `make test`、マイページの [6]・[8] |
-| FM 音源（OPLL）の BGM 5 曲（マイページ・冒険・ボス・ガチャ・イベント） | 済 | `make run` で聴く |
-| **受け入れ**: 課金しない人のサービス終了時の SSR が 1〜3 枚（仕様の 3〜8 枚から下げた） | 済 | `make sim`（中央値 1 枚） |
-| イベントガチャは BOX ガチャ（100 個入り・SSR 1）。天井なし・SR 確定チケットは SR だけ・イベントの SSR は 10 位以内の報酬だけ | 済 | `make test`（引き切ると中身どおり・次の箱・イベントが替わると 1 箱目） |
-| **受け入れ**: 1 週間ぶりの起動でマイページまで 3 秒以内 | 済（エミュレータ） | `make check-offline`（2.66 秒） |
-
-`make sim` の結果（各 30 回、270 日）:
-
-| コース | SSR 中央値 | 範囲 | 課金(円) |
-|---|---|---|---|
-| 課金しない | 1 | 0〜4 | 0 |
-| おこづかい | 2 | 0〜6 | 27,000 |
-| 社会人 | 8 | 5〜12 | 120,000 |
-| 石油王 | 13 | 11〜18 | 227,000 |
-
-課金しない人の 3 割ほどは SSR 0 枚で終わる（当時の無課金の感覚）。無敵モードは石油王と同じ引き方なので同じ結果。
-
-### 追加（カード 120 枚・イベント 3 型・ギルド対抗戦）
-
-![レイド・バトル・ギルド対抗戦](docs/img/screens_events.png)
-
-2010〜2012 年頃の携帯ソシャゲのイベントの分け方（マラソン・レイド・対人戦・ギルド対抗戦）に合わせた。
-
-| 項目 | 状態 | 確認方法 |
-|---|---|---|
-| カード 65 → 120 枚（N・R・SR・SSR の追加、ギルド対抗戦の報酬カード 4 枚）。絵は手続き生成。ROM を 1MB に | 済 | `make`（絵のページ 30 + 小さい絵 8） |
-| イベントの型: 討伐（周回）・レイド・バトル（対人戦）。年表の 7 本に振り分けた | 済 | `make test`（レイド・バトル）、`make check-timeline` |
-| レイド: HP は倒すまで残る。通常攻撃（AP 5）と全力攻撃（AP 15・攻撃 3 倍）。倒すと Lv が上がる。救援依頼で同じギルドの仲間が削る | 済 | `make test`、イベント画面の [1]〜[3] |
-| バトル: 格下・同格・格上の相手（NPC）を選んで戦う。負けても 1/5 のポイント | 済 | `make test`、イベント画面の [1]〜[3] |
-| ギルド: 初めてマイページに来たとき 16 ギルドのどれかに入る | 済 | マイページのお知らせ |
-| ギルド対抗戦: 7 日間、1 日 2 回（12 時・21 時から 1 時間）の戦。相手ギルドの冒険者を攻撃（AP 10）、コンボ、応援。勝ち数で順位と報酬 | 済 | `make test`、`make check-timeline`、マイページのバナー [9] |
-
-既知の課題:
-- 数値は `make sim` で一度合わせただけ。遊んでみて調整する。
-- 文字描画は C で書いていて遅い（名前入力の全面描画で 1 秒弱）。体感が悪ければ RAM 実行の asm に置き換える。
-- BGM はメインループで鳴らしているので、長い描画やディスクの読み書きの間は止まる。
-
-## 構成
-
+### ディレクトリ構成
 ```
-src/sys/   ハード依存（crt0・VDP・文字・漢字ROM・入力・PSG・RTC・ディスク・バンク・中継）
+src/sys/   ハード依存（起動・VDP・文字・漢字ROM・入力・PSG・RTC・ディスク・バンク切替）
 src/core/  ゲームロジック（ハード非依存。PC でテストする）
-src/ui/    画面（Screen 表）・共通部品・セーブディスク管理
+src/ui/    画面・共通部品・BGM ドライバ・セーブディスク管理
 src/data/  生成ヘッダ（手で編集しない）
-data/      元データ（UTF-8 の CSV）
-tools/     Python ビルドツール
-openmsx/   自動確認用 Tcl
+data/      元データ（UTF-8 の CSV・文言・MML）
+tools/     Python のビルドツール（データ変換・絵の手続き生成・MML・ROM の組み立て）
+tests/     PC 単体テストと経済シミュレーション
+openmsx/   自動確認用の Tcl
+docs/      企画書・設計の記録
 ```
 
-## 踏んだ地雷（再発させない）
+### ドキュメント
+- **[企画書](docs/MSX_turboR_SocialRPG_Design.md)** — 何を作るか（コンセプト）。
+- **[実装指示書](IMPLEMENTATION_SPEC.md)** — 仕様・データ形式・式・フェーズ計画（企画書と矛盾したらこちらを優先）。
+- **[DECISIONS](docs/DECISIONS.md)** — 仕様からの変更と仮決めの記録（1 行 / 件）。
+- **[MEMORY_MAP](docs/MEMORY_MAP.md)** — ROM のページ割り当て（ビルドはこの表から組み立てる）。
+- **[開発記録](docs/開発記録.md)** — フェーズごとの状況と確認方法、踏んだ地雷。
 
-- **REDCLK はメインROMではなく SUB-ROM のエントリ（01F5h）。** メインROMの 01F5h を直接
-  `call` すると RDSLT の内部に飛び込み、ページ3 がカートリッジに切り替わって暴走する。
-  `ld ix,#0x01F5 / call EXTROM` で呼ぶ。他の SUB-ROM ルーチンも同様。
-- **VDP コマンド（HMMV）が走っている間に CPU で VRAM へ書くと、後からコマンドに塗りつぶされる。**
-  文字描画の前に S#2 の CE を待つ。
-- **SCREEN5 の色 0 は既定で透明**で、周辺色（R#7）が見える。R#8 の TP を立てる。
-- **セーブ構造体（882 B）をセクタ単位（512 B × 2）で直接読み書きすると、後ろの RAM 変数まで
-  保存・復元される。** リセットしたのにメニュー位置が前回のまま、という形で出た。
-  1 セクタずつ `g_sector` 経由でコピーする（`src/ui/savedisk.c`）。
-- **起動時に画面部品のアトラスを VRAM に読み込み忘れると、部品が全部ただの四角になる**（`gfx_load_atlas()`）。
-- SDCC は小さな定数同士の足し算（124+8 など）を char で畳み、127 を超えると誤検知の警告 158 を出す（値は正しい）。
-- SDCC の `--codeseg BANK1` が作る領域名は `_BANK1`。リンカには `-Wl-b_BANK1=0x16010` のように書く。
-- **SDCC は別バンクの関数を直接 `call` してもリンクを通す**（24bit 番地の下位 16bit で命令を作る）。
-  実行すると今の窓の中の別物に飛ぶ。`FAR` の中継を通し、`tools/check_banks.py` で検査する。
-- **EXTROM（CALSLT）は割り込み禁止のまま戻る。** RTC を読んだあと `ei` しないと、
-  何も描かない待ち画面で JIFFY が止まり、フレーム待ちで永久に固まる（自動プレイで発覚）。
-- 自動テストの「いま押してよいか」の判定に、毎フレーム一瞬しか立たない状態を使うと、
-  サンプリングでは見えない。押下待ちの間ずっと立てておく（`g_ui_state`）。
-- openMSX の Tcl で `after` から呼ぶ手順に空の要素を混ぜると「invalid command name ""」で
-  連鎖が無言で止まる。
-- **Z80 で u32 の割り算・掛け算（`__divulong` / `__mullong`）を NPC 1000 人ぶん回すと、起動が 9 秒かかった。**
-  プロファイルで見つけ、シフトと足し算に書き換えて 2.66 秒にした。毎回回す式に `%` と `*` を書かない。
-- **xor とシフトだけのハッシュは線形なので、種を変えても判定どうしが相関する。** 種を 100 と 101 にしたら
-  引退する NPC が極端に少なく、離れた種にしても 2 回目の引退の波が 30% のところ 39% 当たった。
-  足し算を混ぜて線形を崩す（`src/core/ranking.c` の `hash`）。
-- openMSX は `set throttle off` のままだと `screenshot` が古いフレームを返す。撮るときだけ on にする。
-- **整数の式で「/ 100 を先に」書くと、序盤の小さな値が 0 になる**（ギルド対抗戦の攻撃の点が 0 だった）。
-  桁あふれしない範囲なら掛けてから割る。
-- 自動試験は「押下待ち」（`g_ui_state` が 2）を見たらボタンを押す。お知らせの箱が 1 つ増えるたびに、
-  決め打ちの手順の試験が止まった。
-- 画面の init の途中で「押下待ち」の状態が残っていると、自動試験が前の画面の待ちと見誤って押してしまう。
-  画面を替えるときに BUSY にする（`apply_change`）。
+### ここに至るまで
+本作は、企画書と実装指示書をもとに、フェーズを区切って作ってきました。
 
-## カートリッジへの書き込み（実機）
+| フェーズ | 内容 |
+|---|---|
+| 0 | 土台: ASCII8 メガROM・H.STKE 起動・バンク切替・漢字ROM・セーブディスク・RTC |
+| 1 | クエスト・AP・カード・デッキ・戦闘・ガチャ・ログインボーナス |
+| 1.5 | 当時の携帯の画面を調べ直し、全画面を「絵が主役」に。ガチャの開封演出。軍資金 |
+| 2 | 合成・進化・イベント・ランキング |
+| 3 | 運営年表・NPC 1000 人の疑似オンライン・お知らせ・FM 音源・経済シミュレーション |
+| 以降 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 120 枚、レイド・バトル、ギルド対抗戦、スタッフロール |
 
-ASCII8 対応のフラッシュROMカートリッジに `bin/TurboGuild.rom` を **マッパ種別 ASCII8** を
-指定して書き込む。セーブ用に物理フォーマット済みの 2DD フロッピーを A ドライブに入れる。
-**このディスクはゲーム専用**（DOS でファイルを書き込むとセーブ領域を壊す）。
+各フェーズの確認方法と、途中で踏んだ地雷は [開発記録](docs/開発記録.md) にあります。
+
+### 位置づけ（正直な自己評価）
+本作は**実験的な習作**です。
+
+- **主題は「当時のソシャゲの空気」の再現**で、ゲームとしての面白さの追求は二の次です。
+  ランキングもお知らせもギルドの仲間も、すべて式から作った「それっぽさ」です。
+- **数値は経済シミュレーションで一度合わせただけ**です。実際に遊んでの調整はこれからです。
+- **実機（turboR）ではまだ確認していません。**
+- 文字描画は C で書いていて遅め（全面の描き直しで 1 秒弱）です。BGM はメインループで鳴らしているので、
+  長い描画やディスクの読み書きの間は止まります。
+
+### フィードバック
+不具合報告や感想は GitHub Issues でお願いします。範囲の明確な修正の Pull Request も歓迎します。
+
+### クレジット
+- **原案・コンセプト・ゲームデザイン・ディレクション:** suzuki-black
+- **実装（プログラム／グラフィック／サウンド）:** Claude Code（Anthropic Claude）
+  ― カードの絵・画面部品は手続き生成、BGM はすべてオリジナル。既存作品の絵・楽曲のコピーではありません。
+- **制作の道具:** [SDCC](https://sdcc.sourceforge.net/)、[openMSX](https://openmsx.org/)、Python（Pillow）
+
+### ライセンス
+**MIT** © 2026 suzuki-black. 詳細は [LICENSE](LICENSE) を参照。**コード・グラフィック・音楽・データを含む
+本リポジトリのすべてを MIT ライセンスで公開**します（いずれも本作のために制作したオリジナルで、
+MIT の条件を超える権利主張はしません）。各ソースの先頭に `SPDX-License-Identifier: MIT` を入れています。
+
+ROM の中には SDCC のランタイムライブラリが入ります（GPL ＋ リンク例外のため、ROM の配布に問題はありません）。
+
+### 免責
+- 本作は架空のゲームです。登場するギルド・冒険者（NPC）・運営・イベントはすべて架空で、
+  実在の人物・団体・ゲーム作品とは関係ありません。特定のゲーム作品の名称・キャラクター・画像・音源は使用していません。
+- 「軍資金」「課金」はゲームの中だけの数値です。**現実のお金は一切使いません。**
+- MSX は MSX Licensing Corporation の商標です。その他の会社名・製品名は各社の商標または登録商標です。
+
+---
+
+<a name="english"></a>
+## English
+
+- [Story](#story)
+- [Overview](#overview)
+- [Features](#features)
+- [Controls](#controls)
+- [Requirements](#requirements)
+- [Building](#building)
+- [Running](#running)
+- [Automated checks](#automated-checks)
+- [Project structure](#project-structure)
+- [Documentation](#documentation)
+- [How it got here](#how-it-got-here)
+- [Scope & honest positioning](#scope--honest-positioning)
+- [Feedback](#feedback--contributing)
+- [Credits](#credits)
+- [License](#license)
+- [Disclaimer](#disclaimer)
+
+### Story
+
+> You are a rookie adventurer walking through the doors of an adventurers' guild.
+> The notice board offers daily login bonuses, limited-time events, and a banner that reads
+> "SSR rates UP!". At the next table, strangers level up, climb the rankings, and one day quietly vanish.
+> This world has an end date — day 270 after launch.
+> What kind of adventurer will you be by then?
+
+### Overview
+- **Platform:** MSX turboR software (8 Mbit (1 MB) ASCII8 MegaROM + a 2DD floppy used only for saves).
+- **Genre:** Single-player RPG that recreates the **Japanese feature-phone social-game culture of around 2011**.
+- **Fully offline.** Everything that feels "online" — other players (1,000 NPCs), rankings, operator
+  announcements, limited-time events, guild wars — is a simulation derived from the in-game date.
+- **Time runs 10× faster than real time.** 27 real days are 270 in-game days, after which the service ends.
+  However long you stay away, the results of the events and guild wars you missed appear when you return.
+
+### Features
+- **The feel of the era's phones:** menus picked directly with number keys, a "My Page" hub, a scrolling
+  news marquee, auto-battles you just watch, and stamina (AP) for exploring.
+- **A different opening animation for every gacha** (capsule machine, treasure chest, magic circle, scroll,
+  golden door) — guess the rarity from the colour of the light. Events use a **box gacha** (a box of 100 items).
+  There is no pity system.
+- **War funds.** Instead of real money, an in-game wallet (allowance, salaried worker, oil baron, or
+  infinite mode) buys gems. Paying makes you stronger — the social-game logic, without the real cost.
+- **120 cards** (procedurally drawn), enhancement and evolution fusion, deck building.
+- **Three event types:** hunt (repeatable bosses) / **raid** (a boss whose HP persists until it falls;
+  call guild mates for rescue) / **battle** (fight adventurers ranked below, equal to, or above you).
+- **Guilds and guild wars.** Twice a day, a one-hour battle window: attack the rival guild, build combos, cheer.
+- **An operations timeline:** rate-up campaigns, inflation (newer SSRs are stronger), apology gems,
+  waves of players quitting, the end-of-service notice — and finally the shutdown and staff roll.
+- **FM sound (MSX-MUSIC) background music**, 5 tracks.
+- The economy is tuned with a **PC-side simulation** (`make sim`): a non-paying player ends with 1–3 SSRs.
+
+### Controls
+| Input | Action |
+|------|------|
+| Cursor keys / joystick | Select |
+| Number keys 0–9 | Pick the button with that number directly (like a phone keypad) |
+| Space / Return / trigger A | Confirm; "advance" while exploring |
+| ESC / trigger B | Back (deletes a character in name entry) |
+| 0 on the title screen | License screen |
+| ESC on the title screen | Developer diagnostics |
+
+Title → (New game) name → wallet course → your first 10-pull (re-roll as often as you like) → My Page.
+From My Page: quest, gacha, cards, deck, shop, ranking, save, news.
+While an event or a guild war is running, enter it from the banner ([9]).
+
+### Requirements
+- **MSX turboR only** (FS-A1ST / FS-A1GT). Anything older shows a "turboR only" message and stops.
+- For saving, put a physically formatted 2DD floppy in drive A. **The disk is for this game only**
+  (writing files to it from DOS destroys the save area). You can play without a disk (saving is disabled).
+- The turboR system ROMs are copyrighted and **not included**. Development and checks use
+  [openMSX](https://openmsx.org/) with a machine definition based on dumped system ROMs (Panasonic FS-A1ST).
+- **Not yet verified on real hardware** (emulator only so far).
+
+### Building
+Requires SDCC 4.x (`sdcc`, `sdasz80`), Python 3.11+ (Pillow, for the procedural art), gcc, and GNU make.
+
+```bash
+make
+```
+
+This produces `bin/TurboGuild.rom` (an 8 Mbit (1 MB) ASCII8 MegaROM) and `bin/save.dsk` (a blank 2DD image).
+
+### Running
+```bash
+make run
+```
+
+When starting openMSX by hand, always pass `-romtype ASCII8`:
+
+```bash
+openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild.rom -romtype ASCII8 -diska bin/save.dsk
+```
+
+On real hardware, write `bin/TurboGuild.rom` to an ASCII8-capable flash cartridge with the **ASCII8 mapper type**.
+
+### Automated checks
+| Command | What it checks |
+|---|---|
+| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, raid, battle events, guild war, timeline, saves, …) |
+| `make check` | Boot → save → reset → reboot; the RTC difference × 10 is added to in-game time |
+| `make check-nodisk` | Boots without a disk and carries on when you try to save |
+| `make check-msx2` | Shows "turboR only" and stops on an MSX2 |
+| `make play` | Plays automatically for 30 minutes (emulated) from a new game; progress matches across save → reset → load |
+| `make check-offline` | After a week away, "Continue" reaches My Page within 3 seconds (measured: 2.66 s) |
+| `make check-timeline` | Runs days 0–271: 7 events, 2 guild wars, gifts, the end-of-service notice, and the staff roll |
+| `make sim` | Economy simulation: plays 270 days per wallet course and counts SSRs |
+
+Results are left in `build/run*/` as text and screenshots.
+
+### Project structure
+```
+src/sys/   hardware layer (boot, VDP, text, kanji ROM, input, PSG, RTC, disk, bank switching)
+src/core/  game logic (hardware-independent; unit-tested on the PC)
+src/ui/    screens, shared widgets, BGM driver, save-disk handling
+src/data/  generated headers (do not edit)
+data/      source data (UTF-8 CSV, text, MML)
+tools/     Python build tools (data conversion, procedural art, MML, ROM assembly)
+tests/     PC unit tests and the economy simulation
+openmsx/   Tcl scripts for the automated checks
+docs/      design documents and records
+```
+
+### Documentation
+(The documents are written in Japanese.)
+- **[Design document](docs/MSX_turboR_SocialRPG_Design.md)** — the concept.
+- **[Implementation spec](IMPLEMENTATION_SPEC.md)** — specification, data formats, formulas, phase plan.
+- **[DECISIONS](docs/DECISIONS.md)** — changes from the spec and provisional decisions, one line each.
+- **[MEMORY_MAP](docs/MEMORY_MAP.md)** — ROM page allocation (the build assembles the ROM from this table).
+- **[Development log](docs/開発記録.md)** — status and checks per phase, and the pitfalls we hit.
+
+### How it got here
+Built phase by phase from the design document and the implementation spec.
+
+| Phase | Content |
+|---|---|
+| 0 | Foundation: ASCII8 MegaROM, H.STKE boot, bank switching, kanji ROM, save disk, RTC |
+| 1 | Quests, AP, cards, deck, battle, gacha, login bonus |
+| 1.5 | Re-researched the era's phone UIs and made every screen picture-first; gacha opening animations; war funds |
+| 2 | Fusion, evolution, events, rankings |
+| 3 | Operations timeline, 1,000-NPC pseudo-online world, news, FM music, economy simulation |
+| Later | Harder gacha (box gacha, no pity), 120 cards, raid and battle events, guild wars, staff roll |
+
+### Scope & honest positioning
+This is an **experimental study**.
+
+- **The theme is recreating the atmosphere of social games of that era**; depth as a game comes second.
+  The rankings, the news and your guild mates are all "plausibility" generated from formulas.
+- **The numbers have only been tuned once, by the economy simulation**; tuning by actual play is still to come.
+- **It has not yet been verified on a real turboR.**
+- Text rendering is written in C and is slowish (just under a second for a full redraw). The BGM is driven
+  from the main loop, so it pauses during long redraws and disk access.
+
+### Feedback & Contributing
+Please use GitHub Issues for bug reports and impressions. Pull requests with a clear scope are welcome.
+
+### Credits
+- **Original concept / game design / direction:** suzuki-black
+- **Implementation (program / graphics / sound):** Claude Code (Anthropic Claude)
+  — card art and UI parts are procedurally generated, and all music is original; nothing is copied from existing works.
+- **Tools:** [SDCC](https://sdcc.sourceforge.net/), [openMSX](https://openmsx.org/), Python (Pillow)
+
+### License
+**MIT** © 2026 suzuki-black. See [LICENSE](LICENSE). **Everything in this repository — code, graphics,
+music and data — is released under the MIT license.** All assets are original works created for this game;
+no rights are reserved beyond the MIT terms. Every source file carries `SPDX-License-Identifier: MIT`.
+
+The ROM contains the SDCC runtime library (GPL with a linking exception, so distributing the ROM is fine).
+
+### Disclaimer
+- This is a fictional game. All guilds, adventurers (NPCs), operators and events are fictional and have no
+  relation to real people, organisations or games. No specific game's names, characters, images or audio are used.
+- "War funds" and "payments" exist only inside the game. **No real money is involved.**
+- MSX is a trademark of MSX Licensing Corporation. Other company and product names are trademarks or
+  registered trademarks of their respective owners.

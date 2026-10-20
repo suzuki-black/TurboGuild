@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* login.h — ログインボーナス（7 日周期, 仕様 §4.5）。ゲーム内日付が変わったら 1 回 */
 #ifndef CORE_LOGIN_H
 #define CORE_LOGIN_H

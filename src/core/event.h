@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* event.h — 期間限定イベント（仕様 §4.4）。kind=0 は周回ボス型（初級・中級・上級の 3 面）。
  * 開催はゲーム内の日付で決まる（events.csv の start_day から duration 日）。参加・終了・報酬は自動。 */
 #ifndef CORE_EVENT_H

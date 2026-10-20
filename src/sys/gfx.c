@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* gfx.c — 部品のコピーは VDP コマンドに任せ、CPU は待たない（次のコマンドの前に vdp_cmd が待つ）。
  * カード絵は ROM のデータ窓 8000h から直接 VRAM へ書く（RAM に溜めない）。 */
 #include "gfx.h"

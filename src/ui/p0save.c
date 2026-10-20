@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* p0save.c — Phase0 のセーブ試験。起動時ロードの結果と RTC 差分の加算量を見せ、OK で保存する。
  * 受け入れ: 保存 → リセット → 起動で、止まっていた現実時間 × TIME_SCALE が g_time に足される。 */
 #include "screen.h"

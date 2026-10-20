@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* test_save.c — 封と検証、壊れたデータの検出、構造体サイズ（2KB = 4 セクタ以下） */
 #include "check.h"
 #include "core/save.h"

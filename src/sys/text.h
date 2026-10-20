@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* text.h — Shift-JIS 文字列の描画（全角は漢字ROM の 16x16、半角は BIOS 字形を縦 2 倍の 8x16）
  * 座標: cx は 8 ドット単位の桁（0..31）、y はドット（0..211）。戻り値は次の桁。 */
 #ifndef TEXT_H

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* widget.h — 画面の共通部品（カーネル常駐）。1 行 = 16 ドット、y はドット、cx は 8 ドット桁 */
 #ifndef WIDGET_H
 #define WIDGET_H

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* card_ui.c — カード一覧（絵のグリッド。下に選んだカードの名前と攻撃/防御）と、
  * 詳細（絵を 2 倍で大きく、右に数値）。★ はデッキに入っているカード。 */
 #include "screen.h"

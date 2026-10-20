@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* p0tests.c — Phase0 の試験画面（カード表・入力/音）。コードバンク 1 に載る */
 #include "screen.h"
 #include "../far.h"

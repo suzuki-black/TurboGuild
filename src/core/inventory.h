@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* inventory.h — 所持カード（g_save.cards）の出し入れ。デッキの添字も合わせて直す */
 #ifndef CORE_INVENTORY_H
 #define CORE_INVENTORY_H

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* sim_economy.c — ゲームと同じ core/ を PC で動かし、サービス開始から終了（270 日）までを遊ばせる。
  * tools/sim_economy.py が何人分か走らせて表にする（受け入れ: 課金しない人の終了時の SSR が 1〜3 枚）。
  *

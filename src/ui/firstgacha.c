@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* firstgacha.c — 最初の 10 連（プレミアの確率, SR 以上 1 枚確定）。プレミアと同じ魔法陣の演出で開く。
  * [1] 引き直す（リセマラ, 何度でも）[2] このカードで始める。決めたら所持を入れ替え、おまかせ編成して HOME へ。 */
 #include "screen.h"

@@ -1,3 +1,4 @@
+/* SPDX-License-Identifier: MIT */
 /* tables.h — ROM の表の読み出し口。core/ はこの関数だけを通して表を読む。
  * 実体は MSX では sys/tables.c（データ窓を切り替えて RAM へ写す）、
  * PC のテストでは tests/tables_pc.c（build/ の .bin を読む）。
