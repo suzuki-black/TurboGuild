@@ -7,6 +7,7 @@
 void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/event.h"
+#include "../core/evfight.h"
 #include "../core/quest.h"
 #include "../core/ranking.h"
 #include "../core/tables.h"
@@ -66,23 +67,74 @@ static void reward_line(u8 x, u8 y, u8 item, u16 amount)
     }
 }
 
-static void stage_btn(u8 level)
+/* 型ごとの面の名前（討伐: 初級〜上級 / レイド: 通常・全力 / バトル: 格下〜格上） */
+static u16 btn_text(u8 kind, u8 level)
+{
+    if (kind == EV_RAID) return (u16)(T_EV_RAID1 + level - 1);
+    if (kind == EV_PVP) return (u16)(T_EV_PVP1 + level - 1);
+    return (u16)(T_EV_LV1 + level - 1);
+}
+
+static void stage_btn(u8 kind, u8 level)
 {
     EventStage es;
     u8 x = (u8)(4 + (level - 1) * 64), cx;
-    event_stage(level, &es);
-    ui_box(x, BTN_Y, 62, 40, COL_DRED, COL_ORANGE);
+    u8 bg = kind == EV_PVP ? COL_DBLUE : COL_DRED;
+    ui_box(x, BTN_Y, 62, 40, bg, COL_ORANGE);
     ui_key(level, (u8)(x + 3), BTN_Y + 4);
-    txt_id((u8)(x / 8 + 2), BTN_Y + 2, (u16)(T_EV_LV1 + level - 1), COL_YELLOW, COL_DRED);
-    cx = txt_id((u8)(x / 8 + 1), BTN_Y + 20, T_AP, COL_LGRAY, COL_DRED);
-    txt_num(cx, BTN_Y + 20, es.ap, COL_WHITE, COL_DRED);
+    if (kind == EV_RAID && level == 3) {             /* レイドの 3 は救援依頼 */
+        txt_id((u8)(x / 8 + 2), BTN_Y + 2, T_EV_RESCUE, g_save.raid_rescued ? COL_LGRAY : COL_YELLOW, bg);
+        return;
+    }
+    event_stage(level, &es);
+    txt_id((u8)(x / 8 + 2), BTN_Y + 2, btn_text(kind, level), COL_YELLOW, bg);
+    cx = txt_id((u8)(x / 8 + 1), BTN_Y + 20, T_AP, COL_LGRAY, bg);
+    txt_num(cx, BTN_Y + 20, es.ap, COL_WHITE, bg);
+}
+
+/* レイドボスの Lv と残り HP */
+static void raid_status(void)
+{
+    u8 cx;
+    raid_sync();
+    vdp_fill(40, 132, SCREEN_W - 40, 16, COL_BLACK);
+    cx = txt_id(5, 132, T_RAID_LV, COL_YELLOW, COL_BLACK);
+    cx = txt_num(cx, 132, g_save.raid_lv, COL_YELLOW, COL_BLACK);
+    cx = txt_id((u8)(cx + 1), 132, T_RAID_HP, COL_LGRAY, COL_BLACK);
+    txt_num((u8)(cx + 1), 132, g_save.raid_hp, COL_WHITE, COL_BLACK);
+    gfx_gauge(40, 146, 208, (u16)(g_save.raid_hp >> 6), (u16)(raid_max_hp(g_save.raid_lv) >> 6), COL_RED);
+}
+
+/* 救援依頼: 来てくれた仲間と削った HP を並べる */
+static void rescue(void)
+{
+    RescueResult rs;
+    NpcRec n;
+    u8 i, cx, y;
+    if (g_save.raid_rescued) { ui_msg(T_RESCUE_USED); return; }
+    raid_rescue(&rs);
+    if (!rs.n) { ui_msg(T_RESCUE_NONE); return; }
+    g_save_dirty = 1;
+    ui_box(8, 40, 240, (u8)(30 + rs.n * 18 + (rs.kill ? 18 : 0)), COL_DBLUE, COL_YELLOW);
+    txt_id(2, 44, T_RESCUE_TITLE, COL_YELLOW, COL_DBLUE);
+    for (i = 0, y = 62; i < rs.n; i++, y = (u8)(y + 18)) {
+        tbl_npc(rs.npc[i], &n);
+        cx = txt_id(2, y, (u16)(NPC_PRE_TEXT + n.name_id / NPC_SUF_COUNT), COL_WHITE, COL_DBLUE);
+        cx = txt_id(cx, y, (u16)(NPC_SUF_TEXT + n.name_id % NPC_SUF_COUNT), COL_WHITE, COL_DBLUE);
+        txt_num((u8)(cx + 1), y, rs.dmg[i], COL_ORANGE, COL_DBLUE);
+        psg_beep(0x090, 5);
+        ui_wait(15);
+    }
+    if (rs.kill) { txt_id(2, y, T_RAID_KILL, COL_YELLOW, COL_DBLUE); psg_beep(0x050, 20); }
+    ui_wait_key();
+    g_dirty = 1;
 }
 
 FAR(void, evtop_draw, (void))
 {
     EventRec e;
     CardRec bonus;
-    u8 cx, lv;
+    u8 cx, lv, kind;
     u32 next;
     ui_clear();
     if (!g_save.event_id || g_save.event_id != event_active()) {     /* 終わった（マイページに戻ると終了処理） */
@@ -107,6 +159,7 @@ FAR(void, evtop_draw, (void))
     cx = txt_num((u8)(cx + 1), 70, g_rank.player_rank, COL_WHITE, COL_BLACK);
     txt_id(cx, 70, T_I, COL_LGRAY, COL_BLACK);
     next = event_next_line();
+    kind = event_kind();
     if (next) {
         cx = txt_id(8, 88, T_EV_NEXT, COL_LGRAY, COL_BLACK);
         txt_num((u8)(cx + 1), 88, next - g_save.event_pt, COL_WHITE, COL_BLACK);
@@ -118,11 +171,12 @@ FAR(void, evtop_draw, (void))
     cx = txt_id((u8)(cx + 1), 118, bonus.name_text, rarity_color(bonus.rarity), COL_BLACK);
     cx = txt_draw(cx, 118, "x", COL_LGRAY, COL_BLACK);
     txt_num(cx, 118, e.bonus_mul, COL_YELLOW, COL_BLACK);
-    for (lv = 1; lv <= EVENT_LEVELS; lv++) stage_btn(lv);
+    if (kind == EV_RAID) raid_status();
+    for (lv = 1; lv <= EVENT_LEVELS; lv++) stage_btn(kind, lv);
     ui_box(196, BTN_Y, 58, 40, COL_DBLUE, COL_CYAN);
     ui_key(4, 199, BTN_Y + 4);
     gfx_sprite(ATL_ICON_NEWS, 216, BTN_Y + 12);
-    ui_guide(T_EV_GUIDE);
+    ui_guide(kind == EV_RAID ? T_EV_GUIDE_RAID : kind == EV_PVP ? T_EV_GUIDE_PVP : T_EV_GUIDE);
 }
 
 FAR(void, evtop_update, (void))
@@ -131,6 +185,7 @@ FAR(void, evtop_update, (void))
     u8 d = input_digit();
     if (p & BTN_CANCEL) { screen_change(&scr_home); return; }
     if (!g_save.event_id || g_save.event_id != event_active()) return;
+    if (d == 3 && event_kind() == EV_RAID) { rescue(); return; }
     if (d >= 1 && d <= EVENT_LEVELS) {
         u16 stage = (u16)(EVENT_STAGE_BASE + d);
         if (g_save.ap < quest_ap_cost(stage)) { ui_msg(T_AP_SHORT); return; }

@@ -26,8 +26,8 @@ proc fail {m} { say "FAIL $m" ; say "RESULT FAIL" ; close $::log ; exit }
 proc tick {} {
     if {![ready]} { after time 0.02 tick ; return }
     switch $::phase {
-        0 { if {[at home]} { wr32 [sv gtime] [expr {3 * 86400 + 3600}] ; set ::phase 1 ; digit 4 } else { press 16 } }
-        1 { if {[at deck]} { press 32 } elseif {[at home]} { set ::phase 2 ; digit 9 } else { press 16 } }
+        0 { if {[at home] && [rd8 $::ST] == 1} { wr32 [sv gtime] [expr {3 * 86400 + 3600}] ; set ::phase 1 ; digit 4 } else { press 16 } }
+        1 { if {[at deck]} { press 32 } elseif {[at home] && [rd8 $::ST] == 1} { set ::phase 2 ; digit 9 } else { press 16 } }
         2 { if {[at event] && $::fights < 3} { incr ::fights ; digit 1 } elseif {[at event]} { press 32 ; set ::phase 3 } else { press 16 } }
         3 { if {[at home]} { set ::phase 4 ; digit 7 } else { press 16 } }
         4 { if {[at home] && [rd8 $::ST] == 1} {

@@ -5,7 +5,7 @@
 #include "../config.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  6
+#define SAVE_VERSION  7
 
 #define DECK_EMPTY    0xFF
 #define SF_STARTED    0x01   /* 名前と最初の 10 連が済んだ */
@@ -44,6 +44,24 @@ typedef struct {
     u16 box_event;       /* この箱を作ったイベント。開催中のイベントと違えば箱を作り直す */
     u8  box_left[4];     /* N, R, SR, SSR の残り */
     u8  box_no;          /* 何箱目か（1 から） */
+    /* ギルドとイベントの型（DECISIONS #63〜） */
+    u8  guild;           /* 所属ギルド 1..16（guilds.csv の id）。0 = まだ入っていない */
+    u16 raid_event;      /* レイドボスを出したイベント。違えば Lv1 から */
+    u8  raid_lv;         /* いまのレイドボスの Lv（倒すたびに上がる） */
+    u32 raid_hp;         /* いまのレイドボスの残り HP */
+    u8  raid_rescued;    /* このボスで救援依頼を出した */
+    u16 pvp_seed;        /* バトルの対戦相手の顔ぶれ（戦うたびに替わる） */
+    /* ギルド対抗戦（core/guildwar.c） */
+    u8  gvg_war;         /* 参加中の回。0 = なし */
+    u16 gvg_start;       /* その初日 */
+    u16 gvg_done;        /* 結果を出した戦（ビット 0..13） */
+    u16 gvg_wonbits;     /* そのうち勝った戦 */
+    u8  gvg_win, gvg_lose;
+    u8  gvg_m;           /* gvg_pts を稼いだ戦の番号（0xFF = なし） */
+    u32 gvg_pts;         /* その戦で自分が稼いだ点 */
+    u8  gvg_cheer;       /* その戦で応援した */
+    u8  gvg_last_war;    /* 最後に終わった回（同じ回に入り直さない） */
+    u8  gvg_last_rank;
 } SaveData;
 
 u16 save_crc(const SaveData *s);

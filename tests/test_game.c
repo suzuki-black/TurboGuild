@@ -14,6 +14,8 @@
 #include "core/wallet.h"
 #include "core/fusion.h"
 #include "core/event.h"
+#include "core/evfight.h"
+#include "core/guildwar.h"
 #include "core/ranking.h"
 #include "core/timeline.h"
 
@@ -103,7 +105,7 @@ static void test_quest(void)
     /* エリア 1 のボスまで進むとエリアクリア、ボスは R を 100% 落とす */
     g_save.ap = AP_MAX;
     for (n = 2; n <= 10; n++) { g_save.ap = AP_MAX; quest_run(n, &r); CHECK(r.b.win); }
-    CHECK(r.area_cleared && r.drop_card >= 21 && r.drop_card <= 32);
+    { CardRec c; CHECK(r.area_cleared && r.drop_card); tbl_card(r.drop_card, &c); CHECK(c.rarity == RARITY_R); }
     CHECK(quest_max_stage() == 11);
 }
 
@@ -334,6 +336,120 @@ static void test_event(void)
     CHECK(q.status == Q_LOCKED);                /* 終わったイベントの面には入れない */
 }
 
+/* レイド（第 2 回, 20 日目から）: HP は倒すまで残る。倒すと Lv が上がる。救援はボス 1 体に 1 回 */
+static void test_raid(void)
+{
+    EventResult r;
+    QuestResult q;
+    RescueResult rs;
+    u32 hp0;
+    u16 n;
+    fresh();
+    g_save.g_time = GSEC_PER_DAY * 21;
+    event_update(&r);
+    CHECK(r.started && g_save.event_id == 2 && event_kind() == EV_RAID);
+    inv_add(46);                                /* 特効の「浜辺の槍使い」 */
+    g_save.deck[0] = (u8)(g_save.card_count - 1);
+    g_save.ap = AP_MAX;
+    quest_run(EVENT_STAGE_BASE + 1, &q);
+    CHECK(q.status == Q_OK && q.kind == EV_RAID && q.raid_lv == 1 && q.points >= 10);
+    CHECK(q.raid_max == raid_max_hp(1) && g_save.raid_hp < q.raid_before && !q.b.win);
+    CHECK(q.b.turns >= 1 && q.b.turns <= RAID_TURNS);
+    hp0 = q.raid_before - g_save.raid_hp;       /* 通常攻撃で削った分 */
+    quest_run(EVENT_STAGE_BASE + 2, &q);        /* 全力攻撃は通常より削る（AP 15） */
+    CHECK(q.status == Q_OK && q.ap_used == 15 && q.raid_before - g_save.raid_hp > hp0);
+    /* 救援: ギルドに入っていれば仲間が来る。2 度目は来ない */
+    g_save.guild = 3;
+    raid_rescue(&rs);
+    CHECK(rs.n >= 1 && g_save.raid_rescued);
+    for (n = 0; n < rs.n; n++) { NpcRec x; tbl_npc(rs.npc[n], &x); CHECK(x.guild == 2 && rs.dmg[n] > 0); }
+    raid_rescue(&rs);
+    CHECK(rs.n == 0);
+    /* 倒すまで殴ると Lv2 のボスになり、討伐ボーナスが入る */
+    for (n = 0; n < 200 && g_save.raid_lv == 1; n++) { g_save.ap = AP_MAX; quest_run(EVENT_STAGE_BASE + 2, &q); }
+    CHECK(g_save.raid_lv == 2 && q.b.win && q.points == 30 + 5 && g_save.raid_hp == raid_max_hp(2));
+    CHECK(raid_max_hp(2) > raid_max_hp(1) && !g_save.raid_rescued);
+}
+
+/* バトル（第 3 回, 45 日目から）: 格下にはほぼ勝ち、格上にはほぼ負ける。負けても少しポイント */
+static void test_pvp(void)
+{
+    EventResult r;
+    QuestResult q;
+    PvpFoe f1, f3;
+    u16 n, win1 = 0, win3 = 0;
+    fresh();
+    g_save.g_time = GSEC_PER_DAY * 46;
+    event_update(&r);
+    CHECK(r.started && g_save.event_id == 3 && event_kind() == EV_PVP);
+    inv_add(33);
+    g_save.deck[0] = (u8)(g_save.card_count - 1);
+    pvp_foe(1, &f1);
+    pvp_foe(3, &f3);
+    CHECK(f1.power < f3.power && f1.npc != f3.npc);
+    for (n = 0; n < 200; n++) {
+        g_save.ap = AP_MAX;
+        quest_run(EVENT_STAGE_BASE + 1, &q);
+        CHECK(q.status == Q_OK && q.kind == EV_PVP && q.points == (q.b.win ? 30 : 6));
+        win1 += q.b.win;
+        g_save.ap = AP_MAX;
+        quest_run(EVENT_STAGE_BASE + 3, &q);
+        CHECK(q.points == (q.b.win ? 160 : 32));
+        win3 += q.b.win;
+    }
+    CHECK(win1 > 170 && win3 > 20 && win3 < 90);
+    pvp_foe(1, &f3);
+    CHECK(f3.npc != f1.npc);                    /* 戦うと顔ぶれが替わる */
+}
+
+/* ギルド対抗戦（第 1 回, 140 日目から 7 日・14 戦）: 参戦 → 戦の時間に攻撃と応援 → 結果 → 順位と報酬 */
+static void test_guildwar(void)
+{
+    GvgResult r;
+    GvgNow n;
+    GvgAttack a;
+    u32 gems;
+    fresh();
+    inv_add(33);
+    g_save.deck[0] = (u8)(g_save.card_count - 1);
+    gvg_update(&r);
+    CHECK(!r.joined);                           /* ギルドに入っていない */
+    g_save.guild = 5;
+    g_save.g_time = GSEC_PER_DAY * 139 + 600;
+    gvg_update(&r);
+    CHECK(!r.joined && !g_save.gvg_war);
+    g_save.g_time = GSEC_PER_DAY * 140 + 600;
+    gvg_update(&r);
+    CHECK(r.joined && g_save.gvg_war == 1 && g_save.gvg_start == 140 && r.n == 0);
+    gvg_now(&n);
+    CHECK(n.war == 1 && !n.now && n.m == 0 && n.left_min == (43200 - 600) / 60 && n.foe != 4 && n.foe < 16);
+    gvg_attack(1, &a);
+    CHECK(a.status == 1);                       /* 戦の時間外 */
+    g_save.g_time = GSEC_PER_DAY * 140 + 43200 + 1800;   /* 12:30 */
+    gvg_now(&n);
+    CHECK(n.now && n.m == 0 && n.left_min == 30 && n.us > 0 && n.them > 0 && n.combo >= 1);
+    g_save.ap = AP_MAX;
+    gvg_attack(1, &a);
+    CHECK(a.status == 0 && a.pts > 0 && g_save.gvg_pts == a.pts && g_save.gvg_m == 0 && g_save.ap == AP_MAX - GVG_AP);
+    { NpcRec x; tbl_npc(a.npc, &x); CHECK(x.guild == n.foe); }
+    CHECK(gvg_target(1) != gvg_target(2) && gvg_target(2) != gvg_target(3));
+    CHECK(gvg_cheer() && !gvg_cheer());         /* 応援は 1 戦に 1 回 */
+    g_save.ap = 5;
+    gvg_attack(2, &a);
+    CHECK(a.status == 2);                       /* AP 不足 */
+    g_save.g_time = GSEC_PER_DAY * 141 + 600;
+    gvg_update(&r);
+    CHECK(r.n == 2 && r.win <= 2 && g_save.gvg_win + g_save.gvg_lose == 2 && g_save.gvg_done == 3);
+    gems = g_save.gems;
+    g_save.g_time = GSEC_PER_DAY * 147 + 600;   /* 7 日目の夜の戦まで全部終わった */
+    gvg_update(&r);
+    CHECK(r.n == 12 && r.ended && r.rank >= 1 && r.rank <= 16 && g_save.gvg_war == 0 && g_save.gvg_last_war == 1);
+    CHECK(g_save.gvg_win + g_save.gvg_lose == 14 && r.gain.n >= 1);
+    CHECK(g_save.gems >= gems + (u32)r.win * GVG_WIN_GEMS);
+    gvg_update(&r);
+    CHECK(!r.joined && !r.n && !r.ended);       /* 同じ回には入り直さない */
+}
+
 static void test_ranking(void)
 {
     RankList l;
@@ -439,6 +555,9 @@ int main(void)
     test_wallet();
     test_fusion();
     test_event();
+    test_raid();
+    test_pvp();
+    test_guildwar();
     test_ranking();
     test_struct_sizes();
     test_battle();

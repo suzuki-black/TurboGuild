@@ -8,6 +8,11 @@
 #define EVENT_LEVELS     3
 #define REWARD_MAX       4
 
+/* イベントの型（events.csv の kind, DECISIONS #63） */
+#define EV_HUNT          0           /* 討伐: 初級・中級・上級の周回 */
+#define EV_RAID          1           /* レイド: 倒すまで HP が残るボス。1 = 通常攻撃 2 = 全力攻撃 */
+#define EV_PVP           2           /* バトル: 1 = 格下 2 = 同格 3 = 格上 の相手と戦う */
+
 typedef struct { u8 n; u8 item[REWARD_MAX]; u16 amount[REWARD_MAX]; } RewardList;
 
 typedef struct {
@@ -27,12 +32,14 @@ typedef struct {
     u8  element;
     u16 boss_card, bonus_card, evo_card;
     u8  bonus_mul, evo_mul;
+    u8  kind;             /* EV_* */
 } EventStage;
 
 u16  event_active(void);                          /* いま開催中のイベント id（無ければ 0） */
+u8   event_kind(void);                            /* 参加中のイベントの型（EV_*） */
 u16  event_days_left(void);                       /* 開催中なら残りゲーム日数 */
 void event_update(EventResult *r);                /* 参加と終了の処理（マイページに入るたび） */
-u8   event_stage(u16 level, EventStage *s);       /* level 1..3。開催中でなければ 0 */
+u8   event_stage(u16 level, EventStage *s);       /* level 1..（型ごとの面の数）。無ければ 0 */
 void event_add_points(u16 pts, RewardList *g);    /* ポイントを足し、届いた報酬ラインを受け取る */
 u32  event_next_line(void);                       /* 次の報酬ラインのポイント（無ければ 0） */
 #endif

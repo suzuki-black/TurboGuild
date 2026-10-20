@@ -13,6 +13,8 @@
 #include <string.h>
 #include "core/deck.h"
 #include "core/event.h"
+#include "core/evfight.h"
+#include "core/guildwar.h"
 #include "core/fusion.h"
 #include "core/gacha.h"
 #include "core/inventory.h"
@@ -118,6 +120,15 @@ static void quests(void)
     u16 fails = 0;
     for (;;) {
         player_ap_update();
+        if (g_save.event_id && g_save.event_id == event_active() && event_kind() != EV_HUNT) {
+            RescueResult rs;
+            u8 k = event_kind();
+            if (k == EV_RAID) raid_rescue(&rs);          /* ボスごとに 1 回は救援を呼ぶ */
+            lv = (u8)(k == EV_RAID ? (g_save.ap >= 15 ? 2 : 1) : 2);   /* レイドは全力、バトルは同格 */
+            quest_run(EVENT_STAGE_BASE + lv, &q);
+            if (q.status != Q_OK) return;
+            continue;
+        }
         if (g_save.event_id && g_save.event_id == event_active()) {
             for (lv = EVENT_LEVELS; lv >= 1; lv--) {     /* 勝てる一番上の面 */
                 quest_run(EVENT_STAGE_BASE + lv, &q);
@@ -155,6 +166,7 @@ int main(int argc, char **argv)
     save_new(&g_save, 0);
     g_save.rng_gacha = seed * 2654435761UL | 1;
     wallet_start(course ? course : 1);
+    g_save.guild = (u8)(1 + seed % 16);
     {   /* 最初の 10 連（引き直しはしない） */
         GachaReq g; g.gacha = 3; g.count = 10;
         gacha_roll(&g);
@@ -168,6 +180,7 @@ int main(int argc, char **argv)
         login_check(&lr);
         wallet_payday();
         event_update(&er);
+        { GvgResult gr; gvg_update(&gr); if (gr.ended) fprintf(stderr, "guildwar: rank %u\n", gr.rank); }
         if (er.ended) fprintf(stderr, "event %u: pt %lu rank %u\n", er.id, (unsigned long)er.points, er.rank);
         timeline_update(&tr);
         deck_auto();

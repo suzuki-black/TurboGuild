@@ -1,5 +1,5 @@
 # timeline.tcl — Phase3: 運営年表を SERVICE_END まで通す。ゲーム内の日付を進めながらマイページに入り直し、
-# イベントの参加・終了、贈り物、終了の告知、サービス終了後のタイトルを確かめる。要所でスクリーンショット。
+# イベントの参加・終了、ギルド対抗戦 2 回、贈り物、終了の告知、サービス終了後のタイトルを確かめる。要所でスクリーンショット。
 set throttle off
 set ::log [open $::env(OUT) w]
 set ::map $::env(MAP)
@@ -20,18 +20,21 @@ proc digit {d} { debug write memory $::DG [expr {$d + 1}] }
 # throttle off のままだと screenshot は古いフレームを返す。撮るときだけ on にして 0.1 秒描かせる
 proc shot {n} { if {[info exists ::env(SHOTDIR)]} { set ::throttle on ; after time 0.1 [list snap $n] } }
 proc snap {n} { screenshot -raw [file join $::env(SHOTDIR) $n.png] ; set ::throttle off }
-set ::days {3 10 17 20 36 45 60 70 95 110 120 150 165 185 200 245 271}
+set ::days {3 10 17 20 36 45 60 70 95 110 120 141 150 165 185 200 216 245 271}
 set ::di 0 ; set ::phase start ; set ::fails 0 ; set ::ends {} ; set ::joins {}
 proc fail {m} { incr ::fails ; say "FAIL $m" }
 proc done {} {
     say "events ended: $::ends  joined: $::joins"
     if {$::ends ne "1 2 3 4 5 6 7"} { fail "not every event ended: $::ends" }
+    set gw [rd8 [sv gvg_last_war]]
+    say "guild wars finished: $gw (rank [rd8 [sv gvg_last_rank]])"
+    if {$gw != 2} { fail "guild war 2 not finished" }
     say [expr {$::fails ? "RESULT FAIL" : "RESULT PASS"}] ; close $::log ; exit
 }
 proc tick {} {
     if {![ready]} { after time 0.05 tick ; return }
     switch $::phase {
-        start { if {[at home]} { set ::phase next } else { press 16 } }
+        start { if {[at home] && [rd8 $::ST] == 1} { set ::phase next } else { press 16 } }
         next {
             if {$::di >= [llength $::days]} { done ; return }
             set d [lindex $::days $::di] ; incr ::di
@@ -39,7 +42,7 @@ proc tick {} {
             wr32 [sv gtime] [expr {$d * 86400 + 600}]
             set ::day $d ; set ::phase leave ; digit 6          ;# ランキングへ行って戻る = マイページに入り直す
         }
-        leave { if {[at ranking]} { press 32 ; set ::phase back } elseif {[at home]} { digit 6 } else { press 16 } }
+        leave { if {[rd8 $::ST] == 2} { press 16 } elseif {[at ranking]} { press 32 ; set ::phase back } elseif {[at home]} { digit 6 } else { press 16 } }
         back {
             if {[at title]} {
                 say "day $::day: title (service ended)" ; shot tl_end_title

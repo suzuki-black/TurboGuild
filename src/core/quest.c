@@ -2,6 +2,7 @@
  * ドロップはエリアの属性・レアリティ（通常 N / ボス R）の恒常カードから等確率。 */
 #include "quest.h"
 #include "deck.h"
+#include "evfight.h"
 #include "inventory.h"
 #include "player.h"
 #include "rng.h"
@@ -22,6 +23,7 @@ typedef struct {
     u8 element;
     u8 event;
     u16 points;
+    u8 kind;            /* イベントの型（EV_*） */
 } Fight;
 
 /* ★イベントかどうかの分岐はここ 1 か所（仕様 §4.4）。デッキの特効もここで決める */
@@ -29,10 +31,12 @@ static u8 setup(u16 stage, Fight *f, DeckStats *d)
 {
     f->event = 0;
     f->points = 0;
+    f->kind = EV_HUNT;
     if (stage >= EVENT_STAGE_BASE) {
         EventStage es;
         if (!event_stage(stage - EVENT_STAGE_BASE, &es)) return 0;
         f->event = 1;
+        f->kind = es.kind;
         f->points = es.points;
         f->element = es.element;
         f->st.ap = es.ap; f->st.hp = es.hp; f->st.def = es.def; f->st.atk = es.atk;
@@ -121,6 +125,7 @@ FAR(void, quest_run, (u16 stage, QuestResult *r))
     g_save.ap -= r->ap_used;
     r->event = f.event;
     r->enemy_elem = f.element;
+    if (f.kind != EV_HUNT) { event_fight(stage - EVENT_STAGE_BASE, r); return; }   /* レイド・バトル */
     in.deck_atk = d.atk;
     in.deck_def = d.def;
     in.player_hp = r->player_hp = PLAYER_HP(g_save.level);

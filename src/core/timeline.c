@@ -20,6 +20,8 @@ FAR(void, timeline_state, (TlState *s))
     s->drop_pct = 0;
     s->announce = s->ended = 0;
     s->days_to_end = 0;
+    s->gvg = 0;
+    s->gvg_start = 0;
     for (i = 0; i < TIMELINE_COUNT; i++) {
         tbl_timeline(i, &t);
         if (t.kind == TL_SERVICE_END) s->days_to_end = t.day > s->day ? t.day - s->day : 0;
@@ -30,6 +32,7 @@ FAR(void, timeline_state, (TlState *s))
         case TL_PLAYER_DROP:  keep = (u16)(keep * (100 - t.param) / 100); break;
         case TL_ANNOUNCE_END: s->announce = 1; break;
         case TL_SERVICE_END:  s->ended = 1; break;
+        case TL_GUILDWAR:     if (s->day < t.day + GVG_DAYS) { s->gvg = (u8)t.param; s->gvg_start = t.day; } break;
         default: break;          /* SERVICE_START / NEWS / EVENT / GIFT は状態を持たない */
         }
     }

@@ -6,11 +6,13 @@
 #include "../data/bgm_data.h"
 void bgm_play(u8 song);
 #include "../ram.h"
+#include "../core/rng.h"
 #include "../core/login.h"
 #include "../core/player.h"
 #include "../core/time.h"
 #include "../core/wallet.h"
 #include "../core/event.h"
+#include "../core/guildwar.h"
 #include "../core/tables.h"
 #include "../core/timeline.h"
 #include "../data/screens.h"
@@ -52,6 +54,10 @@ static void cell(u8 i)
 }
 
 static void banner(void);
+void gvg_result_show(void);
+
+/* バナーが入口になるもの: イベントかギルド対抗戦（イベントと対抗戦は日が重ならない） */
+static u8 has_banner(void) { return (u8)(g_save.event_id || g_save.gvg_war); }
 
 static void redraw_sel(u8 i)
 {
@@ -80,6 +86,19 @@ static void banner(void)
         cx = txt_id((u8)(cx + 1), BANNER_Y + 4, T_EV_LEFT, COL_WHITE, COL_DRED);
         cx = txt_num(cx, BANNER_Y + 4, event_days_left(), COL_YELLOW, COL_DRED);
         txt_id(cx, BANNER_Y + 4, T_DAYS, COL_WHITE, COL_DRED);
+    } else if (g_save.gvg_war) {
+        GvgNow n;
+        u8 cx;
+        gvg_now(&n);
+        ui_key(9, 2, BANNER_Y + 7);
+        cx = txt_id(2, BANNER_Y + 4, T_GVG_TITLE, COL_YELLOW, COL_DRED);
+        if (n.now) {
+            txt_id((u8)(cx + 1), BANNER_Y + 4, T_GVG_ONAIR, COL_WHITE, COL_DRED);
+        } else {
+            cx = txt_id((u8)(cx + 1), BANNER_Y + 4, T_GVG_NEXT, COL_WHITE, COL_DRED);
+            cx = txt_num(cx, BANNER_Y + 4, n.left_min, COL_YELLOW, COL_DRED);
+            txt_id(cx, BANNER_Y + 4, T_GVG_MIN, COL_WHITE, COL_DRED);
+        }
     } else {
         TlState tl;
         u16 tx;
@@ -134,6 +153,7 @@ FAR(void, home_init, (void))
     login_check(&g_login);
     g_paid = wallet_payday();
     event_update(&g_evres);
+    gvg_update(&g_gvgres);
     {
         TlResult tr;
         TlState tl;
@@ -143,8 +163,13 @@ FAR(void, home_init, (void))
         timeline_state(&tl);
         if (tl.ended) { g_save_dirty = 1; screen_change(&scr_title); }   /* サービス終了 */
     }
-    if (g_login.given || g_paid || g_evres.started || g_evres.ended || g_gift) g_save_dirty = 1;
-    if (g_cursor == ITEMS && !g_save.event_id) g_cursor = 0;
+    if (!g_save.guild) {                             /* 最初に来たとき、どこかのギルドに入る */
+        g_save.guild = (u8)(1 + rng_range(&g_save.rng_sim, GUILD_COUNT));
+        g_joined = 1;
+    }
+    if (g_login.given || g_paid || g_evres.started || g_evres.ended || g_gift || g_joined ||
+        g_gvgres.joined || g_gvgres.n || g_gvgres.ended) g_save_dirty = 1;
+    if (g_cursor == ITEMS && !has_banner()) g_cursor = 0;
     /* ★起動直後（タイトルから来たとき）は保存を後回しにして、すぐ遊べるようにする（Phase3 の受け入れ: 3 秒）。
      * イベントの終了・給料日・年表は日付から決まるので、保存前に電源を切っても次の起動で同じ結果になる */
     if (g_save_dirty && !g_from_title) ui_saving();
@@ -168,7 +193,19 @@ FAR(void, home_draw, (void))
     g_ticker_gap = 0;
     if (g_paid) { g_paid = 0; ui_msg(T_PAYDAY); return; }
     if (g_gift) { g_gift = 0; ui_msg(T_GIFT_GOT); return; }
+    if (g_joined) {
+        g_joined = 0;
+        ui_box(16, 80, 224, 44, COL_DBLUE, COL_YELLOW);
+        cx = txt_id(3, 84, T_GUILD, COL_LGRAY, COL_DBLUE);
+        txt_id((u8)(cx + 1), 84, (u16)(GUILD_TEXT + g_save.guild - 1), COL_YELLOW, COL_DBLUE);
+        txt_id(3, 102, T_GUILD_JOINED, COL_WHITE, COL_DBLUE);
+        psg_beep(0x060, 10);
+        ui_wait_key();
+        g_dirty = 1;
+        return;
+    }
     if (g_evres.started || g_evres.ended) { screen_change(&scr_evresult); return; }
+    if (g_gvgres.joined || g_gvgres.n || g_gvgres.ended) { gvg_result_show(); return; }
     if (g_login.given) show_login_bonus();
 }
 
@@ -189,7 +226,7 @@ static void open(u8 i)
         ui_saving();
         if (!g_save_dirty) ui_msg(T_SAVED);
         break;
-    case ITEMS: screen_change(&scr_event); break;
+    case ITEMS: screen_change(g_save.event_id ? &scr_event : &scr_guildwar); break;
     default: screen_change(&scr_news); break;
     }
 }
@@ -205,10 +242,10 @@ FAR(void, home_update, (void))
         if (p & BTN_LEFT)  g_cursor = (u8)((g_cursor + ITEMS - 1) % ITEMS);
         if (p & BTN_RIGHT) g_cursor = (u8)((g_cursor + 1) % ITEMS);
         if (p & BTN_DOWN) g_cursor = (u8)((g_cursor + 4) % ITEMS);
-        if (p & BTN_UP) g_cursor = (u8)(g_cursor < 4 && g_save.event_id ? ITEMS : (g_cursor + 4) % ITEMS);
+        if (p & BTN_UP) g_cursor = (u8)(g_cursor < 4 && has_banner() ? ITEMS : (g_cursor + 4) % ITEMS);
     }
     if (old != g_cursor) { psg_beep(0x100, 2); redraw_sel(old); redraw_sel(g_cursor); }
-    if (d == 9 && g_save.event_id) { g_cursor = ITEMS; open(ITEMS); return; }
+    if (d == 9 && has_banner()) { g_cursor = ITEMS; open(ITEMS); return; }
     if (d >= 1 && d <= ITEMS) { g_cursor = (u8)(d - 1); redraw_sel(old); redraw_sel(g_cursor); open(g_cursor); return; }
     if (p & BTN_OK) { open(g_cursor); return; }
     if (p & BTN_CANCEL) {

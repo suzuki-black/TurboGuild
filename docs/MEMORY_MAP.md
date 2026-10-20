@@ -3,7 +3,7 @@
 `tools/link_rom.py` がこの表を読んで `bin/TurboGuild.rom` を組み立て、
 `src/data/rompages.h`（`#define PAGE_<名前> n`）を生成する。**表を書き換えたら make し直す。**
 
-- 1 ページ = 8KB。64 ページ（512KB）。絵を入れたので Phase 1 の 256KB から広げた。
+- 1 ページ = 8KB。128 ページ（1MB）。カード 120 枚の絵を入れるため 512KB から広げた（Phase 1 は 256KB）。
 - ページ 0 以外の先頭 16 バイトは**ページ見出し**: `[ページ番号, 'T', 'G', 'P', 種別, FFh×11]`。
   中身はオフセット 16（窓の先頭 + 10h）から置く。バンク切替テストはこの見出しを読む。
 - 種別: 0=空き 1=コード 2=データA 3=データB
@@ -72,9 +72,28 @@
 | 53 | 8000h データA | CARDART14 | build/cardart14.bin | カード絵 56x72（4 枚/ページ） |
 | 54 | 8000h データA | CARDART15 | build/cardart15.bin | カード絵 56x72（4 枚/ページ） |
 | 55 | 8000h データA | CARDART16 | build/cardart16.bin | カード絵 56x72（4 枚/ページ） |
-| 56 | 8000h データA | THUMB0 | build/thumb0.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 57 | 8000h データA | THUMB1 | build/thumb1.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 58 | 8000h データA | THUMB2 | build/thumb2.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 59 | 8000h データA | THUMB3 | build/thumb3.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 60 | 8000h データA | THUMB4 | build/thumb4.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 61-63 | - | - | - | 空き |
+| 56 | 8000h データA | CARDART17 | build/cardart17.bin | カード絵 56x72（4 枚/ページ） |
+| 57 | 8000h データA | CARDART18 | build/cardart18.bin | カード絵 56x72（4 枚/ページ） |
+| 58 | 8000h データA | CARDART19 | build/cardart19.bin | カード絵 56x72（4 枚/ページ） |
+| 59 | 8000h データA | CARDART20 | build/cardart20.bin | カード絵 56x72（4 枚/ページ） |
+| 60 | 8000h データA | CARDART21 | build/cardart21.bin | カード絵 56x72（4 枚/ページ） |
+| 61 | 8000h データA | CARDART22 | build/cardart22.bin | カード絵 56x72（4 枚/ページ） |
+| 62 | 8000h データA | CARDART23 | build/cardart23.bin | カード絵 56x72（4 枚/ページ） |
+| 63 | 8000h データA | CARDART24 | build/cardart24.bin | カード絵 56x72（4 枚/ページ） |
+| 64 | 8000h データA | CARDART25 | build/cardart25.bin | カード絵 56x72（4 枚/ページ） |
+| 65 | 8000h データA | CARDART26 | build/cardart26.bin | カード絵 56x72（4 枚/ページ） |
+| 66 | 8000h データA | CARDART27 | build/cardart27.bin | カード絵 56x72（4 枚/ページ） |
+| 67 | 8000h データA | CARDART28 | build/cardart28.bin | カード絵 56x72（4 枚/ページ） |
+| 68 | 8000h データA | CARDART29 | build/cardart29.bin | カード絵 56x72（4 枚/ページ） |
+| 69 | 8000h データA | THUMB0 | build/thumb0.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 70 | 8000h データA | THUMB1 | build/thumb1.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 71 | 8000h データA | THUMB2 | build/thumb2.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 72 | 8000h データA | THUMB3 | build/thumb3.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 73 | 8000h データA | THUMB4 | build/thumb4.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 74 | 8000h データA | THUMB5 | build/thumb5.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 75 | 8000h データA | THUMB6 | build/thumb6.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 76 | 8000h データA | THUMB7 | build/thumb7.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 77 | 6000h コード | CORE4 | code: src/core/evfight.c | レイド・バトル（イベントの型） |
+| 78 | 6000h コード | CORE5 | code: src/core/guildwar.c | ギルド対抗戦 |
+| 79 | 6000h コード | UI_GUILD | code: src/ui/guildwar_ui.c | ギルド対抗戦の画面 |
+| 80-127 | - | - | - | 空き |

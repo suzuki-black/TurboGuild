@@ -414,6 +414,14 @@ HOME ─┬─ QUEST  → AREA_SELECT → STAGE_SELECT → BATTLE → RESULT →
 
 ---
 
+## 11.5 ライセンスと配布方針
+
+- turboR 版は **MIT ライセンス**。リポジトリ直下に `LICENSE`（MIT）を置き、各ソースの先頭コメントに `SPDX-License-Identifier: MIT` を1行入れる。
+- `core/` と `data/` はスマホ版（将来、寄付ウェア）と共有する前提。MIT のまま共有してよい。データだけ別ライセンスにする場合は `data/LICENSE` を別に置き、`build_data.py` が ROM 内にライセンス文字列を埋め込む。
+- ROM イメージは無料配布（itch.io / GitHub Releases）。タイトル画面に MIT とリポジトリ URL を表示する画面を1つ設ける。
+- README の冒頭とスタッフロール（§3.1）に、**コンセプト・ゲームデザイン／実装** の役割分担を明記する。表記は既存作『真零の咆哮』に揃える。企画書 `MSX_turboR_SocialRPG_Design.md` と本書もリポジトリに同梱する。
+- 第三者ライブラリは使わない方針（§2）なので、ライセンス混在の心配はない。SDCC のランタイムライブラリは GPL+リンク例外で ROM 配布に問題なし。
+
 ## 12. やらないこと（スコープ外）
 
 - 実通信、ネット対戦、フレンド申請の実処理

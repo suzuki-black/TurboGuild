@@ -39,7 +39,8 @@ CARD_FIELDS = [("u16", "id"), ("u16", "name_text"), ("u8", "rarity"), ("u8", "el
                ("u8", "max_lv"), ("u16", "evo_to"), ("u16", "event_id"), ("u8", "img"),
                ("u16", "release_day"), ("u16", "era_pct")]
 TIMELINE_KIND = {"SERVICE_START": 0, "NEWS": 1, "EVENT": 2, "GACHA_RATEUP": 3, "INFLATION": 4,
-                 "PLAYER_DROP": 5, "ANNOUNCE_END": 6, "SERVICE_END": 7, "GIFT": 8}
+                 "PLAYER_DROP": 5, "ANNOUNCE_END": 6, "SERVICE_END": 7, "GIFT": 8,
+                 "GUILDWAR": 9}   # GUILDWAR: param = 第何回か。7 日間
 TIMELINE_FIELDS = [("u16", "day"), ("u8", "kind"), ("u16", "param"), ("u16", "text")]
 AREA_FIELDS = [("u16", "name_text"), ("u8", "element"), ("u16", "enemy_text"), ("u16", "boss_card")]
 STAGE_FIELDS = [("u8", "ap"), ("u32", "hp"), ("u16", "def"), ("u16", "atk"), ("u16", "exp"),

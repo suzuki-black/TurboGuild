@@ -23,6 +23,11 @@ typedef struct {
     u8  event;           /* イベントの面だった */
     u16 points;          /* イベントポイント */
     RewardList gain;     /* 届いた報酬ライン */
+    u8  kind;            /* イベントの型（EV_*）。通常の面は EV_HUNT */
+    u8  raid_lv;         /* レイド: 戦ったボスの Lv */
+    u32 raid_before;     /* レイド: 戦う前の残り HP */
+    u32 raid_max;        /* レイド: そのボスの最大 HP / バトル: 相手の HP（見せ方） */
+    u16 foe;             /* バトル: 相手の NPC */
 } QuestResult;
 
 void quest_run(u16 stage, QuestResult *r);     /* stage >= EVENT_STAGE_BASE ならイベントの面 */

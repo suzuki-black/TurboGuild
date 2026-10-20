@@ -5,6 +5,7 @@
 #include "../types.h"
 
 #define RATEUP_DAYS 7
+#define GVG_DAYS    7          /* ギルド対抗戦の期間 */
 
 typedef struct {
     u16 day;             /* いまのゲーム内日数 */
@@ -14,6 +15,8 @@ typedef struct {
     u8  announce;        /* サービス終了の告知が出ている */
     u8  ended;           /* サービス終了 */
     u16 days_to_end;
+    u8  gvg;             /* 開催中のギルド対抗戦（第何回か）。0 = なし */
+    u16 gvg_start;       /* その初日 */
 } TlState;
 
 typedef struct { u8 n_news; u16 gift_gems; } TlResult;

@@ -29,13 +29,16 @@ void event_gain_show(void);
 
 static u8 is_event(void) { return (u8)(g_sel_stage >= EVENT_STAGE_BASE); }
 
+/* バトルの相手の顔: NPC ごとに決まった R のカード */
+static u16 foe_card(void) { return (u16)(21 + g_qr.foe % 12); }
+
 static u16 boss_card(void)
 {
     AreaRec a;
     if (is_event()) {
         EventStage es;
         event_stage(g_sel_stage - EVENT_STAGE_BASE, &es);
-        return es.boss_card;
+        return g_qr.kind == EV_PVP ? foe_card() : es.boss_card;
     }
     tbl_area((u8)((g_sel_stage - 1) / STAGES_PER_AREA + 1), &a);
     return a.boss_card;
@@ -44,6 +47,7 @@ static u16 boss_card(void)
 static u32 boss_hp(void)
 {
     StageRec st;
+    if (g_qr.kind != EV_HUNT) return g_qr.raid_max;
     if (is_event()) {
         EventStage es;
         event_stage(g_sel_stage - EVENT_STAGE_BASE, &es);
@@ -110,6 +114,12 @@ static void outcome(void)
     CardRec c;
     u8 y = 104, cx;
     ui_box(PANEL_X - 4, y, SCREEN_W - PANEL_X + 4, 62, g_qr.b.win ? COL_DRED : COL_DBLUE, COL_YELLOW);
+    if (g_qr.kind == EV_RAID) {                    /* レイドは倒せなくても削った分が残る */
+        cx = txt_id(16, (u8)(y + 4), g_qr.b.win ? T_RAID_KILL : T_RAID_DMG, COL_YELLOW, g_qr.b.win ? COL_DRED : COL_DBLUE);
+        if (!g_qr.b.win) txt_num((u8)(cx + 1), (u8)(y + 4), g_qr.b.dmg_per_turn * g_qr.b.turns, COL_WHITE, COL_DBLUE);
+        psg_beep(g_qr.b.win ? 0x050 : 0x0A0, 20);
+        return;
+    }
     txt_id(16, (u8)(y + 4), g_qr.b.win ? T_WIN : T_LOSE, COL_YELLOW, g_qr.b.win ? COL_DRED : COL_DBLUE);
     psg_beep(g_qr.b.win ? 0x050 : 0x300, 20);
     if (!g_qr.b.win) return;
@@ -139,16 +149,27 @@ FAR(void, boss_draw, (void))
     tbl_card(boss_card(), &c);
     max = boss_hp();
     ui_clear();
-    ui_header(T_BOSS_BATTLE);
+    ui_header(g_qr.kind == EV_RAID ? T_RAID_TITLE : g_qr.kind == EV_PVP ? T_PVP_TITLE : T_BOSS_BATTLE);
     gfx_card2x(boss_card(), BOSS_X, BOSS_Y);
-    txt_id(16, 20, c.name_text, rarity_color(c.rarity), COL_BLACK);
-    left = max;
+    if (g_qr.kind == EV_PVP) {                     /* 相手は NPC の冒険者 */
+        NpcRec n;
+        tbl_npc(g_qr.foe, &n);
+        t = txt_id(16, 20, (u16)(NPC_PRE_TEXT + n.name_id / NPC_SUF_COUNT), COL_WHITE, COL_BLACK);
+        txt_id((u8)t, 20, (u16)(NPC_SUF_TEXT + n.name_id % NPC_SUF_COUNT), COL_WHITE, COL_BLACK);
+    } else if (g_qr.kind == EV_RAID) {
+        t = txt_id(16, 20, T_RAID_LV, COL_YELLOW, COL_BLACK);
+        t = txt_num((u8)t, 20, g_qr.raid_lv, COL_YELLOW, COL_BLACK);
+        txt_id((u8)(t + 1), 20, c.name_text, rarity_color(c.rarity), COL_BLACK);
+    } else {
+        txt_id(16, 20, c.name_text, rarity_color(c.rarity), COL_BLACK);
+    }
+    left = g_qr.kind == EV_RAID ? g_qr.raid_before : max;
     hp(left, max);
     deck_row(0);
     if (g_qr.status != Q_OK) return;
     ui_wait(30);
     for (t = 0; t < g_qr.b.turns && shown < BATTLE_LOG_MAX; t++, shown++) {
-        if (shown == BATTLE_LOG_MAX - 1) {           /* 長い戦いは最後の一撃まで飛ばす */
+        if (shown == BATTLE_LOG_MAX - 1 && g_qr.kind == EV_HUNT) {   /* 長い戦いは最後の一撃まで飛ばす */
             left = g_qr.b.dmg_per_turn < left && g_qr.b.win ? g_qr.b.dmg_per_turn : left;
             if (!g_qr.b.win) left = max - (u32)(max / 2);
         }
