@@ -3,6 +3,7 @@
  * ディスクROM が居ないと H.PHYD が空（C9h）なので、そのときは呼ばずに NOFDD を返す。 */
 #include "disk.h"
 #include "bios.h"
+#include "bgmdrv.h"
 #include "../ram.h"
 
 #define H_PHYD   (*(volatile u8 *)0xFFA7)
@@ -32,7 +33,9 @@ static u8 transfer(u8 write, u16 sector, u8 count, u8 *buf)
     r->sector = sector;
     r->buf = buf;
     for (i = 0; i < RETRY; i++) {
+        bgm_hold();                    /* ディスク ROM が 4000h に出る間は BGM を止める */
         e = bios_phydio(r);
+        bgm_release();
         if (e == 0) return DISK_OK;
         if (e == 1 || e == 3) break;   /* 書込禁止・未挿入は再試行しても同じ */
     }

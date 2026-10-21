@@ -1,4 +1,18 @@
 # マイページ・タイトル: 明るいハ長調のループ（オリジナル）
+# 起承転結 × 4 小節 = 16 小節（1 小節 = 16 分音符 16 個）
+# 起: C Dm C G（はじめの旋律）
 A: T6 @4 v2 L o5 l8 e g >c< c b g a g  f a >d< d c a b g  e g >c< c b g >d c<  b a g f e4 r4
 B: T6 @3 v5 L o3 l8 c g e g c g e g  d a f a d a f a  c g e g c g e g  g b >d< b g4 r4
 C: T6 @14 v3 L o2 l4 c c g g  d d a a  c c e g  g g c r
+# 承: F G Em-Am Dm-G（広がる）
+A: o5 a4 g8 a8 >c4< a4  b4 a8 b8 >d4< b4  o6 e8 d8 c8 o5 b8 o6 c8 o5 a8 e8 a8  f8 a8 >d8< c8 b8 g8 a8 b8
+B: o3 l8 f >c< a >c< f >c< a >c<  g >d< b >d< g >d< b >d<  e b g b a >c e c<  d a f a g >d< b >d<
+C: o2 l4 f f >c c<  g g >d d<  e e a a  d d g g
+# 転: Am Dm E Am-E（イ短調で静かに）
+A: o5 e4. d8 c4 e4  f4. e8 d4 f4  g+4 b4 >d4< b4  a4 e4 a8 b8 >c8< b8
+B: o3 l8 a >c e c< a >c e c<  d f a f d f a f  e g+ b g+ e g+ b g+  a >c e c< e g+ b g+
+C: o2 a2 a2  d2 d2  e2 e2  a2 e2
+# 結: C F G C（はじめに戻って締める）
+A: o5 e8 g8 >c4< b8 g8 e4  f8 a8 >c4< a8 f8 a4  g8 b8 >d4 c8< b8 a8 b8  >c4< g4 c4 r4
+B: o3 l8 c g e g c g e g  f >c< a >c< f >c< a >c<  g b >d< b g b >d< b  c g e g c4 r4
+C: o2 l4 c c e g  f f a >c<  g g b >d<  c g c r

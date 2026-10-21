@@ -7,7 +7,7 @@
 
 	.globl	_kanji_read
 
-	.area	_CODE
+	.area	_HOT		; RAM で実行（MEMORY_MAP の hot: 行）
 
 ; void kanji_read(u16 index, u8 *buf)   HL=字番号, DE=32 バイトの置き場
 _kanji_read:

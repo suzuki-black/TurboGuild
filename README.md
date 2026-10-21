@@ -75,7 +75,7 @@
 - **ギルドとギルド対抗戦。** 1 日 2 回の「戦の時間」に相手ギルドを攻撃し、コンボと応援で押し切る。
 - **運営年表。** 確率アップ・インフレ（新しい SSR ほど強い）・お詫びの石・引退の波・終了の告知・
   そしてサービス終了とスタッフロール。
-- **FM 音源（MSX-MUSIC）の BGM** 5 曲。
+- **FM 音源（MSX-MUSIC）の BGM** 5 曲（各曲 起承転結の 13〜26 秒で 1 周）。
 - 経済は **PC 上のシミュレーション**（`make sim`）で合わせています。課金しない人は、終了時に SSR が 1〜3 枚。
 
 ### 操作
@@ -177,8 +177,9 @@ docs/      企画書・設計の記録
   ランキングもお知らせもギルドの仲間も、すべて式から作った「それっぽさ」です。
 - **数値は経済シミュレーションで一度合わせただけ**です。実際に遊んでの調整はこれからです。
 - **実機（turboR）ではまだ確認していません。**
-- 文字描画は C で書いていて遅め（全面の描き直しで 1 秒弱）です。BGM はメインループで鳴らしているので、
-  長い描画やディスクの読み書きの間は止まります。
+- 画面の描き直しは、全面で 0.6 秒ほどかかります（文字と VDP の処理は RAM で実行して速くしました）。
+  ランキングの計算などは、まだカートリッジ ROM の上で動いています。
+- BGM は VBLANK 割り込みで鳴らしています。ディスクの読み書きの間だけ止まり、終わると続きから鳴ります。
 
 ### フィードバック
 不具合報告や感想は GitHub Issues でお願いします。範囲の明確な修正の Pull Request も歓迎します。
@@ -254,7 +255,7 @@ ROM の中には SDCC のランタイムライブラリが入ります（GPL ＋
 - **Guilds and guild wars.** Twice a day, a one-hour battle window: attack the rival guild, build combos, cheer.
 - **An operations timeline:** rate-up campaigns, inflation (newer SSRs are stronger), apology gems,
   waves of players quitting, the end-of-service notice — and finally the shutdown and staff roll.
-- **FM sound (MSX-MUSIC) background music**, 5 tracks.
+- **FM sound (MSX-MUSIC) background music**, 5 tracks (each a 13–26 s loop in four parts).
 - The economy is tuned with a **PC-side simulation** (`make sim`): a non-paying player ends with 1–3 SSRs.
 
 ### Controls
@@ -355,8 +356,9 @@ This is an **experimental study**.
   The rankings, the news and your guild mates are all "plausibility" generated from formulas.
 - **The numbers have only been tuned once, by the economy simulation**; tuning by actual play is still to come.
 - **It has not yet been verified on a real turboR.**
-- Text rendering is written in C and is slowish (just under a second for a full redraw). The BGM is driven
-  from the main loop, so it pauses during long redraws and disk access.
+- A full-screen redraw takes about 0.6 s (text and VDP code run from RAM for speed). Heavier logic such as
+  the ranking calculations still runs from the cartridge ROM.
+- The BGM is driven by the VBLANK interrupt. It pauses only during disk access and resumes where it left off.
 
 ### Feedback & Contributing
 Please use GitHub Issues for bug reports and impressions. Pull requests with a clear scope are welcome.

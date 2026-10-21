@@ -1,3 +1,14 @@
 # ガチャ: 期待をあおる分散和音（オリジナル）
+# 起承転結 × 2 小節 = 8 小節
+# 起: C D / E D（はじめの旋律）
 A: T6 @12 v3 L o5 l16 c e g >c< g e c e d f a >d< a f d f  e g b >e< b g e g d f a >d< a f g b
 B: T6 @3 v6 L o3 l2 c d e d
+# 承: F G / Am E（上へ）
+A: o5 l16 f a >c f c< a f a g b >d g d< b g b  a >c e a e c< a >c< e g+ b >e< b g+ e g+
+B: o3 l2 f g a e
+# 転: Dm E / F G（もうひと押し）
+A: o5 l16 d f a >d< a f d f e g+ b >e< b g+ e g+  f a >c f c< a f a g b >d g d< b g b
+B: o3 l2 d e f g
+# 結: C C / C（光が出る）
+A: o5 l16 c e g >c< g e c e c e g >c e c< g e  c8 g8 >c4< r2
+B: o3 l2 c c c r

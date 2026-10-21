@@ -1,4 +1,18 @@
 # ボス戦: 速いイ短調（オリジナル）
+# 起承転結 × 4 小節 = 16 小節
+# 起: Am Am F E（はじめの旋律）
 A: T4 @10 v2 L o4 l16 a a >c< a e a >d< a a a >e< a >d c< b g+  a a >c< a e a >d< a >e d c< b >c< b a g+  f f a f c f b- f f f >c< f b- a g e  e e g+ e b e >d< e >e d c< b a4
 B: T4 @13 v3 L o2 l8 a a a a a a a a  a a a a a a a a  f f f f f f f f  e e e e e e e e
 C: T4 @1 v6 L o4 l1 a a f e
+# 承: Dm Am E Am-E（たたみかける）
+A: o4 l16 d d f d a d >d< d a8 f8 d4  a a >c< a e a >c< a e8 c8 o3 a4  o4 g+ g+ b g+ e g+ b g+ >e8 d8< b4  a b >c d e d c< b a8 g+8 e4
+B: o2 l8 d d d d d d d d  a a a a a a a a  e e e e e e e e  a a a a e e e e
+C: o4 l1 d a g+ a
+# 転: F G Am E（せり上がる）
+A: o4 f4 a4 >c4 f4<  g4 b4 >d4 g4<  >e8 d8 c8< b8 a8 g+8 a8 b8  g+4 e4 b4 >e4<
+B: o2 l8 f f f f f f f f  g g g g g g g g  a a a a a a a a  e e e e e e e e
+C: o4 l1 f g a e
+# 結: Am Am F-E Am（はじめの形で決着）
+A: o4 l16 a a >c< a e a >d< a a a >e< a >d c< b g+  a a >c< a e a >d< a >e d c< b >c< b a g+  f f a f c f b- f e8 g+8 b4  a >c e c< a >c< e g+ a2
+B: o2 l8 a a a a a a a a  a a a a a a a a  f f f f e e e e  a a a a a4 r4
+C: o4 l1 a a  l2 f e  l1 a

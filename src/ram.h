@@ -69,9 +69,12 @@ extern u16 g_gift;             /* 年表の贈り物（知らせる石の数） 
 extern u8  g_joined;
 extern u16 g_cred_pos;          /* スタッフロールの位置（流したドット数） */            /* マイページ: ギルドに入ったばかり（知らせる） */
 extern u8 g_from_title;        /* タイトルの「つづきから」でマイページへ来た（保存を後回しにする） */
-typedef struct { u16 pos, loop; u8 wait, inst, hi; } BgmCh;     /* BGM の 1 チャンネル（ui/bgm.c） */
+typedef struct { u16 pos, loop; u8 wait, inst, hi, lo, on; } BgmCh;   /* BGM の 1 チャンネル（sys/bgmdrv.c） */
 extern BgmCh g_bgm_ch[3];
 extern u8 g_bgm_song, g_bgm_nch;
+extern u16 g_bgm_base;          /* 鳴らしている曲の、ページの中での位置 */
+extern volatile u8 g_isr_safe;  /* 1 = 割り込みからカーネルを呼んでよい（ディスクの間は 0） */
+extern u8 g_timi_stub[17];      /* H.TIMI から飛ぶ RAM の入口（sys/bgmdrv.c） */
 extern u8 g_nosave_warned;    /* 「セーブできません」は 1 回だけ出す */
 extern GachaReq g_gacha;
 extern QuestResult g_qr;

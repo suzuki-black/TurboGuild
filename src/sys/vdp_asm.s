@@ -18,7 +18,7 @@ VDP_IND  = 0x9B
 	.globl	_vdp_load
 	.globl	_vdp_pal1
 
-	.area	_CODE
+	.area	_HOT		; RAM で実行（MEMORY_MAP の hot: 行）
 
 ; void vdp_wreg(u8 reg, u8 val)   A=reg L=val
 _vdp_wreg:
@@ -168,7 +168,7 @@ _vdp_put_rect:
 	.area	_DATA
 r_w:	.ds	1
 
-	.area	_CODE
+	.area	_HOT		; RAM で実行（MEMORY_MAP の hot: 行）
 
 ; void vdp_load(const VdpXfer16 *x)   HL -> { u16 addr; const u8 *src; u16 len; }
 ; 連続した len バイトを VRAM へ（アトラスの読み込み用）。256 バイトずつ OTIR。

@@ -171,7 +171,7 @@ boot_main:
 	ld	(BANK_DATAB), a
 	ld	(_g_bank_dataB), a
 
-	ld	a, #0x81		; R800 ROM モード + LED（仕様 §2）。S1990 直書きは実ファームで暴走する
+	ld	a, #0x81		; R800 ROM モード（DECISIONS #73: DRAM モード 82h は実測で速くならなかった）。S1990 直書きは実ファームで暴走する
 	call	CHGCPU
 	call	gsinit
 	ei

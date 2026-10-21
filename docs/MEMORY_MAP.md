@@ -8,6 +8,9 @@
   中身はオフセット 16（窓の先頭 + 10h）から置く。バンク切替テストはこの見出しを読む。
 - 種別: 0=空き 1=コード 2=データA 3=データB
 - ソース `kernel` は SDCC のリンク結果のうち 0x4000-0x5FFF（バンクに載せないソース全部）。
+- ソース `hot: <ファイル…>` は RAM で実行するコード。SDCC の領域 `_HOT` に入り RAM の CC00h にリンクされる（asm は `.area _HOT` と自分で書く）。
+  ROM にはこのページに置き、起動時に `main` が最初に CC00h へ写す（DECISIONS #72）。静的 RAM（C000h〜）は CC00h を越えてはいけない。
+  スタックは DA00h〜HIMEM（DE67h）。
 - ソース `code: <ファイル…>` はコードバンク。そのソースは SDCC の領域 `_BANKn` に入り、0xn6010 にリンクされる
   （24bit 番地。下位 16bit が窓 6000h の中の位置）。Makefile はこの表からソース→バンクを決める。
 - 別バンクの関数は `FAR(...)` で定義し、カーネルに生成される中継を通して呼ぶ（`src/far.h`, DECISIONS #14）。
@@ -96,4 +99,6 @@
 | 77 | 6000h コード | CORE4 | code: src/core/evfight.c | レイド・バトル（イベントの型） |
 | 78 | 6000h コード | CORE5 | code: src/core/guildwar.c | ギルド対抗戦 |
 | 79 | 6000h コード | UI_GUILD | code: src/ui/guildwar_ui.c | ギルド対抗戦の画面 |
-| 80-127 | - | - | - | 空き |
+| 80 | 8000h データA | BGMDATA | build/bgm.bin | BGM の曲データ（割り込みから窓 A に載せて読む, tools/mml.py） |
+| 81 | RAM CC00h へ | HOTCODE | hot: src/sys/bgmdrv.c src/sys/text.c src/sys/vdp_asm.s src/sys/kanji_asm.s | 起動時に RAM CC00h〜D9FFh（最大 3,584 B）へ写して実行するコード。割り込みの BGM（4000h にどの ROM が出ていても動く）と、文字・VDP（R800 はカートリッジ ROM のコードが RAM の約 4 倍遅い） |
+| 82-127 | - | - | - | 空き |

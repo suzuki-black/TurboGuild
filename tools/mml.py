@@ -90,6 +90,24 @@ def compile_channel(text, where):
     return bytes(out)
 
 
+def channel_frames(body):
+    """チャンネルのバイト列の 1 周のフレーム数（ループ位置から終わりまで）"""
+    i, total, start = 0, 0, 0
+    while i < len(body):
+        b = body[i]
+        if b == 0xFF:
+            break
+        if b == 0xFE:
+            start = total
+            i += 1
+        elif b in (0x81, 0x82):
+            i += 2
+        else:
+            total += body[i + 1]
+            i += 2
+    return total - start
+
+
 def compile_song(path):
     chans = []
     for ln, line in enumerate(Path(path).read_text(encoding="utf-8").splitlines(), 1):
@@ -104,6 +122,9 @@ def compile_song(path):
             chans.append("")
         chans[idx] += m.group(2)
     bodies = [compile_channel(c, f"{path}") for c in chans]
+    lens = [channel_frames(b) for b in bodies]
+    if len(set(lens)) > 1:                  # 1 周の長さがずれるとループのたびに和音が崩れる
+        die(f"{path}: チャンネルごとの長さが違う（フレーム数 {lens}）")
     head = 1 + 2 * len(bodies)
     out = bytearray([len(bodies)])
     pos = head
@@ -116,25 +137,32 @@ def compile_song(path):
 
 
 def main(out, files):
+    """ヘッダ（曲の番号）と、曲データのページ（build/bgm.bin）を出す。
+    bgm.bin: [曲数 u8][各曲の先頭の位置 u16 × 曲数][曲…]。位置は bgm.bin の先頭から（窓 8000h+10h に載る）"""
     lines = ["/* bgm_data.h — tools/mml.py の生成物（data/bgm/ の .mml）。手で編集しない */",
              "#ifndef DATA_BGM_H", "#define DATA_BGM_H"]
-    names = []
+    songs = []
     for k, f in enumerate(files, 1):
         name = re.sub(r"^\d+", "", Path(f).stem).upper()   # 先頭の数字は並び順のためだけ
-        data = compile_song(f)
-        names.append(name)
+        songs.append(compile_song(f))
         lines.append(f"#define BGM_{name} {k}")
-        lines.append(f"#ifdef BGM_DATA_HERE")
-        lines.append(f"static const u8 song_{name.lower()}[{len(data)}] = {{ {', '.join(str(b) for b in data)} }};")
-        lines.append("#endif")
-    lines.append(f"#define BGM_COUNT {len(files)}")
-    lines += ["#ifdef BGM_DATA_HERE", "static const u8 * const songs[BGM_COUNT] = { " +
-              ", ".join(f"song_{n.lower()}" for n in names) + " };", "#endif", "#endif", ""]
+    lines += [f"#define BGM_COUNT {len(files)}", "#endif", ""]
     text = "\n".join(lines)
     p = Path(out)
     if not p.exists() or p.read_text(encoding="utf-8") != text:
         p.write_text(text, encoding="utf-8")
-    print(f"mml: {len(files)} 曲")
+    blob = bytearray([len(songs)])
+    pos = 1 + 2 * len(songs)
+    for s in songs:
+        blob += bytes([pos & 255, pos >> 8])
+        pos += len(s)
+    for s in songs:
+        blob += s
+    if len(blob) > 8192 - 16:
+        die(f"曲データが 1 ページに入らない（{len(blob)} B）")
+    Path("build").mkdir(exist_ok=True)
+    Path("build/bgm.bin").write_bytes(bytes(blob))
+    print(f"mml: {len(files)} 曲, {len(blob)} B")
 
 
 if __name__ == "__main__":

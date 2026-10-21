@@ -33,7 +33,7 @@ BANKSMK  := $(B)/banks.mk
 # --disable-warning 110: 「最適化で条件の流れを変えた」の通知。a ? 定数 : 定数 などで毎回出るだけ
 CFLAGS   := -mz80 --std-c99 --sdcccall 1 --opt-code-size --disable-warning 158 --disable-warning 110 -Isrc
 LDFLAGS  := -mz80 --no-std-crt0 --code-loc 0x4010 --data-loc 0xC000 \
-            $(foreach n,$(CODE_BANKS),-Wl-b_BANK$(n)=0x$(shell printf %X $(n))6010)
+            $(foreach n,$(CODE_BANKS),-Wl-b_BANK$(n)=0x$(shell printf %X $(n))6010) -Wl-b_HOT=$(HOT_ADDR)
 
 CSRC     := $(wildcard src/*.c src/sys/*.c src/core/*.c src/ui/*.c)
 ASRC     := $(filter-out src/sys/crt0.s,$(wildcard src/sys/*.s))
@@ -68,7 +68,9 @@ src/data/art.h src/data/palette.h: $(B)/art.stamp
 	@:
 
 src/data/bgm_data.h: tools/mml.py $(wildcard data/bgm/*.mml)
+	@mkdir -p $(B)
 	$(PYTHON) tools/mml.py $@ data/bgm/*.mml
+	@touch $@
 
 $(BANKSMK): docs/MEMORY_MAP.md tools/link_rom.py
 	$(PYTHON) tools/link_rom.py header src/data/rompages.h $(BANKSMK)
@@ -82,7 +84,7 @@ src/data/screens.h: $(B)/far_stubs.s
 
 $(B)/obj/%.rel: src/%.c $(HDRS) Makefile $(BANKSMK)
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) $(if $(BANK_OF_$<),--codeseg BANK$(BANK_OF_$<) --constseg BANK$(BANK_OF_$<)) -c -o $@ $<
+	$(CC) $(CFLAGS) $(if $(HOT_OF_$<),--codeseg HOT --constseg HOT,$(if $(BANK_OF_$<),--codeseg BANK$(BANK_OF_$<) --constseg BANK$(BANK_OF_$<))) -c -o $@ $<
 
 $(B)/obj/%.rel: src/%.s
 	@mkdir -p $(dir $@)

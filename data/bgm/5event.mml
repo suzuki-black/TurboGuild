@@ -1,4 +1,18 @@
 # イベント: お祭り風のニ長調（オリジナル）
+# 起承転結 × 4 小節 = 16 小節
+# 起: D Em-A D A-D（はじめの旋律）
 A: T5 @11 v2 L o5 l8 d f+ a f+ e g b g  f+ a >d< a g f+ e4  d f+ a f+ e g b >c+<  d4 a4 d4 r4
 B: T5 @14 v3 L o3 l4 d a d a  d a e a  d a e a  d a d r
 C: T5 @8 v6 L o4 l2 f+ g a e f+ g f+ r
+# 承: G D Em-A D（踊りの輪が広がる）
+A: o5 b4 a8 g8 b4 >d4<  a4 f+8 d8 a4 f+4  g8 f+8 e8 g8 a8 g8 f+8 e8  f+4 d4 d2
+B: o3 l4 g >d< g >d<  d a d a  e b a >e<  d a d r
+C: o4 l2 g b  f+ a  e c+  d r
+# 転: Bm G Em A（夕暮れのひと休み）
+A: o5 f+8 f+8 b4 a8 f+8 d4  g8 g8 b4 a8 g8 e4  e8 g8 b8 >e8< d8 b8 g8 e8  a4 c+4 e4 g4
+B: o3 l4 b >f+< b >f+<  g >d< g >d<  e b e b  a >e< a >e<
+C: o4 l2 d f+  d g  e g  c+ e
+# 結: D D G-A D（お祭りの締め）
+A: o5 l8 d f+ a f+ e g b g  f+ a >d< a g f+ e4  g8 b8 >d4< a8 >c+8 e4<  >d4< a4 >d2<
+B: o3 l4 d a d a  d a e a  g >d< a >e<  d a d r
+C: o4 l2 f+ g  a e  g a  f+ r

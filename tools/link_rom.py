@@ -20,6 +20,7 @@ PAGE = 0x2000
 HDR = 16
 KERNEL_BASE, KERNEL_END = 0x4000, 0x6000
 CODE_WIN, CODE_BASE, CODE_END = 0x6000, 0x6010, 0x8000
+HOT_ADDR, HOT_CAP = 0xCC00, 0xE00     # RAM で実行するコード（MEMORY_MAP の hot: 行）。CC00h-D9FFh
 KIND = {"コード": 1, "データA": 2, "データB": 3}
 
 
@@ -46,6 +47,10 @@ def code_files(r):
     return r["src"][5:].split() if r["src"].startswith("code:") else []
 
 
+def hot_files(r):
+    return r["src"][4:].split() if r["src"].startswith("hot:") else []
+
+
 def cmd_header(out, banks_mk):
     rows = parse_map()
     mk = ["# banks.mk — tools/link_rom.py が docs/MEMORY_MAP.md から生成"]
@@ -57,11 +62,17 @@ def cmd_header(out, banks_mk):
             mk.append(f"BANK_OF_{f} := {r['lo']}")
         if code_files(r):
             pages.append(str(r["lo"]))
+        for f in hot_files(r):
+            if not (ROOT / f).exists():
+                sys.exit(f"link_rom: MEMORY_MAP のページ {r['lo']} に載っている {f} が無い")
+            mk.append(f"HOT_OF_{f} := 1")
     mk.append(f"CODE_BANKS := {' '.join(pages)}")
+    mk.append(f"HOT_ADDR := 0x{HOT_ADDR:04X}")
     write_if_changed(banks_mk, "\n".join(mk) + "\n")
     lines = ["/* rompages.h — tools/link_rom.py が docs/MEMORY_MAP.md から生成。手で編集しない */",
              "#ifndef DATA_ROMPAGES_H", "#define DATA_ROMPAGES_H",
-             f"#define ROM_PAGE_COUNT {page_count(rows)}"]
+             f"#define ROM_PAGE_COUNT {page_count(rows)}",
+             f"#define HOT_ADDR 0x{HOT_ADDR:04X}", f"#define HOT_CAP {HOT_CAP}"]
     for r in rows:
         if r["name"] not in ("-", "") and r["lo"] == r["hi"]:
             lines.append(f"#define PAGE_{r['name']} {r['lo']}")
@@ -102,17 +113,19 @@ def parse_ihx(path):
 def split_code(mem, rows):
     """カーネル {addr: v} と、コードバンク {page: {addr16: v}} に分ける。"""
     code_pages = {r["lo"] for r in rows if code_files(r)}
-    kern, banks = {}, {}
+    kern, banks, hot = {}, {}, {}
     for a, v in mem.items():
         page, a16 = a >> 16, a & 0xFFFF
         if page == 0 and KERNEL_BASE <= a16 < KERNEL_END:
             kern[a16] = v
+        elif page == 0 and HOT_ADDR <= a16 < HOT_ADDR + HOT_CAP:
+            hot[a16] = v
         elif page in code_pages and CODE_BASE <= a16 < CODE_END:
             banks.setdefault(page, {})[a16] = v
         else:
             sys.exit(f"link_rom: 0x{a:06X} にリンクされた（カーネルは 0x4000-0x5FFF の 8KB、"
-                     f"コードバンク n は 0xn6010-0xn7FFF。溢れていないか）")
-    return kern, banks
+                     f"コードバンク n は 0xn6010-0xn7FFF、RAM 実行は 0x{HOT_ADDR:04X} から {HOT_CAP} B。溢れていないか）")
+    return kern, banks, hot
 
 
 def cmd_rom(ihx, out):
@@ -129,7 +142,12 @@ def cmd_rom(ihx, out):
             owner[o] = what
             rom[o] = b
 
-    kern, banks = split_code(parse_ihx(ihx), rows)
+    kern, banks, hot = split_code(parse_ihx(ihx), rows)
+    hot_page = next((r["lo"] for r in rows if hot_files(r)), None)
+    if hot and hot_page is None:
+        sys.exit("link_rom: RAM 実行のコードがあるのに MEMORY_MAP に hot: の行が無い")
+    for a, v in hot.items():
+        put(hot_page * PAGE + HDR + (a - HOT_ADDR), [v], "hot")
     for a, v in kern.items():
         put(a - KERNEL_BASE, [v], "kernel")
     for page, mem in banks.items():
@@ -141,7 +159,7 @@ def cmd_rom(ihx, out):
             if p == 0:
                 continue
             put(p * PAGE, bytes([p, ord("T"), ord("G"), ord("P"), r["kind"]]) + b"\xFF" * 11, "header")
-            if r["src"] not in ("-", "", "kernel") and not code_files(r):
+            if r["src"] not in ("-", "", "kernel") and not code_files(r) and not hot_files(r):
                 data = (ROOT / r["src"]).read_bytes()
                 if len(data) > PAGE - HDR:
                     sys.exit(f"link_rom: {r['src']} が {len(data)} B で 1 ページに入らない")
@@ -152,6 +170,9 @@ def cmd_rom(ihx, out):
     used0 = max(kern) - KERNEL_BASE + 1
     print(f"link_rom: {out} {len(rom)//1024}KB ASCII8 ({npages} ページ)")
     print(f"  kernel 0x4000-0x{KERNEL_BASE+used0-1:04X}  {used0:5d} / 8192 B (残り {8192-used0} B)")
+    if hot:
+        used = max(hot) - HOT_ADDR + 1
+        print(f"  hot   0x{HOT_ADDR:04X}-0x{HOT_ADDR+used-1:04X}  {used:5d} / {HOT_CAP} B（RAM で実行。残り {HOT_CAP-used} B）")
     for page in sorted(banks):
         used = max(banks[page]) - CODE_WIN + 1
         print(f"  bank{page:<2d} 0x6000-0x{CODE_WIN+used-1:04X}  {used:5d} / 8192 B (残り {8192-used} B)")

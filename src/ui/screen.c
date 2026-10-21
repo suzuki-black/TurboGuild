@@ -10,8 +10,6 @@
 #define cur      g_screen_cur
 #define next_scr g_screen_next
 
-void bgm_tick(void);
-
 void screen_change(const Screen *next) { next_scr = next; }
 
 static void apply_change(void)
@@ -31,7 +29,6 @@ void screen_run(void)
         vdp_wait_vsync();
         input_update();
         psg_tick();
-        bgm_tick();
         if (++g_frames >= 60) {
             g_frames = 0;
             time_sync();
