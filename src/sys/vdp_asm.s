@@ -124,7 +124,8 @@ _vdp_palette:
 
 ; void vdp_put_rect(const VdpRect *r)   HL -> { u16 addr; const u8 *buf; u8 w; u8 h; }
 ; SCREEN5 の矩形（w バイト × h 行）を CPU で書く。1 行 128 バイトなので行ごとにアドレスを設定し直す。
-; 1 回の呼び出し = 1 つの di 区間。
+; ★di は 1 行ずつ。大きな絵（カードの 2 倍表示で 8KB）を 1 つの di で書くと VBLANK 割り込みを
+;   何回も取りこぼし、BGM やフレーム待ちが遅れる（DECISIONS #74）。
 _vdp_put_rect:
 	ld	e, (hl)
 	inc	hl
@@ -146,7 +147,9 @@ _vdp_put_rect:
 	push	af
 	call	wait_cmd_raw
 	pop	af
+	ei
 1$:	push	af
+	di
 	ex	de, hl
 	call	setw_raw
 	ld	a, #128
@@ -159,10 +162,10 @@ _vdp_put_rect:
 	ld	b, a
 	ld	c, #VDP_DATA
 	otir
+	ei
 	pop	af
 	dec	a
 	jr	nz, 1$
-	ei
 	ret
 
 	.area	_DATA
@@ -172,6 +175,7 @@ r_w:	.ds	1
 
 ; void vdp_load(const VdpXfer16 *x)   HL -> { u16 addr; const u8 *src; u16 len; }
 ; 連続した len バイトを VRAM へ（アトラスの読み込み用）。256 バイトずつ OTIR。
+; 256 バイトごとに割り込みを通す（VRAM の番地は割り込みで変わらない: BIOS は S#0 を読むだけ）。
 _vdp_load:
 	ld	e, (hl)
 	inc	hl
@@ -202,6 +206,8 @@ _vdp_load:
 	jr	z, 3$
 1$:	ld	b, #0
 	otir
+	ei
+	di
 	dec	d
 	jr	nz, 1$
 3$:	ei

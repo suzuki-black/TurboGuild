@@ -72,7 +72,9 @@ extern u8 g_from_title;        /* タイトルの「つづきから」でマイ�
 typedef struct { u16 pos, loop; u8 wait, inst, hi, lo, on; } BgmCh;   /* BGM の 1 チャンネル（sys/bgmdrv.c） */
 extern BgmCh g_bgm_ch[3];
 extern u8 g_bgm_song, g_bgm_nch;
-extern u16 g_bgm_base;          /* 鳴らしている曲の、ページの中での位置 */
+extern u16 g_bgm_base;
+extern u16 g_bgm_ticks;
+extern u16 g_bgm_clock, g_bgm_acc;   /* テンポの時計（システムタイマーの値と、たまった経過） */         /* BGM を進めた回数（1/60 秒単位。テンポの確認用） */          /* 鳴らしている曲の、ページの中での位置 */
 extern volatile u8 g_isr_safe;  /* 1 = 割り込みからカーネルを呼んでよい（ディスクの間は 0） */
 extern u8 g_timi_stub[17];      /* H.TIMI から飛ぶ RAM の入口（sys/bgmdrv.c） */
 extern u8 g_nosave_warned;    /* 「セーブできません」は 1 回だけ出す */

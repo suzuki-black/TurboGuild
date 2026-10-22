@@ -5,13 +5,39 @@
  * ★割り込みはカーネル（4000h〜）を呼ぶので、カートリッジが 4000h に居ないとき（ディスクの読み書きで
  *   ディスク ROM が出ている間）は呼んではいけない。H.TIMI からはまず RAM の小さな入口に飛び、
  *   g_isr_safe が 0 なら何もせず元のフックへつなぐ。ディスクの前後は bgm_hold / bgm_release で包む
- *   （鳴っている音を消して止め、終わったら同じところから続ける）。 */
+ *   （鳴っている音を消して止め、終わったら同じところから続ける）。
+ * ★テンポは割り込みの回数でなく時計で数える（DECISIONS #74）。turboR のシステムタイマー（I/O E6h/E7h,
+ *   3.911µs ごとに 1 進む 16bit）で前の割り込みからの経過を測り、その分だけ 1/60 秒ずつ進める。
+ *   処理が重くて割り込みを取りこぼしても、次の割り込みで追いつく（曲のテンポは処理の重さで変わらない）。 */
 #include "bgmdrv.h"
 #include "../ram.h"
 #include "../data/rompages.h"
 
 __sfr __at 0x7C opll_addr;
 __sfr __at 0x7D opll_data;
+__sfr __at 0xE6 sys_timer_lo;
+__sfr __at 0xE7 sys_timer_hi;
+
+#define TICK_UNITS 4262u        /* 1/60 秒 = 16,667µs ÷ 3.911µs */
+#define MAX_CATCHUP 15          /* 1 回の割り込みで追いつく上限（1/4 秒ぶん） */
+
+/* システムタイマーを読む（上位を読む間に下位が繰り上がったら読み直す） */
+static u16 timer_now(void)
+{
+    u8 h, l;
+    do {
+        h = sys_timer_hi;
+        l = sys_timer_lo;
+    } while (h != sys_timer_hi);
+    return (u16)((h << 8) | l);
+}
+
+/* いまから数え直す（曲の始め・ディスクの後。止まっていた時間は追いかけない） */
+static void clock_reset(void)
+{
+    g_bgm_clock = timer_now();
+    g_bgm_acc = 0;
+}
 
 #define REG_DATAA (*(volatile u8 *)0x7000)
 #define PAGE_BASE ((const u8 *)0x8010)       /* ページの中身は窓の先頭 + 10h から */
@@ -72,21 +98,41 @@ static void step(u8 ch, const u8 *s)
     }
 }
 
-/* 割り込みから 1/60 秒ごとに呼ばれる */
-void bgm_isr(void)
+static void tick(const u8 *s)
 {
-    const u8 *s;
     u8 ch;
-    if (!g_bgm_song) return;
-    REG_DATAA = PAGE_BGMDATA;
-    s = PAGE_BASE + g_bgm_base;
+    g_bgm_ticks++;
     for (ch = 0; ch < g_bgm_nch; ch++) {
         BgmCh *c = &g_bgm_ch[ch];
         if (c->wait == 0) continue;              /* 止まったチャンネル */
         if (--c->wait == 0) step(ch, s);
     }
+}
+
+/* VBLANK 割り込みから呼ばれる。前の呼び出しからの実時間ぶん進める */
+void bgm_isr(void)
+{
+    u16 now;
+    u8 n = 0;
+    if (!g_bgm_song) return;
+    now = timer_now();
+    if (now == g_bgm_clock) {                    /* タイマーが動かない機械: 1 回 = 1/60 秒とみなす */
+        g_bgm_acc = TICK_UNITS;
+    } else {
+        g_bgm_acc += (u16)(now - g_bgm_clock);
+        g_bgm_clock = now;
+    }
+    REG_DATAA = PAGE_BGMDATA;
+    while (g_bgm_acc >= TICK_UNITS && n < MAX_CATCHUP) {
+        g_bgm_acc -= TICK_UNITS;
+        tick(PAGE_BASE + g_bgm_base);
+        n++;
+    }
+    if (n == MAX_CATCHUP) g_bgm_acc = 0;         /* 長く止まっていたら追いかけきらない */
     REG_DATAA = g_bank_dataA;                    /* メインが載せていたページへ戻す */
 }
+
+void bgm_clock_reset(void) { clock_reset(); }
 
 void bgm_silence(void)
 {
@@ -133,5 +179,6 @@ void bgm_release(void)
         opll_w((u8)(0x10 + ch), c->lo);
         opll_w((u8)(0x20 + ch), (u8)(0x10 | c->hi));
     }
+    clock_reset();                               /* 止まっていた間は追いかけない */
     g_isr_safe = 1;
 }

@@ -44,6 +44,7 @@ FAR(void, bgm_play, (u8 song))
             c->on = 0;
             opll_w((u8)(0x30 + ch), 0x30);
         }
+        bgm_clock_reset();
         g_bgm_song = song;
     }
     __asm__("ei");

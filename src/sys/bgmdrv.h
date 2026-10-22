@@ -10,4 +10,5 @@ void bgm_silence(void);
 void bgm_install(void);     /* 起動時に 1 回: H.TIMI へつなぐ */
 void bgm_hold(void);        /* ディスクの前 */
 void bgm_release(void);     /* ディスクの後 */
+void bgm_clock_reset(void); /* 曲の始めに時計を合わせる */
 #endif

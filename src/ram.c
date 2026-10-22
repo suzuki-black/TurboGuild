@@ -54,6 +54,8 @@ u8 g_from_title;
 BgmCh g_bgm_ch[3];
 u8 g_bgm_song, g_bgm_nch;
 u16 g_bgm_base;
+u16 g_bgm_ticks;
+u16 g_bgm_clock, g_bgm_acc;
 volatile u8 g_isr_safe;
 u8 g_timi_stub[17];
 u8 g_nosave_warned;
