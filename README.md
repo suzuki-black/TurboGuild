@@ -2,7 +2,7 @@
 # TurboGuild
 
 <p align="center">
-  <img src="docs/img/title.png" width="640" alt="TurboGuild — title screen (English version)">
+  <img src="docs/img/title_en.png" width="640" alt="TurboGuild — title screen (English version)">
 </p>
 
 > ⚠️ **This is a prototype** (work in progress), published for feedback and experimentation.
@@ -19,7 +19,7 @@
 **Repository / リポジトリ:** <https://github.com/suzuki-black/TurboGuild>
 
 <p align="center">
-  <img src="docs/img/screens_events.png" width="640" alt="Raid, battle and guild war (English version)">
+  <img src="docs/img/screens_events_en.png" width="640" alt="Raid, battle and guild war (English version)">
 </p>
 
 **Language / 言語:** [🇬🇧 English](#english) · [🇯🇵 日本語](#japanese)
