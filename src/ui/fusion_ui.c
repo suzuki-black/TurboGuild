@@ -32,13 +32,19 @@ static u8 usable(u16 i)
     return (u8)(i != g_fuse.base && !inv_in_deck(i));
 }
 
-static void cell(u16 i)
+void card_sort(void);
+
+/* 表示位置 n のカードの添字（一覧と同じ並べ方, g_order） */
+static u16 at(u16 n) { return g_order[n]; }
+
+static void cell(u16 n)
 {
-    u16 k = i - g_list.top;
+    u16 k = n - g_list.top, i;
     u8 x = (u8)((k % COLS) * CELL_W + 2), y = (u8)(GRID_Y + (k / COLS) * CELL_H);
-    u8 on = (u8)(i == g_list.cursor), sel;
+    u8 on = (u8)(n == g_list.cursor), sel;
     vdp_fill(x, y, CELL_W - 2, CELL_H - 2, COL_BLACK);
-    if (i >= g_list.count) return;
+    if (n >= g_list.count) return;
+    i = at(n);
     sel = (u8)(SEL_GET(g_fuse.sel, i) != 0);
     vdp_fill(x, y, CELL_W - 2, CELL_H - 2, on ? COL_YELLOW : (sel ? COL_ORANGE : COL_DGRAY));
     vdp_fill((u16)x + 2, (u16)y + 2, CELL_W - 6, CELL_H - 6, sel ? COL_DRED : COL_DBLUE);
@@ -118,6 +124,7 @@ FAR(void, fuse_init, (void))
 {
     g_fuse.base = g_sel_card;
     clear_sel();
+    card_sort();
     g_list.count = g_save.card_count;
     g_list.cursor = 0;
     g_list.top = 0;
@@ -202,11 +209,11 @@ FAR(void, fuse_update, (void))
     u8 d = input_digit();
     grid_move(p);
     if (p & BTN_OK) {
-        u16 i = g_list.cursor;
+        u16 i = at(g_list.cursor);
         if (usable(i)) {
             if (SEL_GET(g_fuse.sel, i)) SEL_CLR(g_fuse.sel, i); else SEL_SET(g_fuse.sel, i);
             psg_beep(0x0C0, 3);
-            cell(i);
+            cell(g_list.cursor);
             info();
         }
     }
@@ -223,10 +230,11 @@ FAR(void, evo_init, (void))
 {
     g_fuse.base = g_sel_card;
     clear_sel();
+    card_sort();
     g_list.count = g_save.card_count;
     g_list.cursor = 0;
     g_list.top = 0;
-    while (g_list.cursor < g_list.count && !evolve_partner_ok(g_fuse.base, g_list.cursor)) g_list.cursor++;
+    while (g_list.cursor < g_list.count && !evolve_partner_ok(g_fuse.base, at(g_list.cursor))) g_list.cursor++;
 }
 
 FAR(void, evo_draw, (void))
@@ -278,10 +286,10 @@ FAR(void, evo_update, (void))
     u8 p = input_pressed();
     if (g_list.cursor < g_list.count) grid_move(p);
     if ((p & BTN_OK) && g_list.cursor < g_list.count) {
-        if (!evolve_partner_ok(g_fuse.base, g_list.cursor)) { psg_beep(0x300, 4); return; }
+        if (!evolve_partner_ok(g_fuse.base, at(g_list.cursor))) { psg_beep(0x300, 4); return; }
         if (g_save.gold < 100) { ui_msg(T_NO_GOLD); return; }
         if (!ui_confirm(T_EVO_CONFIRM)) return;
-        evo_anim(g_list.cursor);
+        evo_anim(at(g_list.cursor));
         return;
     }
     if (p & BTN_CANCEL) screen_change(&scr_carddetail);

@@ -84,11 +84,11 @@ static void stage_btn(u8 kind, u8 level)
     ui_box(x, BTN_Y, 62, 40, bg, COL_ORANGE);
     ui_key(level, (u8)(x + 3), BTN_Y + 4);
     if (kind == EV_RAID && level == 3) {             /* レイドの 3 は救援依頼 */
-        txt_id((u8)(x / 8 + 2), BTN_Y + 2, T_EV_RESCUE, g_save.raid_rescued ? COL_LGRAY : COL_YELLOW, bg);
+        txt_id((u8)((x + 20) / 8), BTN_Y + 2, T_EV_RESCUE, g_save.raid_rescued ? COL_LGRAY : COL_YELLOW, bg);
         return;
     }
     event_stage(level, &es);
-    txt_id((u8)(x / 8 + 2), BTN_Y + 2, btn_text(kind, level), COL_YELLOW, bg);
+    txt_id((u8)((x + 20) / 8), BTN_Y + 2, btn_text(kind, level), COL_YELLOW, bg);   /* 数字キー（x+3〜15）と離す */
     cx = txt_id((u8)(x / 8 + 1), BTN_Y + 20, T_AP, COL_LGRAY, bg);
     txt_num(cx, BTN_Y + 20, es.ap, COL_WHITE, bg);
 }
@@ -102,8 +102,9 @@ static void raid_status(void)
     cx = txt_id(5, 132, T_RAID_LV, COL_YELLOW, COL_BLACK);
     cx = txt_num(cx, 132, g_save.raid_lv, COL_YELLOW, COL_BLACK);
     cx = txt_id((u8)(cx + 1), 132, T_RAID_HP, COL_LGRAY, COL_BLACK);
-    txt_num((u8)(cx + 1), 132, g_save.raid_hp, COL_WHITE, COL_BLACK);
-    gfx_gauge(40, 146, 208, (u16)(g_save.raid_hp >> 6), (u16)(raid_max_hp(g_save.raid_lv) >> 6), COL_RED);
+    cx = txt_num((u8)(cx + 1), 132, g_save.raid_hp, COL_WHITE, COL_BLACK);
+    gfx_gauge((u8)(cx * 8 + 8), 137, (u8)(SCREEN_W - 8 - (cx * 8 + 8)), (u16)(g_save.raid_hp >> 6),
+              (u16)(raid_max_hp(g_save.raid_lv) >> 6), COL_RED);   /* 同じ行の右に（下のボタンに食い込まない） */
 }
 
 /* 救援依頼: 来てくれた仲間と削った HP を並べる */
@@ -168,10 +169,10 @@ FAR(void, evtop_draw, (void))
     }
     tbl_card(e.bonus_card, &bonus);
     gfx_thumb(e.bonus_card, 4, 112);
-    cx = txt_id(5, 118, T_EV_BONUS, COL_RED, COL_BLACK);
-    cx = txt_id((u8)(cx + 1), 118, bonus.name_text, rarity_color(bonus.rarity), COL_BLACK);
-    cx = txt_draw(cx, 118, "x", COL_LGRAY, COL_BLACK);
-    txt_num(cx, 118, e.bonus_mul, COL_YELLOW, COL_BLACK);
+    cx = txt_id(5, 114, T_EV_BONUS, COL_RED, COL_BLACK);       /* 114〜130。レイドの行は 132〜148 */
+    cx = txt_id((u8)(cx + 1), 114, bonus.name_text, rarity_color(bonus.rarity), COL_BLACK);
+    cx = txt_draw(cx, 114, "x", COL_LGRAY, COL_BLACK);
+    txt_num(cx, 114, e.bonus_mul, COL_YELLOW, COL_BLACK);
     if (kind == EV_RAID) raid_status();
     for (lv = 1; lv <= EVENT_LEVELS; lv++) stage_btn(kind, lv);
     ui_box(196, BTN_Y, 58, 40, COL_DBLUE, COL_CYAN);

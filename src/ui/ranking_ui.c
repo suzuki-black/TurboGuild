@@ -16,6 +16,8 @@
 #include "../sys/vdp.h"
 
 #define LIST_Y 36
+#define ROW_H  16          /* 文字の高さ。15 だと下の行に食い込む */
+#define SHOW   9           /* 36 + 16 × 9 = 180（案内の行は 192 から） */
 
 static const u8 medal[3] = { COL_YELLOW, COL_LGRAY, COL_ORANGE };
 
@@ -30,12 +32,13 @@ static void tabs(void)
     }
 }
 
-static void row(u8 k)
+/* rows[k] を画面の pos 行目に描く */
+static void row(u8 k, u8 pos)
 {
     const RankRow *r = &g_rank.rows[k];
-    u8 y = (u8)(LIST_Y + k * 15), me = (u8)(r->npc == RANK_PLAYER), cx;
+    u8 y = (u8)(LIST_Y + pos * ROW_H), me = (u8)(r->npc == RANK_PLAYER), cx;
     u8 bg = me ? COL_BLUE : (k & 1 ? COL_BLACK : COL_DGRAY);
-    vdp_fill(0, y, SCREEN_W, 15, bg);
+    vdp_fill(0, y, SCREEN_W, ROW_H, bg);
     if (r->rank <= 3) vdp_fill(2, (u16)y + 2, 10, 11, medal[r->rank - 1]);
     txt_num_r(1, y, r->rank, 4, me ? COL_YELLOW : COL_WHITE, bg);
     if (me) {
@@ -52,12 +55,14 @@ static void row(u8 k)
 
 static void list(void)
 {
-    u8 k;
+    u8 k, s = 0;
     g_ui_state = UIS_BUSY;                 /* 描き直しの間（自動試験が途中で撮らないように） */
     ranking_list(&g_rank);
     g_rank.first = g_rank.rows[0].rank;
-    vdp_fill(0, LIST_Y, SCREEN_W, 150, COL_BLACK);
-    for (k = 0; k < g_rank.n; k++) row(k);
+    vdp_fill(0, LIST_Y, SCREEN_W, ROW_H * SHOW, COL_BLACK);
+    for (k = 0; k < g_rank.n; k++)                 /* 自分の行が 9 行目より下なら、そこが見えるようずらす */
+        if (g_rank.rows[k].npc == RANK_PLAYER && k >= SHOW) s = (u8)(k - SHOW + 1);
+    for (k = s; k < g_rank.n && k < s + SHOW; k++) row(k, (u8)(k - s));
     {                                      /* 自分の順位は見出しの右に */
         u8 cx;
         vdp_fill(128, 0, 128, 15, COL_DBLUE);

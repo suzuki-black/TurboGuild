@@ -43,9 +43,9 @@ static void draw_menu(void)
     u8 i, n = ended() ? 3 : can_continue() ? 2 : 1;
     for (i = 0; i < n; i++) {
         u8 y = (u8)((ended() ? 132 : 146) + i * 20), on = (u8)(i == g_cursor);
-        ui_box(64, y, 128, 20, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
-        ui_key((u8)(i + 1), 68, (u8)(y + 4));
-        txt_id(11, (u8)(y + 2), items[i], on ? COL_YELLOW : COL_WHITE, on ? COL_BLUE : COL_DBLUE);
+        ui_box(48, y, 160, 20, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);   /* 「思い出をリセット」が入る幅 */
+        ui_key((u8)(i + 1), 52, (u8)(y + 4));
+        txt_id(9, (u8)(y + 2), items[i], on ? COL_YELLOW : COL_WHITE, on ? COL_BLUE : COL_DBLUE);
     }
 }
 

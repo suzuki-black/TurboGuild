@@ -91,11 +91,12 @@ static u8 is_lead(u8 c)
 u8 txt_draw(u8 cx, u8 y, const char *s, u8 fg, u8 bg)
 {
     u8 lut[4];
+    u8 lim = g_txt_maxcol ? g_txt_maxcol : TEXT_COLS;   /* 枠の中で止める（0 = 画面の右端） */
     make_lut(fg, bg, lut);
-    while (*s && cx < TEXT_COLS) {
+    while (*s && cx < lim) {
         u8 c = (u8)*s;
         if (is_lead(c) && s[1]) {
-            if (cx + 1 >= TEXT_COLS) break;
+            if (cx + 1 >= lim) break;
             s++;
             draw_wide(cx, y, sjis_index(c, (u8)*s++), lut);
             cx += 2;

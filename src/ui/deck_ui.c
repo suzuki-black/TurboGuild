@@ -27,16 +27,16 @@ static void slot(u8 i)
     u8 x = (u8)(4 + i * 42), on = (u8)(i == g_cursor);
     u8 idx;
     if (i == DECK_SIZE) {
-        ui_box(214, SLOT_Y, 40, 48, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
+        ui_box(214, SLOT_Y, 40, 50, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
         ui_key(6, 218, SLOT_Y + 4);
         gfx_sprite(ATL_ICON_DECK, 222, SLOT_Y + 18);
         return;
     }
-    ui_box(x, SLOT_Y, 40, 48, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
-    ui_key((u8)(i + 1), (u8)(x + 2), SLOT_Y + 2);
+    ui_box(x, SLOT_Y, 40, 50, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
     idx = g_save.deck[i];
-    if (idx != DECK_EMPTY && idx < g_save.card_count) gfx_thumb(g_save.cards[idx].id, (u8)(x + 6), SLOT_Y + 8);
-    else gfx_part(ATL_CARDBACK_S, (u8)(x + 6), SLOT_Y + 8);
+    if (idx != DECK_EMPTY && idx < g_save.card_count) gfx_thumb(g_save.cards[idx].id, (u8)(x + 6), SLOT_Y + 2);
+    else gfx_part(ATL_CARDBACK_S, (u8)(x + 6), SLOT_Y + 2);
+    ui_key((u8)(i + 1), (u8)(x + 14), SLOT_Y + 39);   /* 数字キーは絵の下（絵の左上のレア度の札を隠さない） */
 }
 
 static void detail(void)
@@ -150,7 +150,8 @@ FAR(void, deckpick_draw, (void))
     ui_clear();
     ui_header(T_DECK_PICK);
     grid_draw();
-    ui_guide(T_GUIDE_LIST);
+    ui_guide(T_GUIDE_PICK);
+    grid_sort_label();
 }
 
 FAR(void, deckpick_update, (void))

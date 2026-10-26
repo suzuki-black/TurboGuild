@@ -55,6 +55,9 @@ extern UiList g_list;         /* 一覧画面の状態（同時に使うのは 1
 extern u8 g_deck_slot;
 extern u8 g_replay;
 extern u8 g_grid_remove;
+extern u8 g_order[CARD_MAX];   /* カード一覧の表示順（表示位置 → 所持カードの添字, ui/card_ui.c の card_sort） */
+extern u8 g_card_sort;
+extern u8 g_txt_maxcol;        /* 文字をこの桁の手前で止める（0 = 画面の右端, sys/text.c） */         /* 並べ方: 0 入手順 1 レア度 2 攻撃 3 コスト */
 extern u8 g_paid;
 extern FuseReq g_fuse;         /* 合成の選択 */
 extern EventResult g_evres;    /* イベントの開幕・終了のお知らせ */

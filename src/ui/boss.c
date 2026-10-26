@@ -123,7 +123,7 @@ static void outcome(void)
     }
     txt_id(16, (u8)(y + 4), g_qr.b.win ? T_WIN : T_LOSE, COL_YELLOW, g_qr.b.win ? COL_DRED : COL_DBLUE);
     psg_beep(g_qr.b.win ? 0x050 : 0x300, 20);
-    if (!g_qr.b.win) return;
+    if (!g_qr.b.win) { txt_id(16, (u8)(y + 22), T_LOSE2, COL_WHITE, COL_DBLUE); return; }
     cx = txt_id(16, (u8)(y + 22), T_EXP, COL_CYAN, COL_DRED);
     txt_num((u8)(cx + 1), (u8)(y + 22), g_qr.exp, COL_WHITE, COL_DRED);
     cx = txt_id(16, (u8)(y + 40), T_GOLD, COL_YELLOW, COL_DRED);

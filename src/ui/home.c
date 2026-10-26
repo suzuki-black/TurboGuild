@@ -25,11 +25,12 @@ void bgm_play(u8 song);
 #include "../sys/vdp.h"
 
 #define ITEMS    8
-#define MENU_Y   118
-#define CELL_W   64
-#define CELL_H   39
 #define BANNER_Y 92
-#define TICK_Y   ROW_LAST
+#define BANNER_H 18        /* 文字 16 + 上下 1 */
+#define MENU_Y   110
+#define CELL_W   64
+#define CELL_H   43        /* 絵 2〜26・名前 24〜40・枠 41〜42 */
+#define TICK_Y   196       /* 流れるお知らせは画面の最下段（196〜211） */
 
 static const u16 labels[ITEMS] = {
     T_M_QUEST, T_M_GACHA, T_M_CARD, T_M_DECK, T_M_SHOP, T_M_RANK, T_M_SAVE, T_M_NEWS,
@@ -51,7 +52,7 @@ static void cell(u8 i)
     ui_box(x, y, CELL_W, CELL_H, bg, on ? COL_YELLOW : COL_DGRAY);
     gfx_sprite(icons[i][0], icons[i][1], 24, 24, (u8)(x + 20), (u8)(y + 2));
     ui_key((u8)(i + 1), (u8)(x + 4), (u8)(y + 4));
-    txt_id((u8)((x + (CELL_W - w * 8) / 2) / 8), (u8)(y + 22), labels[i], on ? COL_YELLOW : COL_WHITE, bg);
+    txt_id((u8)((x + (CELL_W - w * 8) / 2) / 8), (u8)(y + 24), labels[i], on ? COL_YELLOW : COL_WHITE, bg);
 }
 
 static void banner(void);
@@ -76,46 +77,47 @@ static void leader(void)
 static void banner(void)
 {
     u8 k, on = (u8)(g_cursor == ITEMS);
-    vdp_fill(0, BANNER_Y, SCREEN_W, 26, on ? COL_YELLOW : COL_BLACK);
-    for (k = 0; k < 4; k++) vdp_fill(1, (u16)(BANNER_Y + 1 + k * 6), SCREEN_W - 2, 6, (u8)(k & 1 ? COL_RED : COL_DRED));
+    vdp_fill(0, BANNER_Y, SCREEN_W, BANNER_H, on ? COL_YELLOW : COL_BLACK);
+    for (k = 0; k < 4; k++) vdp_fill(1, (u16)(BANNER_Y + 1 + k * 4), SCREEN_W - 2, 4, (u8)(k & 1 ? COL_RED : COL_DRED));
+    g_txt_maxcol = 30;                             /* 右端のきらめき（244〜）の手前で止める */
     if (g_save.event_id) {
         EventRec e;
         u8 cx;
         tbl_event((u8)g_save.event_id, &e);
-        ui_key(9, 2, BANNER_Y + 7);
-        cx = txt_id(2, BANNER_Y + 4, e.name_text, COL_YELLOW, COL_DRED);
-        cx = txt_id((u8)(cx + 1), BANNER_Y + 4, T_EV_LEFT, COL_WHITE, COL_DRED);
-        cx = txt_num(cx, BANNER_Y + 4, event_days_left(), COL_YELLOW, COL_DRED);
-        txt_id(cx, BANNER_Y + 4, T_DAYS, COL_WHITE, COL_DRED);
+        ui_key(9, 2, BANNER_Y + 4);
+        cx = txt_id(2, BANNER_Y + 1, e.name_text, COL_YELLOW, COL_DRED);
+        cx = txt_id((u8)(cx + 1), BANNER_Y + 1, T_EV_LEFT, COL_WHITE, COL_DRED);
+        cx = txt_num(cx, BANNER_Y + 1, event_days_left(), COL_YELLOW, COL_DRED);
+        txt_id(cx, BANNER_Y + 1, T_DAYS, COL_WHITE, COL_DRED);
     } else if (g_save.gvg_war) {
         GvgNow n;
         u8 cx;
         gvg_now(&n);
-        ui_key(9, 2, BANNER_Y + 7);
-        cx = txt_id(2, BANNER_Y + 4, T_GVG_TITLE, COL_YELLOW, COL_DRED);
+        ui_key(9, 2, BANNER_Y + 4);
+        cx = txt_id(2, BANNER_Y + 1, T_GVG_TITLE, COL_YELLOW, COL_DRED);
         if (n.now) {
-            txt_id((u8)(cx + 1), BANNER_Y + 4, T_GVG_ONAIR, COL_WHITE, COL_DRED);
+            txt_id((u8)(cx + 1), BANNER_Y + 1, T_GVG_ONAIR, COL_WHITE, COL_DRED);
         } else {
-            cx = txt_id((u8)(cx + 1), BANNER_Y + 4, T_GVG_NEXT, COL_WHITE, COL_DRED);
-            cx = txt_num(cx, BANNER_Y + 4, n.left_min, COL_YELLOW, COL_DRED);
-            txt_id(cx, BANNER_Y + 4, T_GVG_MIN, COL_WHITE, COL_DRED);
+            cx = txt_id((u8)(cx + 1), BANNER_Y + 1, T_GVG_NEXT, COL_WHITE, COL_DRED);
+            cx = txt_num(cx, BANNER_Y + 1, n.left_min, COL_YELLOW, COL_DRED);
+            txt_id(cx, BANNER_Y + 1, T_GVG_MIN, COL_WHITE, COL_DRED);
         }
     } else {
         TlState tl;
         u16 tx;
         u8 cx;
         timeline_state(&tl);
-        gfx_sprite(ATL_ICON_GACHA, 4, BANNER_Y);
         if (tl.announce) {                         /* 終了の告知が最優先 */
-            cx = txt_id(4, BANNER_Y + 4, T_END_SOON, COL_YELLOW, COL_DRED);
-            cx = txt_num((u8)(cx + 1), BANNER_Y + 4, tl.days_to_end, COL_WHITE, COL_DRED);
-            txt_id(cx, BANNER_Y + 4, T_DAYS, COL_YELLOW, COL_DRED);
+            cx = txt_id(1, BANNER_Y + 1, T_END_SOON, COL_YELLOW, COL_DRED);
+            cx = txt_num((u8)(cx + 1), BANNER_Y + 1, tl.days_to_end, COL_WHITE, COL_DRED);
+            txt_id(cx, BANNER_Y + 1, T_DAYS, COL_YELLOW, COL_DRED);
         } else if (tl.rateup_pct > 100) {
-            txt_id(4, BANNER_Y + 4, T_RATEUP_ON, COL_YELLOW, COL_DRED);
+            txt_id(1, BANNER_Y + 1, T_RATEUP_ON, COL_YELLOW, COL_DRED);
         } else if (timeline_news(0, &tx)) {
-            txt_id(4, BANNER_Y + 4, tx, COL_YELLOW, COL_DRED);
+            txt_id(1, BANNER_Y + 1, tx, COL_YELLOW, COL_DRED);
         }
     }
+    g_txt_maxcol = 0;
     gfx_sprite(ATL_SPARK, 244, BANNER_Y + 2);
 }
 

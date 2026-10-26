@@ -46,7 +46,10 @@ static void cell(u8 i, u8 today)
     cx = txt_num((u8)(x / 8 + 1), CELL_Y + 2, i + 1, COL_WHITE, today ? COL_BLUE : COL_DBLUE);
     (void)cx;
     gfx_sprite(item_icon[lr.item][0], item_icon[lr.item][1], 14, 14, (u8)(x + 10), CELL_Y + 22);
-    gfx_num((u8)(x + 4), CELL_Y + 44, lr.amount);
+    {                                             /* 量は数字の幅（1 桁 7 ドット）でマスの真ん中に。1000 も枠に収まる */
+        u8 n = (u8)(lr.amount >= 1000 ? 4 : lr.amount >= 100 ? 3 : lr.amount >= 10 ? 2 : 1);
+        gfx_num((u8)(x + (33 - (n * 7 + 1)) / 2), CELL_Y + 44, lr.amount);
+    }
 }
 
 FAR(void, login_draw, (void))

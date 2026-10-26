@@ -66,11 +66,34 @@ static void box(u8 lines)
     ui_box(BOX_X, 72, BOX_W, (u8)(16 * lines + 12), COL_DBLUE, COL_CYAN);
 }
 
+#define WRAP_COL 30          /* 箱の中の右端（BOX_X + BOX_W = 248 = 31 桁目は枠） */
+
+/* 箱に入る行数（28 桁で折り返す。最大 3 行） */
+static u8 lines_of(u16 id)
+{
+    u8 w = txt_id_width(id);
+    return (u8)(w <= 28 ? 1 : w <= 56 ? 2 : 3);
+}
+
+/* 箱の中に折り返して描く */
+static void wrap_text(u8 y, u16 id, u8 fg)
+{
+    const char *s = txt_ptr(id);
+    u8 n;
+    g_txt_maxcol = WRAP_COL;
+    for (n = 0; n < 3 && *s; n++) {
+        txt_draw(2, (u8)(y + n * 16), s, fg, COL_DBLUE);
+        s = g_txt_rest;
+    }
+    g_txt_maxcol = 0;
+}
+
 FAR(void, ui_msg, (u16 id))
 {
-    box(2);
-    txt_id(2, 78, id, COL_WHITE, COL_DBLUE);
-    ui_key(0, 234, 96);
+    u8 n = lines_of(id);
+    box((u8)(n + 1));
+    wrap_text(78, id, COL_WHITE);
+    ui_key(0, 234, (u8)(80 + n * 16));
     psg_beep(0x90, 4);
     ui_wait_key();
     g_dirty = 1;          /* 下の画面を描き直してもらう */
@@ -79,18 +102,18 @@ FAR(void, ui_msg, (u16 id))
 FAR(u8, ui_confirm, (u16 id))
 {
     static const u16 yn[2] = { T_YES, T_NO };
-    u8 cur = 0;
-    box(3);
-    txt_id(2, 78, id, COL_YELLOW, COL_DBLUE);
-    ui_box(56, 96, 56, 20, cur == 0 ? COL_BLUE : COL_DBLUE, COL_WHITE);
+    u8 cur = 0, n = lines_of(id), by;
+    box((u8)(n + 2));
+    wrap_text(78, id, COL_YELLOW);
+    by = (u8)(80 + n * 16);                       /* はい / いいえ の行 */
     g_ui_state = UIS_WAITKEY;
     for (;;) {
         u8 p;
         u8 i;
         for (i = 0; i < 2; i++) {
             u8 x = (u8)(56 + i * 88);
-            ui_box(x, 96, 56, 20, i == cur ? COL_BLUE : COL_DBLUE, i == cur ? COL_YELLOW : COL_LGRAY);
-            txt_id((u8)(x / 8 + 2), 98, yn[i], COL_WHITE, i == cur ? COL_BLUE : COL_DBLUE);
+            ui_box(x, by, 56, 20, i == cur ? COL_BLUE : COL_DBLUE, i == cur ? COL_YELLOW : COL_LGRAY);
+            txt_id((u8)(x / 8 + 2), (u8)(by + 2), yn[i], COL_WHITE, i == cur ? COL_BLUE : COL_DBLUE);
         }
         do {
             ui_frame();

@@ -34,7 +34,7 @@ static void draw_choice(void)
     static const u16 labels[2] = { T_FG_REROLL, T_FG_DECIDE };
     u8 i;
     for (i = 0; i < 2; i++) {
-        u8 x = (u8)(i ? 104 : 4), w = (u8)(i ? 148 : 96), on = (u8)(i == g_cursor);
+        u8 x = (u8)(i ? 112 : 8), w = (u8)(i ? 136 : 96), on = (u8)(i == g_cursor);
         ui_box(x, CHOICE_Y, w, 20, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
         ui_key((u8)(i + 1), (u8)(x + 4), CHOICE_Y + 4);
         txt_id((u8)(x / 8 + 2), CHOICE_Y + 2, labels[i], on ? COL_YELLOW : COL_WHITE, on ? COL_BLUE : COL_DBLUE);

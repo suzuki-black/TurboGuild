@@ -370,8 +370,33 @@ FRAME_COLS = {
 RAINBOW = ["RED", "ORANGE", "YELLOW", "GREEN", "CYAN", "BLUE", "PURPLE"]
 
 
+# レア度の印に使う 5 ドット高の字（幅は字ごと）。小さい絵（28x36）でも読める大きさ
+BADGE_FONT = {
+    "N": ["1..1", "11.1", "1.11", "1..1", "1..1"],
+    "R": ["11.", "1.1", "11.", "1.1", "1.1"],
+    "S": ["111", "1..", "111", "..1", "111"],
+}
+BADGE = {0: ("N", "LGRAY", "BLACK"), 1: ("R", "CYAN", "DBLUE"), 2: ("SR", "YELLOW", "DRED"), 3: ("SSR", "WHITE", "PURPLE")}
+
+
+def badge(d, rarity, x, y):
+    """左上にレア度の札（N / R / SR / SSR）"""
+    text, fg, bg = BADGE[rarity]
+    w = sum(len(BADGE_FONT[ch][0]) + 1 for ch in text) + 1
+    d.rectangle([x, y, x + w - 1, y + 6], fill=C[bg])
+    cx = x + 1
+    for ch in text:
+        rows = BADGE_FONT[ch]
+        for ry, row in enumerate(rows):
+            for rx, bit in enumerate(row):
+                if bit == "1":
+                    d.point((cx + rx, y + 1 + ry), fill=C[fg])
+        cx += len(rows[0]) + 1
+
+
 def framed(art, rarity, size=(56, 72), border=4):
-    """絵（48x64）に枠を付けたカード 1 枚"""
+    """絵（48x64）に枠を付けたカード 1 枚。レア度が上がるほど枠を豪華に、左上にレア度の札
+      N: 灰の 1 本線 / R: 青の 2 本線 / SR: 金の 2 本線と赤い宝石 / SSR: 虹と白い宝石ときらめき"""
     fw, fh = size
     card = Image.new("P", size, C["BLACK"])
     px = card.load()
@@ -380,18 +405,27 @@ def framed(art, rarity, size=(56, 72), border=4):
             inner = border <= x < fw - border and border <= y < fh - border
             if inner:
                 continue
+            ring = min(x, y, fw - 1 - x, fh - 1 - y)
             if rarity == 3:
                 px[x, y] = C[RAINBOW[((x + y) // 3) % len(RAINBOW)]]
+                if ring == border - 1:
+                    px[x, y] = C["WHITE"]
             else:
                 dark, light = FRAME_COLS[rarity]
-                ring = min(x, y, fw - 1 - x, fh - 1 - y)
-                px[x, y] = C[light] if ring == 1 else C[dark]
+                lit = ring == 1 or (rarity >= 1 and ring == border - 1 and border > 2)
+                px[x, y] = C[light] if lit else C[dark]
     card.paste(art, (border, border))
     d = ImageDraw.Draw(card)
-    if rarity >= 2:      # 四隅の宝石
+    if rarity >= 2:      # 四隅の宝石（小さい絵では 2x2）
         gem = C["RED"] if rarity == 2 else C["WHITE"]
-        for x, y in ((1, 1), (fw - 4, 1), (1, fh - 4), (fw - 4, fh - 4)):
-            d.rectangle([x, y, x + 2, y + 2], fill=gem)
+        g = 2 if border >= 4 else 1
+        for x, y in ((1, 1), (fw - 2 - g, 1), (1, fh - 2 - g), (fw - 2 - g, fh - 2 - g)):
+            d.rectangle([x, y, x + g, y + g], fill=gem)
+    if rarity == 3 and border >= 4:   # 辺の真ん中にきらめき
+        for x, y in ((fw // 2, 1), (fw // 2, fh - 2), (1, fh // 2), (fw - 2, fh // 2)):
+            d.point((x, y), fill=C["WHITE"])
+            d.point((x - 1, y), fill=C["YELLOW"]); d.point((x + 1, y), fill=C["YELLOW"])
+    badge(d, rarity, border, border)
     return card
 
 

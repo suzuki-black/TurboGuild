@@ -6,7 +6,7 @@ T_TITLE_CONT	つづきから
 T_TITLE_DAY	サービス開始から
 T_DAY	日目
 T_TITLE_ENDED	サービスは終了しました
-T_TITLE_OVERWRITE	今のデータを消して始めますか？
+T_TITLE_OVERWRITE	データを消して始めますか？
 T_TITLE_NOSAVE	セーブディスクが無いのでセーブできません
 T_NAME_PROMPT	あなたの名前を決めてください
 T_NAME_END	決定
@@ -16,7 +16,7 @@ T_FG_TITLE	はじめての10連ガチャ！
 T_FG_SUB	SR以上1枚確定・引き直し自由
 T_FG_REROLL	引き直す
 T_FG_DECIDE	これで始める
-T_FG_CONFIRM	このカードで冒険を始めますか？
+T_FG_CONFIRM	このカードで始めますか？
 T_HOME_QUEST	クエスト
 T_HOME_GACHA	ガチャ
 T_HOME_CARD	カード
@@ -38,7 +38,7 @@ T_AREA_TITLE	クエスト　エリア選択
 T_STAGE_TITLE	ステージ選択
 T_BOSS	ボス
 T_AP_SHORT	APが足りません
-T_USE_POTION	回復薬を使ってAPを回復しますか？
+T_USE_POTION	回復薬でAPを回復しますか？
 T_NO_POTION	回復薬を持っていません
 T_YES	はい
 T_NO	いいえ
@@ -48,7 +48,8 @@ T_DAMAGE	ダメージ
 T_TAKEN	ダメージを受けた
 T_SKIP	…
 T_WIN	勝利！
-T_LOSE	敗北…デッキを強くしよう
+T_LOSE	敗北…
+T_LOSE2	デッキを強化！
 T_RAID_KILL	討伐！
 T_RAID_TITLE	レイドボス
 T_PVP_TITLE	対戦
@@ -59,7 +60,7 @@ T_GET	獲得
 T_DROP	カードを手に入れた！
 T_DROP_LOST	カードがいっぱいで受け取れなかった
 T_LEVELUP	レベルアップ！AP全回復
-T_AREA_CLEAR	エリアクリア！次のエリアが開いた
+T_AREA_CLEAR	エリアクリア！次のエリアへ
 T_NEXT	次へ
 T_GACHA_TITLE	ガチャ
 T_GACHA_1	1回
@@ -92,7 +93,7 @@ T_SHOP_BOUGHT	購入しました
 T_SHOP_USED	APが全回復した
 T_SAVING	通信中…
 T_SAVED	セーブしました
-T_SAVE_FAIL	セーブできません（ディスクを入れてください）
+T_SAVE_FAIL	セーブできませんでした。　　ディスクを入れてください
 T_SAVE_INIT	このディスクをセーブ専用に初期化しますか？
 T_LOGIN_TITLE	ログインボーナス
 T_LOGIN_DAY	日目
@@ -134,7 +135,12 @@ T_GUIDE_HOME	1〜8:メニュー SPACE:決定
 T_GUIDE_LIST	SPACE:決定 ESC:戻る
 T_GUIDE_EXPLORE	SPACE:進む ESC:エリアへ
 T_GUIDE_GACHA	1〜5:えらぶ SPACE:引く ESC:戻る
-T_GUIDE_CARD	カーソル:えらぶ SPACE:詳細
+T_GUIDE_CARD	SPACE:詳細 0:並べ替え
+T_GUIDE_PICK	SPACE:決定 0:並べ替え
+T_SORT0	入手順
+T_SORT1	レア度順
+T_SORT2	攻撃順
+T_SORT3	コスト順
 T_GUIDE_DECK	SPACE:入れかえ ESC:戻る
 T_GUIDE_ANY	SPACEで次へ
 T_EXPLORE	探索度
@@ -192,7 +198,7 @@ T_FUSE_NONE	素材を選んでください
 T_FUSE_MAX	これ以上強くなりません
 T_FUSE_BAD	デッキのカードは素材にできません
 T_EVO_NONE	進化できる相方がいません
-T_EVO_CONFIRM	2枚を合わせて進化させますか？
+T_EVO_CONFIRM	2枚を合わせて進化しますか？
 T_EVO_DONE	進化した！
 T_NO_GOLD	ゴールドが足りません
 T_CARD_ACTIONS	1:強化 2:進化 ESC:戻る
@@ -212,7 +218,7 @@ T_EV_GAINED	報酬ライン到達！
 T_RANK_TITLE	ランキング
 T_RANK_EVENT	イベント
 T_RANK_POWER	総戦力
-T_RANK_GUIDE	1:イベント 2:総戦力 0:自分 ESC:戻る
+T_RANK_GUIDE	1:イベント 2:総戦力 0:自分
 T_RANK_YOU	あなた
 T_I	位
 T_ITEM_5	カード
@@ -225,8 +231,8 @@ T_EV_RESCUE	救援
 T_EV_PVP1	格下
 T_EV_PVP2	同格
 T_EV_PVP3	格上
-T_EV_GUIDE_RAID	1:通常 2:全力 3:救援 4:順位 ESC:戻る
-T_EV_GUIDE_PVP	1〜3:相手を選ぶ 4:ランキング ESC:戻る
+T_EV_GUIDE_RAID	1:通常 2:全力 3:救援 ESC:戻る
+T_EV_GUIDE_PVP	1〜3:相手を選ぶ ESC:戻る
 T_RAID_HP	残りHP
 T_RESCUE_TITLE	救援に来てくれた！
 T_RESCUE_USED	このボスには依頼済みです
@@ -287,7 +293,7 @@ T_END_SOON	サービス終了まで
 T_ENDED_TITLE	サービスは終了しました
 T_MEMORIES	思い出を見る
 T_RESET	思い出をリセット
-T_RESET_CONFIRM	本当に最初からやり直しますか？
+T_RESET_CONFIRM	最初からやり直しますか？
 T_GIFT_GOT	運営から石が届きました
 T_TO_TITLE	タイトルへ戻りますか？
-T_GUIDE_HOME2	1〜8:メニュー 9:バナー ESC:タイトル
+T_GUIDE_HOME2	1〜8:メニュー ESC:タイトル

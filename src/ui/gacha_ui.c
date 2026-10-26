@@ -52,24 +52,24 @@ static void banner(u8 i)
     tbl_gacha(kinds[i], &g);
     vdp_fill(0, y, SCREEN_W, BANNER_H - 2, on ? COL_YELLOW : COL_DGRAY);
     for (k = 0; k < 4; k++) vdp_fill(2, (u16)(y + 2 + k * 6), SCREEN_W - 4, (u16)(k == 3 ? BANNER_H - 22 : 6), (u8)(k & 1 ? b : a));
-    gfx_sprite(art[id][0], art[id][1], art[id][2] > 40 ? 40 : art[id][2], art[id][3] > 24 ? 24 : art[id][3], 6, (u8)(y + 2));
-    ui_key((u8)(i + 1), 2, (u8)(y + 2));
-    txt_id(6, (u8)(y + 1), g.name_text, on ? COL_YELLOW : COL_WHITE, a);
+    gfx_sprite(art[id][0], art[id][1], art[id][2] > 40 ? 40 : art[id][2], art[id][3] > 24 ? 24 : art[id][3], 16, (u8)(y + 2));
+    ui_key((u8)(i + 1), 2, (u8)(y + 2));          /* 数字キー（2〜14）と絵（16〜56）を重ねない */
+    txt_id(7, (u8)(y + 1), g.name_text, on ? COL_YELLOW : COL_WHITE, a);
     y = (u8)(y + BANNER_H - 34);           /* 6 種のときは 2 行目を詰める */
     if (g.currency == CUR_FREE) {
         u8 used = (u8)(g_save.last_free_gacha_gday == time_gday(g_save.g_time));
-        txt_id(6, (u8)(y + 16), used ? T_GACHA_FREE_USED : T_TODAY_FREE, used ? COL_LGRAY : COL_YELLOW, b);
+        txt_id(7, (u8)(y + 16), used ? T_GACHA_FREE_USED : T_TODAY_FREE, used ? COL_LGRAY : COL_YELLOW, b);
         return;
     }
-    gfx_sprite(cur_icon[g.currency][0], cur_icon[g.currency][1], 14, 14, 48, (u8)(y + 18));
-    cx = txt_num(8, (u8)(y + 16), g.price, COL_WHITE, b);
+    gfx_sprite(cur_icon[g.currency][0], cur_icon[g.currency][1], 14, 14, 56, (u8)(y + 18));
+    cx = txt_num(9, (u8)(y + 16), g.price, COL_WHITE, b);
     if (g.price10) {
         cx = txt_id((u8)(cx + 2), (u8)(y + 16), T_GACHA_10, COL_YELLOW, b);
         txt_num(cx, (u8)(y + 16), g.price10, COL_WHITE, b);
     }
     if (g.currency == CUR_SRTICKET) txt_id(20, (u8)(y + 16), T_SR_UP, COL_RED, b);
     if (id == BOX_ID) {
-        cx = txt_id(22, (u8)(y + 16), T_BOX_LEFT, COL_YELLOW, b);
+        cx = txt_id(23, (u8)(y + 16), T_BOX_LEFT, COL_YELLOW, b);
         txt_num(cx, (u8)(y + 16), box_total(), COL_YELLOW, b);
     }
 }
@@ -143,8 +143,8 @@ static u8 ask_count(void)
     for (;;) {
         u8 p;
         for (k = 0; k < 2; k++) {
-            u8 x = (u8)(40 + k * 92);
-            ui_box(x, 96, 84, 22, k == cur ? COL_BLUE : COL_DBLUE, k == cur ? COL_YELLOW : COL_LGRAY);
+            u8 x = (u8)(24 + k * 112);               /* 「10連で引く」が入る幅（96） */
+            ui_box(x, 96, 96, 22, k == cur ? COL_BLUE : COL_DBLUE, k == cur ? COL_YELLOW : COL_LGRAY);
             txt_id((u8)(x / 8 + 1), 99, k ? T_PULL_10 : T_PULL_1, COL_WHITE, k == cur ? COL_BLUE : COL_DBLUE);
         }
         g_ui_state = UIS_WAITKEY;
