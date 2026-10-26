@@ -10,7 +10,7 @@
 
 #define GOLD_PER_MAT 100
 
-static const u16 mat_exp[4] = { 10, 50, 300, 2000 };
+static const u16 mat_exp[RARITIES] = { 10, 50, 300, 2000, 5000, 12000 };
 
 static u16 need_of(u8 lv, u8 rarity)
 {

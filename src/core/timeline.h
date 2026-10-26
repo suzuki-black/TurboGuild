@@ -12,6 +12,7 @@ typedef struct {
     u16 day;             /* いまのゲーム内日数 */
     u16 rateup_pct;      /* 100 = 通常。キャンペーン中は 200 / 300 */
     u16 era_pct;         /* いまの時代のインフレ倍率 */
+    u8  top_rarity;      /* いま出る最上位のレア度（SSR → 90 日目 USR → 180 日目 XUSR） */
     u8  drop_pct;        /* NPC が辞めた割合（%、累計） */
     u8  announce;        /* サービス終了の告知が出ている */
     u8  ended;           /* サービス終了 */

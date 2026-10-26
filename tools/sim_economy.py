@@ -7,7 +7,7 @@
 
     sim_economy.py [--seeds N] [--plays P] [--csv 出力.csv]
 
-受け入れ: 課金しないプレイヤーの終了時 SSR 所持の中央値が 1〜3 枚（DECISIONS #61 で仕様の 3〜8 枚から下げた）。外れたら終了コード 1。
+受け入れ: 課金しないプレイヤーの終了時 SSR 以上（USR・XUSR を含む）所持の中央値が 1〜3 枚（DECISIONS #61 で仕様の 3〜8 枚から下げた）。外れたら終了コード 1。
 """
 import argparse
 import statistics

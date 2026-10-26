@@ -29,8 +29,8 @@ THUMB_W, THUMB_H = 28, 36
 CARDS_PER_PAGE = PAGE_PAYLOAD // (CARD_W * CARD_H // 2)        # 4
 THUMBS_PER_PAGE = PAGE_PAYLOAD // (THUMB_W * THUMB_H // 2)     # 16
 # docs/MEMORY_MAP.md に並べたページ数と一致させる
-ATLAS_PAGES, CARDART_PAGES, THUMB_PAGES = 5, 30, 8
-RAR = {"N": 0, "R": 1, "SR": 2, "SSR": 3}
+ATLAS_PAGES, CARDART_PAGES, THUMB_PAGES = 5, 38, 10
+RAR = {"N": 0, "R": 1, "SR": 2, "SSR": 3, "USR": 4, "XUSR": 5}
 ELEM = {"炎": 0, "水": 1, "雷": 2, "光": 3, "闇": 4}
 
 

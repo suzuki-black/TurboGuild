@@ -115,7 +115,7 @@ static void test_box(void);
 static void test_gacha(void)
 {
     GachaReq g;
-    long hist[4] = {0};
+    long hist[RARITIES] = {0};
     CardRec c;
     int i, j;
     fresh();
@@ -501,6 +501,38 @@ static void test_timeline(void)
     g_save.g_time = GSEC_PER_DAY * 100;          /* インフレ 2 回目まで */
     timeline_state(&t);
     CHECK(t.era_pct == 160);
+    /* 上のレア度は 3 か月ごと: 90 日目に USR、180 日目に XUSR（DECISIONS #79） */
+    g_save.g_time = GSEC_PER_DAY * 89;
+    timeline_state(&t);
+    CHECK(t.top_rarity == RARITY_SSR);
+    g_save.g_time = GSEC_PER_DAY * 90;
+    timeline_state(&t);
+    CHECK(t.top_rarity == RARITY_USR);
+    g_save.g_time = GSEC_PER_DAY * 181;
+    timeline_state(&t);
+    CHECK(t.top_rarity == RARITY_XUSR && t.era_pct == 250);
+    {   /* XUSR の時代のプレミア: XUSR 1% / USR 2% / SSR 3% */
+        GachaReq g;
+        long hist[RARITIES] = {0};
+        int i;
+        g_save.gems = 1000000;
+        for (i = 0; i < 20000; i++) {
+            g.gacha = 3; g.count = 1;
+            gacha_roll(&g);
+            tbl_card(g.ids[0], &c);
+            hist[c.rarity]++;
+        }
+        CHECK(hist[RARITY_XUSR] > 120 && hist[RARITY_XUSR] < 300);
+        CHECK(hist[RARITY_USR] > 300 && hist[RARITY_USR] < 520);
+        CHECK(hist[RARITY_SSR] > 470 && hist[RARITY_SSR] < 730);
+    }
+    {   /* イベントの敵は、その時点の最上位のレア度を持っている前提で強い */
+        EventRec e;
+        tbl_event(1, &e); CHECK(e.boss_pct == 100);
+        tbl_event(5, &e); CHECK(e.boss_pct == 256);    /* 時代 160% × USR 160% */
+        tbl_event(7, &e); CHECK(e.boss_pct == 625);    /* 時代 250% × XUSR 250% */
+        tbl_card(e.boss_card, &c); CHECK(c.rarity == RARITY_XUSR);
+    }
     g_save.g_time = GSEC_PER_DAY * 200;          /* 20% と 30% が辞めた → 残り 0.8 × 0.7 = 56% */
     timeline_state(&t);
     CHECK(t.drop_pct == 44 && !t.announce);

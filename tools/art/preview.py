@@ -11,7 +11,7 @@ import chibi  # noqa: E402
 from palette import rgb8  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[2]
-RAR = {"N": 0, "R": 1, "SR": 2, "SSR": 3}
+RAR = {"N": 0, "R": 1, "SR": 2, "SSR": 3, "USR": 4, "XUSR": 5}
 ELEM = {"炎": 0, "水": 1, "雷": 2, "光": 3, "闇": 4}
 
 

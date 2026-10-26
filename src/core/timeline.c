@@ -18,6 +18,7 @@ FAR(void, timeline_state, (TlState *s))
     s->day = today();
     s->rateup_pct = 100;
     s->era_pct = 100;
+    s->top_rarity = RARITY_SSR;
     s->drop_pct = 0;
     s->announce = s->ended = 0;
     s->days_to_end = 0;
@@ -30,6 +31,7 @@ FAR(void, timeline_state, (TlState *s))
         switch (t.kind) {
         case TL_GACHA_RATEUP: if (s->day < t.day + RATEUP_DAYS) s->rateup_pct = t.param; break;
         case TL_INFLATION:    s->era_pct = t.param; break;
+        case TL_NEW_RARITY:   if (t.param > s->top_rarity) s->top_rarity = (u8)t.param; break;
         case TL_PLAYER_DROP:  keep = (u16)(keep * (100 - t.param) / 100); break;
         case TL_ANNOUNCE_END: s->announce = 1; break;
         case TL_SERVICE_END:  s->ended = 1; break;

@@ -26,9 +26,11 @@ GEN = ROOT / "src" / "data"
 PAGE_PAYLOAD = 8192 - 16
 TEXT_PAGES = 4                     # docs/MEMORY_MAP.md の TEXT0..TEXT3 と一致させる
 
-RARITY = {"N": 0, "R": 1, "SR": 2, "SSR": 3}
+RARITY = {"N": 0, "R": 1, "SR": 2, "SSR": 3, "USR": 4, "XUSR": 5}
 ELEMENT = {"炎": 0, "水": 1, "雷": 2, "光": 3, "闇": 4}
-MAX_LV = {0: 20, 1: 30, 2: 40, 3: 50}
+MAX_LV = {0: 20, 1: 30, 2: 40, 3: 50, 4: 60, 5: 70}
+# イベントの敵は、その時点の最上位のレア度を持っている前提で強くする（DECISIONS #79）
+TIER_PCT = {3: 100, 4: 160, 5: 250}
 CURRENCY = {"free": 0, "gold": 1, "gems": 2, "ticket": 3, "srticket": 4}
 POOL = {"normal": 0, "normal_event": 1, "event2x": 2, "box": 3}   # box: n/r/sr/ssr は 100 個の箱の中身の個数
 ITEM = {"gold": 0, "potion": 1, "ticket": 2, "gems": 3, "srticket": 4, "card": 5}
@@ -41,7 +43,8 @@ CARD_FIELDS = [("u16", "id"), ("u16", "name_text"), ("u8", "rarity"), ("u8", "el
                ("u16", "release_day"), ("u16", "era_pct")]
 TIMELINE_KIND = {"SERVICE_START": 0, "NEWS": 1, "EVENT": 2, "GACHA_RATEUP": 3, "INFLATION": 4,
                  "PLAYER_DROP": 5, "ANNOUNCE_END": 6, "SERVICE_END": 7, "GIFT": 8,
-                 "GUILDWAR": 9}   # GUILDWAR: param = 第何回か。7 日間
+                 "GUILDWAR": 9,   # GUILDWAR: param = 第何回か。7 日間
+                 "NEW_RARITY": 10}   # NEW_RARITY: param = 解禁するレア度（4 = USR, 5 = XUSR）
 TIMELINE_FIELDS = [("u16", "day"), ("u8", "kind"), ("u16", "param"), ("u16", "text")]
 AREA_FIELDS = [("u16", "name_text"), ("u8", "element"), ("u16", "enemy_text"), ("u16", "boss_card")]
 STAGE_FIELDS = [("u8", "ap"), ("u32", "hp"), ("u16", "def"), ("u16", "atk"), ("u16", "exp"),
@@ -54,7 +57,8 @@ COURSE_FIELDS = [("u16", "name_text"), ("u32", "start"), ("u32", "monthly"), ("u
 PACK_FIELDS = [("u16", "gems"), ("u16", "price")]
 EVENT_FIELDS = [("u16", "name_text"), ("u16", "story_text"), ("u16", "boss_card"), ("u16", "bonus_card"),
                 ("u8", "bonus_mul"), ("u8", "evo_bonus_mul"), ("u8", "reward_tbl"), ("u8", "duration"),
-                ("u8", "kind"), ("u16", "start_day"), ("u16", "era_pct")]
+                ("u8", "kind"), ("u16", "start_day"), ("u16", "era_pct"),
+                ("u16", "boss_pct")]
 EVSTAGE_FIELDS = [("u8", "kind"), ("u8", "level"), ("u16", "name_text"), ("u8", "ap"), ("u32", "hp"),
                   ("u16", "def"), ("u16", "atk"), ("u16", "points"), ("u16", "exp"), ("u16", "gold")]
 EVREWARD_FIELDS = [("u8", "tbl"), ("u8", "kind"), ("u32", "threshold"), ("u8", "item"), ("u16", "amount")]
@@ -267,6 +271,15 @@ def era_pct(timeline, day):
     return pct
 
 
+def top_rarity(timeline, day):
+    """その日の時点の最上位のレア度。NEW_RARITY 行で上がる"""
+    top = RARITY["SSR"]
+    for d, kind, param, _t in timeline:
+        if kind == TIMELINE_KIND["NEW_RARITY"] and d <= day:
+            top = max(top, param)
+    return top
+
+
 def load_cards(text, timeline):
     rows = []
     for ln, r in read_csv("cards.csv"):
@@ -286,6 +299,8 @@ def load_cards(text, timeline):
     for r in rows:
         if r[9] and r[9] not in ids:
             die(f"cards.csv: id {r[0]} の evo_to {r[9]} が存在しない")
+        if r[2] > top_rarity(timeline, r[12]):
+            die(f"cards.csv: id {r[0]} はまだ解禁されていないレア度（年表の NEW_RARITY より前に出している）")
     return rows
 
 
@@ -367,7 +382,8 @@ def load_events(text, ncards, timeline):
             die(f"{where}: timeline.csv に EVENT,{eid} の行が無い（開催日は年表で決める）")
         rows.append((text.add(r["name"], maxw=18), text.add(r["story"], maxw=48), int(r["boss_card_id"]), int(r["bonus_card_id"]),
                      int(r["bonus_mul"]), int(r["evo_bonus_mul"]), int(r["reward_tbl_id"]),
-                     int(r["duration_days"]), int(r["kind"]), starts[eid], era_pct(timeline, starts[eid])))
+                     int(r["duration_days"]), int(r["kind"]), starts[eid], era_pct(timeline, starts[eid]),
+                     era_pct(timeline, starts[eid]) * TIER_PCT[top_rarity(timeline, starts[eid])] // 100))
     return rows
 
 
@@ -437,6 +453,7 @@ def write_headers(cards, areas, stages, gacha, text, courses, packs, extra):
     h += c_struct("CardRec", CARD_FIELDS) + PACK_OFF
     h += [f"#define CARD_COUNT_BUILT {len(cards)}",
           "#define RARITY_N 0", "#define RARITY_R 1", "#define RARITY_SR 2", "#define RARITY_SSR 3",
+          "#define RARITY_USR 4", "#define RARITY_XUSR 5", "#define RARITIES 6",
           "#define ELEMENTS 5", "#endif", ""]
     write_if_changed(GEN / "cards.h", "\n".join(h))
 

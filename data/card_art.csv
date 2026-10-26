@@ -119,3 +119,4 @@ id,kind,hair,hair_col,head,head_col,outfit,outfit_col,weapon,weapon_col,extra,ex
 118,human,spiky,ORANGE,crown,YELLOW,armor,RED,sword,YELLOW,cape,RED,fierce,
 119,human,short,PURPLE,band,YELLOW,armor,PURPLE,twin,YELLOW,cape,YELLOW,fierce,
 120,human,short,BLACK,helmet,PURPLE,armor,BLACK,shield,PURPLE,aura,PURPLE,fierce,1
+121,human,long,CYAN,crown,YELLOW,robe,PURPLE,staff,YELLOW,aura,YELLOW,smile,

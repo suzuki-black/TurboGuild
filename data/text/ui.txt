@@ -113,6 +113,8 @@ T_RAR_0	N
 T_RAR_1	R
 T_RAR_2	SR
 T_RAR_3	SSR
+T_RAR_4	USR
+T_RAR_5	XUSR
 T_SKILL_0	なし
 T_SKILL_1	攻撃+10%
 T_SKILL_2	防御+10%
@@ -159,8 +161,8 @@ T_TODAY_FREE	本日無料！
 T_SR_UP	SR確定
 T_BOX_LEFT	のこり
 T_BOX_NO	箱目
-T_BOX_SSR	SSRのこり
-T_BOX_SSR_GOT	SSR獲得済み！
+T_BOX_SSR	目玉のこり
+T_BOX_SSR_GOT	目玉獲得済み！
 T_STAMP_TITLE	ログインスタンプ
 T_STAMP_NEXT	明日もログインしよう！
 T_FOR_SALE	回復薬　石100

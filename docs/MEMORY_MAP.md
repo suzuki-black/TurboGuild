@@ -4,6 +4,7 @@
 `src/data/rompages.h`（`#define PAGE_<名前> n`）を生成する。**表を書き換えたら make し直す。**
 
 - 1 ページ = 8KB。128 ページ（1MB）。カード 120 枚の絵を入れるため 512KB から広げた（Phase 1 は 256KB）。
+  カード絵はページ 39〜76 で 152 枚まで、小さい絵はページ 82〜91 で 160 枚まで（上のレア度のカードを足すときに広げた）。
 - ページ 0 以外の先頭 16 バイトは**ページ見出し**: `[ページ番号, 'T', 'G', 'P', 種別, FFh×11]`。
   中身はオフセット 16（窓の先頭 + 10h）から置く。バンク切替テストはこの見出しを読む。
 - 種別: 0=空き 1=コード 2=データA 3=データB
@@ -88,17 +89,27 @@
 | 66 | 8000h データA | CARDART27 | build/cardart27.bin | カード絵 56x72（4 枚/ページ） |
 | 67 | 8000h データA | CARDART28 | build/cardart28.bin | カード絵 56x72（4 枚/ページ） |
 | 68 | 8000h データA | CARDART29 | build/cardart29.bin | カード絵 56x72（4 枚/ページ） |
-| 69 | 8000h データA | THUMB0 | build/thumb0.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 70 | 8000h データA | THUMB1 | build/thumb1.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 71 | 8000h データA | THUMB2 | build/thumb2.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 72 | 8000h データA | THUMB3 | build/thumb3.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 73 | 8000h データA | THUMB4 | build/thumb4.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 74 | 8000h データA | THUMB5 | build/thumb5.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 75 | 8000h データA | THUMB6 | build/thumb6.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 76 | 8000h データA | THUMB7 | build/thumb7.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 69 | 8000h データA | CARDART30 | build/cardart30.bin | カード絵 56x72（4 枚/ページ） |
+| 70 | 8000h データA | CARDART31 | build/cardart31.bin | カード絵 56x72（4 枚/ページ） |
+| 71 | 8000h データA | CARDART32 | build/cardart32.bin | カード絵 56x72（4 枚/ページ） |
+| 72 | 8000h データA | CARDART33 | build/cardart33.bin | カード絵 56x72（4 枚/ページ） |
+| 73 | 8000h データA | CARDART34 | build/cardart34.bin | カード絵 56x72（4 枚/ページ） |
+| 74 | 8000h データA | CARDART35 | build/cardart35.bin | カード絵 56x72（4 枚/ページ） |
+| 75 | 8000h データA | CARDART36 | build/cardart36.bin | カード絵 56x72（4 枚/ページ） |
+| 76 | 8000h データA | CARDART37 | build/cardart37.bin | カード絵 56x72（4 枚/ページ） |
 | 77 | 6000h コード | CORE4 | code: src/core/evfight.c | レイド・バトル（イベントの型） |
 | 78 | 6000h コード | CORE5 | code: src/core/guildwar.c | ギルド対抗戦 |
 | 79 | 6000h コード | UI_GUILD | code: src/ui/guildwar_ui.c | ギルド対抗戦の画面 |
 | 80 | 8000h データA | BGMDATA | build/bgm.bin | BGM の曲データ（割り込みから窓 A に載せて読む, tools/mml.py） |
 | 81 | RAM CC00h へ | HOTCODE | hot: src/sys/bgmdrv.c src/sys/text.c src/sys/vdp_asm.s src/sys/kanji_asm.s | 起動時に RAM CC00h〜D9FFh（最大 3,584 B）へ写して実行するコード。割り込みの BGM（4000h にどの ROM が出ていても動く）と、文字・VDP（R800 はカートリッジ ROM のコードが RAM の約 4 倍遅い） |
-| 82-127 | - | - | - | 空き |
+| 82 | 8000h データA | THUMB0 | build/thumb0.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 83 | 8000h データA | THUMB1 | build/thumb1.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 84 | 8000h データA | THUMB2 | build/thumb2.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 85 | 8000h データA | THUMB3 | build/thumb3.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 86 | 8000h データA | THUMB4 | build/thumb4.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 87 | 8000h データA | THUMB5 | build/thumb5.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 88 | 8000h データA | THUMB6 | build/thumb6.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 89 | 8000h データA | THUMB7 | build/thumb7.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 90 | 8000h データA | THUMB8 | build/thumb8.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 91 | 8000h データA | THUMB9 | build/thumb9.bin | カードの小さい絵 28x36（16 枚/ページ） |
+| 92-127 | - | - | - | 空き |

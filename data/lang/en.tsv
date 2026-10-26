@@ -117,6 +117,8 @@ T_RAR_0	N
 T_RAR_1	R
 T_RAR_2	SR
 T_RAR_3	SSR
+T_RAR_4	USR
+T_RAR_5	XUSR
 T_SKILL_0	None
 T_SKILL_1	ATK+10%
 T_SKILL_2	DEF+10%
@@ -162,8 +164,8 @@ T_TODAY_FREE	Free today
 T_SR_UP	SR+
 T_BOX_LEFT	Left
 T_BOX_NO	 box
-T_BOX_SSR	SSR left
-T_BOX_SSR_GOT	SSR pulled!
+T_BOX_SSR	Prize left
+T_BOX_SSR_GOT	Prize won!
 T_STAMP_TITLE	Login Stamps
 T_STAMP_NEXT	Log in tomorrow too!
 T_FOR_SALE	Potion 100Gm
@@ -309,13 +311,16 @@ T_GUIDE_HOME2	1-8:Menu ESC:Title
 【イベント】第3回「雷神の試練」開催！	[Event] #3 Thunder Trial is on!
 【ガチャ】SSR確率2倍！今がチャンス	[Gacha] SSR rate x2! Pull now!
 【イベント】第4回「収穫祭の大鎌」開催！	[Event] #4 Harvest Scythe is on!
-【新カード】超レアSSR「紅蓮の竜王」「雷光の戦乙女」登場！	[New] Super rare SSR Crimson King, Bolt Valkyrie!
+【新レア度】SSRを超える「USR」解禁！	[New] USR rarity above SSR is here!
+【新カード】USR「紅蓮の竜王」「雷光の戦乙女」登場！	[New] USR Crimson King, Bolt Valkyrie!
 【イベント】第5回「氷晶の城」開催！	[Event] #5 Ice Crystal Castle!
 【お知らせ】不具合のお詫びとして石500個を配布しました	[News] 500 gems sent as an apology for a bug
 【イベント】第6回「大感謝祭」開催！	[Event] #6 Thanks Festival!
 【ガチャ】SSR確率3倍！最大級キャンペーン	[Gacha] SSR rate x3! Biggest ever!
 【ギルド】第1回ギルド対抗戦、開戦！昼と夜の戦に集え	[Guild] Guild War #1 begins! Fight noon & night
-【新カード】最強SSR「深淵の魔導王」「蒼海の守護神」登場！	[New] Top SSR Abyss Archmage, Sea Guardian!
+【新カード】最強USR「深淵の魔導王」「蒼海の守護神」登場！	[New] Top USR Abyss Archmage, Sea Guardian!
+【新レア度】USRを超える「XUSR」解禁！	[New] XUSR rarity above USR is here!
+【新カード】XUSR「天輪の創造神」登場！	[New] XUSR Halo Creator arrives!
 【お知らせ】メンテナンスのお知らせ	[News] Maintenance notice
 【お知らせ】ギルドの再編成について	[News] About guild reshuffles
 【イベント】最終イベント「最後の竜」開催！	[Event] Final event: The Last Dragon!
@@ -440,6 +445,7 @@ T_GUIDE_HOME2	1-8:Menu ESC:Title
 太陽神の化身	Sun Avatar
 獄炎の魔神	Inferno Djinn
 星海の大賢者	Star Archsage
+天輪の創造神	Halo Creator
 ギルドの旗手	Guild Banner
 ギルドの英雄	Guild Hero
 双剣の団長	Twin Captain

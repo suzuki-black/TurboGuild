@@ -12,10 +12,10 @@
 #include "../sys/psg.h"
 #include "../sys/gfx.h"
 
-static const u8 rar_col[4] = { COL_LGRAY, COL_CYAN, COL_YELLOW, COL_PURPLE };
+static const u8 rar_col[RARITIES] = { COL_LGRAY, COL_CYAN, COL_YELLOW, COL_PURPLE, COL_ORANGE, COL_RED };
 static const u8 elem_col[5] = { COL_RED, COL_CYAN, COL_YELLOW, COL_WHITE, COL_PURPLE };
 
-u8 rarity_color(u8 r) { return r < 4 ? rar_col[r] : COL_WHITE; }
+u8 rarity_color(u8 r) { return r < RARITIES ? rar_col[r] : COL_WHITE; }
 u8 elem_color(u8 e)   { return e < 5 ? elem_col[e] : COL_WHITE; }
 
 void ui_clear(void) { vdp_fill(0, 0, SCREEN_W, SCREEN_H, COL_BLACK); }

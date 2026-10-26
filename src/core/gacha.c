@@ -3,7 +3,9 @@
  * 10 連は SR 以上 1 枚確定（9 枚目まで出なければ 10 枚目を SR に）。
  * 天井: pity を持つガチャは pity_count が達したら SSR 確定にして数え直す（今のデータでは 0 = 天井なし）。
  * BOX ガチャ: 100 個入りの箱から引く。残りの個数で抽選し、引いた分だけ減る。空になれば次の箱。
- *   箱の SSR はイベント限定の SSR（無いイベントでは通常の SSR）。確率 UP と 10 連の SR 確定は無し。 */
+ *   箱の目玉はイベント限定の最上位（SSR 以上。無いイベントでは通常の SSR）。確率 UP と 10 連の SR 確定は無し。
+ * 上のレア度（90 日目 USR・180 日目 XUSR）が解禁されると、最上位がこれまでの SSR の確率で出て、
+ *   その下の段は 1 段ごとに同じ分だけ多く出る（古いレア度ほど出やすくなる。DECISIONS #79）。 */
 #include "gacha.h"
 #include "inventory.h"
 #include "rng.h"
@@ -29,13 +31,13 @@ static u16 pick(u8 rarity, u8 pool)
 {
     CardRec c;
     u16 n = tbl_card_count(), id, hits = 0, k;
-    if (pool == POOL_BOX && rarity == RARITY_SSR) {  /* 箱の目玉は限定 SSR。無ければ通常の SSR */
+    if (pool == POOL_BOX && rarity == RARITY_SSR) {  /* 箱の目玉は限定の最上位。無ければ通常の SSR */
+        u8 top = 0;
         for (id = 1; id <= n; id++) {
             tbl_card(id, &c);
-            if (c.rarity == RARITY_SSR) hits += weight(&c, POOL_LIMITED);
+            if (c.rarity >= RARITY_SSR && c.rarity > top && weight(&c, POOL_LIMITED)) top = c.rarity;
         }
-        if (hits) pool = POOL_LIMITED;
-        hits = 0;
+        if (top) { pool = POOL_LIMITED; rarity = top; }
     }
     for (;;) {
         for (id = 1; id <= n; id++) {
@@ -58,13 +60,18 @@ static u16 pick(u8 rarity, u8 pool)
     return 1;
 }
 
-/* 年表の確率 UP キャンペーン中は SSR を倍に（N の分から回す） */
-static u8 roll_rarity(const GachaRec *gr, u16 rateup)
+/* 年表の確率 UP キャンペーン中は SSR 以上を倍に（N の分から回す）。
+ * top が USR なら USR 1% / SSR 2%、XUSR なら XUSR 1% / USR 2% / SSR 3%（プレミアの rate_ssr が 1% のとき） */
+static u8 roll_rarity(const GachaRec *gr, u16 rateup, u8 top)
 {
     u16 r = rng_range(&g_save.rng_gacha, 10000);
-    u16 ssr = (u16)((u32)gr->rate_ssr * rateup / 100);
-    if (r < ssr) return RARITY_SSR;
-    r -= ssr;
+    u16 ssr = (u16)((u32)gr->rate_ssr * rateup / 100), w = ssr;
+    u8 rar;
+    for (rar = top; rar >= RARITY_SSR; rar--) {
+        if (r < w) return rar;
+        r -= w;
+        w += ssr;
+    }
     if (r < gr->rate_sr) return RARITY_SR;
     r -= gr->rate_sr;
     if (r < gr->rate_r) return RARITY_R;
@@ -117,10 +124,10 @@ static void draw_all(GachaReq *g, const GachaRec *gr)
             g->ids[i] = pick(box_draw(gr), gr->pool);
             continue;
         }
-        rar = roll_rarity(gr, gr->rate_ssr ? tl.rateup_pct : 100);
+        rar = roll_rarity(gr, gr->rate_ssr ? tl.rateup_pct : 100, tl.top_rarity);
         if (gr->pity) {
             if (++g_save.pity_count >= gr->pity) { rar = RARITY_SSR; g->pity_hit = 1; }
-            if (rar == RARITY_SSR) g_save.pity_count = 0;
+            if (rar >= RARITY_SSR) g_save.pity_count = 0;
         }
         if (g->count == GACHA_ONE_MAX && i == GACHA_ONE_MAX - 1 && best < RARITY_SR) rar = RARITY_SR;
         if (rar > best) best = rar;

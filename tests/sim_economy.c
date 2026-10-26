@@ -39,7 +39,7 @@ static u16 count_rarity(u8 r)
     u16 i, n = 0;
     for (i = 0; i < g_save.card_count; i++) {
         tbl_card(g_save.cards[i].id, &c);
-        if (c.rarity == r) n++;
+        if (r == RARITY_SSR ? c.rarity >= r : c.rarity == r) n++;   /* SSR は USR・XUSR も含めて数える */
     }
     return n;
 }

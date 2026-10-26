@@ -35,7 +35,7 @@ static u8 best(void)
         tbl_card(g_gacha.ids[i], &c);
         if (c.rarity > b) b = c.rarity;
     }
-    return b;
+    return b > RARITY_SSR ? RARITY_SSR : b;          /* USR・XUSR も SSR と同じ確定演出 */
 }
 
 static void stage_clear(void)
@@ -189,12 +189,12 @@ static void flip_big(u16 id)
     vdp_fill(0, 166, SCREEN_W, 18, rarity_color(c.rarity));
     cx = ui_rarity(4, 167, c.rarity, rarity_color(c.rarity));
     txt_id((u8)(cx + 1), 167, c.name_text, COL_BLACK, rarity_color(c.rarity));
-    if (c.rarity == RARITY_SSR) { sparkles(8); cycle(COL_PURPLE, 21); gfx_pal_reset(); }
+    if (c.rarity >= RARITY_SSR) { sparkles(8); cycle(COL_PURPLE, 21); gfx_pal_reset(); }
 }
 
 static void flip_grid(void)
 {
-    static const u16 tone[4] = { 0x200, 0x140, 0x0C0, 0x060 };
+    static const u16 tone[RARITIES] = { 0x200, 0x140, 0x0C0, 0x060, 0x050, 0x040 };
     CardRec c;
     u8 i;
     stage_clear();
@@ -206,7 +206,7 @@ static void flip_grid(void)
         u8 x = (u8)(18 + (i % 5) * 46), y = (u8)(40 + (i / 5) * 64);
         tbl_card(g_gacha.ids[i], &c);
         if (c.rarity >= RARITY_SR) {
-            vdp_fill((u16)x - 3, (u16)y - 3, 34, 42, c.rarity == RARITY_SSR ? COL_PURPLE : COL_YELLOW);
+            vdp_fill((u16)x - 3, (u16)y - 3, 34, 42, c.rarity >= RARITY_SSR ? COL_PURPLE : COL_YELLOW);
             psg_beep(0x050, 6);
             ui_wait(10);
         }

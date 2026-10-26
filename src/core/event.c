@@ -101,9 +101,10 @@ FAR(u8, event_stage, (u16 level, EventStage *s))
     tbl_card(e.boss_card, &boss);
     tbl_card(e.bonus_card, &bonus);
     s->ap = st.ap;
-    s->hp = e.kind == EV_PVP ? st.hp : st.hp * e.era_pct / 100;   /* 後のイベントほど敵も強い（バトルは自分比なので掛けない） */
-    s->def = (u16)((u32)st.def * e.era_pct / 100);
-    s->atk = (u16)((u32)st.atk * e.era_pct / 100);
+    /* 後のイベントほど敵も強い。boss_pct = 時代% × その時点の最上位レア度の倍率（バトルは自分比なので掛けない） */
+    s->hp = e.kind == EV_PVP ? st.hp : st.hp * e.boss_pct / 100;
+    s->def = (u16)((u32)st.def * e.boss_pct / 100);
+    s->atk = (u16)((u32)st.atk * e.boss_pct / 100);
     s->exp = st.exp; s->gold = st.gold; s->points = st.points;
     s->element = boss.element;
     s->boss_card = e.boss_card;

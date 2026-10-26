@@ -163,32 +163,31 @@ static u32 value_of(u8 mode, u16 i, const Ctx *c, NpcNow *n)
     return mode == RANK_POWER ? n->power : event_pt_of(i, c, &r, rd);
 }
 
+/* 辞めた日とイベントのポイントだけ見る（総戦力の掛け算を省く。イベントの終わりに 1000 人ぶん回す） */
 FAR(u16, ranking_final_rank, (void))
 {
     Ctx c;
-    NpcNow n;
+    NpcRec r;
     u32 points = g_save.event_pt;
-    u16 i, above = 0;
+    u16 i, rd, above = 0;
     ctx_init(&c, 1);
     for (i = 0; i < NPC_COUNT; i++) {
-        u32 v = value_of(RANK_EVENT, i, &c, &n);
-        if (!n.retired && v > points) above++;
+        rd = retire_day(i, &c);
+        if (rd != 0xFFFF) continue;
+        tbl_npc(i, &r);
+        if (event_pt_of(i, &c, &r, rd) > points) above++;
     }
     return (u16)(above + 1);
 }
 
+/* 辞めたかどうかだけ見る（総戦力の掛け算と NPC の表の読み出しを省く。マイページに入るたびに呼ぶ） */
 FAR(u16, npc_active_count, (void))
 {
     Ctx c;
-    NpcNow n;
-    NpcRec r;
     u16 i, k = 0;
     ctx_init(&c, 0);
-    for (i = 0; i < NPC_COUNT; i++) {
-        tbl_npc(i, &r);
-        now_of(i, &c, &r, &n);
-        if (!n.retired) k++;
-    }
+    for (i = 0; i < NPC_COUNT; i++)
+        if (retire_day(i, &c) == 0xFFFF) k++;
     return k;
 }
 
@@ -263,7 +262,7 @@ FAR(void, feed_line, (u16 k, FeedLine *f))
         f->param = 39;
         for (id = 1; id <= tbl_card_count(); id++) {
             tbl_card(id, &cr);
-            if (cr.rarity == RARITY_SSR && cr.event_id == 0 && cr.release_day <= c.day) {
+            if (cr.rarity >= RARITY_SSR && cr.event_id == 0 && cr.release_day <= c.day) {
                 f->param = id;
                 if (seen++ == pick) break;
             }
