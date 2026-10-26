@@ -1,0 +1,686 @@
+# en.tsv — 英語の訳（DECISIONS #77）。書き方は tools/build_data.py の「言語」の注釈を参照
+#   T_キー<TAB>訳        UI の文（data/text/ui.txt）
+#   日本語<TAB>訳        それ以外（カード名・イベント・お知らせ・NPC の名前など）
+#   3 列目の ! は「日本語より長いが置き場所に余裕がある（画面で確かめた）」
+
+# ---- UI ----
+T_TITLE_SUB	- Welcome to the Guild -
+T_TITLE_NEW	New Game
+T_TITLE_CONT	Continue
+T_TITLE_DAY	Since launch:
+T_DAY	 day
+T_TITLE_ENDED	The service has ended
+T_TITLE_OVERWRITE	Erase data and restart?
+T_TITLE_NOSAVE	No save disk - saving is disabled
+T_NAME_PROMPT	Enter your name
+T_NAME_END	OK
+T_NAME_HELP	SPACE:pick ESC:erase
+T_NAME_DEFAULT	HERO
+T_FG_TITLE	Your first 10-pull!
+T_FG_SUB	SR+ sure, free rerolls
+T_FG_REROLL	Reroll
+T_FG_DECIDE	Start!
+T_FG_CONFIRM	Start with these cards?
+T_HOME_QUEST	Quest
+T_HOME_GACHA	Gacha
+T_HOME_CARD	Cards
+T_HOME_SHOP	Shop
+T_HOME_SAVE	Save
+T_HOME_TITLE	To title
+T_BANNER	Live
+T_BANNER_NONE	No event today
+T_NEWS_0	Launch celebration gacha!
+T_LV	Lv
+T_AP	AP
+T_GOLD	G
+T_GEMS	Gm
+T_POTION	Potion
+T_TICKET	Tk
+T_SRTICKET	SRtk
+T_CARDS	Cards
+T_AREA_TITLE	Quest - Select Area
+T_STAGE_TITLE	Stages
+T_BOSS	Boss
+T_AP_SHORT	Not enough AP
+T_USE_POTION	Use a potion to refill AP?
+T_NO_POTION	You have no potions
+T_YES	Yes
+T_NO	No
+T_APPEAR	 appeared!
+T_ATTACK	Attack!
+T_DAMAGE	Damage
+T_TAKEN	You took damage
+T_SKIP	..
+T_WIN	Win!
+T_LOSE	Lost
+T_LOSE2	Power up deck
+T_RAID_KILL	Down!
+T_RAID_TITLE	Raid Boss
+T_PVP_TITLE	Duel
+T_RAID_DMG	Damage
+T_RAID_LV	Lv
+T_EXP	EXP
+T_GET	!
+T_DROP	You got a card!
+T_DROP_LOST	Cards full - could not take it
+T_LEVELUP	Level up! AP refilled
+T_AREA_CLEAR	Area clear! Onward!
+T_NEXT	Next
+T_GACHA_TITLE	Gacha
+T_GACHA_1	x1
+T_GACHA_10	x10:
+T_GACHA_FREE_USED	Used for today
+T_GACHA_NO_MONEY	Not enough
+T_GACHA_FULL	Your cards are full
+T_GACHA_NA	Not available
+T_GACHA_RESULT	Results
+T_GACHA_PITY	Pity! SSR sure
+T_GACHA_PRICE	Cost
+T_CARD_TITLE	Cards
+T_CARD_DETAIL	Card Info
+T_DECK_TITLE	Deck
+T_DECK_AUTO	Auto deck
+T_DECK_CLEAR	Remove
+T_DECK_SLOT	#
+T_DECK_PICK	Pick a card to put in
+T_DECK_OVER	Cost is too high
+T_COST	Cost 
+T_ATK	ATK
+T_DEF	DEF
+T_SKILL	Skill
+T_IN_DECK	*
+T_EMPTY	(empty)
+T_SHOP_TITLE	Shop
+T_SHOP_BUY	Buy potion (100 Gm)
+T_SHOP_USE	Use potion
+T_SHOP_BOUGHT	Purchased
+T_SHOP_USED	AP refilled
+T_SAVING	Saving..
+T_SAVED	Saved
+T_SAVE_FAIL	Could not save.             Insert the save disk.
+T_SAVE_INIT	Format this disk for saving?
+T_LOGIN_TITLE	Login Bonus
+T_LOGIN_DAY	 day
+T_ITEM_0	Gold
+T_ITEM_1	Potion
+T_ITEM_2	Gacha ticket
+T_ITEM_3	Gems
+T_ITEM_4	SR ticket
+T_OWNED	Own
+T_TIME_BACK	The clock went back. Check the time
+T_ELEM_0	Fire	!
+T_ELEM_1	Water	!
+T_ELEM_2	Thunder	!
+T_ELEM_3	Light	!
+T_ELEM_4	Dark	!
+T_RAR_0	N
+T_RAR_1	R
+T_RAR_2	SR
+T_RAR_3	SSR
+T_SKILL_0	None
+T_SKILL_1	ATK+10%
+T_SKILL_2	DEF+10%
+T_SKILL_3	AP-1
+T_SKILL_4	Drop+10%
+T_HELP_SELECT	SPACE:OK ESC:Back
+T_HELP_BACK	ESC:Back
+T_HELP_ANY	Press SPACE
+T_MYPAGE	My Page
+T_M_QUEST	Quest	!
+T_M_GACHA	Gacha
+T_M_CARD	Cards
+T_M_DECK	Deck
+T_M_SHOP	Shop
+T_M_LOGIN	Bonus
+T_M_SAVE	Save
+T_M_TITLE	Quit
+T_GUIDE_HOME	1-8:Menu SPACE:OK
+T_GUIDE_LIST	SPACE:OK ESC:Back
+T_GUIDE_EXPLORE	SPACE:Go ESC:Areas
+T_GUIDE_GACHA	1-5:Pick SPACE:Pull ESC:Back
+T_GUIDE_CARD	SPACE:Info 0:Sort
+T_GUIDE_PICK	SPACE:OK 0:Sort
+T_SORT0	New
+T_SORT1	Rarity
+T_SORT2	ATK
+T_SORT3	Cost
+T_GUIDE_DECK	SPACE:Swap ESC:Back
+T_GUIDE_ANY	SPACE:Next
+T_EXPLORE	Scout
+T_DEFEAT	 defeated!
+T_TOO_STRONG	Too strong! Fled
+T_TREASURE	Found a chest!
+T_GOT	 obtained!
+T_BOSS_APPEAR	Boss!
+T_BOSS_BATTLE	Boss
+T_HP	HP
+T_CLEAR	Clear
+T_NEWAREA	NEW
+T_PULL_1	Pull 1
+T_PULL_10	Pull 10
+T_TODAY_FREE	Free today
+T_SR_UP	SR+
+T_BOX_LEFT	Left
+T_BOX_NO	 box
+T_BOX_SSR	SSR left
+T_BOX_SSR_GOT	SSR pulled!
+T_STAMP_TITLE	Login Stamps
+T_STAMP_NEXT	Log in tomorrow too!
+T_FOR_SALE	Potion 100Gm
+T_BUY	[1]Buy
+T_USE	[2]Use
+T_LEADER	Leader
+T_TOTAL	Sum
+T_FUNDS	Funds
+T_YEN	Y
+T_INFINITE	Unlim.
+T_COURSE_TITLE	Choose your wallet
+T_COURSE_NOTE	Funds are used to buy gems
+T_PAYDAY	Payday! Funds added
+T_SHOP_GEMS	Buy gems ($$$)
+T_SHOP_POTION	Buy potion (100 Gm)
+T_SPENT	Spent
+T_NO_FUNDS	Not enough funds
+T_PACK_TITLE	Which pack to buy?
+T_GEMS_BOUGHT	Gems purchased
+T_M_RANK	Rank
+T_FUSE	Fuse
+T_EVOLVE	Evolve
+T_FUSE_TITLE	Fuse - Pick Fodder
+T_EVO_TITLE	Evolve - Pick Pair
+T_FUSE_ALLN	All N
+T_FUSE_DO	Fuse
+T_FUSE_GUIDE	SPACE:Pick 1:All N 2:Fuse
+T_FUSE_COUNT	Use 
+T_FUSE_GAIN	EXP
+T_FUSE_CONFIRM	Fuse with these cards?
+T_FUSE_DONE	Fused!
+T_FUSE_NONE	Pick fodder first
+T_FUSE_MAX	Already at max level
+T_FUSE_BAD	Deck cards can't be fodder
+T_EVO_NONE	No card to evolve with
+T_EVO_CONFIRM	Evolve with these two?
+T_EVO_DONE	Evolved!
+T_NO_GOLD	Not enough gold
+T_CARD_ACTIONS	1:Fuse 2:Evolve ESC
+T_EVENT	Event
+T_EV_LEFT	Left 	!
+T_EV_PT	Points
+T_EV_RANK	Rank
+T_EV_NEXT	Next reward
+T_EV_BONUS	Boon
+T_EV_GUIDE	1-3:Fight 4:Rank ESC:Back
+T_EV_START	Event start!
+T_EV_END	Event over!
+T_EV_FINAL	Final
+T_EV_REWARD	Gift
+T_EV_CLOSED	No event is running now
+T_EV_GAINED	Reward reached!
+T_RANK_TITLE	Ranking
+T_RANK_EVENT	Event
+T_RANK_POWER	Power
+T_RANK_GUIDE	1:Event 2:Power 0:You
+T_RANK_YOU	you
+T_I	 
+T_ITEM_5	Card
+T_EV_LV1	Easy
+T_EV_LV2	Norm
+T_EV_LV3	Hard
+T_EV_RAID1	Hit
+T_EV_RAID2	Max
+T_EV_RESCUE	Help
+T_EV_PVP1	Weak
+T_EV_PVP2	Even
+T_EV_PVP3	Hard
+T_EV_GUIDE_RAID	1:Hit 2:Max 3:Help ESC:Back
+T_EV_GUIDE_PVP	1-3:Pick foe ESC:Back
+T_RAID_HP	HP
+T_RESCUE_TITLE	Help arrived!
+T_RESCUE_USED	Already asked for help
+T_RESCUE_NONE	Nobody can help now
+T_POWER	Pow
+T_GUILD_JOINED	You joined!
+T_GUILD	Guild
+T_GVG_TITLE	Guild War
+T_GVG_NO	 
+T_GVG_DAI	#
+T_GVG_MATCH	M
+T_GVG_VS	vs
+T_GVG_WIN	W
+T_GVG_LOSE	L
+T_GVG_LEFT	Left
+T_GVG_MIN	m
+T_GVG_NEXT	Next in
+T_GVG_COMBO	Combo
+T_GVG_CHEER	Cheer	!
+T_GVG_CHEERED	Cheered
+T_GVG_ATTACK	Hit
+T_GVG_ONAIR	On now!
+T_GVG_JOINED	Guild War begins!
+T_GVG_RESULT	War results
+T_GVG_RANK	Guild rank
+T_GVG_NOTNOW	Not a battle time
+T_GVG_CHEER_OK	Cheered! Score +3%
+T_GVG_GUIDE	1-3:Hit 4:Cheer ESC:Back
+T_GVG_TIMES	Battles at 12:00 and 21:00
+T_GVG_US	Us
+T_GVG_THEM	Foe
+T_DAYS	d
+T_M_NEWS	News
+T_NEWS_TITLE	News
+T_FEED_TITLE	Live feed
+T_PLAYERS	Users 
+T_PERSON	 
+T_FD_GA	: 
+T_FD_SSR	 GET!
+T_FD_BOSS	 beat a boss!
+T_FD_LEVEL	 Lv
+T_FD_LEVEL2	 up!
+T_FD_RANKUP	 rose to #
+T_FD_RANKUP2	!
+T_FD_LOGIN	 logged in.
+T_FD_BYE0	: Thank you, all!
+T_FD_BYE1	: Fun times! See ya!
+T_FD_BYE2	: GG, my guildmates!
+T_FD_BYE3	: One last pull...
+T_LICENSE_TITLE	License
+T_LICENSE_SRC	Source
+T_LICENSE_NOTE	Code, art and music: MIT
+T_TITLE_LICENSE	0:MIT
+T_STAFFROLL	Staff roll
+T_RATEUP_ON	SSR rate UP!
+T_END_SOON	Ends in
+T_ENDED_TITLE	The service has ended
+T_MEMORIES	Memories
+T_RESET	Reset memories
+T_RESET_CONFIRM	Start over from scratch?
+T_GIFT_GOT	A gift of gems arrived
+T_TO_TITLE	Return to the title?
+T_GUIDE_HOME2	1-8:Menu ESC:Title
+
+# ---- 運営のお知らせ（data/timeline.csv） ----
+【お知らせ】サービス開始！冒険者ギルドへようこそ	[News] Service launched! Welcome to the Guild
+【お知らせ】事前登録の特典をプレゼント中です	[News] Pre-registration gifts now live
+【イベント】第1回「星降る夏祭り」開催！	[Event] #1 Starfall Festival is on!
+【ガチャ】プレミアガチャSSR確率2倍キャンペーン！	[Gacha] Premium Gacha SSR rate x2!
+【イベント】第2回「海辺の魔物退治」開催！	[Event] #2 Beach Monster Hunt is on!
+【お知らせ】登録者数10万人突破！ありがとう！	[News] 100,000 players! Thank you!
+【新カード】新SSR「天空の聖騎士」登場！	[New] SSR Sky Paladin is here!
+【イベント】第3回「雷神の試練」開催！	[Event] #3 Thunder Trial is on!
+【ガチャ】SSR確率2倍！今がチャンス	[Gacha] SSR rate x2! Pull now!
+【イベント】第4回「収穫祭の大鎌」開催！	[Event] #4 Harvest Scythe is on!
+【新カード】超レアSSR「紅蓮の竜王」「雷光の戦乙女」登場！	[New] Super rare SSR Crimson King, Bolt Valkyrie!
+【イベント】第5回「氷晶の城」開催！	[Event] #5 Ice Crystal Castle!
+【お知らせ】不具合のお詫びとして石500個を配布しました	[News] 500 gems sent as an apology for a bug
+【イベント】第6回「大感謝祭」開催！	[Event] #6 Thanks Festival!
+【ガチャ】SSR確率3倍！最大級キャンペーン	[Gacha] SSR rate x3! Biggest ever!
+【ギルド】第1回ギルド対抗戦、開戦！昼と夜の戦に集え	[Guild] Guild War #1 begins! Fight noon & night
+【新カード】最強SSR「深淵の魔導王」「蒼海の守護神」登場！	[New] Top SSR Abyss Archmage, Sea Guardian!
+【お知らせ】メンテナンスのお知らせ	[News] Maintenance notice
+【お知らせ】ギルドの再編成について	[News] About guild reshuffles
+【イベント】最終イベント「最後の竜」開催！	[Event] Final event: The Last Dragon!
+【ギルド】第2回ギルド対抗戦、開戦！昼と夜の戦に集え	[Guild] Guild War #2 begins! Fight noon & night
+【重要】サービス終了のお知らせ	[!] Notice of service end
+【重要】サービスは終了しました。ありがとうございました	[!] The service has ended. Thank you so much
+
+# ---- カード（data/cards.csv）。14 桁まで ----
+ひよこ剣士	Chick Fencer
+かまど番の少年	Kitchen Boy
+火吹きトカゲ	Fire Lizard
+赤帽子の行商人	Red Cap Trader
+泉のうさぎ	Spring Bunny
+渡し舟の娘	Ferry Girl
+霧ガエル	Mist Frog
+見習い漁師	Rookie Fisher
+雷鳴の見習い弓兵	Storm Archer
+かみなり小僧	Thunder Imp
+風見鶏の配達人	Wind Courier
+しびれ蜂	Shock Bee
+灯火の修道女	Lamp Nun
+鐘つきの少女	Bell Girl
+白羽の伝令	White Herald
+ほたる妖精	Firefly Fairy
+影ねずみ	Shadow Rat
+墓守の老人	Grave Keeper
+夜鳴きフクロウ	Night Owl
+黒猫の占い師	Cat Seer
+紅蓮の槍騎士	Crimson Lancer
+溶岩ゴーレム	Lava Golem
+炎舞の踊り子	Flame Dancer
+霧の歌姫	Mist Diva
+氷河の狩人	Glacier Hunter
+潮騒の魔術師	Tide Mage
+稲妻の双剣士	Bolt Duelist
+嵐呼びの神子	Storm Caller
+聖堂の盾騎士	Shield Knight
+朝焼けの治療師	Dawn Healer
+月夜の暗殺者	Moon Assassin
+宵闇の人形師	Dusk Puppeteer
+紅炎の竜騎士	Flame Dragoon
+深海の女帝	Deep Empress
+蒼天の騎竜	Sky Wyvern
+星読みの賢者	Star Sage
+月影の魔導士	Moon Sorcerer
+緑玉の大司教	Jade Bishop
+暁の聖女王	Dawn Queen
+冥府の大公	Hades Duke
+祭りの舞姫	Fest Dancer
+祭りの舞姫＋	Fest Dancer+
+宵祭りの鬼神	Fest Demon
+ひよこ剣士＋	Chick Fencer+
+泉のうさぎ＋	Spring Bunny+
+浜辺の槍使い	Beach Lancer
+浜辺の槍使い＋	Beach Lancer+
+雷太鼓の奏者	Storm Drummer
+雷太鼓の奏者＋	Storm Drummer+
+豊穣の死神	Harvest Reaper
+収穫の娘	Harvest Girl
+収穫の娘＋	Harvest Girl+
+氷晶の魔女王	Frost Witch
+雪合戦の子	Snowball Kid
+雪合戦の子＋	Snowball Kid+
+感謝の天使	Thanks Angel
+感謝の天使＋	Thanks Angel+
+黄昏の黒竜	Dusk Dragon
+竜狩りの騎士	Dragon Hunter
+竜狩りの騎士＋	Dragon Hunter+
+天空の聖騎士	Sky Paladin
+紅蓮の竜王	Crimson King
+雷光の戦乙女	Bolt Valkyrie
+深淵の魔導王	Abyss Archmage
+蒼海の守護神	Sea Guardian
+焚き火の番人	Campfire Ward
+赤トンボ	Red Dragonfly
+鍛冶屋の弟子	Smith Pupil
+火の粉スライム	Ember Slime
+港の水夫	Harbor Sailor
+雨ガエル	Rain Frog
+川辺のカワウソ	River Otter
+水色スライム	Aqua Slime
+見張り台の少年	Lookout Boy
+雷雲スライム	Storm Slime
+鳩の伝書係	Pigeon Mail
+稲穂の農夫	Rice Farmer
+白うさぎ	White Bunny
+聖歌隊の少年	Choir Boy
+光の小妖精	Light Sprite
+見習い神官	Novice Priest
+どぶねずみ	Sewer Rat
+闇スライム	Dark Slime
+盗賊見習い	Thief Pupil
+古井戸の亡霊	Well Ghost
+野良犬	Stray Dog
+火竜の子	Baby Drake
+鉄拳の格闘家	Iron Fist
+灯火の舞い手	Lamp Dancer
+炎の弓使い	Flame Archer
+人魚の歌い手	Mermaid Singer
+波乗りの剣士	Surf Swordsman
+氷の魔法使い	Ice Mage
+雪国の狩人	Snow Hunter
+雷鳥の騎手	Roc Rider
+風の旅芸人	Wind Jester
+機巧の発明家	Gear Inventor
+疾風の忍び	Gale Ninja
+天馬の騎士	Pegasus Knight
+祈りの修道士	Praying Monk
+星の占星術師	Astrologer
+白銀の弓姫	Silver Archer
+死霊使い	Necromancer
+吸血鬼の執事	Vampire Butler
+呪いの人形	Cursed Doll
+黒き傭兵	Black Merc
+爆炎の魔剣士	Blast Blade
+渦潮の大魔導	Whirlpool Mage
+迅雷の槍聖	Thunder Lancer
+光輪の大天使	Halo Archangel
+冥界の剣豪	Underworld Ace
+炎獄の番犬	Hellhound
+雪原の白狼	Snow Wolf
+太陽神の化身	Sun Avatar
+獄炎の魔神	Inferno Djinn
+星海の大賢者	Star Archsage
+ギルドの旗手	Guild Banner
+ギルドの英雄	Guild Hero
+双剣の団長	Twin Captain
+覇王の盾	Overlord Aegis
+
+# ---- エリアと敵（data/areas.csv）。エリア 16 桁・敵 14 桁まで ----
+草原地帯	Grasslands
+火トカゲ	Fire Newt
+森林地帯	Woods
+水スライム	Water Slime
+洞窟地帯	Caverns
+雷バチ	Volt Wasp
+遺跡地帯	Ruins
+石像ゴーレム	Stone Golem
+火山地帯	Volcano
+砂トカゲ	Sand Newt
+湖畔の村	Lakeside
+泉スライム	Spring Slime
+風車の丘	Windmill Hill
+風バチ	Wind Wasp
+古城の庭	Castle Garden
+神殿ゴーレム	Temple Golem
+霧の沼地	Misty Marsh
+影の獣	Shade Beast
+砂丘	Dunes
+炎トカゲ	Flame Newt
+珊瑚の浜	Coral Beach
+霧スライム	Mist Slime
+落雷の峡谷	Bolt Canyon
+嵐バチ	Storm Wasp
+白亜の神殿	White Temple
+白亜ゴーレム	Chalk Golem
+黒い森	Black Forest
+夜の獣	Night Beast
+灼熱の鉱山	Scorch Mine
+溶岩トカゲ	Lava Newt
+氷の洞窟	Ice Cave
+氷スライム	Ice Slime
+嵐の岬	Storm Cape
+稲妻バチ	Bolt Wasp
+天空の階段	Sky Stairs
+黄金ゴーレム	Gold Golem
+忘れられた墓地	Lost Graveyard
+霧の獣	Fog Beast
+炎の大地	Burning Land
+鉱山トカゲ	Mine Newt
+深海の神殿	Deep Temple
+海スライム	Sea Slime
+雷雲の塔	Storm Tower
+雷雲バチ	Cloud Wasp
+光の庭園	Light Garden
+聖なるゴーレム	Holy Golem
+夜の都	Night City
+墓場の獣	Grave Beast
+紅蓮の砦	Crimson Fort
+太陽トカゲ	Sun Newt
+水晶の湖	Crystal Lake
+青スライム	Blue Slime
+稲妻の平原	Bolt Plains
+天雷バチ	Sky Wasp
+聖なる山	Holy Mountain
+天空ゴーレム	Sky Golem
+呪いの館	Cursed Manor
+呪いの獣	Cursed Beast
+溶岩の川	Lava River
+紅蓮トカゲ	Crimson Newt
+人魚の入江	Mermaid Cove
+湖スライム	Lake Slime
+雷鳴の山脈	Thunder Range
+女王バチ	Queen Wasp
+黄金の都	Golden City
+星のゴーレム	Star Golem
+闇の回廊	Dark Corridor
+冥府の番犬	Hades Hound
+太陽の神殿	Sun Temple
+灼熱トカゲ	Scorch Newt
+嵐の海	Stormy Sea
+深海スライム	Abyss Slime
+天雷の祭壇	Thunder Altar
+鉄バチ	Iron Wasp
+天上の庭	Heaven Garden
+光のゴーレム	Light Golem
+冥府の入口	Hades Gate
+奈落の獣	Abyss Beast
+竜の巣	Dragon Nest
+氷結の王城	Frozen Castle
+嵐スライム	Storm Slime
+雷帝の宮殿	Thunder Palace
+黄金バチ	Gold Wasp
+星の聖域	Star Sanctum
+天使の像	Angel Statue
+奈落の底	Abyss Floor
+闇の獣	Dark Beast
+炎竜の山	Fire Drake Peak
+炎竜の子	Fire Whelp
+海竜の深淵	Sea Drake Depth
+王様スライム	King Slime
+雷竜の峰	Volt Drake Peak
+雷帝バチ	Emperor Wasp
+光竜の宮	Light Drake Hall
+光竜の像	Drake Idol
+闇竜の城	Dark Drake Keep
+闇竜の子	Dark Whelp
+世界の果て	World's End
+
+# ---- ガチャ・お財布・イベント・イベントの面 ----
+無料ガチャ	Free Gacha
+ゴールドガチャ	Gold Gacha
+プレミアガチャ	Premium Gacha
+イベントBOXガチャ	Event BOX Gacha
+チケットガチャ	Ticket Gacha
+SR確定チケット	SR Ticket
+おこづかい（月3000円）	Allowance 3000Y/mo
+社会人（月3万円）	Worker 30000Y/mo
+石油王（月100万円）	Oil Baron 1MY/mo
+無敵モード（無尽蔵）	God mode (no limit)
+星降る夏祭り	Starfall Festival
+海辺の魔物退治	Beach Monster Hunt
+雷神の試練	Thunder Trial
+収穫祭の大鎌	Harvest Scythe
+氷晶の城	Ice Crystal Castle
+大感謝祭	Thanks Festival
+最後の竜	The Last Dragon
+初級	Easy
+中級	Norm
+上級	Hard
+通常攻撃	Hit
+全力攻撃	Max
+格下	Weak
+同格	Even
+格上	Hard
+
+# ---- イベントの物語（data/events.csv）。24 桁 × 2 行。1 行目は空白で 24 桁にそろえる ----
+夏祭りの夜、封じられた鬼神がよみがえった。舞姫と共に鎮めよ！	The festival demon woke!Calm it with the dancer!
+深海の女帝が浜辺に出現！救援を呼んで皆で倒せ！	The Deep Empress rose onthe beach! Call allies!
+雷雲の塔で腕自慢が競う。太鼓を合図に勝ち抜け！	Brave fighters clash in the storm tower. Win it!
+実りの秋、死神が畑に現れた。収穫の娘と共に追い払え！	Autumn harvest: a reaperhaunts the field! Fight!
+魔女王が氷の城ごと出現！何度でも蘇る。倒し続けろ	The witch queen's castlekeeps rising. Beat it!
+感謝祭の武闘会が始まる！天使の加護で勝ち抜け！	The thanks festival duelbegins! Win with angels!
+黄昏に黒竜が舞い降りた。救援を呼び全員で討て！	A black dragon descends.Rally everyone! Slay it!
+
+# ---- NPC の名前の部品（data/npc_names.csv） ----
+ゆう	Yuu
+たく	Taku
+みー	Mii
+あや	Aya
+しん	Shin
+なな	Nana
+けん	Ken
+りょう	Ryo
+さく	Saku
+まー	Maa
+ひろ	Hiro
+あっ	Ace
+のん	Non
+そら	Sora
+れい	Rei
+こう	Kou
+ちー	Chi
+もも	Momo
+だい	Dai
+るな	Luna
+★	*
+☆	+
+♪	~
+ちゃん	chan
+くん	kun
+ぴょん	pyon
+にゃん	nyan
+っち	cchi
+たん	tan
+丸	99
+太郎	taro
+ぞう	zou
+りん	rin
+ぽん	pon
+きち	kid
+ん	n
+ぼう	bou
+ちゃま	chama
+ぴー	pii
+タン	Tan
+＠勇者	@hero
+＠騎士	@guard
+＠魔王	@demon
+＠姫	@luv
+＠団長	@boss
+＠初心者	@newbie
+＠課金勢	@whale
+＠無課金	@F2P
+＠廃人	@grind
+＠社畜	@9to5
+＠学生	@pupil
+＠夜勤	@night
+＠寝落ち	@sleepy
+＠復帰	@back
+＠ガチ勢	@tryhard
+＠ゆる勢	@casual
+２号	2nd
+ＤＸ	DX
+ＭＫ２	Mk2
+ＥＸ	EX
+改	R
+Ｚ	Z
+神	OP
+様	Sr
+殿	II
+先生	Prof
+隊長	Capt
+王子	Lord
+姫	<3
+番長	Boss
+
+# ---- ギルド（data/guilds.csv）。14 桁まで ----
+蒼天騎士団	Azure Knights
+紅蓮の牙	Crimson Fang
+月夜のお茶会	Moonlit Tea
+ゆるふわ同盟	Comfy Club
+黄金の獅子	Golden Lions
+深淵の探求者	Abyss Seekers
+星屑旅団	Stardust Band
+雷鳴隊	Thunder Squad
+まったり冒険部	Chill Raiders
+白銀の翼	Silver Wings
+夜勤明け連合	Night Shifters
+無課金の誇り	F2P Pride
+鋼の意志	Iron Will
+森の守り人	Forest Guards
+夕焼け商会	Sunset Trade
+竜殺し同好会	Dragonslayers
+
+# ---- スタッフロール（data/text/credits.txt）。32 桁まで ----
+― スタッフ ―	- Staff -
+原案・コンセプト	Original concept
+ゲームデザイン・ディレクション	Game design & direction
+実装	Implementation
+プログラム／グラフィック	Program / Graphics
+サウンド	Sound
+制作の道具	Tools
+そして	And
+遊んでくれた	to every adventurer
+すべての冒険者のみなさん	who played this game:
+270日間	For 270 days
+ありがとうございました！	thank you so much!

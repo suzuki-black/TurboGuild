@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT */
-/* name.c — 名前入力。半角カナ・英数字の表から選ぶ（8 文字まで）。
- * 半角カナは MSX の文字コードと Shift-JIS の 1 バイトカナが同じなので、そのまま名前にできる。 */
+/* name.c — 名前入力。文字の表から選ぶ（8 文字まで）。日本語版は半角カナと英数字、
+ * 英語版（LANG_EN）は英数字と記号。半角カナは MSX の文字コードと Shift-JIS の 1 バイトカナが同じなので、そのまま名前にできる。 */
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
@@ -14,19 +14,31 @@
 
 #define NAME_MAX   8
 #define COLS       16
-#define CELLS      95           /* 94 文字 + 「決定」 */
-#define CELL_END   (CELLS - 1)
 #define GRID_Y     ROW(4)
 
-/* 表の並び: ｱ〜ﾝ(B1-DD) ｧ〜ｯ(A7-AF) ｰ ﾞ ﾟ ｦ A〜Z 0〜9（{個数, 先頭の文字コード} の列） */
-static const u8 runs[8][2] = {
+/* 入力できる文字の表（{個数, 先頭の文字コード} の列）。言語で表が違う（DECISIONS #77） */
+#ifdef LANG_EN
+/* A〜Z a〜z 0〜9 と記号 */
+static const u8 runs[][2] = {
+    { 26, 'A' }, { 26, 'a' }, { 10, '0' }, { 1, '-' }, { 1, '.' }, { 1, '!' }, { 1, '?' }, { 1, '@' }, { 1, '&' },
+    { 1, '*' }, { 1, '+' }, { 1, '#' }, { 1, '=' }, { 1, '~' }, { 1, '_' },
+};
+#define CHARS      74
+#else
+/* ｱ〜ﾝ(B1-DD) ｧ〜ｯ(A7-AF) ｰ ﾞ ﾟ ｦ A〜Z 0〜9（半角カナは MSX の文字コードと Shift-JIS の 1 バイトカナが同じ） */
+static const u8 runs[][2] = {
     { 45, 0xB1 }, { 9, 0xA7 }, { 1, 0xB0 }, { 1, 0xDE }, { 1, 0xDF }, { 1, 0xA6 }, { 26, 'A' }, { 10, '0' },
 };
+#define CHARS      94
+#endif
+#define RUNS       (sizeof runs / sizeof runs[0])
+#define CELLS      (CHARS + 1)  /* 文字 + 「決定」 */
+#define CELL_END   (CELLS - 1)
 
 static u8 cell_char(u8 i)
 {
     u8 r;
-    for (r = 0; r < 8; r++) {
+    for (r = 0; r < RUNS; r++) {
         if (i < runs[r][0]) return (u8)(runs[r][1] + i);
         i -= runs[r][0];
     }

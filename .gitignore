@@ -3,3 +3,4 @@ bin/
 .claude/settings.local.json
 src/data/*.h
 __pycache__/
+data/lang/*.missing.tsv

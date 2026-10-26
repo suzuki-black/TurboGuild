@@ -3,7 +3,9 @@
 """docs/MEMORY_MAP.md の表どおりに ASCII8 メガROM を組み立てる（仕様 §2.2）。
 
     link_rom.py header <out.h> <banks.mk>         PAGE_<名前> の #define と、ソース→バンク表を生成
-    link_rom.py rom <kernel.ihx> <out.rom>        ROM イメージを生成
+    link_rom.py rom <kernel.ihx> <out.rom> [--text-dir DIR]
+                                                  ROM イメージを生成。--text-dir は文字列のページ
+                                                  （build/textN.dat）を DIR/textN.dat に置き換える（英語版など）
 
 ihx の 0x4000-0x5FFF はページ 0（カーネル）。コードバンク n の領域 _BANKn は 0xn6010 に
 リンクされ（24bit 番地, ihx の型 04 レコード）、ページ n の 6000h 窓の位置に置く。
@@ -128,7 +130,7 @@ def split_code(mem, rows):
     return kern, banks, hot
 
 
-def cmd_rom(ihx, out):
+def cmd_rom(ihx, out, text_dir=None):
     rows = parse_map()
     npages = page_count(rows)
     rom = bytearray(b"\xFF" * (npages * PAGE))
@@ -160,7 +162,10 @@ def cmd_rom(ihx, out):
                 continue
             put(p * PAGE, bytes([p, ord("T"), ord("G"), ord("P"), r["kind"]]) + b"\xFF" * 11, "header")
             if r["src"] not in ("-", "", "kernel") and not code_files(r) and not hot_files(r):
-                data = (ROOT / r["src"]).read_bytes()
+                src = r["src"]
+                if text_dir and re.fullmatch(r"build/text\d+\.dat", src):
+                    src = f"{text_dir}/{Path(src).name}"      # 言語ごとの文字列のページ
+                data = (ROOT / src).read_bytes()
                 if len(data) > PAGE - HDR:
                     sys.exit(f"link_rom: {r['src']} が {len(data)} B で 1 ページに入らない")
                 put(p * PAGE + HDR, data, r["src"])
@@ -183,6 +188,8 @@ def main(argv):
         cmd_header(argv[2], argv[3])
     elif len(argv) == 4 and argv[1] == "rom":
         cmd_rom(argv[2], argv[3])
+    elif len(argv) == 6 and argv[1] == "rom" and argv[4] == "--text-dir":
+        cmd_rom(argv[2], argv[3], argv[5])
     else:
         sys.exit(__doc__)
 

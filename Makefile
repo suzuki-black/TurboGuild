@@ -9,6 +9,7 @@
 #   make check-msx2  MSX2 機種で「turboR 専用」表示を確認
 #   make play     30 分の自動プレイ（Phase1 の受け入れ）。DURATION=秒 で短くできる
 #   make sim      経済シミュレーション（Phase3 の受け入れ）
+#   make LANG=en  英語版 bin/TurboGuild_en.rom（訳は data/lang/en.tsv。足りなければ en.missing.tsv に出して止まる）
 #   make clean
 .DELETE_ON_ERROR:
 
@@ -20,10 +21,25 @@ MACHINE  ?= Panasonic_FS-A1ST
 MACHINE_MSX2 ?= C-BIOS_MSX2_JP
 
 B        := build
-ROM      := bin/TurboGuild.rom
 DSK      := bin/save.dsk
-IHX      := $(B)/kernel.ihx
 BANKSMK  := $(B)/banks.mk
+
+# 言語（DECISIONS #77）。日本語が元で、ほかの言語は文字列のページと #ifdef LANG_xx の部分だけが違う
+LANG     ?= ja
+ifeq ($(LANG),ja)
+OBJ      := $(B)/obj
+ROM      := bin/TurboGuild.rom
+IHX      := $(B)/kernel.ihx
+LANGFLAG :=
+TEXTSTAMP :=
+else
+OBJ      := $(B)/obj-$(LANG)
+ROM      := bin/TurboGuild_$(LANG).rom
+IHX      := $(B)/kernel-$(LANG).ihx
+LANGFLAG := -DLANG_$(shell echo $(LANG) | tr a-z A-Z)
+TEXTSTAMP := $(B)/$(LANG)/text.stamp
+endif
+MAP      := $(IHX:.ihx=.map)
 
 # ソース→コードバンクの対応は docs/MEMORY_MAP.md が唯一の定義。そこから banks.mk を作って読む
 -include $(BANKSMK)
@@ -31,7 +47,7 @@ BANKSMK  := $(B)/banks.mk
 # --disable-warning 158: SDCC 4.6 は「定数 + 定数」が 127 を超えて u8 の引数に渡ると、
 #   値は正しく渡すのに桁あふれ警告を出す（124+8 → 0x84 を確認済み）。誤検知なので止める
 # --disable-warning 110: 「最適化で条件の流れを変えた」の通知。a ? 定数 : 定数 などで毎回出るだけ
-CFLAGS   := -mz80 --std-c99 --sdcccall 1 --opt-code-size --disable-warning 158 --disable-warning 110 -Isrc
+CFLAGS   := -mz80 --std-c99 --sdcccall 1 --opt-code-size --disable-warning 158 --disable-warning 110 -Isrc $(LANGFLAG)
 LDFLAGS  := -mz80 --no-std-crt0 --code-loc 0x4010 --data-loc 0xC000 \
             $(foreach n,$(CODE_BANKS),-Wl-b_BANK$(n)=0x$(shell printf %X $(n))6010) -Wl-b_HOT=$(HOT_ADDR)
 
@@ -40,9 +56,9 @@ ASRC     := $(filter-out src/sys/crt0.s,$(wildcard src/sys/*.s))
 GENH     := src/data/cards.h src/data/rompages.h src/data/screens.h src/data/tables.h src/data/text_ids.h \
             src/data/art.h src/data/palette.h src/data/bgm_data.h
 HDRS     := $(wildcard src/*.h src/*/*.h) $(GENH)
-COBJ     := $(patsubst src/%.c,$(B)/obj/%.rel,$(CSRC))
-AOBJ     := $(patsubst src/%.s,$(B)/obj/%.rel,$(ASRC)) $(B)/obj/far_stubs.rel
-CRT0     := $(B)/obj/sys/crt0.rel
+COBJ     := $(patsubst src/%.c,$(OBJ)/%.rel,$(CSRC))
+AOBJ     := $(patsubst src/%.s,$(OBJ)/%.rel,$(ASRC)) $(OBJ)/far_stubs.rel
+CRT0     := $(OBJ)/sys/crt0.rel
 DATABIN  := $(wildcard $(B)/*.bin $(B)/*.dat)
 DATASRC  := $(wildcard data/*.csv data/text/*.txt)
 
@@ -82,15 +98,15 @@ $(B)/far_stubs.s: $(BANKSMK) tools/gen_far.py $(CSRC)
 src/data/screens.h: $(B)/far_stubs.s
 	@:
 
-$(B)/obj/%.rel: src/%.c $(HDRS) Makefile $(BANKSMK)
+$(OBJ)/%.rel: src/%.c $(HDRS) Makefile $(BANKSMK)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) $(if $(HOT_OF_$<),--codeseg HOT --constseg HOT,$(if $(BANK_OF_$<),--codeseg BANK$(BANK_OF_$<) --constseg BANK$(BANK_OF_$<))) -c -o $@ $<
 
-$(B)/obj/%.rel: src/%.s
+$(OBJ)/%.rel: src/%.s
 	@mkdir -p $(dir $@)
 	$(AS) -g -o $@ $<
 
-$(B)/obj/far_stubs.rel: $(B)/far_stubs.s
+$(OBJ)/far_stubs.rel: $(B)/far_stubs.s
 	@mkdir -p $(dir $@)
 	$(AS) -g -o $@ $<
 
@@ -98,10 +114,16 @@ $(B)/obj/far_stubs.rel: $(B)/far_stubs.s
 $(IHX): $(CRT0) $(AOBJ) $(COBJ)
 	$(CC) $(LDFLAGS) -o $@ $(CRT0) $(AOBJ) $(COBJ)
 
-$(ROM): $(IHX) $(B)/data.stamp $(B)/art.stamp docs/MEMORY_MAP.md tools/link_rom.py tools/ram_used.py tools/check_banks.py
-	$(PYTHON) tools/check_banks.py $(B)/kernel.map $(BANKSMK) $(B)/obj
-	$(PYTHON) tools/link_rom.py rom $(IHX) $@
-	@$(PYTHON) tools/ram_used.py $(B)/kernel.map
+$(ROM): $(IHX) $(B)/data.stamp $(B)/art.stamp $(TEXTSTAMP) docs/MEMORY_MAP.md tools/link_rom.py tools/ram_used.py tools/check_banks.py
+	$(PYTHON) tools/check_banks.py $(MAP) $(BANKSMK) $(OBJ)
+	$(PYTHON) tools/link_rom.py rom $(IHX) $@ $(if $(TEXTSTAMP),--text-dir $(B)/$(LANG))
+	@$(PYTHON) tools/ram_used.py $(MAP)
+
+# ほかの言語の文字列のページ（番号は日本語と同じ。訳は data/lang/$(LANG).tsv）
+$(B)/$(LANG)/text.stamp: $(B)/data.stamp data/lang/$(LANG).tsv tools/build_data.py
+	@mkdir -p $(B)/$(LANG)
+	$(PYTHON) tools/build_data.py --lang $(LANG)
+	@touch $@
 
 $(DSK): tools/mkblank_dsk.py
 	@if [ ! -f $@ ]; then $(PYTHON) tools/mkblank_dsk.py $@; fi
@@ -158,7 +180,7 @@ play: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run4 && mkdir -p $(B)/run4
 	@cp $(ROM) $(B)/run4/TurboGuild.rom
 	@$(PYTHON) tools/mkblank_dsk.py $(B)/run4/save.dsk >/dev/null
-	-OUT=$(abspath $(B))/run4/play.txt MAP=$(abspath $(B))/kernel.map DURATION=$(DURATION) $(if $(TRACE),TRACE=1) timeout 1500 \
+	-OUT=$(abspath $(B))/run4/play.txt MAP=$(abspath $(MAP)) DURATION=$(DURATION) $(if $(TRACE),TRACE=1) timeout 1500 \
 	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run4/TurboGuild.rom -romtype ASCII8 \
 	  -diska $(abspath $(B))/run4/save.dsk -script $(abspath openmsx/play.tcl) >/dev/null 2>&1
 	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run4" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
@@ -170,7 +192,7 @@ check-offline: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run5 && mkdir -p $(B)/run5
 	@cp $(ROM) $(B)/run5/TurboGuild.rom
 	@$(PYTHON) tools/mkblank_dsk.py $(B)/run5/save.dsk >/dev/null
-	-OUT=$(abspath $(B))/run5/offline.txt MAP=$(abspath $(B))/kernel.map timeout 400 \
+	-OUT=$(abspath $(B))/run5/offline.txt MAP=$(abspath $(MAP)) timeout 400 \
 	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run5/TurboGuild.rom -romtype ASCII8 \
 	  -diska $(abspath $(B))/run5/save.dsk -script $(abspath openmsx/offline.tcl) >/dev/null 2>&1
 	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run5" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
@@ -182,7 +204,7 @@ check-timeline: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run6 && mkdir -p $(B)/run6
 	@cp $(ROM) $(B)/run6/TurboGuild.rom
 	@$(PYTHON) tools/mkblank_dsk.py $(B)/run6/save.dsk >/dev/null
-	-OUT=$(abspath $(B))/run6/timeline.txt MAP=$(abspath $(B))/kernel.map SHOTDIR=$(abspath $(B))/run6 timeout 1000 \
+	-OUT=$(abspath $(B))/run6/timeline.txt MAP=$(abspath $(MAP)) SHOTDIR=$(abspath $(B))/run6 timeout 1000 \
 	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run6/TurboGuild.rom -romtype ASCII8 \
 	  -diska $(abspath $(B))/run6/save.dsk -script $(abspath openmsx/timeline.tcl) >/dev/null 2>&1
 	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run6" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done

@@ -85,6 +85,84 @@ def read_csv(name):
         return [(ln, r) for ln, r in enumerate(csv.DictReader(f), 2)]
 
 
+# ---- 言語（DECISIONS #77）: 日本語が元。ほかの言語は data/lang/<言語>.tsv で置き換える ----
+#   「T_キー<TAB>訳」   UI の文（data/text/ui.txt）はキーで。同じ日本語でも画面ごとに訳し分けられる
+#   「日本語<TAB>訳」   それ以外（カード名・イベント・お知らせ・NPC の名前など）は日本語の文で
+#   3 列目に ! を書くと、日本語より長い訳も通す（置き場所に余裕があるのを画面で確かめたもの）
+
+LANG_DIR = ROOT / "data" / "lang"
+
+
+def width(s):
+    """画面の桁数（全角 2・半角 1）。改行を含む文は一番長い行"""
+    def w1(line):
+        return sum(1 if ord(c) < 0x80 or 0xFF61 <= ord(c) <= 0xFF9F else 2 for c in line)
+    return max(w1(line) for line in s.split("\n"))
+
+
+def load_lang(lang):
+    """訳の辞書 {日本語: (訳, 幅の検査を外すか)}。\\n は改行"""
+    path = LANG_DIR / f"{lang}.tsv"
+    if not path.exists():
+        die(f"{path} が無い")
+    d = {}
+    for ln, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+        if not line.strip() or line.startswith("#"):
+            continue
+        cols = line.split("\t")
+        if len(cols) < 2:
+            die(f"{path.name}:{ln}: '日本語<TAB>訳' の形で書く")
+        ja, tr = cols[0].replace("\\n", "\n"), cols[1].replace("\\n", "\n")
+        if ja in d:
+            die(f"{path.name}:{ln}: 「{ja}」が 2 回ある")
+        d[ja] = (tr, len(cols) > 2 and cols[2].strip() == "!")
+    return d
+
+
+def translate(text, lang):
+    """text.items を訳した並び。訳が無い・長すぎる・使えない字があれば、まとめて出して止める"""
+    d = load_lang(lang)
+    key_of = {i: k for k, i in text.keys.items() if k in text.ui}
+    out, missing, errors = [], [], []
+    used = set()
+    for i, ja in enumerate(text.items):
+        k = key_of.get(i)
+        if k and k in d:                             # UI はキーの訳を優先
+            hit = k
+        elif ja in d:
+            hit = ja
+        elif all(ord(c) < 0x80 for c in ja):         # もともと半角だけの文（TurboGuild・URL など）はそのまま
+            out.append(ja if ja else " ")
+            continue
+        else:
+            missing.append(k if k else ja)
+            out.append(ja)
+            continue
+        used.add(hit)
+        tr, free = d[hit]
+        limit = max(width(ja), text.maxw.get(i, 0))
+        if not free and width(tr) > limit:
+            errors.append(f"長すぎる（{width(tr)} 桁 > {limit} 桁）: {k or ja} -> {tr}")
+        bad = [c for c in tr if not (c == "\n" or 0x20 <= ord(c) < 0x7F)]
+        if bad:
+            errors.append(f"半角の英数字と記号だけにする（{''.join(bad)}）: {tr}")
+        out.append(tr if tr else " ")
+    unused = [ja for ja in d if ja not in used]
+    for u in unused:
+        print(f"build_data: [{lang}] 使われていない訳: {u}")
+    if missing:
+        miss = LANG_DIR / f"{lang}.missing.tsv"
+        seen = []
+        for m in missing:
+            if m not in seen:
+                seen.append(m)
+        miss.write_text("".join(f"{m.replace(chr(10), chr(92) + 'n')}\t\n" for m in seen), encoding="utf-8")
+        errors.append(f"訳が無いものが {len(seen)} 件 → {miss.relative_to(ROOT)} に書き出した（訳を書いて {lang}.tsv へ足す）")
+    if errors:
+        die(f"[{lang}] " + "\n  ".join([""] + errors))
+    return out
+
+
 def lookup(table, key, where):
     if key not in table:
         die(f"{where}: 不明な値 '{key}'（使えるのは {', '.join(table)}）")
@@ -94,18 +172,26 @@ def lookup(table, key, where):
 class TextTable:
     def __init__(self):
         self.items, self.index, self.keys = [], {}, {}
+        self.ui = set()      # data/text/ui.txt のキー（訳はキーで引く）
+        self.maxw = {}       # 番号 → 訳してよい桁数（日本語の幅より大きいとき。置き場所の幅）
 
-    def add(self, s, key=None):
+    def add(self, s, key=None, maxw=0, ui=False):
         if key:
             if key in self.keys:
                 die(f"text キー {key} が重複")
             self.keys[key] = len(self.items)
             self.items.append(s)          # キー付きは同じ文でも別 id（画面ごとに書き換えられるように）
-            return self.keys[key]
-        if s not in self.index:
-            self.index[s] = len(self.items)
-            self.items.append(s)
-        return self.index[s]
+            if ui:
+                self.ui.add(key)
+            i = self.keys[key]
+        else:
+            if s not in self.index:
+                self.index[s] = len(self.items)
+                self.items.append(s)
+            i = self.index[s]
+        if maxw:
+            self.maxw[i] = max(self.maxw.get(i, 0), maxw)
+        return i
 
     def check_jis1(self):
         """漢字ROM は JIS 第1水準だけ。第2水準の字は出ないので先に止める。"""
@@ -117,14 +203,17 @@ class TextTable:
                     if len(j) != 2 or j[0] >= 0x50:
                         die(f"'{ch}'（「{s}」）は漢字ROM（JIS 第1水準）に無い")
 
-    def pack(self):
-        self.check_jis1()
-        n = len(self.items)
+    def pack(self, items=None):
+        """文字列のページを作る。items を渡すとその並び（訳した文）で作る（番号は日本語と同じ）"""
+        if items is None:
+            self.check_jis1()
+            items = self.items
+        n = len(items)
         pages = [bytearray()]
         dir_size = 2 + 3 * n
         pos = dir_size
         entries = []
-        for s in self.items:
+        for s in items:
             b = s.encode("cp932") + b"\0"
             if pos + len(b) > PAGE_PAYLOAD:
                 pages.append(bytearray())
@@ -151,7 +240,7 @@ def load_ui_text(text):
             key, s = line.split("\t", 1)
             if not key.startswith("T_"):
                 die(f"{path.name}:{ln}: キーは T_ で始める")
-            text.add(s.replace("\\n", "\n"), key)
+            text.add(s.replace("\\n", "\n"), key, ui=True)
 
 
 def load_timeline(text):
@@ -186,7 +275,7 @@ def load_cards(text, timeline):
         skill = int(r["skill"])
         if not 0 <= skill <= 4:
             die(f"{where}: skill は 0..4（4 種で固定）")
-        rows.append((int(r["id"]), text.add(r["name"]), rar, lookup(ELEMENT, r["element"], where),
+        rows.append((int(r["id"]), text.add(r["name"], maxw=14), rar, lookup(ELEMENT, r["element"], where),
                      int(r["atk"]), int(r["def"]), int(r["cost"]), skill,
                      int(r["max_lv"]) if r["max_lv"] else MAX_LV[rar],
                      int(r["evo_to"]), int(r["event_id"]), int(r["img"] or 0),
@@ -209,8 +298,8 @@ def load_areas(text, ncards):
         boss = int(r["boss_card_id"])
         if not 1 <= boss <= ncards:
             die(f"{where}: boss_card_id {boss} が存在しない")
-        rows.append((text.add(r["name"]), lookup(ELEMENT, r["element"], where),
-                     text.add(r["enemy"]), boss))
+        rows.append((text.add(r["name"], maxw=16), lookup(ELEMENT, r["element"], where),
+                     text.add(r["enemy"], maxw=14), boss))
     return rows
 
 
@@ -276,7 +365,7 @@ def load_events(text, ncards, timeline):
         eid = int(r["id"])
         if eid not in starts:
             die(f"{where}: timeline.csv に EVENT,{eid} の行が無い（開催日は年表で決める）")
-        rows.append((text.add(r["name"]), text.add(r["story"]), int(r["boss_card_id"]), int(r["bonus_card_id"]),
+        rows.append((text.add(r["name"], maxw=18), text.add(r["story"], maxw=48), int(r["boss_card_id"]), int(r["bonus_card_id"]),
                      int(r["bonus_mul"]), int(r["evo_bonus_mul"]), int(r["reward_tbl_id"]),
                      int(r["duration_days"]), int(r["kind"]), starts[eid], era_pct(timeline, starts[eid])))
     return rows
@@ -315,7 +404,7 @@ def load_npc_texts(text):
     guilds = [r["name"] for _ln, r in read_csv("guilds.csv")]
     first_guild = len(text.items)
     for i, s in enumerate(guilds):
-        text.add(s, f"T_GUILD{i}")
+        text.add(s, f"T_GUILD{i}", maxw=14)
     return first_pre, len(pre), first_suf, len(suf), first_guild, len(guilds)
 
 
@@ -328,7 +417,7 @@ def load_credits(text):
             continue
         if sum(2 if ord(c) > 0x7F else 1 for c in s) > 32:
             die(f"credits.txt:{ln}: 32 桁を超える")
-        text.add(s or " ", f"T_CREDIT{n}")
+        text.add(s or " ", f"T_CREDIT{n}", maxw=32)
         n += 1
     return first, n
 
@@ -384,6 +473,7 @@ def write_headers(cards, areas, stages, gacha, text, courses, packs, extra):
 
 
 def main():
+    lang = sys.argv[sys.argv.index("--lang") + 1] if "--lang" in sys.argv else "ja"
     OUT.mkdir(exist_ok=True)
     GEN.mkdir(exist_ok=True)
     text = TextTable()
@@ -425,6 +515,14 @@ def main():
         "npcpow.bin": struct.pack(f"<{len(by_power)}H", *by_power),
         "timeline.bin": pack_table(TIMELINE_FIELDS, timeline),
     }
+    if lang != "ja":                 # ほかの言語は文字列のページだけ作る（番号も表もほかのページも日本語と同じ）
+        pages = text.pack(translate(text, lang))
+        out = OUT / lang
+        out.mkdir(exist_ok=True)
+        for i in range(TEXT_PAGES):
+            (out / f"text{i}.dat").write_bytes(bytes(pages[i]) if i < len(pages) else b"")
+        print(f"build_data: [{lang}] text {len(text.items)} 件")
+        return
     pages = text.pack()
     for i in range(TEXT_PAGES):
         blobs[f"text{i}.dat"] = bytes(pages[i]) if i < len(pages) else b""

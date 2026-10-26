@@ -54,7 +54,9 @@ static u8 slot_io(u8 write, u8 slot)
 static u8 read_slot(u8 slot)
 {
     if (slot_io(0, slot) != DISK_OK) return 0;
-    return save_valid(&g_save);
+    if (!save_valid(&g_save)) return 0;
+    save_upgrade(&g_save);                       /* 古い版のセーブは今の版へ */
+    return 1;
 }
 
 static u8 load_best(void)

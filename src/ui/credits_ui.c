@@ -9,6 +9,7 @@
 #include "../data/bgm_data.h"
 void bgm_play(u8 song);
 #include "../ram.h"
+#include "../config.h"
 #include "../core/tables.h"
 #include "../data/screens.h"
 #include "../data/text_ids.h"
@@ -75,7 +76,15 @@ FAR(void, license_draw, (void))
 {
     ui_clear();
     ui_header(T_LICENSE_TITLE);
-    txt_draw(2, 30, "TurboGuild", COL_YELLOW, COL_BLACK);
+    {                                             /* ROM の版と言語（セーブにも書く, DECISIONS #78） */
+        u8 cx = txt_draw(2, 30, "TurboGuild v", COL_YELLOW, COL_BLACK);
+        cx = txt_num(cx, 30, GAME_VER_MAJOR, COL_YELLOW, COL_BLACK);
+        cx = txt_draw(cx, 30, ".", COL_YELLOW, COL_BLACK);
+        cx = txt_num(cx, 30, GAME_VER_MINOR, COL_YELLOW, COL_BLACK);
+        cx = txt_draw(cx, 30, ".", COL_YELLOW, COL_BLACK);
+        cx = txt_num(cx, 30, GAME_VER_PATCH, COL_YELLOW, COL_BLACK);
+        txt_draw((u8)(cx + 1), 30, GAME_LANG == LANG_EN_CODE ? "(EN)" : "(JA)", COL_LGRAY, COL_BLACK);
+    }
     txt_draw(2, 54, "MIT License", COL_WHITE, COL_BLACK);
     txt_draw(1, 72, "Copyright (c) 2026 suzuki-black", COL_WHITE, COL_BLACK);
     txt_id(2, 100, T_LICENSE_SRC, COL_LGRAY, COL_BLACK);

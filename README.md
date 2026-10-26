@@ -109,6 +109,25 @@ make
 
 `bin/TurboGuild.rom`（8メガビット（1MB）の ASCII8 メガROM）と `bin/save.dsk`（空の 2DD）ができます。
 
+#### 英語版
+
+```bash
+make LANG=en
+```
+
+`bin/TurboGuild_en.rom` ができます。プログラムは日本語版と同じで、文字列のページと名前入力の表だけが違います。
+
+- 訳は `data/lang/en.tsv` の 1 行 1 件です。UI の文（`data/text/ui.txt`）は「`T_キー`⇥英語」、それ以外
+  （カード名・イベント・お知らせ・NPC の名前など）は「日本語⇥英語」と書きます。
+- 日本語を足したり変えたりして訳が足りなくなると、英語版のビルドは止まり、足りない文を
+  `data/lang/en.missing.tsv` に書き出します。英語を書き足して `en.tsv` へ移せば通ります。
+- 訳は日本語の幅（全角は 2 桁）を超えられません（カード名は 14 桁など、置き場所ごとの上限もあります）。
+  画面で確かめて余裕のある所だけ、3 列目に `!` を書いて超えてよいことにします。
+- 言語を足すときは `data/lang/<言語>.tsv` を作り、`make LANG=<言語>` でビルドします
+  （名前入力の表など、入力の作りが違う所は `#ifdef LANG_EN` のように切り替えます）。
+
+セーブには、最後に保存した ROM の言語と版が入ります。古い版（v5 以降）のセーブは新しい版でそのまま読めます。
+
 ### 実行
 ```bash
 make run
@@ -288,6 +307,27 @@ make
 ```
 
 This produces `bin/TurboGuild.rom` (an 8 Mbit (1 MB) ASCII8 MegaROM) and `bin/save.dsk` (a blank 2DD image).
+
+#### English version
+
+```bash
+make LANG=en
+```
+
+This produces `bin/TurboGuild_en.rom`. The program is the same as the Japanese one; only the text pages and
+the name-entry character table differ.
+
+- Translations live in `data/lang/en.tsv`, one per line: UI strings (`data/text/ui.txt`) as `T_KEY<TAB>English`,
+  everything else (card names, events, news, NPC names, ...) as `Japanese<TAB>English`.
+- If a translation is missing, the English build stops and writes the missing strings to
+  `data/lang/en.missing.tsv`. Fill in the English, move the lines into `en.tsv`, and build again.
+- A translation may not be wider than the Japanese (full-width characters count as 2 columns), and some places
+  have their own limit (card names: 14 columns, ...). Where the screen has room, a `!` in the third column allows more.
+- To add a language, create `data/lang/<lang>.tsv` and build with `make LANG=<lang>` (input-specific code such as
+  the name-entry table is switched with `#ifdef LANG_EN`).
+
+Saves record the language and version of the ROM that last saved them, and saves from older versions (v5 and later)
+load in newer versions as they are.
 
 ### Running
 ```bash

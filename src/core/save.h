@@ -6,7 +6,11 @@
 #include "../config.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  8
+#define SAVE_VERSION  9
+#define SAVE_MIN_VERSION 5           /* 読めるいちばん古い版（それより前はカードの形が違う） */
+/* ★上位互換の決まり（DECISIONS #78）: 欄は必ず末尾に足し、SAVE_VERSION を 1 上げ、
+ *   save.c の save_size[] にその版の大きさを足す。古い版は「その版の大きさ」で検査して読み、
+ *   あとから足した欄は 0 で始まる（0 で困る欄は save_upgrade で既定値を入れる）。 */
 
 #define DECK_EMPTY    0xFF
 #define SF_STARTED    0x01   /* 名前と最初の 10 連が済んだ */
@@ -64,11 +68,15 @@ typedef struct {
     u8  gvg_last_war;    /* 最後に終わった回（同じ回に入り直さない） */
     u8  gvg_last_rank;
     u8  credits_seen;    /* サービス終了のスタッフロールを流した */
+    /* v9: 最後に保存した ROM の言語と版 */
+    u8  lang;            /* LANG_JA_CODE / LANG_EN_CODE */
+    u8  game_ver[3];     /* GAME_VER_MAJOR, MINOR, PATCH */
 } SaveData;
 
-u16 save_crc(const SaveData *s);
+u16 save_crc(const SaveData *s);           /* その版の大きさで計算する */
 void save_seal(SaveData *s);
-u8  save_valid(const SaveData *s);
+u8  save_valid(const SaveData *s);          /* SAVE_MIN_VERSION〜SAVE_VERSION の版なら検査して 1 */
+void save_upgrade(SaveData *s);             /* 古い版を今の版へ（足した欄を 0 に） */
 void save_new(SaveData *s, u32 real_now);
 
 extern SaveData g_save;   /* 実体は ram.c（MSX）/ テスト側 */
