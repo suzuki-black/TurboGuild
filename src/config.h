@@ -75,7 +75,7 @@
 #define UIS_IDLE            1           /* 画面の update 待ち */
 #define UIS_WAITKEY         2           /* メッセージ・確認・結果で押下待ち */
 
-/* ゲームの版（セーブに書く。リリースのたびに上げる）と言語（make LANG=en で LANG_EN） */
+/* ゲームの版（セーブに書く。リリースのたびに上げる）と言語（既定の make で LANG_EN、make LANG=ja で日本語） */
 #define GAME_VER_MAJOR      0
 #define GAME_VER_MINOR      9
 #define GAME_VER_PATCH      0

@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: MIT
 # TurboGuild — ASCII8 メガROM のビルド定義
 #
-#   make          bin/TurboGuild.rom と bin/save.dsk
+#   make          英語版 bin/TurboGuild.rom と bin/save.dsk（既定は英語）
+#   make LANG=ja  日本語版 bin/TurboGuild_ja.rom
 #   make test     core/ の PC 単体テスト (gcc)
 #   make run      openMSX (FS-A1ST, FDD あり) で起動
 #   make check    ヘッドレスで起動しスクリーンショットと自己診断を取る
@@ -9,7 +10,7 @@
 #   make check-msx2  MSX2 機種で「turboR 専用」表示を確認
 #   make play     30 分の自動プレイ（Phase1 の受け入れ）。DURATION=秒 で短くできる
 #   make sim      経済シミュレーション（Phase3 の受け入れ）
-#   make LANG=en  英語版 bin/TurboGuild_en.rom（訳は data/lang/en.tsv。足りなければ en.missing.tsv に出して止まる）
+#   （英訳は data/lang/en.tsv。足りなければ en.missing.tsv に出して止まる。どの make も LANG=ja を付ければ日本語版で動く）
 #   make clean
 .DELETE_ON_ERROR:
 
@@ -24,17 +25,18 @@ B        := build
 DSK      := bin/save.dsk
 BANKSMK  := $(B)/banks.mk
 
-# 言語（DECISIONS #77）。日本語が元で、ほかの言語は文字列のページと #ifdef LANG_xx の部分だけが違う
-LANG     ?= ja
+# 言語（DECISIONS #77, #80）。既定は英語。文字列の元は日本語で、ほかの言語は文字列のページと
+# #ifdef LANG_xx の部分だけが違う。英語版を bin/TurboGuild.rom、ほかは bin/TurboGuild_<言語>.rom に出す
+LANG     ?= en
 ifeq ($(LANG),ja)
 OBJ      := $(B)/obj
-ROM      := bin/TurboGuild.rom
+ROM      := bin/TurboGuild_ja.rom
 IHX      := $(B)/kernel.ihx
 LANGFLAG :=
 TEXTSTAMP :=
 else
 OBJ      := $(B)/obj-$(LANG)
-ROM      := bin/TurboGuild_$(LANG).rom
+ROM      := bin/TurboGuild$(if $(filter en,$(LANG)),,_$(LANG)).rom
 IHX      := $(B)/kernel-$(LANG).ihx
 LANGFLAG := -DLANG_$(shell echo $(LANG) | tr a-z A-Z)
 TEXTSTAMP := $(B)/$(LANG)/text.stamp
@@ -221,4 +223,4 @@ check-msx2: all
 	@cat $(B)/run2/check.txt
 
 clean:
-	rm -rf $(B) bin/TurboGuild.rom src/data/*.h
+	rm -rf $(B) bin/TurboGuild*.rom src/data/*.h

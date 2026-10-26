@@ -110,20 +110,25 @@ Requires SDCC 4.x (`sdcc`, `sdasz80`), Python 3.11+ (Pillow, for the procedural 
 make
 ```
 
-This produces `bin/TurboGuild.rom` (an 8 Mbit (1 MB) ASCII8 MegaROM) and `bin/save.dsk` (a blank 2DD image).
+This produces the **English version** `bin/TurboGuild.rom` (an 8 Mbit (1 MB) ASCII8 MegaROM) and `bin/save.dsk`
+(a blank 2DD image).
 
-#### English version
+#### Japanese version
 
 ```bash
-make LANG=en
+make LANG=ja
 ```
 
-This produces `bin/TurboGuild_en.rom`. The program is the same as the Japanese one; only the text pages and
-the name-entry character table differ.
+This produces `bin/TurboGuild_ja.rom`. The program is the same as the English one; only the text pages and
+the name-entry character table differ. Every other target (`make run`, `make check`, ...) also takes `LANG=ja`.
+
+#### Translations
+
+The game text is written in Japanese (`data/`) and the English build replaces it at build time.
 
 - Translations live in `data/lang/en.tsv`, one per line: UI strings (`data/text/ui.txt`) as `T_KEY<TAB>English`,
   everything else (card names, events, news, NPC names, ...) as `Japanese<TAB>English`.
-- If a translation is missing, the English build stops and writes the missing strings to
+- If a translation is missing, the build stops and writes the missing strings to
   `data/lang/en.missing.tsv`. Fill in the English, move the lines into `en.tsv`, and build again.
 - A translation may not be wider than the Japanese (full-width characters count as 2 columns), and some places
   have their own limit (card names: 14 columns, ...). Where the screen has room, a `!` in the third column allows more.
@@ -317,19 +322,24 @@ SDCC 4.x（`sdcc`, `sdasz80`）、Python 3.11 以上（絵の生成に Pillow）
 make
 ```
 
-`bin/TurboGuild.rom`（8メガビット（1MB）の ASCII8 メガROM）と `bin/save.dsk`（空の 2DD）ができます。
+**英語版**の `bin/TurboGuild.rom`（8メガビット（1MB）の ASCII8 メガROM）と `bin/save.dsk`（空の 2DD）ができます。
 
-#### 英語版
+#### 日本語版
 
 ```bash
-make LANG=en
+make LANG=ja
 ```
 
-`bin/TurboGuild_en.rom` ができます。プログラムは日本語版と同じで、文字列のページと名前入力の表だけが違います。
+`bin/TurboGuild_ja.rom` ができます。プログラムは英語版と同じで、文字列のページと名前入力の表だけが違います。
+ほかのコマンド（`make run`・`make check` など）も `LANG=ja` を付ければ日本語版で動きます。
+
+#### 翻訳
+
+ゲームの文は日本語で書き（`data/`）、英語版はビルドのときに置き換えます。
 
 - 訳は `data/lang/en.tsv` の 1 行 1 件です。UI の文（`data/text/ui.txt`）は「`T_キー`⇥英語」、それ以外
   （カード名・イベント・お知らせ・NPC の名前など）は「日本語⇥英語」と書きます。
-- 日本語を足したり変えたりして訳が足りなくなると、英語版のビルドは止まり、足りない文を
+- 日本語を足したり変えたりして訳が足りなくなると、ビルドは止まり、足りない文を
   `data/lang/en.missing.tsv` に書き出します。英語を書き足して `en.tsv` へ移せば通ります。
 - 訳は日本語の幅（全角は 2 桁）を超えられません（カード名は 14 桁など、置き場所ごとの上限もあります）。
   画面で確かめて余裕のある所だけ、3 列目に `!` を書いて超えてよいことにします。
@@ -346,10 +356,10 @@ make run
 手で起動する場合は `-romtype ASCII8` を必ず付けてください:
 
 ```bash
-openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild.rom -romtype ASCII8 -diska bin/save.dsk
+openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild_ja.rom -romtype ASCII8 -diska bin/save.dsk
 ```
 
-実機では、ASCII8 対応のフラッシュROMカートリッジに `bin/TurboGuild.rom` を**マッパ種別 ASCII8** で書き込みます。
+実機では、ASCII8 対応のフラッシュROMカートリッジに `bin/TurboGuild_ja.rom`（英語版なら `bin/TurboGuild.rom`）を**マッパ種別 ASCII8** で書き込みます。
 
 ### 自動確認
 | コマンド | 確認すること |
