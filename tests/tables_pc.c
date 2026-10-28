@@ -8,6 +8,31 @@
 
 SaveData g_save;
 
+/* セーブディスクの PC 版: g_pc_disk（2DD のイメージ）に読み書きする。NULL ならディスク無し */
+#include "sys/disk.h"
+#include "core/fat12.h"
+FatInfo g_fat;
+u8 g_sector[512];
+u8 *g_pc_disk;
+u16 g_pc_disk_secs;
+u16 g_pc_reads, g_pc_writes;
+u8 disk_read(u16 sector, u8 count, u8 *buf)
+{
+    if (!g_pc_disk) return DISK_NODISK;
+    if (sector + count > g_pc_disk_secs) return DISK_ERROR;
+    memcpy(buf, g_pc_disk + (size_t)sector * 512, (size_t)count * 512);
+    g_pc_reads++;
+    return DISK_OK;
+}
+u8 disk_write(u16 sector, u8 count, u8 *buf)
+{
+    if (!g_pc_disk) return DISK_NODISK;
+    if (sector + count > g_pc_disk_secs) return DISK_ERROR;
+    memcpy(g_pc_disk + (size_t)sector * 512, buf, (size_t)count * 512);
+    g_pc_writes++;
+    return DISK_OK;
+}
+
 static unsigned char *load(const char *name)
 {
     static unsigned char *cache[32];

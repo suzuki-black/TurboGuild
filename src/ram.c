@@ -17,6 +17,7 @@ u8 g_sector[512];
 
 SaveData g_save;
 u8 g_save_slot;
+FatInfo g_fat;
 u8 g_save_status;
 u8 g_time_status;
 u32 g_time_added;

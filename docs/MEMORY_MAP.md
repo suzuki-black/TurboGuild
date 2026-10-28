@@ -112,4 +112,5 @@
 | 89 | 8000h データA | THUMB7 | build/thumb7.bin | カードの小さい絵 28x36（16 枚/ページ） |
 | 90 | 8000h データA | THUMB8 | build/thumb8.bin | カードの小さい絵 28x36（16 枚/ページ） |
 | 91 | 8000h データA | THUMB9 | build/thumb9.bin | カードの小さい絵 28x36（16 枚/ページ） |
-| 92-127 | - | - | - | 空き |
+| 92 | 6000h コード | CORE6 | code: src/core/fat12.c | セーブディスクの FAT12（TGSAVE.DAT） |
+| 93-127 | - | - | - | 空き |

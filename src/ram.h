@@ -7,6 +7,7 @@
 #include "sys/vdp.h"
 #include "sys/bios.h"
 #include "core/save.h"
+#include "core/fat12.h"
 #include "ui/screen.h"
 #include "ui/widget.h"
 #include "core/gacha.h"
@@ -34,6 +35,7 @@ extern u8 g_sector[512];
 /* セーブ */
 extern SaveData g_save;
 extern u8 g_save_slot;         /* 次に書くスロット 0=A 1=B */
+extern FatInfo g_fat;          /* セーブディスクの FAT12 と TGSAVE.DAT の場所（core/fat12.h） */
 extern u8 g_save_status;       /* 起動時ロードの結果 */
 extern u8 g_time_status;       /* 時刻差分の結果 TIME_* */
 extern u32 g_time_added;       /* 起動時に加算したゲーム秒 */

@@ -5,7 +5,7 @@
     mkblank_dsk.py <out.dsk>
 
 ブートセクタのブートコードは RET だけにして、DOS 起動を試みないようにする。
-セクタ 16 以降（識別・セーブスロット）は空のまま。ゲーム側が初回保存時に書く。
+ファイルは無い。ゲームが初回の保存でルートに TGSAVE.DAT を作り、FAT にも登録する（DECISIONS #82）。
 """
 import struct
 import sys
