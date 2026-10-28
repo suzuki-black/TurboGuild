@@ -137,6 +137,7 @@ FAR(void, ui_saving, (void))
     e = savedisk_save();
     if (e == DISK_OK) {
         g_save_dirty = 0;
+        g_nosave_warned = 0;
     } else if (!g_nosave_warned) {
         g_nosave_warned = 1;
         ui_msg(T_SAVE_FAIL);

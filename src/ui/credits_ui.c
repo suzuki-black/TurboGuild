@@ -48,7 +48,7 @@ static void finish(void)
     if (!g_save.credits_seen) {
         g_save.credits_seen = 1;
         g_save_dirty = 1;
-        ui_saving();
+        if (!g_nosave_warned) ui_saving();      /* 前に保存に失敗していたらディスクに触らない */
     }
     screen_change(&scr_title);
 }

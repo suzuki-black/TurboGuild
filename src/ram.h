@@ -80,7 +80,8 @@ extern u16 g_bgm_ticks;
 extern u16 g_bgm_clock, g_bgm_acc;   /* テンポの時計（システムタイマーの値と、たまった経過） */         /* BGM を進めた回数（1/60 秒単位。テンポの確認用） */          /* 鳴らしている曲の、ページの中での位置 */
 extern volatile u8 g_isr_safe;  /* 1 = 割り込みからカーネルを呼んでよい（ディスクの間は 0） */
 extern u8 g_timi_stub[17];      /* H.TIMI から飛ぶ RAM の入口（sys/bgmdrv.c） */
-extern u8 g_nosave_warned;    /* 「セーブできません」は 1 回だけ出す */
+extern u8 g_nosave_warned;    /* 保存に失敗した（ディスク無しなど）。「セーブできません」は 1 回だけ出し、
+                                 * メニューの「保存」で成功するまで自動保存はディスクに触らない */
 extern GachaReq g_gacha;
 extern QuestResult g_qr;
 extern LoginResult g_login;

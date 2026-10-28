@@ -175,7 +175,7 @@ FAR(void, home_init, (void))
     if (g_cursor == ITEMS && !has_banner()) g_cursor = 0;
     /* ★起動直後（タイトルから来たとき）は保存を後回しにして、すぐ遊べるようにする（Phase3 の受け入れ: 3 秒）。
      * イベントの終了・給料日・年表は日付から決まるので、保存前に電源を切っても次の起動で同じ結果になる */
-    if (g_save_dirty && !g_from_title) ui_saving();
+    if (g_save_dirty && !g_from_title && !g_nosave_warned) ui_saving();   /* 失敗した後は自動では書きに行かない */
     g_from_title = 0;
 }
 
@@ -216,7 +216,7 @@ static void open(u8 i)
 {
     g_menu_pos = i;
     psg_beep(0x80, 4);
-    if (g_save_dirty && i != 6) ui_saving();          /* 後回しにした保存はここで（6 = 保存は自分でする） */
+    if (g_save_dirty && i != 6 && !g_nosave_warned) ui_saving();   /* 後回しにした保存はここで（6 = 保存は自分でする） */
     switch (i) {
     case 0: screen_change(&scr_area); break;
     case 1: screen_change(&scr_gacha); break;
@@ -224,8 +224,9 @@ static void open(u8 i)
     case 3: screen_change(&scr_deck); break;
     case 4: screen_change(&scr_shop); break;
     case 5: screen_change(&scr_ranking); break;
-    case 6:
+    case 6:                                          /* 自分で保存: 前に失敗していても書きに行き、失敗ならまた知らせる */
         g_save_dirty = 1;
+        g_nosave_warned = 0;
         ui_saving();
         if (!g_save_dirty) ui_msg(T_SAVED);
         break;
