@@ -70,7 +70,7 @@
   There is no pity system.
 - **War funds.** Instead of real money, an in-game wallet (allowance, salaried worker, oil baron, or
   infinite mode) buys gems. Paying makes you stronger — the social-game logic, without the real cost.
-- **120 cards** (procedurally drawn), enhancement and evolution fusion, deck building.
+- **121 cards** (procedurally drawn), enhancement and evolution fusion, deck building.
 - **Three event types:** hunt (repeatable bosses) / **raid** (a boss whose HP persists until it falls;
   call guild mates for rescue) / **battle** (fight adventurers ranked below, equal to, or above you).
 - **Guilds and guild wars.** Twice a day, a one-hour battle window: attack the rival guild, build combos, cheer.
@@ -285,7 +285,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   光の色で中身を察する、あの演出。イベントは **BOX ガチャ**（100 個入りの箱）。天井はありません。
 - **軍資金。** 現実のお金の代わりに、ゲームの中のお財布（おこづかい・社会人・石油王・無敵モード）で
   石を買います。課金すれば強くなる——ソシャゲと同じ理屈を、懐を痛めずに味わえます。
-- **カード 120 枚**（手続き生成の絵）。強化合成・進化合成・デッキ編成。
+- **カード 121 枚**（手続き生成の絵）。強化合成・進化合成・デッキ編成。
 - **イベント 3 型:** 討伐（周回ボス）／ **レイド**（倒すまで HP が残るボス、救援依頼でギルドの仲間が削る）／
   **バトル**（格下・同格・格上の冒険者と対戦）。
 - **ギルドとギルド対抗戦。** 1 日 2 回の「戦の時間」に相手ギルドを攻撃し、コンボと応援で押し切る。
