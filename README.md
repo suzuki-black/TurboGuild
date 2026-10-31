@@ -99,7 +99,8 @@ While an event or a guild war is running, enter it from the banner ([9]).
 - **MSX turboR only** (FS-A1ST / FS-A1GT). Anything older shows a "turboR only" message and stops.
 - For saving, put a DOS-formatted (FAT12) 2DD floppy in drive A. The save is an ordinary file, `TGSAVE.DAT`
   (4.5 KB, in the root directory), so the disk can hold other files too, and you can back it up by copying the file
-  from DOS. Saves made by earlier versions (written straight to sectors 16–24) are registered as `TGSAVE.DAT` in place
+  from DOS. On a disk without that file, the game asks before creating it (the default answer is No), and it re-reads
+  the disk before every save, so a disk swapped in mid-game is not written to blindly. Saves made by earlier versions (written straight to sectors 16–24) are registered as `TGSAVE.DAT` in place
   on the first save. You can play without a disk (saving is disabled).
 - The turboR system ROMs are copyrighted and **not included**. Development and checks use
   [openMSX](https://openmsx.org/) with a machine definition based on dumped system ROMs (Panasonic FS-A1ST).
@@ -313,7 +314,8 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **MSX turboR 専用**（FS-A1ST / FS-A1GT）。turboR 未満では「turboR 専用」と出して止まります。
 - セーブには、DOS でフォーマットした（FAT12 の）2DD フロッピーを A ドライブに入れてください。セーブはルートの
   ふつうのファイル `TGSAVE.DAT`（4.5KB）なので、ほかのファイルと同じディスクに置けて、DOS でコピーすれば
-  バックアップになります。以前の版のセーブ（セクタ 16〜24 に直接書いていたもの）は、最初の保存のときに
+  バックアップになります。このファイルが無いディスクには、作ってよいかを聞いてから書きます（既定は「いいえ」）。
+  保存のたびにディスクを読み直すので、途中で入れ替えた FD に確かめずに書くこともありません。以前の版のセーブ（セクタ 16〜24 に直接書いていたもの）は、最初の保存のときに
   その場所のまま `TGSAVE.DAT` として登録します。ディスクが無くても遊べます（保存はできません）。
 - turboR の本体 ROM は著作物のため**同梱していません**。開発と確認は [openMSX](https://openmsx.org/) で、
   本体 ROM を吸い出した機種定義（Panasonic FS-A1ST）を使っています。

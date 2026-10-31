@@ -99,10 +99,10 @@ FAR(void, ui_msg, (u16 id))
     g_dirty = 1;          /* 下の画面を描き直してもらう */
 }
 
-FAR(u8, ui_confirm, (u16 id))
+static u8 confirm(u16 id, u8 cur)
 {
     static const u16 yn[2] = { T_YES, T_NO };
-    u8 cur = 0, n = lines_of(id), by;
+    u8 n = lines_of(id), by;
     box((u8)(n + 2));
     wrap_text(78, id, COL_YELLOW);
     by = (u8)(80 + n * 16);                       /* はい / いいえ の行 */
@@ -112,7 +112,7 @@ FAR(u8, ui_confirm, (u16 id))
         u8 i;
         for (i = 0; i < 2; i++) {
             u8 x = (u8)(56 + i * 88);
-            ui_box(x, by, 56, 20, i == cur ? COL_BLUE : COL_DBLUE, i == cur ? COL_YELLOW : COL_LGRAY);
+            ui_box(x, by, 72, 20, i == cur ? COL_BLUE : COL_DBLUE, i == cur ? COL_YELLOW : COL_LGRAY);
             txt_id((u8)(x / 8 + 2), (u8)(by + 2), yn[i], COL_WHITE, i == cur ? COL_BLUE : COL_DBLUE);
         }
         do {
@@ -128,13 +128,25 @@ FAR(u8, ui_confirm, (u16 id))
     return (u8)(cur == 0);
 }
 
+FAR(u8, ui_confirm, (u16 id)) { return confirm(id, 0); }
+
 FAR(void, ui_saving, (void))
 {
     u8 e;
     g_ui_state = UIS_BUSY;          /* 書き込み中（自動試験がここでリセットしないように） */
     box(1);
     txt_id(12, 78, T_SAVING, COL_WHITE, COL_DBLUE);
-    e = savedisk_save();
+    e = savedisk_save(0);
+    if (e == DISK_NEWFILE) {                        /* セーブのファイルが無いディスク。既定は「いいえ」 */
+        if (!confirm(T_SAVE_NEWFILE, 1)) {
+            g_nosave_warned = 1;                    /* 自動保存では聞き直さない（メニューの「保存」でまた聞く） */
+            g_dirty = 1;
+            return;
+        }
+        box(1);
+        txt_id(12, 78, T_SAVING, COL_WHITE, COL_DBLUE);
+        e = savedisk_save(1);
+    }
     if (e == DISK_OK) {
         g_save_dirty = 0;
         g_nosave_warned = 0;

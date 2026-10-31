@@ -77,7 +77,7 @@
 
 /* ゲームの版（セーブに書く。リリースのたびに上げる）と言語（既定の make で LANG_EN、make LANG=ja で日本語） */
 #define GAME_VER_MAJOR      0
-#define GAME_VER_MINOR      9
+#define GAME_VER_MINOR      1
 #define GAME_VER_PATCH      0
 #define LANG_JA_CODE        0
 #define LANG_EN_CODE        1

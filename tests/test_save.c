@@ -19,6 +19,14 @@ int main(void)
     CHECK(save_valid(&s));
     s.cards[199].lv ^= 0x80;
     CHECK(!save_valid(&s));
+    /* CRC が正しくても、枚数が配列を超えるセーブは読まない（カード一覧の並べ替えなどが RAM を壊す） */
+    save_new(&s, 1);
+    s.card_count = CARD_MAX;
+    save_seal(&s);
+    CHECK(save_valid(&s));
+    s.card_count = CARD_MAX + 1;
+    save_seal(&s);
+    CHECK(!save_valid(&s));
     /* 封をすると言語と版が入る */
     save_new(&s, 1);
     save_seal(&s);

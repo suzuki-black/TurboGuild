@@ -10,5 +10,5 @@
 #define SD_ERROR    4
 
 void savedisk_boot(void);     /* 起動時: ロードしてゲーム時間を進める */
-u8   savedisk_save(void);     /* 戻り値 DISK_* */
+u8   savedisk_save(u8 allow_new);   /* 戻り値 DISK_*。allow_new = 0 ならファイルを作らず DISK_NEWFILE を返す */
 #endif

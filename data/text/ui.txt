@@ -94,6 +94,7 @@ T_SHOP_USED	APが全回復した
 T_SAVING	通信中…
 T_SAVED	セーブしました
 T_SAVE_FAIL	セーブできませんでした。　　ディスクを入れてください
+T_SAVE_NEWFILE	このディスクに新しくセーブのファイルを作りますか
 T_SAVE_INIT	このディスクをセーブ専用に初期化しますか？
 T_LOGIN_TITLE	ログインボーナス
 T_LOGIN_DAY	日目

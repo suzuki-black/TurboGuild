@@ -98,6 +98,7 @@ T_SHOP_USED	AP refilled
 T_SAVING	Saving..
 T_SAVED	Saved
 T_SAVE_FAIL	Could not save.             Insert the save disk.
+T_SAVE_NEWFILE	Make a save file on         this disk?
 T_SAVE_INIT	Format this disk for saving?
 T_LOGIN_TITLE	Login Bonus
 T_LOGIN_DAY	 day

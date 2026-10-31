@@ -59,8 +59,9 @@ void save_seal(SaveData *s)
 
 u8 save_valid(const SaveData *s)
 {
+    /* CRC は改ざんを防がない。ディスクから来た枚数は、配列の添字に使う前にここで止める */
     return (u8)(s->magic == SAVE_MAGIC && size_of(s->version) &&
-                s->crc == save_crc(s));
+                s->card_count <= CARD_MAX && s->crc == save_crc(s));
 }
 
 FAR(void, save_upgrade, (SaveData *s))

@@ -9,6 +9,7 @@
 #define DISK_CRC     3
 #define DISK_ERROR   4
 #define DISK_NOFDD   5
+#define DISK_NEWFILE 6   /* セーブのファイルが無いディスク。作ってよいかを聞く（savedisk_save） */
 u8 disk_read(u16 sector, u8 count, u8 *buf);
 u8 disk_write(u16 sector, u8 count, u8 *buf);
 #endif

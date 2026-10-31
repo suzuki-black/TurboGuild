@@ -17,7 +17,7 @@
 /* 上書きで前の文字が残らないよう同じ長さに揃える */
 static const char * const sd_names[5] = { "LOADED       ", "NEW (EMPTY)  ", "NOT SAVE DISK", "NO DISK      ", "DISK ERROR   " };
 static const char * const ts_names[3] = { "OK         ", "BACKWARD   ", "CLAMPED 30D" };
-static const char * const de_names[6] = { "OK           ", "WRITE PROTECT", "NO DISK      ", "CRC ERROR    ", "ERROR        ", "NO FDD       " };
+static const char * const de_names[7] = { "OK           ", "WRITE PROTECT", "NO DISK      ", "CRC ERROR    ", "ERROR        ", "NO FDD       ", "NO SAVE FILE " };
 
 static void put2(u8 cx, u8 cy, u8 v)
 {
@@ -54,7 +54,7 @@ FAR(void, p0save_update, (void))
     if (p & BTN_OK) {
         u8 e;
         font_puts(1, 15, "SAVING...             ", 9, 1);
-        e = savedisk_save();
+        e = savedisk_save(0);                    /* 診断画面からは新しいファイルを作らない */
         font_puts(1, 15, "SAVE:                 ", 3, 1);
         font_puts(7, 15, de_names[e], e ? 7 : 11, 1);
         psg_beep(e ? 0x300 : 0x60, 6);

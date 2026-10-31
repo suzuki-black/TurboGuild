@@ -110,30 +110,41 @@ static u8 write_id(void)
     return disk_write(g_fat.sec[FSEC_ID], 1, g_sector);
 }
 
-/* ファイルが無ければ作る（ディスクを後から入れたときは、ここで初めて読む） */
-static u8 ensure_file(void)
+static u8 create_file(void)
 {
     DateTime dt;
     u8 e;
-    if (g_save_status == SD_NODISK || g_save_status == SD_ERROR) {
-        e = fat_open();
-        if (e != DISK_OK) return e;
-    }
-    if (g_fat.state == FS_FILE) return DISK_OK;
     rtc_read(&dt);
-    return fat_create(&dt);                     /* 以前の版の形なら、その場所をファイルとして登録する */
+    e = fat_create(&dt);
+    return e != DISK_OK ? e : write_id();
 }
 
-FAR(u8, savedisk_save, (void))
+/* ★書く前に毎回ディスクを読み直す。覚えているセクタへそのまま書くと、入れ替えられた別の FD を壊す。
+ * セーブのファイルが無いディスクには、確かめるまで書かない（DECISIONS #83）。 */
+static u8 check_disk(u8 allow_new)
 {
-    u8 made = (u8)(g_fat.state != FS_FILE);    /* 今から作る（以前の版から移す）なら識別も書く */
-    u8 e = ensure_file();
+    u8 e = fat_open();
     if (e != DISK_OK) return e;
-    if (made || (g_save_status != SD_LOADED && g_save_status != SD_NEW)) {
-        e = write_id();     /* 確認画面は省略して初回保存時に識別を書く */
-        if (e != DISK_OK) return e;
-        if (g_save_status != SD_LOADED) g_save_status = SD_NEW;
+    switch (g_fat.state) {
+    case FS_FILE:
+        e = disk_read(g_fat.sec[FSEC_ID], 1, g_sector);
+        if (e != DISK_OK || has_id()) return e;
+        if (!allow_new) return DISK_NEWFILE;    /* 同じ名前の別のファイルか、作りかけ */
+        return write_id();
+    case FS_LEGACY:
+        return create_file();                   /* 以前の版のセーブディスク: その場所をファイルとして登録する */
+    case FS_NONE:
+        return allow_new ? create_file() : DISK_NEWFILE;
+    default:
+        return DISK_ERROR;
     }
+}
+
+FAR(u8, savedisk_save, (u8 allow_new))
+{
+    u8 e = check_disk(allow_new);
+    if (e != DISK_OK) return e;
+    if (g_save_status != SD_LOADED) g_save_status = SD_NEW;
     g_save.real_time_last = rtc_now_secs();
     g_save.save_count++;
     save_seal(&g_save);
