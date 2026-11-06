@@ -1,5 +1,17 @@
 # Changelog / 更新履歴
 
+## Unreleased / 未リリース
+
+### English
+- **Rival.** When you open the ranking or the event screen, the player just above you becomes your rival and stays your rival until you pass them. My Page shows the gap in the header ("Rival-320"). When you pass them, they react; during an event they may promise to pass you back on the last day. The marquee tells you whether, at your current pace, you will catch your rival by the last day, or whether the rival you passed will catch you. The save format is now version 10 (7 bytes added); older saves still load.
+- **Guild board.** Each guild has seven or eight mates with a payment style and a verbal tic. Every six in-game hours one of them may post about the current event, guild war, rate-up, new rarity, the end-of-service notice, or their day. A few days before quitting, a mate starts to sound tired; on the day itself the board only says they have left the guild. Open it from News (SPACE). Posts also run on the My Page marquee. Nothing is saved: posts are worked out from the date.
+- The explore screen and the event top now show the enemy's weakness ("[6] Weak Water"). Press 6 there to build the deck for that enemy, counting element advantage and event boon cards. Elements already affected battles; they were just not visible.
+
+### 日本語
+- **ライバル。** ランキングかイベントの画面を開くと、自分のすぐ上の人がライバル（宿敵）になります。抜くまで替わりません。マイページの見出しに差（「宿敵-320」）を出します。抜くと相手がひとこと言い、イベント中なら「最終日に見てろよ」と返してくることもあります。流れるお知らせでは、いまのペースで最終日にライバルに届くか、抜いた元ライバルに抜き返されるかを伝えます。セーブの版は 10 になりました（7 バイト増）。前の版のセーブも読めます。
+- **ギルド伝言板。** どのギルドにも、課金コースと口癖を持つ仲間が 7〜8 人います。ゲーム内の 6 時間ごとに、誰かがいまのイベント・対抗戦・確率アップ・新しいレア度・サービス終了の告知、またはその日のことを書き込みます。辞める数日前から弱音が増え、その日には「ギルドを脱退しました」とだけ流れます。お知らせの画面で SPACE を押すと開きます。マイページの流れるお知らせにも出ます。書き込みは日付から決まるので、セーブは増えていません。
+- 探索の画面とイベントのトップに、敵の弱点（「[6] 弱点 水」）を出すようにしました。そこで 6 を押すと、属性の相性とイベントの特効を込みで、その敵向けにおまかせ編成します。属性は前から戦闘に効いていましたが、画面に出ていませんでした。
+
 ## v0.1.0 — 2026-10-31
 
 The first release. This is a foundation for further development: a prototype that has had little play-testing, and whose numbers and balance will change.

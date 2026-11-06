@@ -31,10 +31,10 @@
 | 8 | 6000h コード | UI_COMMON | code: src/ui/common.c src/ui/gfx_card.c | 共通部品（上下の帯・状態欄・箱・保存） |
 | 9 | 6000h コード | UI_BOSS | code: src/ui/boss.c | ボス戦・イベントのボス戦 |
 | 10 | 6000h コード | UI_ANIM | code: src/ui/gacha_anim.c | ガチャの開封演出とカードめくり |
-| 11 | 6000h コード | CORE2 | code: src/core/fusion.c src/core/event.c src/core/timeline.c | 合成・進化・イベント・ランキング・運営年表 |
+| 11 | 6000h コード | CORE2 | code: src/core/fusion.c src/core/event.c src/core/timeline.c src/core/wallet.c | 合成・進化・イベント・運営年表・軍資金 |
 | 12 | 6000h コード | UI_FUSION | code: src/ui/fusion_ui.c | 強化合成・進化合成 |
 | 13 | 6000h コード | UI_EVENT | code: src/ui/event_ui.c src/ui/ranking_ui.c src/ui/news_ui.c | イベント・ランキング・イベント結果・お知らせ |
-| 14 | 6000h コード | CORE3 | code: src/core/ranking.c src/core/wallet.c | NPC のいま・ランキング・みんなの動き、軍資金 |
+| 14 | 6000h コード | CORE3 | code: src/core/ranking.c src/core/board.c | NPC のいま・ランキング・ライバル・みんなの動き、ギルド伝言板 |
 | 15 | 6000h コード | BGM | code: src/ui/bgm.c | FM 音源の BGM ドライバと曲（tools/mml.py） |
 | 16 | 8000h データA | CARDS | build/cards.bin | カード |
 | 17 | 8000h データA | AREAS | build/areas.bin | エリア |

@@ -6,6 +6,7 @@
 #include "../far.h"
 #include "../ram.h"
 #include "../core/ranking.h"
+#include "../core/save.h"
 #include "../core/tables.h"
 #include "../data/screens.h"
 #include "../data/text_ids.h"
@@ -46,9 +47,11 @@ static void row(u8 k, u8 pos)
         txt_id((u8)(cx + 1), y, T_RANK_YOU, COL_CYAN, bg);
     } else {
         NpcRec n;
+        u8 rv = (u8)(r->npc == RIVAL_OF(g_rank.mode)), fg = rv ? COL_ORANGE : COL_WHITE;
         tbl_npc(r->npc, &n);
-        cx = txt_id(7, y, (u16)(NPC_PRE_TEXT + n.name_id / NPC_SUF_COUNT), COL_WHITE, bg);
-        txt_id(cx, y, (u16)(NPC_SUF_TEXT + n.name_id % NPC_SUF_COUNT), COL_WHITE, bg);
+        cx = txt_id(7, y, (u16)(NPC_PRE_TEXT + n.name_id / NPC_SUF_COUNT), fg, bg);
+        cx = txt_id(cx, y, (u16)(NPC_SUF_TEXT + n.name_id % NPC_SUF_COUNT), fg, bg);
+        if (rv && cx < 19) txt_id((u8)(cx + 1), y, T_RIVAL, COL_ORANGE, bg);
     }
     txt_num_r(23, y, r->value, 9, me ? COL_YELLOW : COL_LGRAY, bg);
 }

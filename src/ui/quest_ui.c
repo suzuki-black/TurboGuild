@@ -142,6 +142,7 @@ static void scene(u8 scroll)
     gfx_sprite(ATL_DECOR_CLOUD, (u8)(200 - scroll / 2), SCENE_Y + 6);
     gfx_sprite(ATL_DECOR_CLOUD, (u8)(60 - scroll / 2), SCENE_Y + 14);
     for (i = 0; i < 4; i++) decor(e, (u8)(i * 72 + 20 - scroll));
+    ui_weak(1, SCENE_Y + 2, e, COL_BLACK);
 }
 
 static void walker(u8 frame)
@@ -316,6 +317,7 @@ static void go(void)
 FAR(void, explore_update, (void))
 {
     u8 p = input_pressed();
+    if (input_digit() == 6) { ui_fit_deck(next_stage()); return; }
     if (p & BTN_OK) {
         if (g_dirty) return;
         scene(0);

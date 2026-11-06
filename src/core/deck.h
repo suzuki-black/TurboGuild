@@ -22,6 +22,8 @@ typedef struct {
 void deck_calc(DeckStats *st);
 void deck_stats_init(DeckStats *st, u16 enemy_elem);  /* 特効なしで初期化（u16 は中継のレジスタ渡しの都合） */
 void deck_auto(void);                 /* コスト上限内で攻撃の高い順に詰める（おまかせ編成） */
+void deck_auto_for(const DeckStats *st); /* 同じく、st の敵の属性・特効込みの攻撃で詰める */
+u8   elem_weak(u8 enemy);             /* enemy に有利を取れる属性（無ければ ELEM_NONE） */
 u32  card_atk_of(u16 index);          /* 所持カード 1 枚の攻撃（Lv 補正・スキル込み, 属性補正なし） */
 u32  card_def_of(u16 index);
 u8   elem_pct(u8 mine, u8 enemy);     /* 属性補正 % */

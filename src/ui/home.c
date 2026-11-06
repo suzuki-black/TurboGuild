@@ -10,6 +10,8 @@ void bgm_play(u8 song);
 #include "../core/rng.h"
 #include "../core/login.h"
 #include "../core/player.h"
+#include "../core/ranking.h"
+#include "../core/save.h"
 #include "../core/time.h"
 #include "../core/wallet.h"
 #include "../core/event.h"
@@ -143,6 +145,93 @@ static void ticker(void)
     if (c != ' ' || g_ticker_gap == 0) g_ticker = (u8)(g_ticker + w);
 }
 
+/* ---- ライバル（DECISIONS #86）。全員の順位は重い（約 2 秒）ので、ここでは相手 1 人ぶんだけ計算する ---- */
+
+static u8 rival_get(RivalNow *r, u16 npc)
+{
+    if (npc == RANK_PLAYER) return 0;
+    r->mode = RANK_MODE();
+    r->npc = npc;
+    rival_now(r);
+    return 1;
+}
+
+/* 見出しの右: 「宿敵 -1234」（相手までの差） */
+static void rival_header(void)
+{
+    RivalNow r;
+    u8 cx;
+    u32 d;
+    if (!rival_get(&r, RIVAL_OF(RANK_MODE())) || r.retired) return;
+    d = r.value >= r.player ? r.value - r.player : r.player - r.value;
+    if (d > 999999UL) d = 999999UL;                  /* 6 桁まで（日付の手前で止める） */
+    cx = (u8)(txt_id_width(T_MYPAGE) + 2);
+    cx = txt_id(cx, 0, T_RIVAL, COL_LGRAY, COL_DBLUE);
+    cx = txt_draw(cx, 0, r.value >= r.player ? "-" : "+", COL_WHITE, COL_DBLUE);
+    txt_num(cx, 0, d, r.value >= r.player ? COL_ORANGE : COL_CYAN, COL_DBLUE);
+}
+
+static void npc_name(u8 cx, u8 y, u16 npc, u8 fg, u8 bg)
+{
+    NpcRec n;
+    tbl_npc(npc, &n);
+    cx = txt_id(cx, y, (u16)(NPC_PRE_TEXT + n.name_id / NPC_SUF_COUNT), fg, bg);
+    txt_id(cx, y, (u16)(NPC_SUF_TEXT + n.name_id % NPC_SUF_COUNT), fg, bg);
+}
+
+/* 知らせの箱。相手の名前とひとこと（comment = 0 なら無し）。出している間に次のライバルを指名する */
+static void rival_popup(u16 title, const RivalNow *r, u16 comment)
+{
+    u8 cx;
+    ui_box(16, 72, 224, comment ? 62 : 44, COL_DBLUE, COL_ORANGE);
+    txt_id(3, 76, title, COL_YELLOW, COL_DBLUE);
+    npc_name(3, 94, r->npc, COL_CYAN, COL_DBLUE);
+    if (comment) {
+        cx = txt_id(3, 112, T_RV_Q0, COL_WHITE, COL_DBLUE);
+        cx = txt_id(cx, 112, comment, COL_WHITE, COL_DBLUE);
+        if (r->tone) cx = txt_id(cx, 112, (u16)(T_BOARD_TONE1 + r->tone - 1), COL_WHITE, COL_DBLUE);
+        txt_id(cx, 112, T_RV_Q1, COL_WHITE, COL_DBLUE);
+    }
+    psg_beep(0x050, 12);
+    g_rank.mode = r->mode;                         /* 空いたら次の人を（すぐ上の人） */
+    g_rank.first = RANK_VIEW_AROUND;
+    ranking_list(&g_rank);
+    g_save_dirty = 1;
+    ui_wait_key();
+    g_dirty = 1;
+}
+
+/* 抜いた・抜き返された・来なくなったを知らせる。知らせたら 1 */
+static u8 rival_check(void)
+{
+    RivalNow r;
+    u8 m = RANK_MODE();
+    if (m == RANK_EVENT && rival_get(&r, CHASER())) {           /* イベントで抜いた元ライバル */
+        if (r.retired) {
+            g_save.chaser = 0;
+        } else if (r.value > r.player) {
+            g_save.rival[m] = g_save.chaser;                    /* 抜き返した人がまたライバルに */
+            g_save.chaser = 0;
+            rival_popup(T_RV_LOST, &r, (u16)(T_RV_TAUNT0 + (r.value & 3)));
+            return 1;
+        }
+    }
+    if (!rival_get(&r, RIVAL_OF(m))) return 0;
+    if (r.retired) {
+        g_save.rival[m] = 0;
+        rival_popup(T_RV_GONE, &r, 0);
+        return 1;
+    }
+    if (r.player > r.value) {
+        u8 vow = (u8)(m == RANK_EVENT && r.pace && r.final > r.pfinal);   /* 最終日には抜き返せる見込み */
+        if (m == RANK_EVENT) g_save.chaser = g_save.rival[m];
+        g_save.rival[m] = 0;
+        rival_popup(T_RV_BEAT, &r, (u16)((vow ? T_RV_VOW0 : T_RV_SORE0) + (r.player & 3)));
+        return 1;
+    }
+    return 0;
+}
+
 static void show_login_bonus(void)
 {
     screen_change(&scr_login);
@@ -186,6 +275,7 @@ FAR(void, home_draw, (void))
     ui_header(T_MYPAGE);
     cx = txt_num(24, 0, time_gday(g_save.g_time) + 1, COL_YELLOW, COL_DBLUE);
     txt_id(cx, 0, T_DAY, COL_WHITE, COL_DBLUE);
+    rival_header();
     leader();
     ui_status_block(20);
     banner();
@@ -203,13 +293,17 @@ FAR(void, home_draw, (void))
         txt_id((u8)(cx + 1), 84, (u16)(GUILD_TEXT + g_save.guild - 1), COL_YELLOW, COL_DBLUE);
         txt_id(3, 102, T_GUILD_JOINED, COL_WHITE, COL_DBLUE);
         psg_beep(0x060, 10);
+        g_rank.mode = RANK_POWER;                  /* 最初のライバルを決めておく（待っている間に） */
+        g_rank.first = RANK_VIEW_AROUND;
+        ranking_list(&g_rank);
         ui_wait_key();
         g_dirty = 1;
         return;
     }
     if (g_evres.started || g_evres.ended) { screen_change(&scr_evresult); return; }
     if (g_gvgres.joined || g_gvgres.n || g_gvgres.ended) { gvg_result_show(); return; }
-    if (g_login.given) show_login_bonus();
+    if (g_login.given) { show_login_bonus(); return; }
+    rival_check();
 }
 
 static void open(u8 i)

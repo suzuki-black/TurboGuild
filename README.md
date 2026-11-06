@@ -74,6 +74,11 @@
 - **Three event types:** hunt (repeatable bosses) / **raid** (a boss whose HP persists until it falls;
   call guild mates for rescue) / **battle** (fight adventurers ranked below, equal to, or above you).
 - **Guilds and guild wars.** Twice a day, a one-hour battle window: attack the rival guild, build combos, cheer.
+- **A guild board.** Seven or eight guild mates, each with a payment style and a verbal tic, post about events,
+  new rarities and their day. Some slowly lose interest, and one day the board just says they have left the guild.
+  Also shown on the My Page marquee.
+- **A rival.** The player just above you in the ranking becomes your rival until you pass them. My Page shows the gap,
+  and during events the marquee tells you whether your pace will carry you past them by the last day.
 - **An operations timeline:** rate-up campaigns, inflation (newer cards are stronger), apology gems,
   waves of players quitting, the end-of-service notice — and finally the shutdown and staff roll.
 - **Rarity inflation every three months:** N / R / SR / SSR at launch, then **USR** on day 90 and **XUSR** on day 180.
@@ -289,6 +294,10 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **イベント 3 型:** 討伐（周回ボス）／ **レイド**（倒すまで HP が残るボス、救援依頼でギルドの仲間が削る）／
   **バトル**（格下・同格・格上の冒険者と対戦）。
 - **ギルドとギルド対抗戦。** 1 日 2 回の「戦の時間」に相手ギルドを攻撃し、コンボと応援で押し切る。
+- **ギルド伝言板。** 課金コースと口癖を持つ 7〜8 人の仲間が、イベントや新しいレア度、その日の出来事を書き込む。
+  だんだん弱音が増えていく人がいて、ある日「ギルドを脱退しました」とだけ流れる。マイページのお知らせにも流れる。
+- **ライバル。** ランキングで自分のすぐ上の人が、抜くまでライバル（宿敵）になる。マイページに差を出し、
+  イベント中は「このペースなら最終日に抜ける」かどうかを流れるお知らせで伝える。
 - **運営年表。** 確率アップ・インフレ（新しいカードほど強い）・お詫びの石・引退の波・終了の告知・
   そしてサービス終了とスタッフロール。
 - **3 か月ごとのレア度インフレ。** 開始時は N / R / SR / SSR。90 日目に **USR**、180 日目に **XUSR** が解禁。

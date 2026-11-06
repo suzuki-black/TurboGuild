@@ -4,6 +4,8 @@
 #include "widget.h"
 #include "../ram.h"
 #include "../config.h"
+#include "../core/deck.h"
+#include "../core/quest.h"
 #include "../core/tables.h"
 #include "../data/text_ids.h"
 #include "../sys/vdp.h"
@@ -86,4 +88,21 @@ void ui_box(u8 x, u8 y, u8 w, u8 h, u8 bg, u8 border)
 void ui_key(u8 digit, u8 x, u8 y)
 {
     gfx_sprite((u8)(ATL_KEYS_X + digit * 12), ATL_KEYS_Y, 12, ATL_KEYS_H, x, y);
+}
+
+u8 ui_weak(u8 cx, u8 y, u8 enemy, u8 bg)
+{
+    u8 w = elem_weak(enemy);
+    if (w == ELEM_NONE) return cx;
+    ui_key(6, (u8)(cx * 8), (u8)(y + 2));
+    cx = txt_id((u8)(cx + 2), y, T_WEAK, COL_LGRAY, bg);
+    return txt_id((u8)(cx + 1), y, (u16)(T_ELEM_0 + w), elem_color(w), bg);
+}
+
+void ui_fit_deck(u16 stage)
+{
+    quest_auto_deck(stage);
+    g_save_dirty = 1;
+    psg_beep(0x060, 8);
+    ui_msg(T_DECK_FIT);
 }

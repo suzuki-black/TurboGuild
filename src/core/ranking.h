@@ -7,6 +7,7 @@
 #ifndef CORE_RANKING_H
 #define CORE_RANKING_H
 #include "../types.h"
+#include "../data/tables.h"
 
 #define RANK_EVENT 0
 #define RANK_POWER 1
@@ -42,7 +43,27 @@ typedef struct {
 #define FEED_BYE     5         /* サービス最終日: 別れの挨拶（FEED_KINDS の外） */
 #define FEED_SLOT_SECS 1800UL     /* ゲーム内 30 分に 1 件 */
 
-typedef struct { u16 npc; u8 kind; u16 param; } FeedLine;   /* param: カード id / Lv / 順位 */
+typedef struct { u16 npc; u8 kind; u16 param; } FeedLine;
+
+/* ライバル（DECISIONS #86）。ランキングを計算したとき、いなければ「自分のすぐ上の人」を指名して覚える（g_save.rival）。
+ * 抜くまで替えない（すぐ上の 5 人より遠くへ離されたときだけ付け替える）。マイページでは 1 人ぶんだけ計算する */
+#define RIVAL_NPC(v) ((u16)((v) - 1) < NPC_COUNT ? (u16)((v) - 1) : RANK_PLAYER)   /* セーブから来た番号は表の範囲に限る */
+#define RIVAL_OF(m)  ((m) == RANK_EVENT && g_save.rival_event != (u8)g_save.event_id ? RANK_PLAYER : RIVAL_NPC(g_save.rival[m]))
+#define CHASER()     (g_save.rival_event != (u8)g_save.event_id ? RANK_PLAYER : RIVAL_NPC(g_save.chaser))
+#define RANK_MODE()  (g_save.event_id ? RANK_EVENT : RANK_POWER)
+#define PACE_MIN_PROG 32       /* 開催の 1/8 を過ぎるまでは最終日の見込みを出さない */
+
+typedef struct {
+    u8  mode;            /* 入力 */
+    u16 npc;             /* 入力 */
+    u8  retired;
+    u8  tone;            /* 口癖（伝言板と同じ） */
+    u32 value;           /* 相手のいまの値 */
+    u32 player;          /* 自分のいまの値 */
+    u32 final;           /* イベント: 相手の最終日の値（総戦力では value と同じ） */
+    u32 pfinal;          /* イベント: 自分がいまのペースで行ったときの最終日の値 */
+    u8  pace;            /* pfinal と final を比べてよいか（イベントで、開催の 1/8 を過ぎた） */
+} RivalNow;   /* param: カード id / Lv / 順位 */
 
 void ranking_list(RankList *l);
 u16  ranking_final_rank(void);           /* イベント終了時の順位（g_save.event_pt で数える） */
@@ -50,4 +71,5 @@ u32  player_power(void);                 /* 総戦力 = デッキの攻撃 + 防
 void npc_now(u16 index, NpcNow *n);
 void feed_line(u16 k, FeedLine *f);      /* k 番目に新しい出来事（0 = 最新） */
 u16  npc_active_count(void);
+void rival_now(RivalNow *r);
 #endif

@@ -65,6 +65,13 @@ FAR(u8, quest_ap_cost, (u16 stage))
     return (u8)(d.ap_minus && f.st.ap > 1 ? f.st.ap - 1 : f.st.ap);
 }
 
+FAR(void, quest_auto_deck, (u16 stage))
+{
+    Fight f;
+    DeckStats d;
+    if (setup(stage, &f, &d)) deck_auto_for(&d);
+}
+
 static u8 droppable(const CardRec *c, u8 rarity, u8 element)
 {
     return (u8)(c->rarity == rarity && c->element == element && c->event_id == 0 &&

@@ -19,6 +19,9 @@
 #include "core/guildwar.h"
 #include "core/ranking.h"
 #include "core/timeline.h"
+#include "core/board.h"
+#include "data/text_ids.h"
+
 
 static void fresh(void) { save_new(&g_save, 1000); }
 
@@ -54,6 +57,29 @@ static void test_elem(void)
     CHECK(elem_pct(3, 4) == 120 && elem_pct(4, 3) == 120);
     CHECK(elem_pct(3, 3) == 100 && elem_pct(0, 3) == 100);
     CHECK(elem_pct(0, ELEM_NONE) == 100);
+    CHECK(elem_weak(0) == 1 && elem_weak(1) == 2 && elem_weak(2) == 0);
+    CHECK(elem_weak(3) == 4 && elem_weak(4) == 3 && elem_weak(ELEM_NONE) == ELEM_NONE);
+}
+
+/* 相性込みのおまかせ編成: 水 N（攻撃 130）と雷 N（140） */
+static void test_auto_for(void)
+{
+    DeckStats d;
+    fresh();
+    inv_add(6); inv_add(77);
+    deck_auto();
+    CHECK(g_save.cards[g_save.deck[0]].id == 77);       /* 属性なしなら攻撃の高い雷 */
+    deck_stats_init(&d, 0);
+    deck_auto_for(&d);
+    CHECK(g_save.cards[g_save.deck[0]].id == 6);        /* 炎の敵には水（130×1.2 > 140×0.8） */
+    deck_stats_init(&d, 1);
+    deck_auto_for(&d);
+    CHECK(g_save.cards[g_save.deck[0]].id == 77);       /* 水の敵には雷 */
+    deck_stats_init(&d, ELEM_NONE);
+    d.bonus_card = 6; d.bonus_mul = 5;
+    deck_auto_for(&d);
+    CHECK(g_save.cards[g_save.deck[0]].id == 6);        /* 特効も込みで比べる */
+    CHECK(g_save.deck[1] != DECK_EMPTY);
 }
 
 static void test_ap(void)
@@ -482,6 +508,68 @@ static void test_ranking(void)
     for (i = 1; i < l.n; i++) CHECK(l.rows[i - 1].value >= l.rows[i].value);
 }
 
+/* ライバル: すぐ上の人を指名し、抜くまで替えない（5 人より遠く離されたら付け替える） */
+static void test_rival(void)
+{
+    RankList l;
+    RivalNow r;
+    EventRec e;
+    u16 i, above = RANK_PLAYER, below = RANK_PLAYER, far = RANK_PLAYER;
+    fresh();
+    CHECK(RIVAL_OF(RANK_POWER) == RANK_PLAYER);        /* 新しいセーブにはいない */
+    inv_add(39); inv_add(40);
+    g_save.deck[0] = 0; g_save.deck[1] = 1;
+    g_save.g_time = GSEC_PER_DAY * 30;
+    l.mode = RANK_POWER; l.first = RANK_VIEW_AROUND;
+    ranking_list(&l);
+    for (i = 0; i < l.n; i++) {
+        if (l.rows[i].rank == l.player_rank - 1) above = l.rows[i].npc;
+        if (l.rows[i].rank == l.player_rank + 1) below = l.rows[i].npc;
+    }
+    CHECK(above != RANK_PLAYER && below != RANK_PLAYER);
+    CHECK(RIVAL_OF(RANK_POWER) == above);
+    r.mode = RANK_POWER; r.npc = above;
+    rival_now(&r);
+    CHECK(!r.retired && r.value > r.player && r.player == player_power() && r.final == r.value && !r.pace && r.tone < 4);
+    /* 抜いた相手（自分より下）は替えない。マイページが知らせてから替える */
+    g_save.rival[RANK_POWER] = (u16)(below + 1);
+    ranking_list(&l);
+    CHECK(RIVAL_OF(RANK_POWER) == below);
+    /* 遠く離れた相手は、すぐ上の人に付け替える */
+    l.first = RANK_VIEW_TOP;
+    ranking_list(&l);
+    far = l.rows[0].npc;
+    CHECK(far != RANK_PLAYER && l.player_rank > 10);
+    g_save.rival[RANK_POWER] = (u16)(far + 1);
+    l.first = RANK_VIEW_AROUND;
+    ranking_list(&l);
+    CHECK(RIVAL_OF(RANK_POWER) == above);
+    /* イベント: そのイベントの間だけ有効で、抜いた元ライバル（chaser）は次のイベントで消える */
+    tbl_event(1, &e);
+    g_save.event_id = 1;
+    g_save.event_pt = 3000;
+    g_save.g_time = (u32)e.start_day * GSEC_PER_DAY + (u32)e.duration * GSEC_PER_DAY / 2;   /* 折り返し */
+    g_save.chaser = 77;
+    CHECK(RIVAL_OF(RANK_EVENT) == RANK_PLAYER && CHASER() == RANK_PLAYER);
+    l.mode = RANK_EVENT;
+    ranking_list(&l);
+    CHECK(g_save.rival_event == 1 && g_save.chaser == 0 && RIVAL_OF(RANK_EVENT) != RANK_PLAYER);
+    r.mode = RANK_EVENT; r.npc = RIVAL_OF(RANK_EVENT);
+    rival_now(&r);
+    CHECK(r.value > r.player && r.final >= r.value);
+    CHECK(r.pace && r.pfinal >= 5900 && r.pfinal <= 6100);       /* 半分で 3000 点なら最終日に約 6000 点 */
+    CHECK(r.final >= r.value * 2 - 4 && r.final <= r.value * 2 + 4);   /* NPC も経過に比例して伸びる */
+    g_save.event_id = 2;
+    CHECK(RIVAL_OF(RANK_EVENT) == RANK_PLAYER);        /* イベントが替われば、いない */
+    CHECK(RIVAL_OF(RANK_POWER) == above);              /* 総戦力のライバルはそのまま */
+    g_save.rival[RANK_POWER] = 0xFFFF;                 /* 壊れた・細工したセーブの番号は「いない」 */
+    CHECK(RIVAL_OF(RANK_POWER) == RANK_PLAYER);
+    g_save.rival[RANK_POWER] = NPC_COUNT + 1;
+    CHECK(RIVAL_OF(RANK_POWER) == RANK_PLAYER);
+    g_save.rival[RANK_POWER] = NPC_COUNT;
+    CHECK(RIVAL_OF(RANK_POWER) == NPC_COUNT - 1);
+}
+
 static void test_timeline(void)
 {
     TlState t;
@@ -582,6 +670,83 @@ static void test_timeline(void)
     }
 }
 
+/* ギルド伝言板: 仲間はどのギルドにも 7〜8 人。辞める日に脱退の知らせが出て、その後は書き込まない */
+static void test_board(void)
+{
+    BoardList l;
+    NpcRec r;
+    NpcNow n;
+    u16 i, g, rd = 0, who = 0, never = 0, total = 0, posts = 0, news = 0, repeats = 0;
+    u8 k, cnt[GUILD_COUNT] = {0};
+    for (i = 0; i < NPC_COUNT; i++) {
+        if (!BOARD_IS_MATE(i)) continue;
+        tbl_npc(i, &r);
+        CHECK(r.guild == (i >> 3) % GUILD_COUNT);
+        cnt[r.guild]++;
+        total++;
+        if (mate_retire_day(i) == BOARD_NEVER) never++;
+        else CHECK(mate_retire_day(i) >= 20 && mate_retire_day(i) < 250);
+    }
+    for (g = 0; g < GUILD_COUNT; g++) CHECK(cnt[g] == 7 || cnt[g] == 8);
+    CHECK(never * 100 / total > 15 && never * 100 / total < 45);   /* 3 割前後が最後まで残る */
+    fresh();
+    l.skip = 0; l.want = BOARD_MAX;
+    board_list(&l);
+    CHECK(l.n == 0);                                   /* ギルドに入る前は何も無い */
+    g_save.guild = 1;
+    for (i = 3; i < NPC_COUNT; i += 128) {             /* ギルド 1 の仲間で、辞める人を 1 人 */
+        u16 d = mate_retire_day(i);
+        if (d != BOARD_NEVER && d > 40) { rd = d; who = i; break; }
+    }
+    CHECK(rd != 0);
+    g_save.g_time = (u32)rd * GSEC_PER_DAY + 13UL * 3600;   /* 辞める日の昼 */
+    l.skip = 0; l.want = BOARD_MAX;
+    board_list(&l);
+    CHECK(l.n == BOARD_MAX && l.post[0].kind == BP_LEAVE && l.post[0].npc == who && l.post[0].day == rd);
+    for (k = 1; k < l.n; k++) {                        /* 新しい順で、日付は戻るだけ */
+        CHECK(l.post[k].day <= l.post[k - 1].day);
+    }
+    npc_now(who, &n);
+    CHECK(n.retired);
+    g_save.g_time -= GSEC_PER_DAY;
+    npc_now(who, &n);
+    CHECK(!n.retired);
+    /* 1 件飛ばすと 1 件ずれる */
+    {
+        BoardPost first = l.post[1];
+        g_save.g_time = (u32)rd * GSEC_PER_DAY + 13UL * 3600;
+        l.skip = 1; l.want = BOARD_MAX;
+        board_list(&l);
+        CHECK(l.post[0].npc == first.npc && l.post[0].text == first.text && l.post[0].day == first.day);
+        l.skip = 0; l.want = 1;
+        board_list(&l);
+        CHECK(l.n == 1 && l.post[0].kind == BP_LEAVE && l.post[0].npc == who);   /* 流れる文は 1 件だけ求める */
+    }
+    /* 辞めた後は書き込まない。文の id は伝言板の範囲で、% の入る文には文言がつく */
+    for (g = 1; g <= GUILD_COUNT; g++) {
+        g_save.guild = (u8)g;
+        for (i = 0; i < 270; i += 9) {
+            g_save.g_time = (u32)i * GSEC_PER_DAY + 23UL * 3600;
+            l.skip = 0; l.want = BOARD_MAX;
+            board_list(&l);
+            for (k = 0; k < l.n; k++) {
+                const BoardPost *p = &l.post[k];
+                posts++;
+                tbl_npc(p->npc, &r);
+                CHECK(BOARD_IS_MATE(p->npc) && r.guild == g - 1);
+                if (p->kind == BP_LEAVE) { CHECK(mate_retire_day(p->npc) == p->day); continue; }
+                CHECK(mate_retire_day(p->npc) >= p->day);
+                CHECK(p->text >= T_BD_FADE0 && p->text <= T_BD_HI7 && p->tone < 4);
+                if (p->text >= T_BD_NEW0 && p->text <= T_BD_NEW2) { CHECK(p->param == T_RAR_4 || p->param == T_RAR_5); news++; }
+                if (k && l.post[k - 1].kind == BP_POST && l.post[k - 1].text == p->text) repeats++;
+                if (p->text == T_BD_HUNT0 || p->text == T_BD_HUNT1 || p->text == T_BD_RAID3 || p->text == T_BD_PVP1) CHECK(p->param != 0);
+            }
+        }
+    }
+    CHECK(posts > 2000 && news > 0);
+    CHECK(repeats * 100 < posts);                      /* 続けて同じ文はめったに出ない */
+}
+
 int main(void)
 {
     test_timeline();
@@ -592,9 +757,12 @@ int main(void)
     test_pvp();
     test_guildwar();
     test_ranking();
+    test_board();
+    test_rival();
     test_struct_sizes();
     test_battle();
     test_elem();
+    test_auto_for();
     test_ap();
     test_inventory();
     test_quest();

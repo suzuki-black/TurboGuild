@@ -88,8 +88,16 @@ static u8 used(u16 i, u8 n)
     return 0;
 }
 
-/* 毎回「入る中で攻撃最大」を選ぶ貪欲法。200 枚 × 5 回で十分速い */
-FAR(void, deck_auto, (void))
+FAR(u8, elem_weak, (u8 enemy))
+{
+    u8 w;
+    for (w = 0; w < ELEMENTS; w++) if (elem_pct(w, enemy) == ELEM_GOOD_PCT) return w;
+    return ELEM_NONE;
+}
+
+/* 毎回「入る中で攻撃最大」を選ぶ貪欲法。200 枚 × 5 回で十分速い。
+ * st があれば、その敵の属性と特効を込みの攻撃で比べる */
+static void fill(const DeckStats *st)
 {
     u16 cost_max = PLAYER_COST_MAX(g_save.level);
     u16 cost = 0;
@@ -103,7 +111,7 @@ FAR(void, deck_auto, (void))
         for (i = 0; i < g_save.card_count; i++) {
             u32 v;
             if (used(i, d)) continue;
-            v = card_value(i, 0, ELEM_NONE, 0, &c);
+            v = card_value(i, 0, st ? st->enemy_elem : ELEM_NONE, st, &c);
             if (cost + c.cost <= cost_max && v > best) {
                 best = v;
                 pick = i;
@@ -115,3 +123,6 @@ FAR(void, deck_auto, (void))
         cost += pick_cost;
     }
 }
+
+FAR(void, deck_auto, (void)) { fill(0); }
+FAR(void, deck_auto_for, (const DeckStats *st)) { fill(st); }

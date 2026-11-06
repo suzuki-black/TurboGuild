@@ -45,6 +45,17 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.gold == 777 && s.credits_seen == 1 && s.lang == 0 && s.game_ver[0] == 0);
+    /* v9（v0.1.0）も読め、v10 で足したライバルは「いない」から */
+    save_new(&s, 1);
+    s.lang = 2;
+    s.rival[1] = 0x1234;                /* v10 で足した欄（v9 のディスクではゴミ） */
+    s.chaser = 0x5678;
+    s.magic = SAVE_MAGIC;
+    s.version = 9;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.lang == 2 && s.rival[1] == 0 && s.chaser == 0);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;

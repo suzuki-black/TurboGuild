@@ -34,4 +34,5 @@ typedef struct {
 void quest_run(u16 stage, QuestResult *r);     /* stage >= EVENT_STAGE_BASE ならイベントの面 */
 u16  quest_max_stage(void);          /* 挑戦できる最大のステージ番号 */
 u8   quest_ap_cost(u16 stage);       /* スキル込みの AP 消費 */
+void quest_auto_deck(u16 stage);     /* その面の敵の属性・特効に合わせておまかせ編成 */
 #endif

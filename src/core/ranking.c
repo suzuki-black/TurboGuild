@@ -3,6 +3,7 @@
  * ★1000 人ぶん回すので 32bit の割り算を使わない（Z80 では 1 回数千サイクル。最初は 1 回の順位計算に
  *   5 秒かかっていた）。倍率は先に「× 128 / 256 の整数」にしておき、シフトで割る。 */
 #include "ranking.h"
+#include "board.h"
 #include "deck.h"
 #include "save.h"
 #include "tables.h"
@@ -27,7 +28,7 @@ typedef struct {
 } Ctx;
 
 /* 掛け算も割り算も使わない 16bit ハッシュ（xor・シフト・足し算） */
-static u16 hash(u16 a, u16 b)
+u16 npc_hash(u16 a, u16 b)
 {
     u16 x = (u16)(a ^ (b << 5) ^ (b >> 3) ^ 0x9E37u);
     x ^= x << 7;
@@ -86,13 +87,17 @@ static void ctx_init(Ctx *c, u8 final_event)
     c->event_k = (u16)((u32)c->event_era * c->prog / 100);
 }
 
-/* 辞めた日（辞めていなければ 0xFFFF） */
+/* 辞めた日（辞めていなければ 0xFFFF）。伝言板の仲間は年表の大量引退と別に、自分の日に辞める */
 static u16 retire_day(u16 i, const Ctx *c)
 {
     u8 w;
+    if (BOARD_IS_MATE(i)) {
+        u16 d = mate_retire_day(i);
+        return d <= c->day ? d : 0xFFFF;
+    }
     for (w = 0; w < DROP_WAVES; w++) {
         if (c->drop_day[w] > c->day) break;
-        if (chance(hash(i, SALT_RETIRE(w)), c->drop_pct[w])) return c->drop_day[w];
+        if (chance(npc_hash(i, SALT_RETIRE(w)), c->drop_pct[w])) return c->drop_day[w];
     }
     return 0xFFFF;
 }
@@ -118,7 +123,7 @@ static u32 event_pt_of(u16 i, const Ctx *c, const NpcRec *r, u16 rd)
     if (!c->event_id || !r->event_pt) return 0;
     if (rd != 0xFFFF && rd <= c->event_start) return 0;
     v = (u16)((r->event_pt >> 2) > 0xFFFF ? 0xFFFF : (r->event_pt >> 2));
-    v = (u16)(((u32)v * (u8)(64 + (hash(i, SALT_EVENT(c->event_id)) & 127))) >> 7);   /* この人のこのイベントの腕前 */
+    v = (u16)(((u32)v * (u8)(64 + (npc_hash(i, SALT_EVENT(c->event_id)) & 127))) >> 7);   /* この人のこのイベントの腕前 */
     return (((u32)v * c->event_k) >> 8) << 2;          /* × 時代% × 経過割合、/4 を戻す */
 }
 
@@ -191,13 +196,56 @@ FAR(u16, npc_active_count, (void))
     return k;
 }
 
+FAR(void, rival_now, (RivalNow *r))
+{
+    Ctx c;
+    NpcRec rec;
+    NpcNow n;
+    u16 rd;
+    ctx_init(&c, 0);
+    tbl_npc(r->npc, &rec);
+    rd = now_of(r->npc, &c, &rec, &n);
+    r->retired = n.retired;
+    r->tone = npc_tone(r->npc);
+    r->pace = 0;
+    if (r->mode == RANK_POWER) {
+        r->value = r->final = n.power;
+        r->player = player_power();
+        return;
+    }
+    r->value = event_pt_of(r->npc, &c, &rec, rd);
+    r->player = g_save.event_pt;
+    if (c.prog >= PACE_MIN_PROG) {                     /* いまの点 × 全期間 / 経過（2^24 を超える点は伸ばさない） */
+        r->pace = 1;
+        r->pfinal = r->player >> 24 ? r->player : (r->player << 8) / c.prog;
+    }
+    c.event_k = (u16)((u32)c.event_era * 256 / 100);   /* 最終日 */
+    r->final = event_pt_of(r->npc, &c, &rec, rd);
+}
+
+/* いなければ（イベントが替わった・まだ指名していない）指名する。すぐ上の 5 人より遠いなら付け替える。
+ * 辞めた・抜いたはマイページが知らせてから付け替える（ここでは替えない） */
+static void rival_pick(u8 mode, u16 cur, u8 cur_above, const RankRow *above, u8 na)
+{
+    u8 k;
+    if (cur != RANK_PLAYER) {
+        if (!cur_above) return;
+        for (k = 0; k < na; k++) if (above[k].npc == cur) return;
+    }
+    if (mode == RANK_EVENT && g_save.rival_event != (u8)g_save.event_id) {
+        g_save.rival_event = (u8)g_save.event_id;
+        g_save.chaser = 0;
+    }
+    g_save.rival[mode] = na ? (u16)(above[0].npc + 1) : 0;
+}
+
 FAR(void, ranking_list, (RankList *l))
 {
     Ctx c;
     NpcNow n;
     RankRow above[RANK_ROWS / 2], below[RANK_ROWS / 2];
-    u8 na = 0, nb = 0, k;
-    u16 i, count_above = 0, active = 0;
+    u8 na = 0, nb = 0, k, rv_above = 0;
+    u16 i, count_above = 0, active = 0, rv = RIVAL_OF(l->mode);
     ctx_init(&c, 0);
     l->player_value = l->mode == RANK_POWER ? player_power() : g_save.event_pt;
     l->n = 0;
@@ -207,6 +255,7 @@ FAR(void, ranking_list, (RankList *l))
         active++;
         if (v > l->player_value) {
             count_above++;
+            if (i == rv) rv_above = 1;
             insert(above, &na, RANK_ROWS / 2, i, v, 0);   /* 自分のすぐ上: 小さい順に 5 人 */
         } else {
             insert(below, &nb, RANK_ROWS / 2, i, v, 1);   /* 自分のすぐ下: 大きい順に 5 人 */
@@ -215,6 +264,7 @@ FAR(void, ranking_list, (RankList *l))
     }
     l->player_rank = (u16)(count_above + 1);
     l->total = (u16)(active + 1);
+    if (l->mode == RANK_POWER || g_save.event_id) rival_pick(l->mode, rv, rv_above, above, na);
     if (l->first == RANK_VIEW_TOP) {
         /* 自分が上位 10 に入るなら差し込む */
         if (l->player_rank <= RANK_ROWS) insert(l->rows, &l->n, RANK_ROWS, RANK_PLAYER, l->player_value, 1);
@@ -244,7 +294,7 @@ FAR(void, feed_line, (u16 k, FeedLine *f))
     NpcRec r;
     NpcNow n;
     u16 slot = (u16)(g_save.g_time / FEED_SLOT_SECS) - k;
-    u16 i = hash(slot, SALT_FEED(1)) % NPC_COUNT, tries;
+    u16 i = npc_hash(slot, SALT_FEED(1)) % NPC_COUNT, tries;
     ctx_init(&c, 0);
     for (tries = 0; tries < 16; tries++, i = (u16)((i + 37) % NPC_COUNT)) {   /* 辞めた人は出さない */
         tbl_npc(i, &r);
@@ -252,13 +302,13 @@ FAR(void, feed_line, (u16 k, FeedLine *f))
         if (!n.retired) break;
     }
     f->npc = i;
-    f->kind = (u8)(hash(slot, SALT_FEED(2)) % FEED_KINDS);
+    f->kind = (u8)(npc_hash(slot, SALT_FEED(2)) % FEED_KINDS);
     if (c.day + 1 >= SERVICE_END_DAY) f->kind = FEED_BYE;  /* 最終日は全員が別れの挨拶 */
-    f->param = (u16)(hash(slot, SALT_FEED(5)) % 4);          /* 挨拶の言い回し */
+    f->param = (u16)(npc_hash(slot, SALT_FEED(5)) % 4);          /* 挨拶の言い回し */
     switch (f->kind) {
     case FEED_SSR: {
         CardRec cr;
-        u16 id, pick = hash(slot, SALT_FEED(3)) & 7, seen = 0;
+        u16 id, pick = npc_hash(slot, SALT_FEED(3)) & 7, seen = 0;
         f->param = 39;
         for (id = 1; id <= tbl_card_count(); id++) {
             tbl_card(id, &cr);
@@ -270,7 +320,7 @@ FAR(void, feed_line, (u16 k, FeedLine *f))
         break;
     }
     case FEED_LEVEL:  f->param = n.level; break;
-    case FEED_RANKUP: f->param = (u16)(1 + hash(slot, SALT_FEED(4)) % 100); break;
+    case FEED_RANKUP: f->param = (u16)(1 + npc_hash(slot, SALT_FEED(4)) % 100); break;
     case FEED_BYE:    break;
     default:          f->param = 0; break;
     }

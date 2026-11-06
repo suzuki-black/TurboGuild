@@ -82,6 +82,8 @@ T_DECK_TITLE	Deck
 T_DECK_AUTO	Auto deck
 T_DECK_CLEAR	Remove
 T_DECK_SLOT	#
+T_WEAK	Weak
+T_DECK_FIT	Deck set for the weakness.
 T_DECK_PICK	Pick a card to put in
 T_DECK_OVER	Cost is too high
 T_COST	Cost 
@@ -300,6 +302,87 @@ T_RESET_CONFIRM	Start over from scratch?
 T_GIFT_GOT	A gift of gems arrived
 T_TO_TITLE	Return to the title?
 T_GUIDE_HOME2	1-8:Menu ESC:Title
+T_BOARD_TITLE	Guild Board
+T_NEWS_GUIDE	SPACE:Guild board ESC:Back
+T_BOARD_GUIDE	U/D:More ESC:Back
+T_BOARD_EMPTY	No posts yet.
+T_BOARD_HEAD	[Guild] 
+T_BOARD_SAY	: 
+T_BOARD_LEFT	 has left the guild.
+T_BOARD_DAY	d
+T_BOARD_TONE1	 lol	!
+T_BOARD_TONE2	 :)
+T_BOARD_TONE3	 ^^;
+T_BD_FADE0	Busy lately. Might not be around much
+T_BD_FADE1	I just log in and log out these days	!
+T_BD_FADE2	Work's getting busy. Taking a break
+T_BD_FADE3	Honestly, I'm getting tired of it	!
+T_BD_END0	Shutting down? Can't believe it	!
+T_BD_END1	I'm staying to the end. You too?	!
+T_BD_END2	What happens to all I spent?
+T_BD_END3	One more pull before it ends
+T_BD_NEW0	%'s out and my cards look weak now
+T_BD_NEW1	% added? Nobody told me
+T_BD_NEW2	No top rank without % now
+T_BD_NEW3	The power creep is getting silly
+T_BD_HUNT0	Grinding Easy in % bit by bit	!
+T_BD_HUNT1	Almost at the next % reward	!
+T_BD_HUNT2	Waiting for AP takes forever	!
+T_BD_HUNT3	Tried Hard. Got wrecked	!
+T_BD_RAID0	Anyone? Need raid backup!	!
+T_BD_RAID1	Boss is tanky. No AP for Max hits	!
+T_BD_RAID2	Thanks for the backup! Saved me	!
+T_BD_RAID3	How many bosses in % so far?	!
+T_BD_PVP0	Beat a stronger foe in battle!	!
+T_BD_PVP1	Top players in % are monsters	!
+T_BD_PVP2	Can't close the points gap	!
+T_BD_GVG0	Guild war today. Show up, all!	!
+T_BD_GVG1	Pressed the cheer button	!
+T_BD_GVG2	Isn't the other guild too strong?	!
+T_BD_RATE0	Rate-up's on. Gotta pull
+T_BD_RATE1	I can feel it this time	!
+T_BD_RATE2	Is the rate-up even real?
+T_BD_PAY0	Free pull. Another N
+T_BD_PAY1	Made it this far without paying	!
+T_BD_PAY2	Spent my whole allowance
+T_BD_PAY3	Meant to pull once. Did a 10x
+T_BD_PAY4	Payday, so I did a 10x pull	!
+T_BD_PAY5	Pulls after work are my joy	!
+T_BD_PAY6	Pulled to the cap. Still nothing	!
+T_BD_PAY7	I own every card I want
+T_BD_HI0	Anyone still up?
+T_BD_HI1	One more run before bed	!
+T_BD_HI2	Morning! Got my login bonus	!
+T_BD_HI3	Burning AP on my commute	!
+T_BD_HI4	Exploring on my lunch break	!
+T_BD_HI5	Let's keep going this afternoon	!
+T_BD_HI6	I'm back! Hi everyone
+T_BD_HI7	Good work all. Off to bed
+T_RIVAL	Rival	!
+T_RV_BEHIND	 is ahead by 	!
+T_RV_CHASE	 is chasing, 	!
+T_RV_CHASE2	 behind	!
+T_RV_PACE_WIN	 At this pace you'll pass them.	!
+T_RV_PACE_NO	 At this pace you won't catch up.	!
+T_RV_PACE_LOSE	 At this pace they'll pass you.	!
+T_RV_PACE_SAFE	 At this pace you'll stay ahead.	!
+T_RV_BEAT	You passed your rival!	!
+T_RV_LOST	Your rival passed you back!	!
+T_RV_GONE	Your rival stopped coming...	!
+T_RV_Q0	"
+T_RV_Q1	"
+T_RV_SORE0	Not bad.
+T_RV_SORE1	Next time.
+T_RV_SORE2	Time to pay up...	!
+T_RV_SORE3	Busy day, OK?	!
+T_RV_VOW0	Last day is mine.	!
+T_RV_VOW1	Enjoy it for now.	!
+T_RV_VOW2	All in tonight.	!
+T_RV_VOW3	It's still early.	!
+T_RV_TAUNT0	See ya.	!
+T_RV_TAUNT1	Too slow.	!
+T_RV_TAUNT2	You slowed down.	!
+T_RV_TAUNT3	Sorry, I'm off.	!
 
 # ---- 運営のお知らせ（data/timeline.csv） ----
 【お知らせ】サービス開始！冒険者ギルドへようこそ	[News] Service launched! Welcome to the Guild

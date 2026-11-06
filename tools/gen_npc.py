@@ -32,6 +32,10 @@ def generate(n_pre, n_suf, n_guild, seed=20111011):
     npcs.sort(key=lambda r: -r[5])
     for k, r in enumerate(npcs[:10]):
         r[7] |= 2                                        # bit1: ランカー
+    # 添字 i % 8 == 3 は伝言板に書き込む「仲間」（core/board.c の BOARD_IS_MATE）。
+    # どのギルドにも 7〜8 人いるように、ギルドは添字から決める
+    for i in range(3, COUNT, 8):
+        npcs[i][1] = (i >> 3) % n_guild
     by_power = sorted(range(COUNT), key=lambda i: -npcs[i][3])
     return npcs, by_power
 

@@ -135,6 +135,7 @@ static void rescue(void)
 FAR(void, evtop_draw, (void))
 {
     EventRec e;
+    EventStage es;
     CardRec bonus;
     u8 cx, lv, kind;
     u32 next;
@@ -152,6 +153,7 @@ FAR(void, evtop_draw, (void))
     cx = txt_id(8, 52, T_EV_LEFT, COL_LGRAY, COL_BLACK);
     cx = txt_num((u8)(cx + 1), 52, event_days_left(), COL_YELLOW, COL_BLACK);
     txt_id(cx, 52, T_DAYS, COL_LGRAY, COL_BLACK);
+    if (event_stage(1, &es)) ui_weak(18, 52, es.element, COL_BLACK);
     g_rank.mode = RANK_EVENT;
     g_rank.first = 0;
     ranking_list(&g_rank);
@@ -188,6 +190,7 @@ FAR(void, evtop_update, (void))
     if (p & BTN_CANCEL) { screen_change(&scr_home); return; }
     if (!g_save.event_id || g_save.event_id != event_active()) return;
     if (d == 3 && event_kind() == EV_RAID) { rescue(); return; }
+    if (d == 6) { ui_fit_deck(EVENT_STAGE_BASE + 1); return; }
     if (d >= 1 && d <= EVENT_LEVELS) {
         u16 stage = (u16)(EVENT_STAGE_BASE + d);
         if (g_save.ap < quest_ap_cost(stage)) { ui_msg(T_AP_SHORT); return; }

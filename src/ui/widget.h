@@ -34,6 +34,8 @@ void ui_guide(u16 id);                /* 下の帯（キーの案内） */
 void ui_status_block(u8 y);           /* 名前・Lv・AP/EXP ゲージ・所持金・軍資金（x=68 から右, 72 行） */
 u8   ui_rarity(u8 cx, u8 y, u8 rarity, u8 bg);       /* [SSR] を色付きで。次の桁を返す */
 void ui_saving(void);                 /* 「通信中…」を出して保存。失敗は 1 回だけ知らせる */
+u8   ui_weak(u8 cx, u8 y, u8 enemy, u8 bg);         /* [6] 弱点 水（6 キーで ui_fit_deck）。次の桁を返す */
+void ui_fit_deck(u16 stage);          /* その面の敵に合わせておまかせ編成して知らせる */
 u8   rarity_color(u8 rarity);
 u8   elem_color(u8 element);
 #endif
