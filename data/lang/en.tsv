@@ -149,7 +149,7 @@ T_SORT0	New
 T_SORT1	Rarity
 T_SORT2	ATK
 T_SORT3	Cost
-T_GUIDE_DECK	SPACE:Swap ESC:Back
+T_GUIDE_DECK	SPACE:Swap 7-9:Deck ESC:Back
 T_GUIDE_ANY	SPACE:Next
 T_EXPLORE	Scout
 T_DEFEAT	 defeated!
@@ -383,6 +383,10 @@ T_RV_TAUNT0	See ya.	!
 T_RV_TAUNT1	Too slow.	!
 T_RV_TAUNT2	You slowed down.	!
 T_RV_TAUNT3	Sorry, I'm off.	!
+T_STANCE_0	Normal	!
+T_STANCE_1	Save
+T_STANCE_2	All-out	!
+T_LEAD_UP	 ATK+20%
 
 # ---- 運営のお知らせ（data/timeline.csv） ----
 【お知らせ】サービス開始！冒険者ギルドへようこそ	[News] Service launched! Welcome to the Guild

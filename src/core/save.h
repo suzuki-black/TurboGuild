@@ -6,7 +6,7 @@
 #include "../config.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  10
+#define SAVE_VERSION  11
 #define SAVE_MIN_VERSION 5           /* 読めるいちばん古い版（それより前はカードの形が違う） */
 /* ★上位互換の決まり（DECISIONS #78）: 欄は必ず末尾に足し、SAVE_VERSION を 1 上げ、
  *   save.c の save_size[] にその版の大きさを足す。古い版は「その版の大きさ」で検査して読み、
@@ -75,6 +75,10 @@ typedef struct {
     u16 rival[2];        /* [RANK_EVENT] イベントポイント / [RANK_POWER] 総戦力 */
     u8  rival_event;
     u16 chaser;          /* イベントで抜いた元ライバル（抜き返されるか見張る） */
+    /* v11: 戦い方とデッキ 3 つ（DECISIONS #87） */
+    u8  stance;          /* STANCE_*。0 = 通常 */
+    u8  deck_sel;        /* いま使っているデッキ 0..DECK_SLOTS-1（中身は deck[]） */
+    u8  deck_slot[DECK_SLOTS][DECK_SIZE];   /* 控えのデッキ。cards[] の添字 + 1（0 = 空き）。[deck_sel] は使わない */
 } SaveData;
 
 u16 save_crc(const SaveData *s);           /* その版の大きさで計算する */

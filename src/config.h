@@ -29,6 +29,15 @@
 #define SKILL_PCT           10
 #define ELEM_GOOD_PCT       120
 #define ELEM_BAD_PCT        80
+#define LEADER_PCT          20          /* リーダー（デッキの 1 枚目）と同じ属性のカードの攻撃 +20%（DECISIONS #87） */
+#define DECK_SLOTS          3           /* デッキは 3 つまで持てる */
+/* 戦い方（DECISIONS #87）: 節約は AP 半分（切り上げ）・攻撃 60%、全力は AP 2 倍・攻撃 250%。報酬は変わらない */
+#define STANCE_NORMAL       0
+#define STANCE_SAVE         1
+#define STANCE_ALL          2
+#define STANCES             3
+#define STANCE_SAVE_ATK     60
+#define STANCE_ALL_ATK      250
 
 /* 画面 */
 #define TEXT_COLS           32

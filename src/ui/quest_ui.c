@@ -132,6 +132,8 @@ static void decor(u8 e, u8 x)
 }
 
 /* 風景を描く。scroll は歩いた量（置物と雲が左へ流れる） */
+static u16 next_stage(void);
+
 static void scene(u8 scroll)
 {
     u8 e = area_elem(), i;
@@ -143,6 +145,7 @@ static void scene(u8 scroll)
     gfx_sprite(ATL_DECOR_CLOUD, (u8)(60 - scroll / 2), SCENE_Y + 14);
     for (i = 0; i < 4; i++) decor(e, (u8)(i * 72 + 20 - scroll));
     ui_weak(1, SCENE_Y + 2, e, COL_BLACK);
+    ui_stance(18, SCENE_Y + 2, quest_ap_cost(next_stage()), COL_BLACK);   /* 英語の最長「[0] All-out AP40」で 31 桁目まで */
 }
 
 static void walker(u8 frame)
@@ -317,7 +320,9 @@ static void go(void)
 FAR(void, explore_update, (void))
 {
     u8 p = input_pressed();
-    if (input_digit() == 6) { ui_fit_deck(next_stage()); return; }
+    u8 d = input_digit();
+    if (d == 6) { ui_fit_deck(next_stage()); return; }
+    if (d == 0 && !g_dirty) { ui_stance_next(); scene(0); walker(0); return; }
     if (p & BTN_OK) {
         if (g_dirty) return;
         scene(0);

@@ -36,6 +36,8 @@ u8   ui_rarity(u8 cx, u8 y, u8 rarity, u8 bg);       /* [SSR] を色付きで。
 void ui_saving(void);                 /* 「通信中…」を出して保存。失敗は 1 回だけ知らせる */
 u8   ui_weak(u8 cx, u8 y, u8 enemy, u8 bg);         /* [6] 弱点 水（6 キーで ui_fit_deck）。次の桁を返す */
 void ui_fit_deck(u16 stage);          /* その面の敵に合わせておまかせ編成して知らせる */
+u8   ui_stance(u8 cx, u8 y, u8 ap, u8 bg);       /* [0] 全力 AP10（ap = 0 なら AP は出さない）。次の桁を返す */
+void ui_stance_next(void);            /* 戦い方を 通常 → 節約 → 全力 → 通常 と替える */
 u8   rarity_color(u8 rarity);
 u8   elem_color(u8 element);
 #endif

@@ -77,6 +77,8 @@
 - **A guild board.** Seven or eight guild mates, each with a payment style and a verbal tic, post about events,
   new rarities and their day. Some slowly lose interest, and one day the board just says they have left the guild.
   Also shown on the My Page marquee.
+- **Choices before a fight.** Normal, Save (half AP, weaker) or All-out (double AP, much stronger); a leader skill
+  (+20% attack for cards of the leader's element); three decks to switch between.
 - **A rival.** The player just above you in the ranking becomes your rival until you pass them. My Page shows the gap,
   and during events the marquee tells you whether your pace will carry you past them by the last day.
 - **An operations timeline:** rate-up campaigns, inflation (newer cards are stronger), apology gems,
@@ -296,6 +298,8 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **ギルドとギルド対抗戦。** 1 日 2 回の「戦の時間」に相手ギルドを攻撃し、コンボと応援で押し切る。
 - **ギルド伝言板。** 課金コースと口癖を持つ 7〜8 人の仲間が、イベントや新しいレア度、その日の出来事を書き込む。
   だんだん弱音が増えていく人がいて、ある日「ギルドを脱退しました」とだけ流れる。マイページのお知らせにも流れる。
+- **戦う前の選択。** 通常・節約（AP 半分・弱い）・全力（AP 2 倍・ずっと強い）を選ぶ。リーダースキル
+  （リーダーと同じ属性のカードの攻撃 +20%）。デッキは 3 つ持てて替えられる。
 - **ライバル。** ランキングで自分のすぐ上の人が、抜くまでライバル（宿敵）になる。マイページに差を出し、
   イベント中は「このペースなら最終日に抜ける」かどうかを流れるお知らせで伝える。
 - **運営年表。** 確率アップ・インフレ（新しいカードほど強い）・お詫びの石・引退の波・終了の告知・

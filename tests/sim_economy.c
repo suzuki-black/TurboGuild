@@ -114,12 +114,66 @@ static void fuse(void)
             if (evolve_partner_ok(i, j) && evolve(i, j) == F_OK) return;
 }
 
+/* 戦い方を選ぶ模擬プレイヤー（環境変数 SIM_STANCE=1。DECISIONS #87 のボーダーへの影響を測る）。
+ * 試しに戦って元に戻し、勝てる組み合わせのうち AP あたりのポイント（通常の面は AP の少なさ）が最良のものを選ぶ */
+static u8 smart;
+static SaveData snap;
+
+static u8 dry(u16 stage, u8 stance, QuestResult *q)
+{
+    u8 ok;
+    snap = g_save;
+    g_save.stance = stance;
+    quest_run(stage, q);
+    ok = (u8)(q->status == Q_OK && q->b.win);
+    g_save = snap;
+    return ok;
+}
+
+/* 一番よい (面, 戦い方) を選んで g_save.stance に入れる。無ければ 0 */
+static u16 pick(u16 first, u16 last)
+{
+    QuestResult q;
+    u16 st, best = 0;
+    u32 score, best_score = 0;
+    u8 s, best_s = STANCE_NORMAL;
+    for (st = first; st <= last; st++)
+        for (s = 0; s < STANCES; s++) {
+            if (!dry(st, s, &q)) continue;
+            score = (u32)(q.event ? q.points : 1000) * 1000 / q.ap_used;
+            if (score > best_score) { best_score = score; best = st; best_s = s; }
+        }
+    g_save.stance = best_s;
+    return best;
+}
+
 static void quests(void)
 {
     QuestResult q;
     u8 lv;
     u16 fails = 0;
     for (;;) {
+        if (smart && g_save.event_id && g_save.event_id == event_active() && event_kind() == EV_HUNT) {
+            u16 st;
+            player_ap_update();
+            st = pick(EVENT_STAGE_BASE + 1, EVENT_STAGE_BASE + EVENT_LEVELS);
+            if (!st) return;
+            quest_run(st, &q);
+            g_save.stance = STANCE_NORMAL;
+            if (q.status != Q_OK) return;
+            continue;
+        }
+        if (smart && !g_save.event_id) {               /* 通常の面: 先へ進める面を、いちばん少ない AP で */
+            u16 st;
+            player_ap_update();
+            st = pick(quest_max_stage(), quest_max_stage());
+            if (!st && quest_max_stage() > 1) st = pick((u16)(quest_max_stage() - 1), (u16)(quest_max_stage() - 1));
+            if (!st) return;
+            quest_run(st, &q);
+            g_save.stance = STANCE_NORMAL;
+            if (q.status != Q_OK) return;
+            continue;
+        }
         player_ap_update();
         if (g_save.event_id && g_save.event_id == event_active() && event_kind() != EV_HUNT) {
             RescueResult rs;
@@ -163,6 +217,7 @@ int main(int argc, char **argv)
     u32 next_report = 0;
     u8 i;
     buy = (u8)(course != 0);
+    smart = (u8)(getenv("SIM_STANCE") && atoi(getenv("SIM_STANCE")));
     whale = (u8)(course >= 3);
     save_new(&g_save, 0);
     g_save.rng_gacha = seed * 2654435761UL | 1;

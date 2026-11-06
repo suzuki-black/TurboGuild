@@ -146,7 +146,7 @@ T_SORT0	入手順
 T_SORT1	レア度順
 T_SORT2	攻撃順
 T_SORT3	コスト順
-T_GUIDE_DECK	SPACE:入れかえ ESC:戻る
+T_GUIDE_DECK	SPACE:入替 7-9:デッキ ESC:戻る
 T_GUIDE_ANY	SPACEで次へ
 T_EXPLORE	探索度
 T_DEFEAT	を倒した！
@@ -383,3 +383,7 @@ T_RV_TAUNT0	お先に
 T_RV_TAUNT1	甘いな
 T_RV_TAUNT2	ペース落ちてるぞ
 T_RV_TAUNT3	悪いな、先に行く
+T_STANCE_0	通常
+T_STANCE_1	節約
+T_STANCE_2	全力
+T_LEAD_UP	の攻撃+20%

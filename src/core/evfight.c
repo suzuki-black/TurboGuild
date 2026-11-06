@@ -110,6 +110,7 @@ FAR(void, event_fight, (u16 level, QuestResult *r))
     deck_stats_init(&d, es.element);
     d.bonus_card = es.bonus_card; d.bonus_mul = es.bonus_mul;
     d.evo_card = es.evo_card; d.evo_mul = es.evo_mul;
+    d.stance = g_save.stance;
     deck_calc(&d);
     r->kind = es.kind;
     r->enemy_elem = es.element;

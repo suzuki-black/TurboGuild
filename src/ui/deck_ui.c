@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: MIT */
 /* deck_ui.c — デッキ編成。上に 5 枠の絵（1 枠目がリーダー＝マイページの顔）、
  * 下に選んだ枠のカードと、デッキの攻撃・防御・コストのゲージ。[6] でおまかせ編成。
+ * デッキは 3 つ持てて、[7]〜[9] で替える（見出しの右に A B C）。リーダーと同じ属性の攻撃 +20%。
  * 枠を選ぶとカードの一覧（cardgrid）から入れるカードを選ぶ。コスト超過は断る。 */
 #include "screen.h"
 #include "widget.h"
@@ -21,6 +22,23 @@
 
 #define SLOT_Y 20
 #define ITEMS  (DECK_SIZE + 1)
+#define TAB_X  160         /* 見出しの右のデッキの札（20 桁目から 4 桁ずつ） */
+
+/* [7] A [8] B [9] C。いま使っているものを黄色の地に、空のデッキは灰色に */
+static void tabs(void)
+{
+    u8 k;
+    vdp_fill(TAB_X, 0, SCREEN_W - TAB_X, 15, COL_DBLUE);
+    for (k = 0; k < DECK_SLOTS; k++) {
+        u8 x = (u8)(TAB_X + k * 32), on = (u8)(k == g_save.deck_sel);
+        char s[2];
+        s[0] = (char)('A' + k);
+        s[1] = 0;
+        ui_key((u8)(7 + k), x, 2);
+        if (on) vdp_fill((u16)(x + 15), 1, 10, 13, COL_YELLOW);
+        txt_draw((u8)(x / 8 + 2), 0, s, on ? COL_BLACK : deck_slot_count(k) ? COL_WHITE : COL_LGRAY, on ? COL_YELLOW : COL_DBLUE);
+    }
+}
 
 static void slot(u8 i)
 {
@@ -42,12 +60,16 @@ static void slot(u8 i)
 static void detail(void)
 {
     CardRec c;
-    u8 idx = g_cursor < DECK_SIZE ? g_save.deck[g_cursor] : DECK_EMPTY, cx;
+    u8 idx = g_cursor < DECK_SIZE ? g_save.deck[g_cursor] : DECK_EMPTY, cx = 9;
     vdp_fill(0, 72, SCREEN_W, 76, COL_BLACK);
     if (g_cursor == DECK_SIZE) { txt_id(2, 80, T_DECK_AUTO, COL_YELLOW, COL_BLACK); return; }
-    if (g_cursor == 0) txt_id(9, 74, T_LEADER, COL_YELLOW, COL_BLACK);
+    if (g_cursor == 0) cx = txt_id(9, 74, T_LEADER, COL_YELLOW, COL_BLACK);
     if (idx == DECK_EMPTY || idx >= g_save.card_count) { txt_id(9, 92, T_EMPTY, COL_LGRAY, COL_BLACK); return; }
     tbl_card(g_save.cards[idx].id, &c);
+    if (g_cursor == 0) {                           /* リーダーの効果: 「リーダー 炎の攻撃+20%」 */
+        cx = txt_id((u8)(cx + 1), 74, (u16)(T_ELEM_0 + c.element), elem_color(c.element), COL_BLACK);
+        txt_id(cx, 74, T_LEAD_UP, COL_WHITE, COL_BLACK);
+    }
     gfx_card(c.id, 4, 74);
     cx = ui_rarity(9, 92, c.rarity, COL_BLACK);
     txt_id((u8)(cx + 1), 92, c.name_text, COL_WHITE, COL_BLACK);
@@ -87,6 +109,7 @@ FAR(void, deck_draw, (void))
     u8 i;
     ui_clear();
     ui_header(T_DECK_TITLE);
+    tabs();
     for (i = 0; i < ITEMS; i++) slot(i);
     detail();
     totals();
@@ -114,6 +137,15 @@ FAR(void, deck_update, (void))
     u8 old = g_cursor;
     if (p & (BTN_LEFT | BTN_UP)) g_cursor = (u8)((g_cursor + ITEMS - 1) % ITEMS);
     if (p & (BTN_RIGHT | BTN_DOWN)) g_cursor = (u8)((g_cursor + 1) % ITEMS);
+    if (d >= 7 && d < 7 + DECK_SLOTS) {
+        if (d - 7 != g_save.deck_sel) {
+            deck_switch((u8)(d - 7));
+            g_save_dirty = 1;
+            psg_beep(0x080, 4);
+            g_dirty = 1;
+        }
+        return;
+    }
     if (d >= 1 && d <= ITEMS) g_cursor = (u8)(d - 1);
     if (old != g_cursor) { psg_beep(0x100, 2); slot(old); slot(g_cursor); detail(); }
     if ((p & BTN_OK) || (d >= 1 && d <= ITEMS)) { choose(g_cursor); return; }

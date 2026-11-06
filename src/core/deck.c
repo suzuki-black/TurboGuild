@@ -36,6 +36,7 @@ static u32 card_value(u16 index, u8 want_def, u8 enemy, const DeckStats *bonus, 
     if (c->skill == (want_def ? 2 : 1)) v = scale(v, (u16)(100 + SKILL_PCT));
     if (!want_def && enemy != ELEM_NONE) v = scale(v, elem_pct(c->element, enemy));
     if (!want_def && bonus) {
+        if (bonus->lead_elem == c->element) v = scale(v, 100 + LEADER_PCT);
         if (bonus->bonus_card && c->id == bonus->bonus_card) v *= bonus->bonus_mul;
         if (bonus->evo_card && c->id == bonus->evo_card) v *= bonus->evo_mul;
     }
@@ -60,6 +61,7 @@ FAR(void, deck_stats_init, (DeckStats *st, u16 enemy_elem))
     u8 i;
     for (i = 0; i < sizeof(DeckStats); i++) p[i] = 0;
     st->enemy_elem = (u8)enemy_elem;
+    st->lead_elem = ELEM_NONE;
 }
 
 FAR(void, deck_calc, (DeckStats *st))
@@ -69,6 +71,9 @@ FAR(void, deck_calc, (DeckStats *st))
     st->atk = st->def = 0;
     st->cost = 0;
     st->count = st->ap_minus = st->drop_bonus = 0;
+    st->lead_elem = ELEM_NONE;
+    d = g_save.deck[0];
+    if (d != DECK_EMPTY && d < g_save.card_count) { tbl_card(g_save.cards[d].id, &c); st->lead_elem = c.element; }
     for (d = 0; d < DECK_SIZE; d++) {
         u8 i = g_save.deck[d];
         if (i == DECK_EMPTY || i >= g_save.card_count) continue;
@@ -79,6 +84,31 @@ FAR(void, deck_calc, (DeckStats *st))
         if (c.skill == 3) st->ap_minus = 1;
         if (c.skill == 4) st->drop_bonus += SKILL_PCT;
     }
+    if (st->stance == STANCE_SAVE) st->atk = scale(st->atk, STANCE_SAVE_ATK);
+    if (st->stance == STANCE_ALL) st->atk = scale(st->atk, STANCE_ALL_ATK);
+}
+
+FAR(u8, deck_slot_count, (u8 slot))
+{
+    u8 d, n = 0;
+    for (d = 0; d < DECK_SIZE; d++)
+        if (slot == g_save.deck_sel ? g_save.deck[d] != DECK_EMPTY : g_save.deck_slot[slot][d] != 0) n++;
+    return n;
+}
+
+FAR(void, deck_switch, (u8 slot))
+{
+    u8 d, *keep;
+    if (g_save.deck_sel >= DECK_SLOTS) g_save.deck_sel = 0;   /* セーブから来た値は範囲を確かめる */
+    if (slot >= DECK_SLOTS || slot == g_save.deck_sel) return;
+    keep = g_save.deck_slot[g_save.deck_sel];
+    for (d = 0; d < DECK_SIZE; d++) keep[d] = (u8)(g_save.deck[d] == DECK_EMPTY ? 0 : g_save.deck[d] + 1);
+    for (d = 0; d < DECK_SIZE; d++) {
+        u8 v = g_save.deck_slot[slot][d];
+        g_save.deck[d] = v && v <= g_save.card_count ? (u8)(v - 1) : DECK_EMPTY;   /* セーブから来た値は範囲を確かめる */
+        g_save.deck_slot[slot][d] = 0;
+    }
+    g_save.deck_sel = slot;
 }
 
 static u8 used(u16 i, u8 n)
@@ -96,13 +126,16 @@ FAR(u8, elem_weak, (u8 enemy))
 }
 
 /* 毎回「入る中で攻撃最大」を選ぶ貪欲法。200 枚 × 5 回で十分速い。
- * st があれば、その敵の属性と特効を込みの攻撃で比べる */
+ * st があれば、その敵の属性と特効を込みの攻撃で比べる。1 枚目（リーダー）を決めたら、その属性の +20% も込みで比べる */
 static void fill(const DeckStats *st)
 {
     u16 cost_max = PLAYER_COST_MAX(g_save.level);
     u16 cost = 0;
-    u8 d;
+    u8 d, pick_elem = ELEM_NONE;
     CardRec c;
+    DeckStats w;
+    if (st) w = *st; else deck_stats_init(&w, ELEM_NONE);
+    w.lead_elem = ELEM_NONE;
     for (d = 0; d < DECK_SIZE; d++) g_save.deck[d] = DECK_EMPTY;
     for (d = 0; d < DECK_SIZE; d++) {
         u32 best = 0;
@@ -111,16 +144,18 @@ static void fill(const DeckStats *st)
         for (i = 0; i < g_save.card_count; i++) {
             u32 v;
             if (used(i, d)) continue;
-            v = card_value(i, 0, st ? st->enemy_elem : ELEM_NONE, st, &c);
+            v = card_value(i, 0, w.enemy_elem, &w, &c);
             if (cost + c.cost <= cost_max && v > best) {
                 best = v;
                 pick = i;
                 pick_cost = c.cost;
+                pick_elem = c.element;
             }
         }
         if (pick == 0xFFFF) break;
         g_save.deck[d] = (u8)pick;
         cost += pick_cost;
+        if (d == 0) w.lead_elem = pick_elem;
     }
 }
 

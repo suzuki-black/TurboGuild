@@ -90,7 +90,8 @@ static void stage_btn(u8 kind, u8 level)
     event_stage(level, &es);
     txt_id((u8)((x + 20) / 8), BTN_Y + 2, btn_text(kind, level), COL_YELLOW, bg);   /* 数字キー（x+3〜15）と離す */
     cx = txt_id((u8)(x / 8 + 1), BTN_Y + 20, T_AP, COL_LGRAY, bg);
-    txt_num(cx, BTN_Y + 20, es.ap, COL_WHITE, bg);
+    vdp_fill((u16)(cx * 8), BTN_Y + 20, (u16)(x + 60 - cx * 8), 16, bg);     /* 戦い方を替えたら書き直す */
+    txt_num(cx, BTN_Y + 20, quest_ap_cost((u16)(EVENT_STAGE_BASE + level)), COL_WHITE, bg);   /* 戦い方・スキル込み */
 }
 
 /* レイドボスの Lv と残り HP */
@@ -176,6 +177,8 @@ FAR(void, evtop_draw, (void))
     cx = txt_draw(cx, 114, "x", COL_LGRAY, COL_BLACK);
     txt_num(cx, 114, e.bonus_mul, COL_YELLOW, COL_BLACK);
     if (kind == EV_RAID) raid_status();
+    vdp_fill(168, 0, SCREEN_W - 168, 15, COL_DBLUE);     /* 見出しの右に戦い方（イベント名は 18 桁まで） */
+    ui_stance(21, 0, 0, COL_DBLUE);
     for (lv = 1; lv <= EVENT_LEVELS; lv++) stage_btn(kind, lv);
     ui_box(196, BTN_Y, 58, 40, COL_DBLUE, COL_CYAN);
     ui_key(4, 199, BTN_Y + 4);
@@ -191,6 +194,14 @@ FAR(void, evtop_update, (void))
     if (!g_save.event_id || g_save.event_id != event_active()) return;
     if (d == 3 && event_kind() == EV_RAID) { rescue(); return; }
     if (d == 6) { ui_fit_deck(EVENT_STAGE_BASE + 1); return; }
+    if (d == 0) {
+        u8 lv;
+        ui_stance_next();
+        vdp_fill(168, 0, SCREEN_W - 168, 15, COL_DBLUE);
+        ui_stance(21, 0, 0, COL_DBLUE);
+        for (lv = 1; lv <= EVENT_LEVELS; lv++) stage_btn(event_kind(), lv);
+        return;
+    }
     if (d >= 1 && d <= EVENT_LEVELS) {
         u16 stage = (u16)(EVENT_STAGE_BASE + d);
         if (g_save.ap < quest_ap_cost(stage)) { ui_msg(T_AP_SHORT); return; }

@@ -15,7 +15,8 @@ static const u16 save_size[] = {
     offsetof(SaveData, credits_seen),  /* v7: ギルド・レイド・バトル */
     offsetof(SaveData, lang),          /* v8: スタッフロール */
     offsetof(SaveData, rival),         /* v9: 言語と版 */
-    sizeof(SaveData),                  /* v10: ライバル */
+    offsetof(SaveData, stance),        /* v10: ライバル */
+    sizeof(SaveData),                  /* v11: 戦い方とデッキ 3 つ */
 };
 
 static u16 size_of(u16 version)

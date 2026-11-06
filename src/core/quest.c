@@ -53,8 +53,18 @@ static u8 setup(u16 stage, Fight *f, DeckStats *d)
         f->element = area.element;
         deck_stats_init(d, area.element);
     }
+    d->stance = g_save.stance;
     deck_calc(d);
     return 1;
+}
+
+/* AP = 面の AP × 戦い方（節約は半分を切り上げ、全力は 2 倍）、スキルの -1 */
+static u8 ap_of(const Fight *f, const DeckStats *d)
+{
+    u8 ap = f->st.ap;
+    if (g_save.stance == STANCE_SAVE) ap = (u8)((ap + 1) / 2);
+    if (g_save.stance == STANCE_ALL) ap = (u8)(ap * 2);
+    return (u8)(d->ap_minus && ap > 1 ? ap - 1 : ap);
 }
 
 FAR(u8, quest_ap_cost, (u16 stage))
@@ -62,7 +72,7 @@ FAR(u8, quest_ap_cost, (u16 stage))
     Fight f;
     DeckStats d;
     if (!setup(stage, &f, &d)) return 0;
-    return (u8)(d.ap_minus && f.st.ap > 1 ? f.st.ap - 1 : f.st.ap);
+    return ap_of(&f, &d);
 }
 
 FAR(void, quest_auto_deck, (u16 stage))
@@ -127,7 +137,7 @@ FAR(void, quest_run, (u16 stage, QuestResult *r))
     for (i = 0; i < sizeof(QuestResult); i++) p[i] = 0;
     if (!setup(stage, &f, &d)) { r->status = Q_LOCKED; return; }
     player_ap_update();
-    r->ap_used = (u8)(d.ap_minus && f.st.ap > 1 ? f.st.ap - 1 : f.st.ap);
+    r->ap_used = ap_of(&f, &d);
     if (g_save.ap < r->ap_used) { r->status = Q_NO_AP; return; }
     if (g_save.ap >= AP_MAX) g_save.ap_gtime = g_save.g_time;   /* 満タンから減らしたらここから数える */
     g_save.ap -= r->ap_used;

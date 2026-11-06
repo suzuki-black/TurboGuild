@@ -56,6 +56,16 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.lang == 2 && s.rival[1] == 0 && s.chaser == 0);
+    /* v10 も読め、v11 で足した戦い方と控えのデッキは 0（通常・空き）から */
+    save_new(&s, 1);
+    s.rival[0] = 5;
+    s.stance = 2; s.deck_slot[1][0] = 9;
+    s.magic = SAVE_MAGIC;
+    s.version = 10;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.rival[0] == 5 && s.stance == 0 && s.deck_slot[1][0] == 0);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;

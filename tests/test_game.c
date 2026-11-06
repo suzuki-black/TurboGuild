@@ -82,6 +82,78 @@ static void test_auto_for(void)
     CHECK(g_save.deck[1] != DECK_EMPTY);
 }
 
+/* リーダー（1 枚目）と同じ属性の攻撃 +20%、戦い方（節約・全力）、デッキ 3 つ（DECISIONS #87） */
+static void test_stance_leader_slots(void)
+{
+    DeckStats d;
+    CardRec a, b;
+    QuestResult q;
+    StageRec st;
+    u32 base, va, vb;
+    u16 ia, ib, ic;
+    u8 ap;
+    fresh();
+    ia = inv_add(6); ib = inv_add(77); ic = inv_add(39);
+    tbl_card(6, &a); tbl_card(77, &b);
+    CHECK(a.element != b.element);
+    va = card_atk_of(ia); vb = card_atk_of(ib);
+    g_save.deck[0] = (u8)ia; g_save.deck[1] = (u8)ib;
+    deck_stats_init(&d, ELEM_NONE);
+    deck_calc(&d);
+    CHECK(d.lead_elem == a.element);
+    CHECK(d.atk + 2 >= va * (100 + LEADER_PCT) / 100 + vb && d.atk <= va * (100 + LEADER_PCT) / 100 + vb + 2);
+    g_save.deck[0] = (u8)ib; g_save.deck[1] = (u8)ia;   /* リーダーを替えると、かかるカードも替わる */
+    deck_calc(&d);
+    CHECK(d.lead_elem == b.element);
+    CHECK(d.atk + 2 >= vb * (100 + LEADER_PCT) / 100 + va && d.atk <= vb * (100 + LEADER_PCT) / 100 + va + 2);
+    g_save.deck[0] = DECK_EMPTY; g_save.deck[1] = (u8)ia;
+    deck_calc(&d);
+    CHECK(d.lead_elem == ELEM_NONE && d.atk == va);      /* 1 枚目が空ならリーダーはいない */
+    /* 戦い方: 攻撃は 60% / 250%、総戦力（ranking）は通常のまま */
+    g_save.deck[0] = (u8)ia; g_save.deck[1] = (u8)ib;
+    deck_calc(&d);
+    base = d.atk;
+    d.stance = STANCE_SAVE; deck_calc(&d);
+    CHECK(d.atk == base * STANCE_SAVE_ATK / 100);
+    d.stance = STANCE_ALL; deck_calc(&d);
+    CHECK(d.atk == base * STANCE_ALL_ATK / 100);
+    g_save.stance = STANCE_ALL;
+    CHECK(player_power() == base + d.def);
+    /* AP: 節約は半分（切り上げ）、全力は 2 倍。報酬は変わらない */
+    tbl_stage(1, &st);
+    g_save.stance = STANCE_NORMAL; ap = quest_ap_cost(1);
+    CHECK(ap == st.ap);
+    g_save.stance = STANCE_SAVE;
+    CHECK(quest_ap_cost(1) == (st.ap + 1) / 2);
+    g_save.stance = STANCE_ALL;
+    CHECK(quest_ap_cost(1) == st.ap * 2);
+    g_save.ap = AP_MAX; g_save.ap_gtime = g_save.g_time;
+    g_save.stance = STANCE_SAVE;
+    quest_run(1, &q);
+    CHECK(q.status == Q_OK && q.ap_used == (st.ap + 1) / 2 && g_save.ap == AP_MAX - q.ap_used);
+    CHECK(!q.b.win || q.exp == st.exp);
+    g_save.stance = STANCE_NORMAL;
+    /* デッキ 3 つ: 替えると空のデッキになり、戻すと元のデッキ */
+    CHECK(deck_slot_count(0) == 2 && deck_slot_count(1) == 0);
+    deck_switch(1);
+    CHECK(g_save.deck_sel == 1 && g_save.deck[0] == DECK_EMPTY && deck_slot_count(0) == 2);
+    g_save.deck[0] = (u8)ic;
+    CHECK(inv_in_deck(ia) && inv_in_deck(ib) && inv_in_deck(ic));   /* 控えのカードも素材にしない */
+    inv_remove(0);                                     /* 控えのデッキの 1 枚目（6）を抜くと空き、ほかは詰める */
+    CHECK(g_save.deck[0] == ic - 1);
+    deck_switch(0);
+    CHECK(g_save.deck_sel == 0 && g_save.deck[0] == DECK_EMPTY && g_save.deck[1] == ib - 1);
+    CHECK(deck_slot_count(1) == 1);
+    deck_switch(1);
+    CHECK(g_save.cards[g_save.deck[0]].id == 39);
+    g_save.deck_sel = 7;                               /* 壊れたセーブの値でも配列の外に書かない */
+    g_save.deck_slot[2][0] = 250;                      /* 所持数を超える添字は空きにする */
+    deck_switch(2);
+    CHECK(g_save.deck_sel == 2 && g_save.deck[0] == DECK_EMPTY);
+    deck_switch(3);
+    CHECK(g_save.deck_sel == 2);
+}
+
 static void test_ap(void)
 {
     fresh();
@@ -759,6 +831,7 @@ int main(void)
     test_ranking();
     test_board();
     test_rival();
+    test_stance_leader_slots();
     test_struct_sizes();
     test_battle();
     test_elem();

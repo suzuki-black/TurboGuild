@@ -99,6 +99,26 @@ u8 ui_weak(u8 cx, u8 y, u8 enemy, u8 bg)
     return txt_id((u8)(cx + 1), y, (u16)(T_ELEM_0 + w), elem_color(w), bg);
 }
 
+u8 ui_stance(u8 cx, u8 y, u8 ap, u8 bg)
+{
+    static const u8 col[STANCES] = { COL_WHITE, COL_GREEN, COL_RED };
+    u8 s = g_save.stance < STANCES ? g_save.stance : STANCE_NORMAL;
+    ui_key(0, (u8)(cx * 8), (u8)(y + 2));
+    cx = txt_id((u8)(cx + 2), y, (u16)(T_STANCE_0 + s), col[s], bg);
+    if (ap) {
+        cx = txt_id((u8)(cx + 1), y, T_AP, COL_LGRAY, bg);
+        cx = txt_num(cx, y, ap, COL_WHITE, bg);
+    }
+    return cx;
+}
+
+void ui_stance_next(void)
+{
+    g_save.stance = (u8)(g_save.stance + 1 < STANCES ? g_save.stance + 1 : 0);
+    g_save_dirty = 1;
+    psg_beep(0x0C0, 3);
+}
+
 void ui_fit_deck(u16 stage)
 {
     quest_auto_deck(stage);
