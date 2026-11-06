@@ -77,8 +77,11 @@
 - **A guild board.** Seven or eight guild mates, each with a payment style and a verbal tic, post about events,
   new rarities and their day. Some slowly lose interest, and one day the board just says they have left the guild.
   Also shown on the My Page marquee.
-- **Choices before a fight.** Normal, Save (half AP, weaker) or All-out (double AP, much stronger); a leader skill
-  (+20% attack for cards of the leader's element); three decks to switch between.
+- **Elements.** Fire, water and thunder beat each other in a circle; light and dark beat each other. A card with the
+  advantage hits for 120%, one at a disadvantage for 80%. The explore screen and the event top show the enemy's
+  weakness, and one key builds the deck for that enemy (counting event boon cards too).
+- **Choices before a fight.** Normal, Save (half AP, 60% attack) or All-out (double AP, 250% attack) — the rewards
+  stay the same. A leader skill (+20% attack for cards of the leader's element) and three decks to switch between.
 - **A rival.** The player just above you in the ranking becomes your rival until you pass them. My Page shows the gap,
   and during events the marquee tells you whether your pace will carry you past them by the last day.
 - **An operations timeline:** rate-up campaigns, inflation (newer cards are stronger), apology gems,
@@ -95,12 +98,17 @@
 | Number keys 0–9 | Pick the button with that number directly (like a phone keypad) |
 | Space / Return / trigger A | Confirm; "advance" while exploring |
 | ESC / trigger B | Back (deletes a character in name entry) |
+| 0 on the explore screen / event top | Switch the battle style (Normal → Save → All-out) |
+| 6 on the explore screen / event top | Build the deck for this enemy |
+| 7–9 on the deck screen | Switch to deck A–C |
+| SPACE on the news screen | Guild board |
 | 0 on the title screen | License screen |
 | ESC on the title screen | Developer diagnostics |
 
 Title → (New game) name → wallet course → your first 10-pull (re-roll as often as you like) → My Page.
 From My Page: quest, gacha, cards, deck, shop, ranking, save, news.
 While an event or a guild war is running, enter it from the banner ([9]).
+After the service ends, the title screen offers Memories (your cards, view only), Reset memories, and the staff roll.
 
 ### Requirements
 - **MSX turboR only** (FS-A1ST / FS-A1GT). Anything older shows a "turboR only" message and stops.
@@ -164,12 +172,12 @@ On real hardware, write `bin/TurboGuild.rom` to an ASCII8-capable flash cartridg
 ### Automated checks
 | Command | What it checks |
 |---|---|
-| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, raid, battle events, guild war, timeline, saves, …) |
+| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, raid, battle events, guild war, timeline, rival, decks and battle styles, saves, …) |
 | `make check` | Boot → save → reset → reboot; the RTC difference × 10 is added to in-game time |
 | `make check-nodisk` | Boots without a disk and carries on when you try to save |
 | `make check-msx2` | Shows "turboR only" and stops on an MSX2 |
 | `make play` | Plays automatically for 30 minutes (emulated) from a new game; progress matches across save → reset → load |
-| `make check-offline` | After a week away, "Continue" reaches My Page within 3 seconds (measured: 2.66 s) |
+| `make check-offline` | After a week away, "Continue" reaches My Page within 3 seconds (measured: 2.00 s) |
 | `make check-timeline` | Runs days 0–271: 7 events, 2 guild wars, gifts, the end-of-service notice, and the staff roll |
 | `make sim` | Economy simulation: plays 270 days per wallet course and counts cards of SSR or above |
 
@@ -206,7 +214,8 @@ Built phase by phase from the design document and the implementation spec.
 | 1.5 | Re-researched the era's phone UIs and made every screen picture-first; gacha opening animations; war funds |
 | 2 | Fusion, evolution, events, rankings |
 | 3 | Operations timeline, 1,000-NPC pseudo-online world, news, FM music, economy simulation |
-| Later | Harder gacha (box gacha, no pity), 120 cards, raid and battle events, guild wars, staff roll |
+| Later | Harder gacha (box gacha, no pity), 121 cards, raid and battle events, guild wars, staff roll, FAT12 save disk (v0.1.0) |
+| After 0.1.0 | Enemy weakness on screen, guild board, rival, battle styles, leader skill, three decks |
 
 ### Scope & honest positioning
 This is an **experimental study**.
@@ -298,8 +307,10 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **ギルドとギルド対抗戦。** 1 日 2 回の「戦の時間」に相手ギルドを攻撃し、コンボと応援で押し切る。
 - **ギルド伝言板。** 課金コースと口癖を持つ 7〜8 人の仲間が、イベントや新しいレア度、その日の出来事を書き込む。
   だんだん弱音が増えていく人がいて、ある日「ギルドを脱退しました」とだけ流れる。マイページのお知らせにも流れる。
-- **戦う前の選択。** 通常・節約（AP 半分・弱い）・全力（AP 2 倍・ずっと強い）を選ぶ。リーダースキル
-  （リーダーと同じ属性のカードの攻撃 +20%）。デッキは 3 つ持てて替えられる。
+- **属性。** 炎・水・雷は三すくみ、光と闇は互いに強い。有利なカードは攻撃 120%、不利なら 80%。
+  探索の画面とイベントのトップに敵の弱点を出し、キー 1 つでその敵向けに編成する（イベントの特効カードも込み）。
+- **戦う前の選択。** 通常・節約（AP 半分・攻撃 60%）・全力（AP 2 倍・攻撃 250%）を選ぶ。報酬は変わらない。
+  リーダースキル（リーダーと同じ属性のカードの攻撃 +20%）。デッキは 3 つ持てて替えられる。
 - **ライバル。** ランキングで自分のすぐ上の人が、抜くまでライバル（宿敵）になる。マイページに差を出し、
   イベント中は「このペースなら最終日に抜ける」かどうかを流れるお知らせで伝える。
 - **運営年表。** 確率アップ・インフレ（新しいカードほど強い）・お詫びの石・引退の波・終了の告知・
@@ -316,12 +327,17 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | 数字キー 0〜9 | ボタンの左上の番号で直接選ぶ（携帯の数字キーのように） |
 | スペース／リターン／トリガA | 決定・探索で「進む」 |
 | ESC／トリガB | 戻る（名前入力では 1 文字消す） |
+| 探索の画面・イベントのトップで 0 | 戦い方を替える（通常 → 節約 → 全力） |
+| 探索の画面・イベントのトップで 6 | その敵向けにおまかせ編成 |
+| デッキの画面で 7〜9 | デッキ A〜C に替える |
+| お知らせの画面で SPACE | ギルド伝言板 |
 | タイトルで 0 | ライセンスの画面 |
 | タイトルで ESC | 開発用の診断画面 |
 
 タイトル →（はじめから）名前 → お財布のコース → 最初の 10 連（何度でも引き直せる）→ マイページ。
 マイページから 冒険・ガチャ・カード・デッキ・お店・ランク・保存・お知らせ。
 イベントやギルド対抗戦の開催中は、バナー（[9]）から入ります。
+サービス終了後のタイトルには「思い出を見る」（手持ちのカードを見るだけ）・「思い出をリセット」・「スタッフロール」が出ます。
 
 ### 動作環境
 - **MSX turboR 専用**（FS-A1ST / FS-A1GT）。turboR 未満では「turboR 専用」と出して止まります。
@@ -383,12 +399,12 @@ openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild_ja.rom -romtype ASCII8 
 ### 自動確認
 | コマンド | 確認すること |
 |---|---|
-| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・レイド・バトル・対抗戦・年表・セーブ など） |
+| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・レイド・バトル・対抗戦・年表・ライバル・デッキと戦い方・セーブ など） |
 | `make check` | 起動 → 保存 → リセット → 再起動で、RTC の差分 × 10 がゲーム内時間に足される |
 | `make check-nodisk` | ディスク無しで起動し、保存しようとしても続行できる |
 | `make check-msx2` | MSX2 では「turboR 専用」と出して止まる |
 | `make play` | 新規開始から 30 分（エミュレータ時間）自動で遊び、保存 → リセット → 読み込みで進行が一致する |
-| `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内（実測 2.66 秒） |
+| `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内（実測 2.00 秒） |
 | `make check-timeline` | 0〜271 日目まで進め、イベント 7 本・ギルド対抗戦 2 回・贈り物・終了の告知・スタッフロールまで通す |
 | `make sim` | 経済シミュレーション。課金コースごとに 270 日遊んで SSR 以上の枚数を数える |
 
@@ -424,7 +440,8 @@ docs/      企画書・設計の記録
 | 1.5 | 当時の携帯の画面を調べ直し、全画面を「絵が主役」に。ガチャの開封演出。軍資金 |
 | 2 | 合成・進化・イベント・ランキング |
 | 3 | 運営年表・NPC 1000 人の疑似オンライン・お知らせ・FM 音源・経済シミュレーション |
-| 以降 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 120 枚、レイド・バトル、ギルド対抗戦、スタッフロール |
+| 以降 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 121 枚、レイド・バトル、ギルド対抗戦、スタッフロール、FAT12 のセーブディスク（v0.1.0） |
+| 0.1.0 の後 | 敵の弱点の表示・ギルド伝言板・ライバル・戦い方・リーダースキル・デッキ 3 つ |
 
 各フェーズの確認方法と、途中で踏んだ地雷は [開発記録](docs/開発記録.md) にあります。
 
