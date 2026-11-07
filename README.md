@@ -105,6 +105,8 @@
 | 6 on the explore screen / event top | Build the deck for this enemy |
 | 7–9 on the deck screen | Switch to deck A–C |
 | SPACE on the news screen | Guild board |
+| 1–3 at an operator-mode meeting | Pick an option (1 is what history did) |
+| ESC in operator mode | Stop running the service (asks first) |
 | 0 on the title screen | License screen |
 | ESC on the title screen | Developer diagnostics |
 
@@ -227,6 +229,8 @@ This is an **experimental study**.
 - **The theme is recreating the atmosphere of social games of that era**; depth as a game comes second.
   The rankings, the news and your guild mates are all "plausibility" generated from formulas.
 - **The numbers have only been tuned once, by the economy simulation**; tuning by actual play is still to come.
+- Operator mode runs on a small model of 1,000 NPCs tuned with `make sim-ops`, not on real data from any service.
+  Running all 270 days takes about two minutes (emulated turboR).
 - **It has not yet been verified on a real turboR.**
 - A full-screen redraw takes about 0.6 s (text and VDP code run from RAM for speed). Heavier logic such as
   the ranking calculations still runs from the cartridge ROM.
@@ -337,6 +341,8 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | 探索の画面・イベントのトップで 6 | その敵向けにおまかせ編成 |
 | デッキの画面で 7〜9 | デッキ A〜C に替える |
 | お知らせの画面で SPACE | ギルド伝言板 |
+| 運営モードの会議で 1〜3 | 選ぶ（1 が史実） |
+| 運営モードで ESC | 運営をやめる（確かめてから） |
 | タイトルで 0 | ライセンスの画面 |
 | タイトルで ESC | 開発用の診断画面 |
 
@@ -458,6 +464,8 @@ docs/      企画書・設計の記録
 - **主題は「当時のソシャゲの空気」の再現**で、ゲームとしての面白さの追求は二の次です。
   ランキングもお知らせもギルドの仲間も、すべて式から作った「それっぽさ」です。
 - **数値は経済シミュレーションで一度合わせただけ**です。実際に遊んでの調整はこれからです。
+- 運営モードは、`make sim-ops` で合わせた NPC 1000 人の小さな模型で動いています。実在のサービスの数字ではありません。
+  270 日を回すのに 2 分ほどかかります（エミュレータの turboR で）。
 - **実機（turboR）ではまだ確認していません。**
 - 画面の描き直しは、全面で 0.6 秒ほどかかります（文字と VDP の処理は RAM で実行して速くしました）。
   ランキングの計算などは、まだカートリッジ ROM の上で動いています。
