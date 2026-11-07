@@ -224,3 +224,59 @@ _vdp_pal1:
 	otir
 	ei
 	ret
+
+	.globl	_vdp_page2_read
+	.globl	_vdp_page2_write
+	.area	_CODE
+
+; VRAM の 10000h〜（ページ 2。画面にも部品のアトラスにも使っていない）を読み書きする。運営モードの 1000 人と履歴。
+; void vdp_page2_read(const VdpXfer *x)    HL -> { u16 addr; u8 *buf; u8 len; }  10000h + addr から len バイト
+; void vdp_page2_write(const VdpXfer *x)   同じ形で書く
+_vdp_page2_read:
+	ld	d, #0x00		; 読む
+	jr	page2
+_vdp_page2_write:
+	ld	d, #0x40		; 書く
+page2:
+	ld	c, (hl)
+	inc	hl
+	ld	b, (hl)			; BC = addr
+	inc	hl
+	ld	e, (hl)			; E = buf の下位
+	inc	hl
+	ld	a, (hl)			; A = buf の上位
+	inc	hl
+	push	de			; D = 読む / 書く
+	ld	h, (hl)			; H = len
+	ld	l, a
+	push	hl
+	di
+	call	wait_cmd_raw		; 塗りつぶしの途中で触らない（A だけ壊す）
+	ld	a, b
+	rlca
+	rlca
+	and	a, #0x03
+	or	a, #0x04		; A16 = 1（ページ 2）
+	out	(VDP_ADDR), a
+	ld	a, #0x8E		; R#14
+	out	(VDP_ADDR), a
+	ld	a, c
+	out	(VDP_ADDR), a
+	pop	hl			; L = buf の上位, H = len
+	pop	de
+	ld	a, b
+	and	a, #0x3F
+	or	a, d
+	out	(VDP_ADDR), a
+	ld	b, h
+	ld	h, l
+	ld	l, e			; HL = buf
+	ld	c, #VDP_DATA
+	bit	6, d
+	jr	nz, 1$
+	inir
+	ei
+	ret
+1$:	otir
+	ei
+	ret

@@ -4,6 +4,7 @@
 #include <string.h>
 #include "core/battle.h"
 #include "core/deck.h"
+#include "core/opsim.h"
 #include "core/gacha.h"
 #include "core/inventory.h"
 #include "core/login.h"
@@ -819,6 +820,41 @@ static void test_board(void)
     CHECK(repeats * 100 < posts);                      /* 続けて同じ文はめったに出ない */
 }
 
+/* 運営モード（DECISIONS #88）: 史実の選択は終了、選び方によっては継続。同じ選択なら同じ数字 */
+static u8 ops_run(const char *pick)
+{
+    OpsMeeting m;
+    u8 met = 0;
+    ops_start();
+    while (g_ops.day < OPS_DAYS) {
+        while (ops_meeting(&m)) {
+            CHECK(m.text == T_OPS_M0 + g_ops.next * OPS_TEXTS);
+            met++;
+            ops_decide((u8)(pick[g_ops.next] - '0'));
+        }
+        ops_step();
+    }
+    CHECK(met == OPS_MEETINGS);
+    return g_ops.verdict;
+}
+
+static void test_ops(void)
+{
+    u32 total;
+    CHECK(ops_run("000000000000") == OPS_END);
+    CHECK(g_ops.sales_total == OPS_HIST_SALES);          /* config.h の史実の売上と利益（決算の上司のひとことに使う） */
+    CHECK(g_ops.sales_total - g_ops.ad_total == OPS_HIST_PROFIT);
+    CHECK(g_ops.points == 187 && g_ops.points < OPS_CONT_POINTS);
+    CHECK(g_ops.reg > OPS_PREREG && g_ops.reg < 1000);   /* 事前登録から流入で増えるが、1000 人は入りきらない */
+    CHECK(g_ops.ad_total == (OPS_AD_L1_MAN - 60UL) * 10000 + 80UL * 10000);   /* 開始の宣伝は CVR で途中打ち切り（240 万円）、95 日目は 80 万円で打ち切り */
+    total = g_ops.sales_total;
+    CHECK(ops_run("000000000000") == OPS_END && g_ops.sales_total == total);   /* 何度でも同じ */
+    CHECK(ops_run("101202012000") == OPS_CONTINUE);      /* 渋い排出率で稼ぎ、送客で人を呼び、USR を見送り、石 3000 個で引き留める */
+    CHECK(g_ops.points >= OPS_CONT_POINTS);
+    CHECK(ops_run("002000020000") == OPS_END && g_ops.ad_total == 0);   /* 広告を打たなければ広告費は 0 */
+    CHECK(ops_run("999999999999") == OPS_END && g_ops.sales_total == total);   /* 範囲外の選択は史実として扱う */
+}
+
 int main(void)
 {
     test_timeline();
@@ -832,6 +868,7 @@ int main(void)
     test_board();
     test_rival();
     test_stance_leader_slots();
+    test_ops();
     test_struct_sizes();
     test_battle();
     test_elem();

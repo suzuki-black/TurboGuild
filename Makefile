@@ -64,7 +64,7 @@ CRT0     := $(OBJ)/sys/crt0.rel
 DATABIN  := $(wildcard $(B)/*.bin $(B)/*.dat)
 DATASRC  := $(wildcard data/*.csv data/text/*.txt)
 
-.PHONY: all test run check check-nodisk check-msx2 check-offline check-timeline play sim clean
+.PHONY: all test run check check-nodisk check-msx2 check-offline check-timeline play sim sim-ops clean
 
 all: $(ROM) $(DSK)
 
@@ -139,6 +139,11 @@ $(B)/save_offsets.tcl: tests/save_offsets.c src/core/save.h src/config.h src/typ
 # ---- 経済シミュレーション（Phase3 の受け入れ: 課金しない人の SSR が終了時に 3〜8 枚） ----
 sim: $(B)/data.stamp
 	$(PYTHON) tools/sim_economy.py --csv $(B)/sim_economy.csv
+
+# ---- 運営モードの模型（core/opsim.c）: 会議の選び方をすべて回す ----
+sim-ops: $(B)/data.stamp
+	gcc -std=c99 -O2 -Wall -Wextra -Werror -Isrc -o $(B)/sim_ops tests/sim_ops.c src/core/*.c tests/tables_pc.c
+	$(B)/sim_ops all
 
 # ---- PC 単体テスト ----
 TESTS := $(wildcard tests/test_*.c)

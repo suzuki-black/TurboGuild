@@ -20,6 +20,10 @@ void vdp_pal1(u8 index, const u8 *pal);
 void vdp_put_rect(const VdpRect *r);
 typedef struct { u16 addr; const u8 *src; u16 len; } VdpXfer16;
 void vdp_load(const VdpXfer16 *x);         /* 連続 len バイト */
+void vdp_page2_read(const VdpXfer *x);     /* VRAM 10000h + addr から len バイトを src へ（運営モード） */
+void vdp_page2_write(const VdpXfer *x);
+#define VRAM2_OPS   0x0000                 /* 運営モード: 1000 人 × 5 バイト */
+#define VRAM2_HIST  0x1400                 /* 運営モード: 日ごとのグラフの点 × 5 バイト */
 
 void vdp_init_screen5(void);
 void vdp_fill(u16 x, u16 y, u16 w, u16 h, u8 color);

@@ -82,3 +82,9 @@ void tbl_npc(u16 i, NpcRec *out)
     memcpy(out, b + (i % NPC_PER_PAGE) * sizeof *out, sizeof *out);
 }
 u16 tbl_npc_by_power(u16 rank) { unsigned char *b = load("npcpow.bin"); return (u16)(b[rank * 2] | b[rank * 2 + 1] << 8); }
+
+/* 運営モードの 1000 人の状態（ROM では VRAM の画面の外） */
+#include "core/opsim.h"
+static u8 ops_mem[OPS_MEM_SIZE];
+void ops_mem_read(u16 off, u8 n, u8 *buf) { memcpy(buf, ops_mem + off, n); }
+void ops_mem_write(u16 off, u8 n, const u8 *buf) { memcpy(ops_mem + off, buf, n); }

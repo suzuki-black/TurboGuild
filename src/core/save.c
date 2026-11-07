@@ -16,7 +16,8 @@ static const u16 save_size[] = {
     offsetof(SaveData, lang),          /* v8: スタッフロール */
     offsetof(SaveData, rival),         /* v9: 言語と版 */
     offsetof(SaveData, stance),        /* v10: ライバル */
-    sizeof(SaveData),                  /* v11: 戦い方とデッキ 3 つ */
+    offsetof(SaveData, ops_best),      /* v11: 戦い方とデッキ 3 つ */
+    sizeof(SaveData),                  /* v12: 運営モード */
 };
 
 static u16 size_of(u16 version)

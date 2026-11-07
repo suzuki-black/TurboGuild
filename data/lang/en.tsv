@@ -778,3 +778,109 @@ SR確定チケット	SR Ticket
 すべての冒険者のみなさん	who played this game:
 270日間	For 270 days
 ありがとうございました！	thank you so much!
+T_OPS_M0	Set the SSR drop rate	!
+T_OPS_M0B	Lower: each payer pays more
+T_OPS_M0R	History: 3%, as usual then	!
+T_OPS_M0O1	3% (history)	!
+T_OPS_M0O2	1% (stingy)	!
+T_OPS_M0O3	6% (generous)	!
+T_OPS_M1	Add a pity system (a sure
+T_OPS_M1B	SSR after N pulls)?	!
+T_OPS_M1R	History: none. Pulls pay
+T_OPS_M1O1	No (history)
+T_OPS_M1O2	Yes, at 100 pulls	!
+T_OPS_M1O3	-
+T_OPS_M2	How to advertise the launch	!
+T_OPS_M2B	Budget cap and CVR cutoff
+T_OPS_M2R	History: 3M, stop under 1%
+T_OPS_M2O1	3M yen, CVR 1% (hist.)
+T_OPS_M2O2	10M yen, CVR 0.5%
+T_OPS_M2O3	No ads
+T_OPS_M3	Launch sales: half of plan	!
+T_OPS_M3B	Act early?
+T_OPS_M3R	History: SSR rate doubled
+T_OPS_M3O1	SSR rate x2 (history)
+T_OPS_M3O2	Do nothing
+T_OPS_M3O3	Get a featured slot	!
+T_OPS_M4	Veterans stopped paying	!
+T_OPS_M4B	Their cards are good enough
+T_OPS_M4R	History: stronger new SSRs
+T_OPS_M4O1	Stronger new SSRs (hist.)
+T_OPS_M4O2	Skip
+T_OPS_M4O3	-
+T_OPS_M5	Sales dip between events
+T_OPS_M5B	The next event is far off	!
+T_OPS_M5R	History: SSR rate x2 again	!
+T_OPS_M5O1	SSR rate x2 (history)
+T_OPS_M5O2	Do nothing
+T_OPS_M5O3	Cross-promo, sister game	!
+T_OPS_M6	SSRs have lost their value	!
+T_OPS_M6B	Everyone has some by now	!
+T_OPS_M6R	History: made USR, one above	!
+T_OPS_M6O1	Add USR (history)
+T_OPS_M6O2	Skip
+T_OPS_M6O3	SSR rate x3
+T_OPS_M7	Advertise the new cards?
+T_OPS_M7B	Fewer new players left
+T_OPS_M7R	History: 5M, stop under 1%
+T_OPS_M7O1	5M yen, CVR 1% (hist.)
+T_OPS_M7O2	15M yen, CVR 0.5%
+T_OPS_M7O3	No ads
+T_OPS_M8	Free players keep quitting	!
+T_OPS_M8B	USR made their cards old
+T_OPS_M8R	History: called it a bug fix
+T_OPS_M8O1	500 gems (history)	!
+T_OPS_M8O2	Do nothing
+T_OPS_M8O3	3000 gems
+T_OPS_M9	Sales are short of target	!
+T_OPS_M9B	The books close soon	!
+T_OPS_M9R	History: the biggest x3 ever	!
+T_OPS_M9O1	SSR rate x3 (history)
+T_OPS_M9O2	Do nothing
+T_OPS_M9O3	Get a featured slot	!
+T_OPS_M10	Few cards left to play	!
+T_OPS_M10B	Fewer people are paying	!
+T_OPS_M10R	History: another top rarity
+T_OPS_M10O1	New rarity (history)
+T_OPS_M10O2	Skip
+T_OPS_M10O3	Give 1000 gems
+T_OPS_M11	Continue or shut down?
+T_OPS_M11B	Decided by profit and DAU	!
+T_OPS_M11R	History: fell short, closed	!
+T_OPS_M11O1	-
+T_OPS_M11O2	-
+T_OPS_M11O3	-
+T_OPS_MENU	Operator mode	!
+T_OPS_TITLE	Operator mode	!
+T_OPS_DAU	DAU
+T_OPS_PAY	Paying
+T_OPS_RET	Quit
+T_OPS_SALES	Sales	!
+T_OPS_MAN	0k yen	!
+T_OPS_PT	 pt	!
+T_OPS_NIN	 left	!
+T_OPS_MEETING	Meeting, day	!
+T_OPS_DAYP	Day
+T_OPS_DAYS	 
+T_OPS_GUIDE_RUN	ESC:Quit
+T_OPS_GUIDE_PICK	1-3:Pick
+T_OPS_GUIDE_NEXT	SPACE:Next
+T_OPS_JUDGE	Score	!
+T_OPS_NEED	Bar
+T_OPS_CONT	The service goes on!
+T_OPS_ENDV	Announce the shutdown	!
+T_OPS_RESULT	Final accounts	!
+T_OPS_R_STAY	Stayed to the end	!
+T_OPS_R_BEST	Best
+T_OPS_R_NEW	New!
+T_OPS_BOSS0	Boss: "Lasted AND paid!"
+T_OPS_BOSS1	Boss: "Less cash, but alive"
+T_OPS_BOSS2	Boss: "Rich, but all gone."
+T_OPS_BOSS3	Boss: "No cash, no future."	!
+T_OPS_QUIT	Stop running the service?	!
+T_OPS_NEW	New
+T_OPS_PROFIT	Profit	!
+T_OPS_AD	Ads
+T_OPS_ADON	Ads on
+T_OPS_AD_SPENT	Ads: budget used up
+T_OPS_AD_CVR	Ads: CVR fell, stopped

@@ -84,6 +84,9 @@
   stay the same. A leader skill (+20% attack for cards of the leader's element) and three decks to switch between.
 - **A rival.** The player just above you in the ranking becomes your rival until you pass them. My Page shows the gap,
   and during events the marquee tells you whether your pace will carry you past them by the last day.
+- **Operator mode (after the service ends).** Run the same 270 days as the operator: twelve meetings with history's choice
+  and others (including ad budgets with a CVR cutoff and platform promotion), a graph of DAU, new players, paying rate,
+  quits and sales for 1,000 NPCs, and on day 240 a verdict on whether the service goes on.
 - **An operations timeline:** rate-up campaigns, inflation (newer cards are stronger), apology gems,
   waves of players quitting, the end-of-service notice — and finally the shutdown and staff roll.
 - **Rarity inflation every three months:** N / R / SR / SSR at launch, then **USR** on day 90 and **XUSR** on day 180.
@@ -108,7 +111,7 @@
 Title → (New game) name → wallet course → your first 10-pull (re-roll as often as you like) → My Page.
 From My Page: quest, gacha, cards, deck, shop, ranking, save, news.
 While an event or a guild war is running, enter it from the banner ([9]).
-After the service ends, the title screen offers Memories (your cards, view only), Reset memories, and the staff roll.
+After the service ends, the title screen offers Memories (your cards, view only), Reset memories, the staff roll, and operator mode.
 
 ### Requirements
 - **MSX turboR only** (FS-A1ST / FS-A1GT). Anything older shows a "turboR only" message and stops.
@@ -172,7 +175,7 @@ On real hardware, write `bin/TurboGuild.rom` to an ASCII8-capable flash cartridg
 ### Automated checks
 | Command | What it checks |
 |---|---|
-| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, raid, battle events, guild war, timeline, rival, decks and battle styles, saves, …) |
+| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, raid, battle events, guild war, timeline, rival, decks and battle styles, operator mode, saves, …) |
 | `make check` | Boot → save → reset → reboot; the RTC difference × 10 is added to in-game time |
 | `make check-nodisk` | Boots without a disk and carries on when you try to save |
 | `make check-msx2` | Shows "turboR only" and stops on an MSX2 |
@@ -180,6 +183,7 @@ On real hardware, write `bin/TurboGuild.rom` to an ASCII8-capable flash cartridg
 | `make check-offline` | After a week away, "Continue" reaches My Page within 3 seconds (measured: 2.00 s) |
 | `make check-timeline` | Runs days 0–271: 7 events, 2 guild wars, gifts, the end-of-service notice, and the staff roll |
 | `make sim` | Economy simulation: plays 270 days per wallet course and counts cards of SSR or above |
+| `make sim-ops` | Operator mode: runs every combination of meeting choices and shows how many keep the service going |
 
 Results are left in `build/run*/` as text and screenshots.
 
@@ -215,7 +219,7 @@ Built phase by phase from the design document and the implementation spec.
 | 2 | Fusion, evolution, events, rankings |
 | 3 | Operations timeline, 1,000-NPC pseudo-online world, news, FM music, economy simulation |
 | Later | Harder gacha (box gacha, no pity), 121 cards, raid and battle events, guild wars, staff roll, FAT12 save disk (v0.1.0) |
-| After 0.1.0 | Enemy weakness on screen, guild board, rival, battle styles, leader skill, three decks |
+| After 0.1.0 | Enemy weakness on screen, guild board, rival, battle styles, leader skill, three decks, operator mode |
 
 ### Scope & honest positioning
 This is an **experimental study**.
@@ -313,6 +317,8 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   リーダースキル（リーダーと同じ属性のカードの攻撃 +20%）。デッキは 3 つ持てて替えられる。
 - **ライバル。** ランキングで自分のすぐ上の人が、抜くまでライバル（宿敵）になる。マイページに差を出し、
   イベント中は「このペースなら最終日に抜ける」かどうかを流れるお知らせで伝える。
+- **運営モード（サービス終了後）。** 同じ 270 日を運営の側から回す。12 回の会議で史実かほかの手を選び（広告の予算と打ち切りの CVR、
+  プラットフォームの送客も）、NPC 1000 人の DAU・新規・課金率・引退・売上をグラフで見る。240 日目に、サービスを続けられるかが決まる。
 - **運営年表。** 確率アップ・インフレ（新しいカードほど強い）・お詫びの石・引退の波・終了の告知・
   そしてサービス終了とスタッフロール。
 - **3 か月ごとのレア度インフレ。** 開始時は N / R / SR / SSR。90 日目に **USR**、180 日目に **XUSR** が解禁。
@@ -337,7 +343,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 タイトル →（はじめから）名前 → お財布のコース → 最初の 10 連（何度でも引き直せる）→ マイページ。
 マイページから 冒険・ガチャ・カード・デッキ・お店・ランク・保存・お知らせ。
 イベントやギルド対抗戦の開催中は、バナー（[9]）から入ります。
-サービス終了後のタイトルには「思い出を見る」（手持ちのカードを見るだけ）・「思い出をリセット」・「スタッフロール」が出ます。
+サービス終了後のタイトルには「思い出を見る」（手持ちのカードを見るだけ）・「思い出をリセット」・「スタッフロール」・「運営モード」が出ます。
 
 ### 動作環境
 - **MSX turboR 専用**（FS-A1ST / FS-A1GT）。turboR 未満では「turboR 専用」と出して止まります。
@@ -399,7 +405,7 @@ openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild_ja.rom -romtype ASCII8 
 ### 自動確認
 | コマンド | 確認すること |
 |---|---|
-| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・レイド・バトル・対抗戦・年表・ライバル・デッキと戦い方・セーブ など） |
+| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・レイド・バトル・対抗戦・年表・ライバル・デッキと戦い方・運営モード・セーブ など） |
 | `make check` | 起動 → 保存 → リセット → 再起動で、RTC の差分 × 10 がゲーム内時間に足される |
 | `make check-nodisk` | ディスク無しで起動し、保存しようとしても続行できる |
 | `make check-msx2` | MSX2 では「turboR 専用」と出して止まる |
@@ -407,6 +413,7 @@ openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild_ja.rom -romtype ASCII8 
 | `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内（実測 2.00 秒） |
 | `make check-timeline` | 0〜271 日目まで進め、イベント 7 本・ギルド対抗戦 2 回・贈り物・終了の告知・スタッフロールまで通す |
 | `make sim` | 経済シミュレーション。課金コースごとに 270 日遊んで SSR 以上の枚数を数える |
+| `make sim-ops` | 運営モード。会議の選び方をすべて回し、サービスを続けられる割合を出す |
 
 結果は `build/run*/` にテキストとスクリーンショットで残ります。
 
@@ -441,7 +448,7 @@ docs/      企画書・設計の記録
 | 2 | 合成・進化・イベント・ランキング |
 | 3 | 運営年表・NPC 1000 人の疑似オンライン・お知らせ・FM 音源・経済シミュレーション |
 | 以降 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 121 枚、レイド・バトル、ギルド対抗戦、スタッフロール、FAT12 のセーブディスク（v0.1.0） |
-| 0.1.0 の後 | 敵の弱点の表示・ギルド伝言板・ライバル・戦い方・リーダースキル・デッキ 3 つ |
+| 0.1.0 の後 | 敵の弱点の表示・ギルド伝言板・ライバル・戦い方・リーダースキル・デッキ 3 つ・運営モード |
 
 各フェーズの確認方法と、途中で踏んだ地雷は [開発記録](docs/開発記録.md) にあります。
 

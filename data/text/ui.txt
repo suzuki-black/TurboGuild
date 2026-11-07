@@ -387,3 +387,110 @@ T_STANCE_0	通常
 T_STANCE_1	節約
 T_STANCE_2	全力
 T_LEAD_UP	の攻撃+20%
+# 運営モード（core/opsim.c）。会議 1 つに 6 行: 議題 2 行・史実のわけ・選択肢 3（使わない選択肢は -）
+T_OPS_M0	SSR の排出率を決める
+T_OPS_M0B	低いほど 1 人の課金は増える
+T_OPS_M0R	史実: 当時の相場どおり 3%
+T_OPS_M0O1	3%（史実）
+T_OPS_M0O2	1%（渋い）
+T_OPS_M0O3	6%（甘い）
+T_OPS_M1	天井（決まった回数で確定）を
+T_OPS_M1B	つけるかどうか
+T_OPS_M1R	史実: なし。引くほど儲かる
+T_OPS_M1O1	つけない（史実）
+T_OPS_M1O2	100 連でつける
+T_OPS_M1O3	-
+T_OPS_M2	開始の広告をどう打つか
+T_OPS_M2B	予算の上限と打ち切りの CVR
+T_OPS_M2R	史実: 300万円、1% 割れで停止
+T_OPS_M2O1	300万円・CVR 1%（史実）
+T_OPS_M2O2	1000万円・CVR 0.5%
+T_OPS_M2O3	打たない
+T_OPS_M3	初動の売上が見込みの半分
+T_OPS_M3B	早めに手を打つか
+T_OPS_M3R	史実: 確率 2 倍で引かせた
+T_OPS_M3O1	SSR 確率 2 倍（史実）
+T_OPS_M3O2	何もしない
+T_OPS_M3O3	一押し枠をもらう
+T_OPS_M4	古参の課金が止まった
+T_OPS_M4B	手持ちが強くて引く理由がない
+T_OPS_M4R	史実: 新 SSR をより強くした
+T_OPS_M4O1	新 SSR を強くする（史実）
+T_OPS_M4O2	見送る
+T_OPS_M4O3	-
+T_OPS_M5	イベントの合間に売上が落ちる
+T_OPS_M5B	次のイベントまで間がある
+T_OPS_M5R	史実: また確率 2 倍
+T_OPS_M5O1	SSR 確率 2 倍（史実）
+T_OPS_M5O2	何もしない
+T_OPS_M5O3	他タイトルと相互送客
+T_OPS_M6	SSR の価値が下がりきった
+T_OPS_M6B	みんな SSR を持っている
+T_OPS_M6R	史実: その上の USR を作った
+T_OPS_M6O1	USR を解禁（史実）
+T_OPS_M6O2	見送る
+T_OPS_M6O3	SSR 確率 3 倍
+T_OPS_M7	新しいカードの広告を打つか
+T_OPS_M7B	残っている層は薄くなった
+T_OPS_M7R	史実: 500万円、1% 割れで停止
+T_OPS_M7O1	500万円・CVR 1%（史実）
+T_OPS_M7O2	1500万円・CVR 0.5%
+T_OPS_M7O3	打たない
+T_OPS_M8	無課金の引退が止まらない
+T_OPS_M8B	USR で手持ちが古くなった
+T_OPS_M8R	史実: 不具合のお詫びと称した
+T_OPS_M8O1	石 500 個（史実）
+T_OPS_M8O2	何もしない
+T_OPS_M8O3	石 3000 個
+T_OPS_M9	売上の目標に届かない
+T_OPS_M9B	決算まで間がない
+T_OPS_M9R	史実: 最大級の確率 3 倍
+T_OPS_M9O1	SSR 確率 3 倍（史実）
+T_OPS_M9O2	何もしない
+T_OPS_M9O3	一押し枠をもらう
+T_OPS_M10	もう打つ手が少ない
+T_OPS_M10B	課金する人が減ってきた
+T_OPS_M10R	史実: 上のレア度をまた足した
+T_OPS_M10O1	新しいレア度（史実）
+T_OPS_M10O2	見送る
+T_OPS_M10O3	石 1000 個を配る
+T_OPS_M11	続けるか終えるかの判定
+T_OPS_M11B	利益と DAU で決まる
+T_OPS_M11R	史実: 基準に届かず終了
+T_OPS_M11O1	-
+T_OPS_M11O2	-
+T_OPS_M11O3	-
+T_OPS_MENU	運営モード
+T_OPS_TITLE	運営モード
+T_OPS_DAU	DAU
+T_OPS_PAY	課金率
+T_OPS_RET	引退
+T_OPS_SALES	売上
+T_OPS_MAN	万円
+T_OPS_PT	点
+T_OPS_NIN	人
+T_OPS_MEETING	運営会議
+T_OPS_DAYP	運営
+T_OPS_DAYS	日目
+T_OPS_GUIDE_RUN	ESC:やめる
+T_OPS_GUIDE_PICK	1〜3:選ぶ
+T_OPS_GUIDE_NEXT	SPACE:次へ
+T_OPS_JUDGE	判定
+T_OPS_NEED	基準
+T_OPS_CONT	サービス継続が決まった！
+T_OPS_ENDV	終了のお知らせを出す
+T_OPS_RESULT	決算
+T_OPS_R_STAY	最後まで残った人
+T_OPS_R_BEST	最高記録
+T_OPS_R_NEW	新記録
+T_OPS_BOSS0	上司「続いて儲かった。満点」
+T_OPS_BOSS1	上司「儲けは減ったが続いた」
+T_OPS_BOSS2	上司「稼いだが誰も残らない」
+T_OPS_BOSS3	上司「稼げず、続かずか…」
+T_OPS_QUIT	運営をやめますか？
+T_OPS_NEW	新規
+T_OPS_PROFIT	利益
+T_OPS_AD	広告費
+T_OPS_ADON	広告中
+T_OPS_AD_SPENT	広告: 予算を使い切った
+T_OPS_AD_CVR	広告: CVR が基準を割り停止

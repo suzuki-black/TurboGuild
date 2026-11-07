@@ -32,3 +32,18 @@ void vdp_wait_vsync(void)
     u16 j = SYS_JIFFY;
     while (SYS_JIFFY == j) { }
 }
+
+/* 運営モード（core/opsim.h）の 1000 人の状態。VRAM のページ 2 に置く */
+#include "../core/opsim.h"
+void ops_mem_read(u16 off, u8 n, u8 *buf)
+{
+    VdpXfer x;
+    x.addr = (u16)(VRAM2_OPS + off); x.src = buf; x.len = n;
+    vdp_page2_read(&x);
+}
+void ops_mem_write(u16 off, u8 n, const u8 *buf)
+{
+    VdpXfer x;
+    x.addr = (u16)(VRAM2_OPS + off); x.src = buf; x.len = n;
+    vdp_page2_write(&x);
+}

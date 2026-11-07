@@ -39,6 +39,74 @@
 #define STANCE_SAVE_ATK     60
 #define STANCE_ALL_ATK      250
 
+/* 運営モード（core/opsim.c, DECISIONS #88）。tests/sim_ops.c で合わせる */
+#define OPS_TEXTS           6        /* 会議 1 つの文: 題・議題・史実のわけ・選択肢 3 */
+#define OPS_PCT_WHALE       5        /* 型の割合（/256, 累計）: 石油王 2% */
+#define OPS_PCT_HEAVY       20       /* 重課金 6% */
+#define OPS_PCT_LIGHT       64       /* 微課金 17%、残りが無課金 */
+#define OPS_PCT_CONV        96       /* 無課金のうち、誘惑で微課金に転ぶことがある人（/256） */
+#define OPS_TOL_BASE        40       /* 我慢の限界 = これ + 0..127 + 活動度 / 2 */
+#define OPS_CONV_BASE       8        /* 転ぶ境目 = これ + 0..127 */
+#define OPS_BORE_FREE       9        /* 毎日の飽き（不満 /16） */
+#define OPS_BORE_LIGHT      7
+#define OPS_BORE_HEAVY      6
+#define OPS_BORE_WHALE      5
+#define OPS_SPEND_LIGHT     5        /* 1 回の課金（百円） */
+#define OPS_SPEND_HEAVY     30
+#define OPS_SPEND_WHALE     100
+#define OPS_WANT_LIGHT      10       /* ふだんの課金する気（/256） */
+#define OPS_WANT_HEAVY      30
+#define OPS_WANT_WHALE      60
+#define OPS_ACT_BASE        64       /* ログインする確率 = これ + 活動度（+ イベント中）/256 */
+#define OPS_ACT_EVENT       24
+#define OPS_EVENT_RELIEF    80
+#define OPS_RATEUP_RELIEF   60
+#define OPS_BOOST_DAYS      7
+#define OPS_INFL_FREE       250
+#define OPS_INFL_LIGHT      200
+#define OPS_INFL_HEAVY      60
+#define OPS_RARE_FREE       600
+#define OPS_RARE_LIGHT      450
+#define OPS_RARE_HEAVY      120
+#define OPS_RARE_WHALE      40
+#define OPS_RARE_TEMPT      300
+#define OPS_SPIKE_DAYS      10
+#define OPS_GIFT_RELIEF     50       /* 石 100 個あたり */
+#define OPS_GLUT_DAYS       2        /* 石 100 個あたり、課金が半分になる日数 */
+#define OPS_LOW_FREE        4        /* 排出率 1%: 無課金の不満が毎日増える */
+#define OPS_HIGH_FREE       3        /* 排出率 6%: 減る */
+#define OPS_PITY_RELIEF     2
+#define OPS_FRESH_DAYS      30       /* 強いカードが出ないと、これを過ぎてから重課金・石油王が飽きる */
+#define OPS_TEMPT_DAILY     2
+#define OPS_TEMPT_BOOST     20
+#define OPS_TEMPT_PITY      2
+#define OPS_END_SHOCK       800
+#define OPS_END_DAILY       40
+#define OPS_CONT_RELIEF     200
+#define OPS_JUDGE_DAY       240
+#define OPS_CONT_PROFIT     150000UL /* 継続の判定: 239 日目までの利益 15 万円で 0.01 点（1500 万円で 1 点） */
+#define OPS_CONT_DAU        260      /* 239 日目の DAU 260 人で 1 点 */
+#define OPS_CONT_POINTS     200      /* 合わせて 2.00 点で継続 */
+#define OPS_PREREG          350      /* 事前登録（0 日目からいる人） */
+#define OPS_WOM             160      /* 口コミ: 前の日の DAU × これ / 25600 人（古くなるほど細る） */
+#define OPS_WOM_RATE        48      /* 排出率 6% で増え、1% で減る */
+#define OPS_WOM_PITY        32       /* 天井があると増える */
+#define OPS_PUSH_DAYS       7        /* プラットフォームの一押し枠・相互送客の日数 */
+#define OPS_PUSH_NEW        8        /* その間に毎日入る人 */
+#define OPS_AD_L1_MAN       300      /* 開始の宣伝の予算（万円）: 史実 */
+#define OPS_AD_L2_MAN       1000     /*                          大きな予算 */
+#define OPS_AD_N1_MAN       500      /* 95 日目の宣伝の予算: 史実 */
+#define OPS_AD_N2_MAN       1500
+#define OPS_AD_CUT1         100      /* 打ち切る CVR（0.01%）: 史実は 1.00% */
+#define OPS_AD_CUT2         50       /* 大きな予算では 0.50% まで粘る */
+#define OPS_AD_CVR_LAUNCH   200      /* 開始の宣伝の CVR（0.01%） */
+#define OPS_AD_CVR_LATER    260      /* 95 日目の宣伝の CVR */
+#define OPS_AD_DAILY        200000UL /* 1 日に使う広告費（円） */
+#define OPS_AD_CPC          200      /* 1 クリックの単価（円） */
+#define OPS_AD_FATIGUE      97       /* 打つたびに CVR がこの % になる */
+#define OPS_HIST_SALES      17779500UL  /* 史実の選択での売上の合計（tests/test_game.c が確かめる） */
+#define OPS_HIST_PROFIT     14579500UL  /* 同じく利益（売上 - 広告費）。決算の上司のひとことはこれと比べる */
+
 /* 画面 */
 #define TEXT_COLS           32
 #define LINE_H              16
