@@ -76,6 +76,16 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.stance == 2 && s.ops_best == 0 && s.ops_flags == 0);
+    /* v12 も読め、v13 で足した思い出は 0（まだ）から */
+    save_new(&s, 1);
+    s.ops_best = 777;
+    s.memo[MEMO_SSR] = 5;
+    s.magic = SAVE_MAGIC;
+    s.version = 12;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.ops_best == 777 && s.memo[MEMO_SSR] == 0);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;

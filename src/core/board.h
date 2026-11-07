@@ -37,5 +37,7 @@ typedef struct {
 u16  npc_hash(u16 a, u16 b);           /* ranking.c と同じハッシュ（同じバンクから直接呼ぶ） */
 u16  mate_retire_day(u16 npc);         /* 仲間の引退の日（最後まで残るなら BOARD_NEVER）。同じバンクから直接呼ぶ */
 u8   npc_tone(u16 npc);               /* 口癖 0..3（仲間でなくても決まる）。同じバンクから直接呼ぶ */
+u16  mate_info(u16 npc);              /* 別のバンク向け: 下位 8 ビットが引退の日（MATE_STAYS = 最後まで残る）、上位が口癖 */
+#define MATE_STAYS 0xFF
 void board_list(BoardList *l);
 #endif

@@ -303,7 +303,7 @@ T_GIFT_GOT	運営から石が届きました
 T_TO_TITLE	タイトルへ戻りますか？
 T_GUIDE_HOME2	1〜8:メニュー ESC:タイトル
 T_BOARD_TITLE	ギルド伝言板
-T_NEWS_GUIDE	SPACE:ギルド伝言板 ESC:戻る
+T_NEWS_GUIDE	SPACE:伝言板 1:思い出 ESC:戻る
 T_BOARD_GUIDE	上下:前後 ESC:戻る
 T_BOARD_EMPTY	まだ書き込みはありません
 T_BOARD_HEAD	【ギルド】
@@ -494,3 +494,66 @@ T_OPS_AD	広告費
 T_OPS_ADON	広告中
 T_OPS_AD_SPENT	広告: 予算を使い切った
 T_OPS_AD_CVR	広告: CVR が基準を割り停止
+T_END_HEAD	サービスの終わりに
+T_END0	石油王の最後
+T_END0A	あなたの課金は、
+T_END0B	サーバーの灯りを
+T_END0C	少しだけ長く守った。
+T_END0D	運営は、きっと忘れない。
+T_END1	図鑑の番人
+T_END1A	集めたカードは、
+T_END1B	もう誰にも見せられない。
+T_END1C	それでも、引いた日の
+T_END1D	胸の高鳴りは残っている。
+T_END2	最後のひとり
+T_END2A	仲間はみんな先に
+T_END2B	ギルドを去っていった。
+T_END2C	最後の日の伝言板に
+T_END2D	書いたのは、あなただけ。
+T_END3	ギルドの柱
+T_END3A	対抗戦の夜を、
+T_END3B	仲間と越えてきた。
+T_END3C	終わりの日まで、
+T_END3D	ギルドの旗は立っていた。
+T_END4	無課金の旅
+T_END4A	1 円も払わずに、
+T_END4B	270 日を歩ききった。
+T_END4C	運営は困ったかもしれない。
+T_END4D	でも、楽しかったなら勝ち。
+T_END5	いつもの帰り道
+T_END5A	毎日ひらいた画面は、
+T_END5B	明日からもう開かない。
+T_END5C	270 日ぶんの思い出は、
+T_END5D	アルバムに残っている。
+T_END_SPENT	課金の合計
+T_END_KINDS	カードの種類
+T_END_SLASH	/
+T_END_LEFT	見送った仲間
+T_END_STAY	最後まで残った仲間
+T_END_NONE	最後まで残った仲間はいない
+T_END_BYE0	今までありがとう！
+T_END_BYE1	楽しかった、また会おう
+T_END_BYE2	みんな、おつかれさま
+T_END_BYE3	このギルドでよかった
+T_ALB_TITLE	思い出アルバム
+T_ALB_NONE	まだ思い出はない
+T_ALB_DAYP	 
+T_ALB_DAYS	日目
+T_ALB_GUIDE	左右:めくる ESC:戻る
+T_ALB_GUIDE_END	左右:めくる 1:カード ESC:戻る
+T_MEMO0	冒険を始めた
+T_MEMO1	初めての SSR
+T_MEMO2	ギルドに入った
+T_MEMO3	初めて課金した
+T_MEMO4	Lv10 になった
+T_MEMO5	Lv50 になった
+T_MEMO6	初めての進化
+T_MEMO7	ステージ100 突破
+T_MEMO8	レイドボスを倒した
+T_MEMO9	対抗戦で初勝利
+T_MEMO10	ライバルを抜いた
+T_MEMO11	抜き返された
+T_MEMO12	イベント100位以内
+T_MEMO13	イベント10位以内
+T_MEMO14	最終日もログイン
+T_MEMO15	仲間が初めて去った

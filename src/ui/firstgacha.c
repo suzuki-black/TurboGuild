@@ -65,6 +65,7 @@ static void decide(void)
     for (i = 0; i < FIRST_GACHA_COUNT; i++) inv_add(g_gacha.ids[i]);
     deck_auto();
     g_save.flags |= SF_STARTED;
+    MEMO_MARK(MEMO_START);
     g_save_dirty = 1;
     screen_change(&scr_home);
 }

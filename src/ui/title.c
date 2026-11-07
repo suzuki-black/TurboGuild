@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT */
 /* title.c — タイトル。はじめから / つづきから。[0] でライセンス、ESC で Phase0 の診断画面へ。
- * サービス終了後は 思い出を見る / 思い出をリセット / スタッフロール / 運営モード（初めてならスタッフロールから） */
+ * サービス終了後は 思い出を見る（アルバム）/ 思い出をリセット / スタッフロール（結末から）/ 運営モード（初めてなら結末とスタッフロールから） */
 #include "screen.h"
 #include "widget.h"
 #include "savedisk.h"
@@ -54,7 +54,7 @@ FAR(void, title_init, (void))
     g_cursor = (u8)(can_continue() && !ended());
     bgm_play(BGM_HOME);
     g_viewonly = 0;
-    if (ended() && !g_save.credits_seen) screen_change(&scr_credits);   /* 終了後はじめて: スタッフロール */
+    if (ended() && !g_save.credits_seen) screen_change(&scr_ending);    /* 終了後はじめて: 結末とスタッフロール */
 }
 
 FAR(void, title_draw, (void))
@@ -101,8 +101,8 @@ FAR(void, title_update, (void))
     if (p & BTN_OK) {
         psg_beep(0x80, 4);
         if (ended()) {
-            if (g_cursor == 0) { g_viewonly = 1; screen_change(&scr_cardlist); }    /* 思い出を見る */
-            else if (g_cursor == 2) screen_change(&scr_credits);
+            if (g_cursor == 0) screen_change(&scr_album);                        /* 思い出を見る（アルバム） */
+            else if (g_cursor == 2) screen_change(&scr_ending);                  /* 結末からスタッフロール */
             else if (g_cursor == 3) screen_change(&scr_ops);              /* 運営モード（裏面） */
             else if (ui_confirm(T_RESET_CONFIRM)) { save_new(&g_save, rtc_now_secs()); screen_change(&scr_name); }
             else g_dirty = 1;

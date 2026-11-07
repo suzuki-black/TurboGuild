@@ -212,6 +212,7 @@ static u8 rival_check(void)
         } else if (r.value > r.player) {
             g_save.rival[m] = g_save.chaser;                    /* 抜き返した人がまたライバルに */
             g_save.chaser = 0;
+            MEMO_MARK(MEMO_LOST);
             rival_popup(T_RV_LOST, &r, (u16)(T_RV_TAUNT0 + (r.value & 3)));
             return 1;
         }
@@ -226,6 +227,7 @@ static u8 rival_check(void)
         u8 vow = (u8)(m == RANK_EVENT && r.pace && r.final > r.pfinal);   /* 最終日には抜き返せる見込み */
         if (m == RANK_EVENT) g_save.chaser = g_save.rival[m];
         g_save.rival[m] = 0;
+        MEMO_MARK(MEMO_RIVAL);
         rival_popup(T_RV_BEAT, &r, (u16)((vow ? T_RV_VOW0 : T_RV_SORE0) + (r.player & 3)));
         return 1;
     }
@@ -253,10 +255,12 @@ FAR(void, home_init, (void))
         g_gift = tr.gift_gems;
         if (tr.n_news) g_save_dirty = 1;
         timeline_state(&tl);
-        if (tl.ended) { g_save_dirty = 1; screen_change(g_save.credits_seen ? &scr_title : &scr_credits); }   /* サービス終了 */
+        if (tl.ended) { g_save_dirty = 1; screen_change(g_save.credits_seen ? &scr_title : &scr_ending); }   /* サービス終了: 結末からスタッフロールへ */
+        if (tl.days_to_end == 1 && !g_save.memo[MEMO_LASTDAY]) { MEMO_MARK(MEMO_LASTDAY); g_save_dirty = 1; }
     }
     if (!g_save.guild) {                             /* 最初に来たとき、どこかのギルドに入る */
         g_save.guild = (u8)(1 + rng_range(&g_save.rng_sim, GUILD_COUNT));
+        MEMO_MARK(MEMO_GUILD);
         g_joined = 1;
     }
     if (g_login.given || g_paid || g_evres.started || g_evres.ended || g_gift || g_joined ||

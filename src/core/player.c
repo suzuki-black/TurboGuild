@@ -35,6 +35,8 @@ FAR(u8, player_add_exp, (u16 exp))
         up++;
     }
     g_save.exp = (u16)(e > 0xFFFF ? 0xFFFF : e);
+    if (g_save.level >= 10) MEMO_MARK(MEMO_LV10);
+    if (g_save.level >= 50) MEMO_MARK(MEMO_LV50);
     if (up && g_save.ap < AP_MAX) {
         g_save.ap = AP_MAX;
         g_save.ap_gtime = g_save.g_time;

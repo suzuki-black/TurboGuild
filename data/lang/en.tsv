@@ -303,7 +303,7 @@ T_GIFT_GOT	A gift of gems arrived
 T_TO_TITLE	Return to the title?
 T_GUIDE_HOME2	1-8:Menu ESC:Title
 T_BOARD_TITLE	Guild Board
-T_NEWS_GUIDE	SPACE:Guild board ESC:Back
+T_NEWS_GUIDE	SPACE:Board 1:Album ESC:Back
 T_BOARD_GUIDE	U/D:More ESC:Back
 T_BOARD_EMPTY	No posts yet.
 T_BOARD_HEAD	[Guild] 
@@ -884,3 +884,66 @@ T_OPS_AD	Ads
 T_OPS_ADON	Ads on
 T_OPS_AD_SPENT	Ads: budget used up
 T_OPS_AD_CVR	Ads: CVR fell, stopped
+T_END_HEAD	When the service ended	!
+T_END0	The Oil King's Farewell	!
+T_END0A	Your spending kept	!
+T_END0B	the servers lit
+T_END0C	just a little longer.	!
+T_END0D	The team won't forget.
+T_END1	Keeper of Cards	!
+T_END1A	Your collection has	!
+T_END1B	no one left to show.
+T_END1C	But the thrill of each	!
+T_END1D	pull is still yours.
+T_END2	The Last One
+T_END2A	Every guildmate left	!
+T_END2B	before you did.
+T_END2C	On the final board,	!
+T_END2D	the only post was yours.
+T_END3	Guild Pillar	!
+T_END3A	You and your mates	!
+T_END3B	fought the war nights.	!
+T_END3C	To the very last day,	!
+T_END3D	the guild flag stood.
+T_END4	Free-to-Play Trip	!
+T_END4A	Not a yen spent,
+T_END4B	270 days walked.
+T_END4C	The team may have sighed.
+T_END4D	If it was fun, you won.
+T_END5	The Usual Way Home	!
+T_END5A	The screen you opened	!
+T_END5B	daily won't open again.	!
+T_END5C	270 days of memories
+T_END5D	stay in the album.
+T_END_SPENT	Total spent	!
+T_END_KINDS	Card kinds
+T_END_SLASH	/
+T_END_LEFT	Mates who left	!
+T_END_STAY	Mates to the end
+T_END_NONE	No mates stayed to the end
+T_END_BYE0	Thanks for all!
+T_END_BYE1	Fun times. See you!	!
+T_END_BYE2	Good work, everyone
+T_END_BYE3	Glad it was this guild	!
+T_ALB_TITLE	Memory album
+T_ALB_NONE	No memories yet
+T_ALB_DAYP	Day 	!
+T_ALB_DAYS	 
+T_ALB_GUIDE	L/R:Page ESC:Back
+T_ALB_GUIDE_END	L/R:Page 1:Cards ESC:Back
+T_MEMO0	Adventure began	!
+T_MEMO1	First SSR
+T_MEMO2	Joined a guild
+T_MEMO3	First purchase
+T_MEMO4	Reached Lv10
+T_MEMO5	Reached Lv50
+T_MEMO6	First evolution	!
+T_MEMO7	Cleared stage 100	!
+T_MEMO8	Beat a raid boss
+T_MEMO9	First guild war win	!
+T_MEMO10	Passed your rival	!
+T_MEMO11	Got overtaken	!
+T_MEMO12	Event top 100
+T_MEMO13	Event top 10
+T_MEMO14	Here on the last day	!
+T_MEMO15	A guildmate left

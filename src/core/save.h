@@ -4,9 +4,10 @@
 #define CORE_SAVE_H
 #include "../types.h"
 #include "../config.h"
+#include "memo.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  12
+#define SAVE_VERSION  13
 #define SAVE_MIN_VERSION 5           /* 読めるいちばん古い版（それより前はカードの形が違う） */
 /* ★上位互換の決まり（DECISIONS #78）: 欄は必ず末尾に足し、SAVE_VERSION を 1 上げ、
  *   save.c の save_size[] にその版の大きさを足す。古い版は「その版の大きさ」で検査して読み、
@@ -82,6 +83,8 @@ typedef struct {
     /* v12: 運営モード（DECISIONS #88） */
     u32 ops_best;        /* いちばん多かった利益（売上 - 広告費, 円） */
     u8  ops_flags;       /* OPS_PLAYED / OPS_SAVED（サービスを続けられたことがある） */
+    /* v13: 思い出アルバム（core/memo.h, DECISIONS #89）。出来事ごとに初めての日 + 1（0 = まだ） */
+    u16 memo[MEMO_SLOTS];
 } SaveData;
 
 u16 save_crc(const SaveData *s);           /* その版の大きさで計算する */

@@ -188,6 +188,7 @@ FAR(void, news_update, (void))
 {
     u8 p = input_pressed();
     if (p & BTN_OK) { psg_beep(0x80, 4); screen_change(&scr_board); return; }
+    if (input_digit() == 1) { psg_beep(0x80, 4); screen_change(&scr_album); return; }   /* 思い出アルバム */
     if (p & BTN_CANCEL) screen_change(&scr_home);
 }
 

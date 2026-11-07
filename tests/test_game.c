@@ -21,6 +21,8 @@
 #include "core/ranking.h"
 #include "core/timeline.h"
 #include "core/board.h"
+#include "core/ending.h"
+#include "core/memo.h"
 #include "data/text_ids.h"
 
 
@@ -855,6 +857,64 @@ static void test_ops(void)
     CHECK(ops_run("999999999999") == OPS_END && g_ops.sales_total == total);   /* 範囲外の選択は史実として扱う */
 }
 
+/* 思い出（memo.h）は初めての日だけ残り、結末（ending.h）は上から順に当てはまったもの */
+static void test_memo_ending(void)
+{
+    CardRec c;
+    EndingStats e;
+    u16 id, ssr = 0, n = 0, i, rd, first = END_NEVER;
+    u8 stay = 0, mates = 0;
+    for (id = 1; id <= CARD_COUNT_BUILT && !(ssr && n); id++) {
+        tbl_card(id, &c);
+        if (c.rarity == RARITY_SSR && !ssr) ssr = id;
+        if (c.rarity == RARITY_N && !n) n = id;
+    }
+    fresh();
+    g_save.g_time = 5 * GSEC_PER_DAY + 100;
+    inv_add(n);
+    CHECK(g_save.memo[MEMO_SSR] == 0);                  /* N では残らない */
+    inv_add(ssr);
+    CHECK(g_save.memo[MEMO_SSR] == 6);                  /* 5 日目（0 始まり）+ 1 */
+    g_save.g_time = 9 * GSEC_PER_DAY;
+    inv_add(ssr);
+    CHECK(g_save.memo[MEMO_SSR] == 6);                  /* 2 回目では変わらない */
+    player_add_exp(60000);
+    CHECK(g_save.memo[MEMO_LV10] == 10 && g_save.memo[MEMO_LV50] == (g_save.level >= 50 ? 10 : 0));
+    g_save.course = 4;                                  /* 無尽蔵 */
+    CHECK(wallet_buy_gems(1) == W_OK && g_save.memo[MEMO_PAY] == 10);
+
+    /* 結末の順番 */
+    memset(&e, 0, sizeof(e));
+    e.kinds_all = 121; e.mates = 8; e.stayed = 2;
+    CHECK(ending_kind(&e) == END_FREE);
+    e.spent = 3000;
+    CHECK(ending_kind(&e) == END_NORMAL);
+    e.gvg_won = 1;
+    CHECK(ending_kind(&e) == END_GUILD);
+    e.stayed = 0;
+    CHECK(ending_kind(&e) == END_ALONE);
+    e.kinds = 61;
+    CHECK(ending_kind(&e) == END_COLLECT);
+    e.kinds = 60;
+    CHECK(ending_kind(&e) == END_ALONE);
+    e.spent = END_WHALE_YEN;
+    CHECK(ending_kind(&e) == END_WHALE);
+
+    /* ギルドの仲間は伝言板と同じ顔ぶれ・同じ引退の日 */
+    fresh();
+    g_save.guild = 1;
+    inv_add(ssr); inv_add(ssr); inv_add(n);
+    ending_stats(&e);
+    for (i = 3; i < NPC_COUNT && mates < END_MATES_MAX; i += 128) {
+        mates++;
+        rd = mate_retire_day(i);
+        if (rd == BOARD_NEVER) { CHECK(e.stay[stay] == i && e.tone[stay] == npc_tone(i)); stay++; }
+        else if (rd < first) first = rd;
+    }
+    CHECK(e.mates == mates && e.stayed == stay && e.first_leave == first);
+    CHECK(e.kinds == 2 && e.kinds_all == CARD_COUNT_BUILT && e.spent == 0 && e.kind == (stay ? END_FREE : END_ALONE));
+}
+
 int main(void)
 {
     test_timeline();
@@ -869,6 +929,7 @@ int main(void)
     test_rival();
     test_stance_leader_slots();
     test_ops();
+    test_memo_ending();
     test_struct_sizes();
     test_battle();
     test_elem();

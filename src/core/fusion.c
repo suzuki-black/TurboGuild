@@ -114,5 +114,6 @@ FAR(u8, evolve, (u16 base, u16 partner))
     g_save.cards[base].lv = 1;
     g_save.cards[base].exp = 0;
     inv_remove(partner);
+    MEMO_MARK(MEMO_EVOLVE);
     return F_OK;
 }

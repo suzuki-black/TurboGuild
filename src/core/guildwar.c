@@ -145,6 +145,7 @@ FAR(void, gvg_update, (GvgResult *r))
         if (r->us > r->them) {
             r->win++;
             g_save.gvg_win++;
+            MEMO_MARK(MEMO_GVGWIN);
             g_save.gvg_wonbits |= bit;
         } else {
             g_save.gvg_lose++;

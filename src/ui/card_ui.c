@@ -176,7 +176,7 @@ FAR(void, cardlist_update, (void))
     u8 p = input_pressed();
     grid_input(p);
     if ((p & BTN_OK) && g_list.count) { g_sel_card = (u16)grid_card(); screen_change(&scr_carddetail); }
-    if (p & BTN_CANCEL) { g_list.cursor = 0; screen_change(g_viewonly ? &scr_title : &scr_home); }
+    if (p & BTN_CANCEL) { g_list.cursor = 0; screen_change(g_viewonly ? &scr_album : &scr_home); }   /* 思い出を見るときはアルバムへ戻る */
 }
 
 SCREEN(scr_cardlist, cardlist_init, cardlist_update, cardlist_draw, 0)

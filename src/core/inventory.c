@@ -3,12 +3,16 @@
  * 抜いたら後ろを詰め、デッキが指す添字もずらす。 */
 #include "inventory.h"
 #include "save.h"
+#include "tables.h"
 #include "../far.h"
 
 FAR(u16, inv_add, (u16 card_id))
 {
     u16 i = g_save.card_count;
+    CardRec c;
     if (i >= CARD_MAX) return INV_FULL;
+    tbl_card(card_id, &c);
+    if (c.rarity >= RARITY_SSR) MEMO_MARK(MEMO_SSR);
     g_save.cards[i].id = card_id;
     g_save.cards[i].lv = 1;
     g_save.cards[i].flags = 0;

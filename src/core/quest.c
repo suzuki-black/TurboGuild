@@ -123,6 +123,7 @@ static void reward(u16 stage, const Fight *f, u8 drop_bonus, QuestResult *r)
     }
     if (stage > g_save.stage_cleared) {
         g_save.stage_cleared = stage;
+        if (stage >= 100) MEMO_MARK(MEMO_STAGE100);
         r->area_cleared = (u8)(stage % STAGES_PER_AREA == 0);
     }
 }

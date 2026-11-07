@@ -11,6 +11,8 @@ proc rd16 {a} { expr {[rd8 $a] | ([rd8 [expr {$a+1}]] << 8)} }
 proc rd32 {a} { expr {[rd16 $a] | ([rd16 [expr {$a+2}]] << 16)} }
 proc wr32 {a v} { for {set i 0} {$i < 4} {incr i} { debug write memory [expr {$a + $i}] [expr {($v >> ($i * 8)) & 255}] } }
 proc say {m} { puts $::log [format "%7.2f %s" [machine_info time] $m]; flush $::log }
+set ::endpg 0
+set ::endwait 0
 set ::SAVE [sym _g_save] ; set ::CUR [sym _g_screen_cur] ; set ::ST [sym _g_ui_state]
 set ::KEYS [sym _g_test_keys] ; set ::DG [sym _g_test_digit] ; set ::MAGIC [sym _g_boot_magic]
 proc sv {k} { expr {$::SAVE + $::O($k)} }
@@ -45,6 +47,13 @@ proc tick {} {
         }
         leave { if {[rd8 $::ST] == 2} { press 16 } elseif {[at ranking]} { press 32 ; set ::phase back } elseif {[at home]} { digit 6 } else { press 16 } }
         back {
+            if {[at ending]} {                              ;# サービス終了: 結末 2 枚を撮って進める
+                if {[rd8 $::ST] == 2} {                     ;# 映り切ってから撮って進める
+                    incr ::endpg ; say "day $::day: ending page $::endpg"
+                    after time 0.5 [list shot tl_ending$::endpg] ; after time 0.7 {press 16} ; after time 1.2 tick ; return
+                }
+                after time 0.2 tick ; return
+            }
             if {[at credits]} {                             ;# サービス終了: スタッフロールを最後まで流す
                 if {![info exists ::roll]} { set ::roll 1 ; say "day $::day: staff roll" ; after time 8 [list shot tl_staffroll] }
                 if {[rd8 $::ST] == 2} { press 16 }
@@ -54,6 +63,7 @@ proc tick {} {
             if {[at title]} {
                 say "day $::day: title (service ended, credits_seen=[rd8 [sv credits_seen]])" ; shot tl_end_title
                 if {![info exists ::roll] || [rd8 [sv credits_seen]] != 1} { fail "staff roll not shown" }
+                if {$::endpg != 2} { fail "ending not shown ($::endpg pages)" }
                 if {$::day < 270} { fail "title before the end" }
                 after time 0.5 done ; return
             }
@@ -62,6 +72,10 @@ proc tick {} {
             if {[at event] || [at ranking]} { press 32 ; after time 0.3 tick ; return }
             if {![at home]} { press 16 ; after time 0.3 tick ; return }
             if {[rd8 $::ST] != 1} { after time 0.1 tick ; return }
+            if {$::day >= 270} {                            ;# 終了の後: ホームは次のフレームで結末へ移るので、ここでは待つ
+                if {[incr ::endwait] > 50} { fail "service end not detected on day $::day" }
+                after time 0.1 tick ; return
+            }
             set le [rd16 [sv last_event]] ; set ev [rd16 [sv event_id]] ; set g [rd32 [sv gems]]
             if {$le != $::le_before} { lappend ::ends $le }
             if {$ev && [lsearch $::joins $ev] < 0} { lappend ::joins $ev }

@@ -65,6 +65,7 @@ static void raid(const EventStage *es, u16 level, const DeckStats *d, QuestResul
     if (r->b.win) {
         r->points += kill_bonus();
         next_boss();
+        MEMO_MARK(MEMO_RAID);
     } else {
         g_save.raid_hp -= dealt;
     }

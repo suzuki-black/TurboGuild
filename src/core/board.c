@@ -42,6 +42,12 @@ u8 npc_tone(u16 i)
     return (u8)(npc_hash(i, SALT_MATE) & 3);
 }
 
+FAR(u16, mate_info, (u16 i))
+{
+    u16 rd = mate_retire_day(i);                         /* 引退の日は 20..249 なので 8 ビットに入る */
+    return (u16)(((u16)npc_tone(i) << 8) | (rd == BOARD_NEVER ? MATE_STAYS : rd));
+}
+
 static void add(Work *w, u16 base, u8 count, u16 param)
 {
     Topic *t;

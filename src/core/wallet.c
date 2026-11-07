@@ -39,6 +39,7 @@ FAR(u8, wallet_buy_gems, (u8 pack))
         g_save.funds -= p.price;
     }
     g_save.spent += p.price;
+    MEMO_MARK(MEMO_PAY);
     g_save.gems += p.gems;
     return W_OK;
 }
