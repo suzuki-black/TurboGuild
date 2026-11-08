@@ -4,6 +4,7 @@
 #include "board.h"
 #include "inventory.h"
 #include "memo.h"
+#include "pev.h"
 #include "player.h"
 #include "ranking.h"
 #include "rng.h"
@@ -213,6 +214,7 @@ FAR(u8, steal_tick, (void))
         g_save.stolen[0] = rec;
         if (!g_save.memo[MEMO_STOLEN]) g_save.memo[MEMO_STOLEN] = (u16)(day + 1);
         if (g_save.stolen_new < 255) g_save.stolen_new++;
+        pev_push(PEV_STOLEN, rec.npc);
         got++;
     }
     return got;

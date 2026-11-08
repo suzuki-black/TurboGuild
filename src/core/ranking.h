@@ -69,6 +69,7 @@ void ranking_list(RankList *l);
 u16  ranking_final_rank(void);           /* イベント終了時の順位（g_save.event_pt で数える） */
 u32  player_power(void);                 /* 総戦力 = デッキの攻撃 + 防御（属性補正なし） */
 void npc_now(u16 index, NpcNow *n);
+void guild_strengths(u32 *s);           /* ギルドごとの総戦力（辞めた人を除く）。s は GUILD_COUNT 個 */
 void feed_line(u16 k, FeedLine *f);      /* k 番目に新しい出来事（0 = 最新） */
 u16  npc_active_count(void);
 void rival_now(RivalNow *r);

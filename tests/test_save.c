@@ -96,6 +96,16 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.memo[MEMO_SSR] == 5 && s.stolen[0].card == 0 && s.steal_check == 0);
+    /* v14 も読め、v15 で足した自分の出来事は 0（空き）から */
+    save_new(&s, 1);
+    s.stolen[0].card = 9;
+    s.pev[0].kind = 3;
+    s.magic = SAVE_MAGIC;
+    s.version = 14;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.stolen[0].card == 9 && s.pev[0].kind == 0);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;

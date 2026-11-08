@@ -7,7 +7,7 @@
 #include "memo.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  14
+#define SAVE_VERSION  15
 #define SAVE_MIN_VERSION 5           /* 読めるいちばん古い版（それより前はカードの形が違う） */
 /* ★上位互換の決まり（DECISIONS #78）: 欄は必ず末尾に足し、SAVE_VERSION を 1 上げ、
  *   save.c の save_size[] にその版の大きさを足す。古い版は「その版の大きさ」で検査して読み、
@@ -19,7 +19,9 @@
 
 typedef struct { u16 id; u8 lv; u8 flags; u16 exp; } OwnedCard;
 #define STOLEN_MAX    3
-typedef struct { u16 npc; u16 card; u8 lv; } StolenRec;   /* 盗まれた 1 件。card = 0 は空き（0 で始まるので版上げで困らない） */   /* exp: 次の Lv までに貯めた合成経験値 */
+typedef struct { u16 npc; u16 card; u8 lv; } StolenRec;
+#define PEV_MAX       4
+typedef struct { u16 slot; u8 kind; u16 param; } PlayerEv;   /* 6 時間の区切りの番号・PEV_*・中身（0 = 空き） */   /* 盗まれた 1 件。card = 0 は空き（0 で始まるので版上げで困らない） */   /* exp: 次の Lv までに貯めた合成経験値 */
 
 typedef struct {
     u32 magic;  u16 version; u16 crc;
@@ -92,6 +94,8 @@ typedef struct {
     u8  steal_seq;       /* 盗みに行った回数（狙える相手の顔ぶれが替わる） */
     u8  stolen_new;      /* まだ知らせていない盗まれた枚数 */
     StolenRec stolen[STOLEN_MAX];   /* 盗まれたカードと盗んだ人（新しい順） */
+    /* v15: 自分の最近の出来事（core/pev.h, DECISIONS #91）。伝言板の仲間が反応する */
+    PlayerEv pev[PEV_MAX];
 } SaveData;
 
 u16 save_crc(const SaveData *s);           /* その版の大きさで計算する */

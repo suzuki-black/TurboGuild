@@ -75,8 +75,13 @@
   call guild mates for rescue) / **battle** (fight adventurers ranked below, equal to, or above you).
 - **Guilds and guild wars.** Twice a day, a one-hour battle window: attack the rival guild, build combos, cheer.
 - **A guild board.** Seven or eight guild mates, each with a payment style and a verbal tic, post about events,
-  new rarities and their day. Some slowly lose interest, and one day the board just says they have left the guild.
-  Also shown on the My Page marquee.
+  new rarities and their day — work, school, payday, weekends, a bad pull or a lucky one. They reply to each other,
+  cheer up a mate who sounds tired, miss the ones who have left, and react to you: your SSR, a theft, passing your
+  rival, coming back after a few days. Some slowly lose interest, and one day the board just says they have left
+  the guild. Also shown on the My Page marquee.
+- **An inn.** From the shop, sleep at the inn (100 G) to skip to six the next morning with full AP, or wait (free)
+  until the next thing on the calendar — the next guild war battle (12:00 or 21:00) or the start of the next event —
+  with AP recovering only for the time that passed. Events go on while you sleep, and so do thieves.
 - **Elements.** Fire, water and thunder beat each other in a circle; light and dark beat each other. A card with the
   advantage hits for 120%, one at a disadvantage for 80%. The explore screen and the event top show the enemy's
   weakness, and one key builds the deck for that enemy (counting event boon cards too).
@@ -123,7 +128,7 @@
 | ESC on the title screen | Developer diagnostics |
 
 Title → (New game) name → wallet course → your first 10-pull (re-roll as often as you like) → My Page.
-From My Page: quest, gacha, cards, deck, shop, ranking, save, news.
+From My Page: quest, gacha, cards, deck, shop (and inn), ranking, save, news.
 While an event or a guild war is running, enter it from the banner ([9]).
 After the service ends, the title screen offers Memories (the album; 1 there shows your cards, view only), Reset memories, the staff roll (ending first), and operator mode.
 
@@ -233,7 +238,7 @@ Built phase by phase from the design document and the implementation spec.
 | 2 | Fusion, evolution, events, rankings |
 | 3 | Operations timeline, 1,000-NPC pseudo-online world, news, FM music, economy simulation |
 | Later | Harder gacha (box gacha, no pity), 121 cards, raid and battle events, guild wars, staff roll, FAT12 save disk (v0.1.0) |
-| After 0.1.0 | Enemy weakness on screen, guild board, rival, battle styles, leader skill, three decks, operator mode, endings, memory album, stealing |
+| After 0.1.0 | Enemy weakness on screen, guild board, rival, battle styles, leader skill, three decks, operator mode, endings, memory album, stealing, livelier guild board, inn |
 
 ### Scope & honest positioning
 This is an **experimental study**.
@@ -325,8 +330,13 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **イベント 3 型:** 討伐（周回ボス）／ **レイド**（倒すまで HP が残るボス、救援依頼でギルドの仲間が削る）／
   **バトル**（格下・同格・格上の冒険者と対戦）。
 - **ギルドとギルド対抗戦。** 1 日 2 回の「戦の時間」に相手ギルドを攻撃し、コンボと応援で押し切る。
-- **ギルド伝言板。** 課金コースと口癖を持つ 7〜8 人の仲間が、イベントや新しいレア度、その日の出来事を書き込む。
+- **ギルド伝言板。** 課金コースと口癖を持つ 7〜8 人の仲間が、イベントや新しいレア度、その日の出来事
+  （仕事・学校・給料日・休日・爆死や SSR）を書き込む。仲間どうしで返事をし、弱音には励まし、去った仲間を懐かしみ、
+  あなたの SSR・盗まれた・ライバルを抜いた・久しぶりに来た などにも反応する。
   だんだん弱音が増えていく人がいて、ある日「ギルドを脱退しました」とだけ流れる。マイページのお知らせにも流れる。
+- **宿屋。** お店の宿屋で「翌朝まで寝る」（100 G）と、翌朝 6 時まで進んで AP が全回復する。「次の予定まで休む」（無料）と、
+  次の対抗戦の戦（12:00 か 21:00）かイベントの始まりまで一気に進む（AP は進んだぶんだけ回復）。
+  寝ている間もイベントは進み、盗まれることもある。
 - **属性。** 炎・水・雷は三すくみ、光と闇は互いに強い。有利なカードは攻撃 120%、不利なら 80%。
   探索の画面とイベントのトップに敵の弱点を出し、キー 1 つでその敵向けに編成する（イベントの特効カードも込み）。
 - **戦う前の選択。** 通常・節約（AP 半分・攻撃 60%）・全力（AP 2 倍・攻撃 250%）を選ぶ。報酬は変わらない。
@@ -368,7 +378,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | タイトルで ESC | 開発用の診断画面 |
 
 タイトル →（はじめから）名前 → お財布のコース → 最初の 10 連（何度でも引き直せる）→ マイページ。
-マイページから 冒険・ガチャ・カード・デッキ・お店・ランク・保存・お知らせ。
+マイページから 冒険・ガチャ・カード・デッキ・お店（宿屋も）・ランク・保存・お知らせ。
 イベントやギルド対抗戦の開催中は、バナー（[9]）から入ります。
 サービス終了後のタイトルには「思い出を見る」（アルバム。そこで 1 を押すと手持ちのカードを見るだけ）・「思い出をリセット」・「スタッフロール」（結末から）・「運営モード」が出ます。
 
@@ -475,7 +485,7 @@ docs/      企画書・設計の記録
 | 2 | 合成・進化・イベント・ランキング |
 | 3 | 運営年表・NPC 1000 人の疑似オンライン・お知らせ・FM 音源・経済シミュレーション |
 | 以降 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 121 枚、レイド・バトル、ギルド対抗戦、スタッフロール、FAT12 のセーブディスク（v0.1.0） |
-| 0.1.0 の後 | 敵の弱点の表示・ギルド伝言板・ライバル・戦い方・リーダースキル・デッキ 3 つ・運営モード・結末の分岐・思い出アルバム・盗み・盗まれ |
+| 0.1.0 の後 | 敵の弱点の表示・ギルド伝言板・ライバル・戦い方・リーダースキル・デッキ 3 つ・運営モード・結末の分岐・思い出アルバム・盗み・盗まれ・伝言板の拡充・宿屋 |
 
 各フェーズの確認方法と、途中で踏んだ地雷は [開発記録](docs/開発記録.md) にあります。
 

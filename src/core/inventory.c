@@ -4,6 +4,7 @@
 #include "inventory.h"
 #include "save.h"
 #include "tables.h"
+#include "pev.h"
 #include "../far.h"
 
 FAR(u16, inv_add, (u16 card_id))
@@ -12,7 +13,7 @@ FAR(u16, inv_add, (u16 card_id))
     CardRec c;
     if (i >= CARD_MAX) return INV_FULL;
     tbl_card(card_id, &c);
-    if (c.rarity >= RARITY_SSR) MEMO_MARK(MEMO_SSR);
+    if (c.rarity >= RARITY_SSR) { MEMO_MARK(MEMO_SSR); pev_push(PEV_SSR, card_id); }
     g_save.cards[i].id = card_id;
     g_save.cards[i].lv = 1;
     g_save.cards[i].flags = 0;

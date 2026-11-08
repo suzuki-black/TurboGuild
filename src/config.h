@@ -107,6 +107,10 @@
 #define OPS_HIST_SALES      17779500UL  /* 史実の選択での売上の合計（tests/test_game.c が確かめる） */
 #define OPS_HIST_PROFIT     14579500UL  /* 同じく利益（売上 - 広告費）。決算の上司のひとことはこれと比べる */
 
+/* 宿屋（core/player.c player_sleep, DECISIONS #91）: 泊まると翌朝まで進み、AP が全回復する */
+#define INN_GOLD            100      /* 宿代（ゴールド） */
+#define INN_WAKE_SECS       (6UL * 3600UL)   /* 朝 6 時に起きる */
+
 /* 盗み・盗まれ（core/steal.c, DECISIONS #90） */
 #define STEAL_AP            20       /* 盗みに行くたびに払う AP（AP をすべて盗みに使っても SSR は全期間で 1〜2 枚ほど） */
 #define STEAL_SLOT_SECS     (GSEC_PER_DAY / 4)   /* 留守の間はゲーム内 6 時間ごとに盗まれるかを決める */

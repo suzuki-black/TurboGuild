@@ -42,6 +42,28 @@ u16 npc_hash(u16 a, u16 b)
     return x;
 }
 
+/* ギルドの仲間（board.h）。伝言板はバンク 98 に移ったので、同じ式の写し（core/board.c）を持つ */
+#define SALT_MATE     0x5A17u
+#define SALT_MATE_R   0x33C5u
+
+u16 mate_retire_day(u16 i)
+{
+    u16 h = npc_hash(i, SALT_MATE_R);
+    if ((u8)h < 77) return BOARD_NEVER;                  /* 3 割は最後まで残る */
+    return (u16)(20 + (h >> 8) % 230);
+}
+
+u8 npc_tone(u16 i)
+{
+    return (u8)(npc_hash(i, SALT_MATE) & 3);
+}
+
+FAR(u16, mate_info, (u16 i))
+{
+    u16 rd = mate_retire_day(i);                         /* 引退の日は 20..249 なので 8 ビットに入る */
+    return (u16)(((u16)npc_tone(i) << 8) | (rd == BOARD_NEVER ? MATE_STAYS : rd));
+}
+
 /* ★種（b）は大きく離れた値にする。1 違いだと結果が強く相関する（辞める人が偏った） */
 #define SALT_RETIRE(w)  ((u16)(0x6D2Bu + (w) * 0x4F1Bu))
 #define SALT_EVENT(e)   ((u16)(0x1F3Du + (e) * 0x3B9Fu))
@@ -134,6 +156,23 @@ FAR(void, npc_now, (u16 index, NpcNow *n))
     ctx_init(&c, 0);
     tbl_npc(index, &r);
     now_of(index, &c, &r, n);
+}
+
+/* ギルドごとの、辞めていない NPC の総戦力の合計（ギルド対抗戦）。年表とイベントの読み出し（ctx_init）は 1 回だけ。
+ * npc_now を 1000 回呼ぶと毎回読み直して、対抗戦に入るのに 20 秒かかっていた（DECISIONS #93） */
+FAR(void, guild_strengths, (u32 *s))
+{
+    Ctx c;
+    NpcRec r;
+    NpcNow n;
+    u16 i;
+    ctx_init(&c, 0);
+    for (i = 0; i < GUILD_COUNT; i++) s[i] = 0;
+    for (i = 0; i < NPC_COUNT; i++) {
+        tbl_npc(i, &r);
+        now_of(i, &c, &r, &n);
+        if (!n.retired && r.guild < GUILD_COUNT) s[r.guild] += n.power;
+    }
 }
 
 FAR(u32, player_power, (void))

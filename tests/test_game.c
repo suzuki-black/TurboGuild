@@ -24,6 +24,7 @@
 #include "core/ending.h"
 #include "core/memo.h"
 #include "core/steal.h"
+#include "core/pev.h"
 #include "data/text_ids.h"
 
 
@@ -752,7 +753,7 @@ static void test_board(void)
     BoardList l;
     NpcRec r;
     NpcNow n;
-    u16 i, g, rd = 0, who = 0, never = 0, total = 0, posts = 0, news = 0, repeats = 0;
+    u16 i, g, rd = 0, who = 0, never = 0, total = 0, posts = 0, news = 0, repeats = 0, replies = 0, miss = 0;
     u8 k, cnt[GUILD_COUNT] = {0};
     for (i = 0; i < NPC_COUNT; i++) {
         if (!BOARD_IS_MATE(i)) continue;
@@ -812,15 +813,39 @@ static void test_board(void)
                 CHECK(BOARD_IS_MATE(p->npc) && r.guild == g - 1);
                 if (p->kind == BP_LEAVE) { CHECK(mate_retire_day(p->npc) == p->day); continue; }
                 CHECK(mate_retire_day(p->npc) >= p->day);
-                CHECK(p->text >= T_BD_FADE0 && p->text <= T_BD_HI7 && p->tone < 4);
-                if (p->text >= T_BD_NEW0 && p->text <= T_BD_NEW2) { CHECK(p->param == T_RAR_4 || p->param == T_RAR_5); news++; }
+                CHECK(p->text >= T_BD_FADE0 && p->text <= T_BD_RE23 && p->tone < 4);
+                if (p->text == T_BD_NEW0 || p->text == T_BD_NEW1 || p->text == T_BD_NEW2 || p->text == T_BD_NEW4 ||
+                    p->text == T_BD_NEW5 || p->text == T_BD_NEW7) { CHECK(p->param == T_RAR_4 || p->param == T_RAR_5); news++; }
+                if (p->text >= T_BD_MISS0 && p->text <= T_BD_BYE2) {   /* # の入る文: 名前はギルドの仲間 */
+                    CHECK(p->ref < NPC_COUNT && BOARD_IS_MATE(p->ref) && p->ref != p->npc && (p->ref >> 3) % GUILD_COUNT == g - 1);
+                    if (p->text <= T_BD_MISS2) { CHECK(mate_retire_day(p->ref) < p->day); miss++; } else replies++;
+                } else CHECK(p->ref == BOARD_NOREF);
                 if (k && l.post[k - 1].kind == BP_POST && l.post[k - 1].text == p->text) repeats++;
                 if (p->text == T_BD_HUNT0 || p->text == T_BD_HUNT1 || p->text == T_BD_RAID3 || p->text == T_BD_PVP1) CHECK(p->param != 0);
             }
         }
     }
-    CHECK(posts > 2000 && news > 0);
+    CHECK(posts > 2000 && news > 0 && replies * 10 > posts && miss > 0);   /* 返事は 1 割以上 */
     CHECK(repeats * 100 < posts);                      /* 続けて同じ文はめったに出ない */
+    /* 自分の出来事のあった時間帯には必ず誰かが反応し、SSR ならそのカードの名前が入る */
+    {
+        CardRec c;
+        g_save.guild = 1;
+        g_save.g_time = 30UL * GSEC_PER_DAY + 1;
+        pev_push(PEV_SSR, 39);
+        l.skip = 0; l.want = 1;
+        board_list(&l);
+        tbl_card(39, &c);
+        CHECK(l.n == 1 && l.post[0].text >= T_BD_RE0 && l.post[0].text <= T_BD_RE2 && (l.post[0].text != T_BD_RE0 || l.post[0].param == c.name_text));
+        g_save.g_time += BOARD_SLOT_SECS;
+        pev_push(PEV_STOLEN, 5);
+        board_list(&l);
+        CHECK(l.n == 1 && l.post[0].text >= T_BD_RE3 && l.post[0].text <= T_BD_RE5 && (l.post[0].text == T_BD_RE5 || l.post[0].ref == 5));
+        g_save.g_time += 3 * BOARD_SLOT_SECS;              /* しばらくたつと反応しない */
+        board_list(&l);
+        CHECK(l.n == 0 || l.post[0].text < T_BD_RE0);
+        memset(g_save.pev, 0, sizeof(g_save.pev));
+    }
 }
 
 /* 運営モード（DECISIONS #88）: 史実の選択は終了、選び方によっては継続。同じ選択なら同じ数字 */
@@ -856,6 +881,68 @@ static void test_ops(void)
     CHECK(g_ops.points >= OPS_CONT_POINTS);
     CHECK(ops_run("002000020000") == OPS_END && g_ops.ad_total == 0);   /* 広告を打たなければ広告費は 0 */
     CHECK(ops_run("999999999999") == OPS_END && g_ops.sales_total == total);   /* 範囲外の選択は史実として扱う */
+}
+
+/* 宿屋（DECISIONS #91）: 翌朝 6 時まで進んで AP が全回復し、宿代を払う。夜明け前なら同じ日の朝 */
+static void test_inn(void)
+{
+    fresh();
+    g_save.gold = INN_GOLD - 1;
+    CHECK(player_sleep() == 0);
+    g_save.gold = 1000;
+    g_save.ap = 3;
+    g_save.g_time = 5UL * GSEC_PER_DAY + 22UL * 3600;
+    CHECK(player_sleep() == 8 && g_save.g_time == 6UL * GSEC_PER_DAY + INN_WAKE_SECS);
+    CHECK(g_save.ap == AP_MAX && g_save.gold == 1000 - INN_GOLD && g_save.pev[0].kind == PEV_INN);
+    g_save.g_time = 9UL * GSEC_PER_DAY + 2UL * 3600;
+    CHECK(player_sleep() == 4 && g_save.g_time == 9UL * GSEC_PER_DAY + INN_WAKE_SECS);
+}
+
+/* 次の予定まで休む（DECISIONS #92）: 対抗戦の戦は 12:00 と 21:00、イベントは始まりの日の 0:00。AP は進んだぶんだけ */
+static void test_plan(void)
+{
+    Plan p;
+    EventRec e;
+    fresh();
+    g_save.g_time = 140UL * GSEC_PER_DAY + 13UL * 3600;             /* 第 1 回の対抗戦の初日、昼の戦の後 */
+    plan_next(&p);
+    CHECK(p.kind == PLAN_GVG && p.match == 1 && p.at == 140UL * GSEC_PER_DAY + 21UL * 3600);
+    g_save.ap = 0;
+    g_save.ap_gtime = g_save.g_time;
+    CHECK(player_wait(&p) && g_save.g_time == 140UL * GSEC_PER_DAY + 21UL * 3600);
+    CHECK(g_save.ap == 8 * 3600UL / AP_RECOVER_GSEC);                  /* 8 時間ぶんだけ回復 */
+    g_save.g_time += 1800;                                            /* 夜の戦の途中 → 翌日の昼の戦 */
+    plan_next(&p);
+    CHECK(p.kind == PLAN_GVG && p.match == 2 && p.at == 141UL * GSEC_PER_DAY + 12UL * 3600);
+    g_save.g_time = 1;                                                /* 始めたばかり: 最初のイベント */
+    plan_next(&p);
+    tbl_event(1, &e);
+    CHECK(p.kind == PLAN_EVENT && p.at == (u32)e.start_day * GSEC_PER_DAY && p.text == e.name_text);
+    g_save.g_time = 269UL * GSEC_PER_DAY;                             /* 終わりの前日: もう予定は無い */
+    plan_next(&p);
+    CHECK(p.kind == PLAN_NONE && !player_wait(&p) && g_save.g_time == 269UL * GSEC_PER_DAY);
+}
+
+/* ギルドの戦力をまとめて数えても、1 人ずつ npc_now で数えたのと同じ（DECISIONS #93） */
+static void test_guild_strengths(void)
+{
+    u32 s[GUILD_COUNT], t[GUILD_COUNT];
+    NpcRec r;
+    NpcNow n;
+    u16 i, d;
+    for (d = 0; d < 270; d += 67) {
+        fresh();
+        g_save.g_time = (u32)d * GSEC_PER_DAY + 3600;
+        g_save.event_id = (u16)(d / 67 % 3);
+        guild_strengths(s);
+        for (i = 0; i < GUILD_COUNT; i++) t[i] = 0;
+        for (i = 0; i < NPC_COUNT; i++) {
+            tbl_npc(i, &r);
+            npc_now(i, &n);
+            if (!n.retired) t[r.guild] += n.power;
+        }
+        for (i = 0; i < GUILD_COUNT; i++) CHECK(s[i] == t[i] && s[i] > 0);
+    }
 }
 
 /* 盗み・盗まれ（steal.h）: デッキのカードは盗まれず、盗まれたカードは盗んだ人から取り返せる */
@@ -989,6 +1076,9 @@ int main(void)
     test_ops();
     test_memo_ending();
     test_steal();
+    test_inn();
+    test_plan();
+    test_guild_strengths();
     test_struct_sizes();
     test_battle();
     test_elem();

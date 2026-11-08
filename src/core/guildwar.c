@@ -4,6 +4,7 @@
  * ギルドの点 = 所属 NPC（辞めていない人）の戦力の合計 / 64 × 揺らぎ 80〜120%。
  * 自分のギルドには、その戦で自分が稼いだ点と応援（+3%）が足される。 */
 #include "guildwar.h"
+#include "pev.h"
 #include "event.h"
 #include "player.h"
 #include "ranking.h"
@@ -37,16 +38,9 @@ static u16 str_day = 0xFFFF;
 
 static const u32 *strengths(void)
 {
-    NpcRec r;
-    NpcNow n;
-    u16 i, d = (u16)time_gday(g_save.g_time);
+    u16 d = (u16)time_gday(g_save.g_time);
     if (str_day == d) return str_cache;
-    for (i = 0; i < GUILD_COUNT; i++) str_cache[i] = 0;
-    for (i = 0; i < NPC_COUNT; i++) {
-        tbl_npc(i, &r);
-        npc_now(i, &n);
-        if (!n.retired) str_cache[r.guild] += n.power;
-    }
+    guild_strengths(str_cache);
     str_day = d;
     return str_cache;
 }
@@ -146,6 +140,7 @@ FAR(void, gvg_update, (GvgResult *r))
             r->win++;
             g_save.gvg_win++;
             MEMO_MARK(MEMO_GVGWIN);
+            pev_push(PEV_GVGWIN, 0);
             g_save.gvg_wonbits |= bit;
         } else {
             g_save.gvg_lose++;

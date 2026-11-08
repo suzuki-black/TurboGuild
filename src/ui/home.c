@@ -12,6 +12,7 @@ void bgm_play(u8 song);
 #include "../core/player.h"
 #include "../core/ranking.h"
 #include "../core/steal.h"
+#include "../core/pev.h"
 #include "../core/save.h"
 #include "../core/time.h"
 #include "../core/wallet.h"
@@ -229,6 +230,7 @@ static u8 rival_check(void)
         if (m == RANK_EVENT) g_save.chaser = g_save.rival[m];
         g_save.rival[m] = 0;
         MEMO_MARK(MEMO_RIVAL);
+        pev_push(PEV_RIVAL, r.npc);
         rival_popup(T_RV_BEAT, &r, (u16)((vow ? T_RV_VOW0 : T_RV_SORE0) + (r.player & 3)));
         return 1;
     }
@@ -289,6 +291,8 @@ FAR(void, home_init, (void))
         MEMO_MARK(MEMO_GUILD);
         g_joined = 1;
     }
+    if (g_save.steal_check && g_save.g_time - g_save.steal_check >= 2 * GSEC_PER_DAY)   /* 久しぶりに来た（前にマイページへ来た時刻） */
+        pev_push(PEV_BACK, (u16)((g_save.g_time - g_save.steal_check) / GSEC_PER_DAY));
     if (steal_tick()) g_save_dirty = 1;              /* 留守の間に盗まれたカード（知らせは home_draw） */
     if (g_login.given || g_paid || g_evres.started || g_evres.ended || g_gift || g_joined ||
         g_gvgres.joined || g_gvgres.n || g_gvgres.ended) g_save_dirty = 1;

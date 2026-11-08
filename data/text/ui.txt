@@ -182,6 +182,17 @@ T_COURSE_NOTE	軍資金で石を買って使います
 T_PAYDAY	給料日！軍資金が入った
 T_SHOP_GEMS	石を買う（課金）
 T_SHOP_POTION	回復薬を買う（石100）
+T_SHOP_INN	宿屋（寝る・休む）
+T_INN_TITLE	宿屋
+T_INN_SLEEP	翌朝まで寝る 100G
+T_INN_WAIT	次の予定まで休む
+T_PLAN_GVG	対抗戦 第
+T_PLAN_GVG2	戦
+T_PLAN_NONE	この先の予定はない
+T_INN_WAITED_GVG	対抗戦の時間だ！
+T_INN_WAITED_EV	イベントが始まる！
+T_INN_SLEPT	ぐっすり眠った。朝になった
+T_INN_NO_GOLD	宿代が足りません
 T_SPENT	累計課金
 T_NO_FUNDS	軍資金が足りません
 T_PACK_TITLE	どの石を買いますか？
@@ -317,31 +328,60 @@ T_BD_FADE0	最近ちょっと忙しくて、あまり来れないかも
 T_BD_FADE1	なんかログインするだけになってる
 T_BD_FADE2	仕事が忙しくなるので、しばらく休みます
 T_BD_FADE3	正直ちょっと疲れてきた
+T_BD_FADE4	最近ガチャ回してもワクワクしない
+T_BD_FADE5	リアルがちょっとバタバタしてて
+T_BD_FADE6	ログボだけもらって寝ます
+T_BD_FADE7	みんなについていけなくなってきた
 T_BD_END0	サ終って本当？まだ信じられない
 T_BD_END1	最後まで残るよ。みんなもいてね
 T_BD_END2	課金したぶん、どうなるんだろう
 T_BD_END3	終わる前にもう一回だけ回すか
+T_BD_END4	このギルドで遊べてよかった
+T_BD_END5	最終日、みんなでログインしよう
+T_BD_END6	次はどのゲームに行く？
+T_BD_END7	スクショ撮っておこう
 T_BD_NEW0	%が来て、手持ちが全部かすんで見える
 T_BD_NEW1	%実装とか聞いてないんだけど
 T_BD_NEW2	もう%引かないと上位は無理だな
 T_BD_NEW3	運営、インフレさせすぎじゃない？
+T_BD_NEW4	%、うちのギルドで誰か引いた？
+T_BD_NEW5	%のために石を貯めてたんだ
+T_BD_NEW6	古いSSRがただの素材に…
+T_BD_NEW7	%、一枚でいいから欲しい
 T_BD_HUNT0	%、初級でコツコツ回してる
 T_BD_HUNT1	%の報酬ライン、あと少し
 T_BD_HUNT2	AP回復待ちの時間が長い
 T_BD_HUNT3	上級に挑んだら負けた
+T_BD_HUNT4	%、今回の報酬カードかわいい
+T_BD_HUNT5	%、寝る前にあと1周
+T_BD_HUNT6	%、ランキング見るのが怖い
+T_BD_HUNT7	%、走ってる人すごいな
 T_BD_RAID0	誰かレイドの救援頼む！
 T_BD_RAID1	ボスが硬すぎ。全力で殴るAPがない
 T_BD_RAID2	救援ありがとう！助かった
 T_BD_RAID3	%、みんな何体倒した？
+T_BD_RAID4	救援出しといたから殴ってって！
+T_BD_RAID5	%、ボスのLvまた上がった
+T_BD_RAID6	全力で殴ったら一撃だった
+T_BD_RAID7	%、もう誰かに倒されてた
 T_BD_PVP0	バトルで格上に勝てた！
 T_BD_PVP1	%、上位の人つよすぎ
 T_BD_PVP2	ポイント差が縮まらない
+T_BD_PVP3	同じ人に3回負けた
+T_BD_PVP4	%、守りのデッキ考えないと
+T_BD_PVP5	勝ったら相手から挨拶が来た
 T_BD_GVG0	今日の対抗戦、みんな来てね！
 T_BD_GVG1	応援ボタン押しといた
 T_BD_GVG2	相手のギルド強すぎない？
+T_BD_GVG3	夜の戦も来れる人いる？
+T_BD_GVG4	勝った！みんなありがとう！
+T_BD_GVG5	負けた…次は勝とう
 T_BD_RATE0	確率アップ中だし回すしかない
 T_BD_RATE1	今なら出る気がする
 T_BD_RATE2	確率アップって本当に上がってる？
+T_BD_RATE3	10連で何も出なかった…
+T_BD_RATE4	確率アップ最終日だって
+T_BD_RATE5	SSR来た！確率アップ最高
 T_BD_PAY0	無料ガチャでまたNだった
 T_BD_PAY1	無課金でもここまで来れたよ
 T_BD_PAY2	今月のおこづかい全部使っちゃった
@@ -352,12 +392,76 @@ T_BD_PAY6	天井まで回したけど出なかった
 T_BD_PAY7	欲しいカードは全部持ってる
 T_BD_HI0	まだ起きてる人いる？
 T_BD_HI1	寝る前にもう1周だけ
-T_BD_HI2	おはよう！ログボもらった
-T_BD_HI3	通勤中にAPだけ使っとく
-T_BD_HI4	昼休みに探索してる
-T_BD_HI5	午後もがんばろう
-T_BD_HI6	ただいま！今日もよろしく
-T_BD_HI7	おつかれさま、今日はもう寝るね
+T_BD_HI2	眠れないからAP消化中
+T_BD_HI3	夜中のガチャは危険
+T_BD_HI4	おはよう！ログボもらった
+T_BD_HI5	通勤中にAPだけ使っとく
+T_BD_HI6	寝坊した！行ってきます
+T_BD_HI7	朝ごはん食べながら探索
+T_BD_HI8	昼休みに探索してる
+T_BD_HI9	午後もがんばろう
+T_BD_HI10	授業中にこっそり…
+T_BD_HI11	今日のランチ、カレーだった
+T_BD_HI12	ただいま！今日もよろしく
+T_BD_HI13	おつかれさま、今日はもう寝るね
+T_BD_HI14	残業でへとへと
+T_BD_HI15	飲み会帰りにログイン
+T_BD_WKND0	休みの日は一日中できる
+T_BD_WKND1	休日出勤つらい
+T_BD_WKND2	家族サービス中、隙を見てログイン
+T_BD_WKND3	日曜の夜って憂うつ
+T_BD_PAYDAY0	給料日！課金するか迷う
+T_BD_PAYDAY1	給料入ったから10連いく
+T_BD_PAYDAY2	給料日なのに残高が…
+T_BD_STORY0	10連2回でSR1枚…爆死
+T_BD_STORY1	ついにSSR出た！！
+T_BD_STORY2	課金しすぎた。今月は反省
+T_BD_STORY3	今日から本気出す
+T_BD_STORY4	合成で素材をまちがえて泣いた
+T_BD_STORY5	デッキ組み直したら強くなった
+T_BD_STORY6	寝落ちしてAPあふれてた
+T_BD_STORY7	友達をこのゲームに誘ってみた
+T_BD_MISS0	#さん、元気かなぁ
+T_BD_MISS1	#さんがいた頃が懐かしい
+T_BD_MISS2	#さんの口ぐせ、思い出した
+T_BD_REPLY0	＞#さん それな
+T_BD_REPLY1	＞#さん わかる〜
+T_BD_REPLY2	＞#さん マジで？
+T_BD_REPLY3	＞#さん 草
+T_BD_REPLY4	＞#さん おつ！
+T_BD_REPLY5	＞#さん うらやましい
+T_BD_REPLY6	＞#さん 自分もそれ
+T_BD_REPLY7	＞#さん がんばろう！
+T_BD_CONSOLE0	＞#さん 無理しないでね
+T_BD_CONSOLE1	＞#さん いつでも戻ってきて
+T_BD_CONSOLE2	＞#さん さびしくなるなぁ
+T_BD_BYE0	#さん、おつかれさま…
+T_BD_BYE1	#さん、行っちゃった
+T_BD_BYE2	#さんのぶんまでがんばる
+T_BD_RE0	$さん%引いたの！？すごい
+T_BD_RE1	$さんおめでとう！SSRいいなぁ
+T_BD_RE2	$さんの引き運わけてほしい
+T_BD_RE3	$さん、#に盗まれたって？
+T_BD_RE4	#、許せん。取り返そう！
+T_BD_RE5	$さん大丈夫？デッキに入れとこ
+T_BD_RE6	$さん、#を抜いたね！
+T_BD_RE7	ランキング見たよ、$さん
+T_BD_RE8	$さん、追い上げすごい
+T_BD_RE9	$さん、おかえり！
+T_BD_RE10	$さん久しぶり！元気だった？
+T_BD_RE11	$さんがいない間に色々あったよ
+T_BD_RE12	$さんのおかげで勝てた！
+T_BD_RE13	$さんナイス！
+T_BD_RE14	対抗戦勝ち！$さんおつかれ
+T_BD_RE15	$さんLvアップおめ！
+T_BD_RE16	$さん、もうそんなLvなんだ
+T_BD_RE17	$さん、育つの早いね
+T_BD_RE18	$さん上位入賞すごい！
+T_BD_RE19	$さん、報酬なにもらった？
+T_BD_RE20	$さん走ってたもんね
+T_BD_RE21	$さん、よく寝てたね
+T_BD_RE22	$さんおはよう、宿屋どうだった？
+T_BD_RE23	ゆうべは$さん見なかったね
 T_RIVAL	宿敵
 T_RV_BEHIND	まで あと 
 T_RV_CHASE	が 

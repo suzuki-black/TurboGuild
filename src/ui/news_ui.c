@@ -62,9 +62,10 @@ static void feed_text(const FeedLine *f)
     }
 }
 
-/* 文言を写す。% にはその場所に param の文言を入れる（Shift-JIS の 2 バイト目に % は来ない）。
+/* 文言を写す。% には param の文言、# には ref の人の名前、$ には自分の名前を入れる
+ * （Shift-JIS の 2 バイト目は 40h 以上なので、%・#・$ と取り違えない）。
  * txt_ptr の窓は次の add_text で替わるので、先に手元へ写してから組み立てる */
-static void add_text_param(u16 id, u16 param)
+static void add_text_param(u16 id, u16 param, u16 ref)
 {
     char tmp[64];
     const char *s = txt_ptr(id);
@@ -73,6 +74,13 @@ static void add_text_param(u16 id, u16 param)
     tmp[n] = 0;
     for (n = 0; tmp[n]; n++) {
         if (tmp[n] == '%') { if (param) add_text(param); continue; }
+        if (tmp[n] == '#') { if (ref < NPC_COUNT) add_npc(ref); continue; }
+        if (tmp[n] == '$') {                                       /* 名前は終わりの 0 が無いこともある */
+            u8 k;
+            for (k = 0; k < sizeof(g_save.name) && g_save.name[k] && len < BUF_MAX; k++) g_ticker_buf[len++] = g_save.name[k];
+            g_ticker_buf[len] = 0;
+            continue;
+        }
         if (len < BUF_MAX) g_ticker_buf[len++] = tmp[n];
     }
     g_ticker_buf[len] = 0;
@@ -84,7 +92,7 @@ static void post_text(const BoardPost *p)
     add_npc(p->npc);
     if (p->kind == BP_LEAVE) { add_text(T_BOARD_LEFT); return; }
     add_text(T_BOARD_SAY);
-    add_text_param(p->text, p->param);
+    add_text_param(p->text, p->param, p->ref);
     if (p->tone) add_text((u16)(T_BOARD_TONE1 + p->tone - 1));
 }
 

@@ -19,7 +19,8 @@ static const u16 save_size[] = {
     offsetof(SaveData, ops_best),      /* v11: 戦い方とデッキ 3 つ */
     offsetof(SaveData, memo),          /* v12: 運営モード */
     offsetof(SaveData, steal_check),   /* v13: 思い出アルバム */
-    sizeof(SaveData),                  /* v14: 盗み・盗まれ */
+    offsetof(SaveData, pev),           /* v14: 盗み・盗まれ */
+    sizeof(SaveData),                  /* v15: 自分の最近の出来事 */
 };
 
 static u16 size_of(u16 version)

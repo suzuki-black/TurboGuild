@@ -34,7 +34,7 @@
 | 11 | 6000h コード | CORE2 | code: src/core/fusion.c src/core/event.c src/core/timeline.c src/core/wallet.c | 合成・進化・イベント・運営年表・軍資金 |
 | 12 | 6000h コード | UI_FUSION | code: src/ui/fusion_ui.c | 強化合成・進化合成 |
 | 13 | 6000h コード | UI_EVENT | code: src/ui/event_ui.c src/ui/ranking_ui.c src/ui/news_ui.c | イベント・ランキング・イベント結果・お知らせ |
-| 14 | 6000h コード | CORE3 | code: src/core/ranking.c src/core/board.c | NPC のいま・ランキング・ライバル・みんなの動き、ギルド伝言板 |
+| 14 | 6000h コード | CORE3 | code: src/core/ranking.c | NPC のいま・ランキング・ライバル・みんなの動き・ギルドの仲間の引退の日と口癖 |
 | 15 | 6000h コード | BGM | code: src/ui/bgm.c | FM 音源の BGM ドライバと曲（tools/mml.py） |
 | 16 | 8000h データA | CARDS | build/cards.bin | カード |
 | 17 | 8000h データA | AREAS | build/areas.bin | エリア |
@@ -118,4 +118,5 @@
 | 95 | 6000h コード | UI_OPS | code: src/ui/ops_ui.c | 運営モードの画面（グラフ・会議・決算） |
 | 96 | 6000h コード | UI_END | code: src/ui/ending_ui.c src/core/ending.c | サービス終了の結末と思い出アルバム（バンク 14 が埋まったので結末の計算もここ） |
 | 97 | 6000h コード | UI_STEAL | code: src/ui/steal_ui.c src/core/steal.c | 盗み・盗まれ（盗みに行く画面と、留守の間に盗まれる計算） |
-| 98-127 | - | - | - | 空き |
+| 98 | 6000h コード | CORE9 | code: src/core/board.c | ギルド伝言板（話題・返事・自分への反応。バンク 14 が埋まったので分けた） |
+| 99-127 | - | - | - | 空き |

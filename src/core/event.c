@@ -3,6 +3,7 @@
  * 何日空けて起動しても同じ（期間をまたいだセーブを読んでも終了処理が走る, 仕様 Phase2 の受け入れ）。
  * ポイント報酬は届いた順に 1 回だけ（受け取り済みは event_rewards_claimed のビット）。 */
 #include "event.h"
+#include "pev.h"
 #include "player.h"
 #include "ranking.h"
 #include "save.h"
@@ -63,7 +64,7 @@ static void finish(EventResult *r)
     if (g_save.event_pt) rank_reward(e.reward_tbl, r->rank, &r->gain);
     g_save.last_event = g_save.event_id;
     g_save.last_rank = r->rank;
-    if (g_save.event_pt && r->rank <= 100) MEMO_MARK(MEMO_TOP100);
+    if (g_save.event_pt && r->rank <= 100) { MEMO_MARK(MEMO_TOP100); pev_push(PEV_EVTOP, r->rank); }
     if (g_save.event_pt && r->rank <= 10) MEMO_MARK(MEMO_TOP10);
     g_save.last_event_pt = g_save.event_pt;
     g_save.event_id = 0;

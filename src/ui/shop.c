@@ -1,5 +1,6 @@
 /* SPDX-License-Identifier: MIT */
-/* shop.c — [1] 石を買う（軍資金で課金）[2] 回復薬を買う（石 100）[3] 回復薬を使う。
+/* shop.c — [1] 石を買う（軍資金で課金）[2] 回復薬を買う（石 100）[3] 回復薬を使う [4] 宿屋に泊まる（翌朝まで進む）。
+ * 宿屋は「翌朝まで寝る（宿代・AP 全回復）」か「次の予定（対抗戦の戦・イベントの始まり）まで休む（無料）」（DECISIONS #91・#92）。
  * 軍資金はリアルマネーの代わり（DECISIONS #33）。無料の石や回復薬を使い切ったら、ここで払うしかない。 */
 #include "screen.h"
 #include "widget.h"
@@ -17,17 +18,18 @@
 #include "../sys/text.h"
 #include "../sys/vdp.h"
 
-#define ITEMS 3
+#define ITEMS 4
 #define BTN_Y 116
-static const u16 items[ITEMS] = { T_SHOP_GEMS, T_SHOP_POTION, T_SHOP_USE };
+#define BTN_H 20            /* 4 つが案内の帯（196〜）の上に入る間隔 */
+static const u16 items[ITEMS] = { T_SHOP_GEMS, T_SHOP_POTION, T_SHOP_USE, T_SHOP_INN };
 
 static void button(u8 i)
 {
     u8 on = (u8)(i == g_cursor);
-    u8 y = (u8)(BTN_Y + i * 24);
-    ui_box(8, y, 240, 22, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
-    ui_key((u8)(i + 1), 12, (u8)(y + 5));
-    txt_id(4, (u8)(y + 3), items[i], on ? COL_YELLOW : COL_WHITE, on ? COL_BLUE : COL_DBLUE);
+    u8 y = (u8)(BTN_Y + i * BTN_H);
+    ui_box(8, y, 240, BTN_H - 1, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);
+    ui_key((u8)(i + 1), 12, (u8)(y + 4));
+    txt_id(4, (u8)(y + 2), items[i], on ? COL_YELLOW : COL_WHITE, on ? COL_BLUE : COL_DBLUE);
 }
 
 static void info(void)
@@ -85,6 +87,44 @@ static u8 ask_pack(void)
     }
 }
 
+/* 宿屋: [1] 翌朝まで寝る [2] 次の予定まで休む（何の予定かを下に出す）。0 = やめる */
+static u8 ask_inn(const Plan *pl)
+{
+    static const u16 opt[2] = { T_INN_SLEEP, T_INN_WAIT };
+    u8 cur = 0, k, cx;
+    ui_box(16, 60, 224, 96, COL_DBLUE, COL_CYAN);
+    txt_id(3, 64, T_INN_TITLE, COL_YELLOW, COL_DBLUE);
+    if (pl->kind == PLAN_NONE) txt_id(3, 132, T_PLAN_NONE, COL_LGRAY, COL_DBLUE);
+    else {                                           /* 12日目 21:00 対抗戦 第3戦 */
+        u32 tod = pl->at % GSEC_PER_DAY;
+        cx = txt_id(3, 132, T_ALB_DAYP, COL_LGRAY, COL_DBLUE);                    /* 「141日目」/「Day 141」 */
+        cx = txt_num(cx, 132, pl->at / GSEC_PER_DAY + 1, COL_WHITE, COL_DBLUE);
+        cx = txt_id(cx, 132, T_ALB_DAYS, COL_LGRAY, COL_DBLUE);
+        cx = txt_num((u8)(cx + 1), 132, tod / 3600, COL_WHITE, COL_DBLUE);
+        cx = txt_draw(cx, 132, ":00", COL_WHITE, COL_DBLUE);
+        if (pl->kind == PLAN_GVG) {
+            cx = txt_id((u8)(cx + 1), 132, T_PLAN_GVG, COL_CYAN, COL_DBLUE);
+            cx = txt_num(cx, 132, pl->match + 1, COL_CYAN, COL_DBLUE);
+            txt_id(cx, 132, T_PLAN_GVG2, COL_CYAN, COL_DBLUE);
+        } else txt_id((u8)(cx + 1), 132, pl->text, COL_CYAN, COL_DBLUE);
+    }
+    for (;;) {
+        u8 p, d;
+        for (k = 0; k < 2; k++) {
+            u8 y = (u8)(84 + k * 22), bg = k == cur ? COL_BLUE : COL_DBLUE;
+            vdp_fill(24, y, 208, 20, bg);
+            ui_key((u8)(k + 1), 26, (u8)(y + 4));
+            txt_id(5, (u8)(y + 2), opt[k], k == 1 && pl->kind == PLAN_NONE ? COL_DGRAY : COL_WHITE, bg);
+        }
+        g_ui_state = UIS_WAITKEY;
+        do { ui_frame(); p = input_pressed(); d = input_digit(); } while (!p && d == NO_DIGIT);
+        if (d == 1 || d == 2) return d;
+        if (p & (BTN_UP | BTN_DOWN)) cur ^= 1;
+        if (p & BTN_CANCEL) return 0;
+        if (p & BTN_OK) return (u8)(cur + 1);
+    }
+}
+
 static void act(void)
 {
     if (g_cursor == 0) {
@@ -103,6 +143,22 @@ static void act(void)
         psg_beep(0x060, 6);
         ui_status_block(20);
         info();
+    } else if (g_cursor == 3) {                      /* 宿屋: 寝るか休むか。済んだらマイページへ（時間が進んだ処理はそこで） */
+        Plan pl;
+        u8 k;
+        plan_next(&pl);
+        k = ask_inn(&pl);
+        g_dirty = 1;
+        if (k == 1) {
+            if (!player_sleep()) { ui_msg(T_INN_NO_GOLD); return; }
+            ui_msg(T_INN_SLEPT);
+        } else if (k == 2) {
+            if (!player_wait(&pl)) { ui_msg(T_PLAN_NONE); return; }
+            ui_msg(pl.kind == PLAN_GVG ? T_INN_WAITED_GVG : T_INN_WAITED_EV);
+        } else return;
+        g_save_dirty = 1;
+        psg_beep(0x200, 20);
+        screen_change(&scr_home);
     } else {
         if (!player_use_potion()) { ui_msg(T_NO_POTION); return; }
         g_save_dirty = 1;

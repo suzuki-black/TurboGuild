@@ -25,7 +25,9 @@ typedef struct {
     u16 alt;             /* 1 つ前（古い方）と同じ文になったときの代わり */
     u16 param;           /* 文の % に入れる文言 id（無ければ 0） */
     u16 day;             /* 書き込んだ日 */
+    u16 ref;             /* 文の # に入れる人（NPC 番号。BOARD_NOREF = なし）。$ には自分の名前が入る */
 } BoardPost;
+#define BOARD_NOREF 0xFFFFu
 
 typedef struct {
     u8 skip;             /* 入力: 新しい順に何件飛ばすか */
@@ -34,8 +36,8 @@ typedef struct {
     BoardPost post[BOARD_MAX];
 } BoardList;
 
-u16  npc_hash(u16 a, u16 b);           /* ranking.c と同じハッシュ（同じバンクから直接呼ぶ） */
-u16  mate_retire_day(u16 npc);         /* 仲間の引退の日（最後まで残るなら BOARD_NEVER）。同じバンクから直接呼ぶ */
+u16  npc_hash(u16 a, u16 b);           /* ranking.c のハッシュ（同じバンクから直接呼ぶ。board.c は同じ式の写しを持つ） */
+u16  mate_retire_day(u16 npc);         /* 仲間の引退の日（最後まで残るなら BOARD_NEVER）。ranking.c にあり、同じバンクから直接呼ぶ */
 u8   npc_tone(u16 npc);               /* 口癖 0..3（仲間でなくても決まる）。同じバンクから直接呼ぶ */
 u16  mate_info(u16 npc);              /* 別のバンク向け: 下位 8 ビットが引退の日（MATE_STAYS = 最後まで残る）、上位が口癖 */
 #define MATE_STAYS 0xFF

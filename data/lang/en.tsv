@@ -184,6 +184,17 @@ T_COURSE_NOTE	Funds are used to buy gems
 T_PAYDAY	Payday! Funds added
 T_SHOP_GEMS	Buy gems ($$$)
 T_SHOP_POTION	Buy potion (100 Gm)
+T_SHOP_INN	Inn (sleep / wait)	!
+T_INN_TITLE	Inn
+T_INN_SLEEP	Sleep till morning 100G	!
+T_INN_WAIT	Wait for next plan	!
+T_PLAN_GVG	War #
+T_PLAN_GVG2	 
+T_PLAN_NONE	Nothing coming up
+T_INN_WAITED_GVG	Guild war time!
+T_INN_WAITED_EV	The event starts!
+T_INN_SLEPT	Slept well. It's morning
+T_INN_NO_GOLD	Not enough gold for the inn	!
 T_SPENT	Spent
 T_NO_FUNDS	Not enough funds
 T_PACK_TITLE	Which pack to buy?
@@ -313,51 +324,144 @@ T_BOARD_DAY	d
 T_BOARD_TONE1	 lol	!
 T_BOARD_TONE2	 :)
 T_BOARD_TONE3	 ^^;
-T_BD_FADE0	Busy lately. Might not be around much
+T_BD_FADE0	Busy lately. Might not be around much	!
 T_BD_FADE1	I just log in and log out these days	!
-T_BD_FADE2	Work's getting busy. Taking a break
+T_BD_FADE2	Work's getting busy. Taking a break	!
 T_BD_FADE3	Honestly, I'm getting tired of it	!
+T_BD_FADE4	Pulls don't excite me anymore	!
+T_BD_FADE5	Real life's been hectic	!
+T_BD_FADE6	Just grabbing the login bonus. Night	!
+T_BD_FADE7	I can't keep up with you all	!
 T_BD_END0	Shutting down? Can't believe it	!
 T_BD_END1	I'm staying to the end. You too?	!
-T_BD_END2	What happens to all I spent?
-T_BD_END3	One more pull before it ends
-T_BD_NEW0	%'s out and my cards look weak now
-T_BD_NEW1	% added? Nobody told me
-T_BD_NEW2	No top rank without % now
-T_BD_NEW3	The power creep is getting silly
+T_BD_END2	What happens to all I spent?	!
+T_BD_END3	One more pull before it ends	!
+T_BD_END4	Glad I played in this guild	!
+T_BD_END5	Let's all log in on the last day	!
+T_BD_END6	Where's everyone going next?	!
+T_BD_END7	Gonna save some screenshots	!
+T_BD_NEW0	%'s out and my cards look weak now	!
+T_BD_NEW1	% added? Nobody told me	!
+T_BD_NEW2	No top rank without % now	!
+T_BD_NEW3	The power creep is getting silly	!
+T_BD_NEW4	Anyone here pulled a %?	!
+T_BD_NEW5	Been saving gems for %	!
+T_BD_NEW6	My old SSRs are just fodder now	!
+T_BD_NEW7	Just one % is all I ask	!
 T_BD_HUNT0	Grinding Easy in % bit by bit	!
 T_BD_HUNT1	Almost at the next % reward	!
 T_BD_HUNT2	Waiting for AP takes forever	!
 T_BD_HUNT3	Tried Hard. Got wrecked	!
+T_BD_HUNT4	%'s reward card is cute	!
+T_BD_HUNT5	One more % run before bed	!
+T_BD_HUNT6	Scared to look at the % ranking	!
+T_BD_HUNT7	The % grinders are amazing	!
 T_BD_RAID0	Anyone? Need raid backup!	!
 T_BD_RAID1	Boss is tanky. No AP for Max hits	!
 T_BD_RAID2	Thanks for the backup! Saved me	!
 T_BD_RAID3	How many bosses in % so far?	!
+T_BD_RAID4	Sent a backup call. Hit it!	!
+T_BD_RAID5	The % boss leveled up again	!
+T_BD_RAID6	One Max hit took it down	!
+T_BD_RAID7	Someone beat the % boss first	!
 T_BD_PVP0	Beat a stronger foe in battle!	!
 T_BD_PVP1	Top players in % are monsters	!
 T_BD_PVP2	Can't close the points gap	!
+T_BD_PVP3	Lost to the same player 3 times	!
+T_BD_PVP4	Need a defense deck for %	!
+T_BD_PVP5	Won, and they said hi after	!
 T_BD_GVG0	Guild war today. Show up, all!	!
 T_BD_GVG1	Pressed the cheer button	!
 T_BD_GVG2	Isn't the other guild too strong?	!
-T_BD_RATE0	Rate-up's on. Gotta pull
+T_BD_GVG3	Who can make the night battle?	!
+T_BD_GVG4	We won! Thanks everyone!	!
+T_BD_GVG5	We lost... Next time	!
+T_BD_RATE0	Rate-up's on. Gotta pull	!
 T_BD_RATE1	I can feel it this time	!
-T_BD_RATE2	Is the rate-up even real?
-T_BD_PAY0	Free pull. Another N
+T_BD_RATE2	Is the rate-up even real?	!
+T_BD_RATE3	A 10x pull and nothing...	!
+T_BD_RATE4	Last day of the rate-up	!
+T_BD_RATE5	Got an SSR! Rate-up rules	!
+T_BD_PAY0	Free pull. Another N	!
 T_BD_PAY1	Made it this far without paying	!
-T_BD_PAY2	Spent my whole allowance
-T_BD_PAY3	Meant to pull once. Did a 10x
+T_BD_PAY2	Spent my whole allowance	!
+T_BD_PAY3	Meant to pull once. Did a 10x	!
 T_BD_PAY4	Payday, so I did a 10x pull	!
 T_BD_PAY5	Pulls after work are my joy	!
 T_BD_PAY6	Pulled to the cap. Still nothing	!
-T_BD_PAY7	I own every card I want
-T_BD_HI0	Anyone still up?
+T_BD_PAY7	I own every card I want	!
+T_BD_HI0	Anyone still up?	!
 T_BD_HI1	One more run before bed	!
-T_BD_HI2	Morning! Got my login bonus	!
-T_BD_HI3	Burning AP on my commute	!
-T_BD_HI4	Exploring on my lunch break	!
-T_BD_HI5	Let's keep going this afternoon	!
-T_BD_HI6	I'm back! Hi everyone
-T_BD_HI7	Good work all. Off to bed
+T_BD_HI2	Can't sleep. Burning AP	!
+T_BD_HI3	Late-night pulls are dangerous	!
+T_BD_HI4	Morning! Got my login bonus	!
+T_BD_HI5	Burning AP on my commute	!
+T_BD_HI6	Overslept! Gotta run	!
+T_BD_HI7	Exploring over breakfast	!
+T_BD_HI8	Exploring on my lunch break	!
+T_BD_HI9	Let's keep going this afternoon	!
+T_BD_HI10	Sneaking a turn in class...	!
+T_BD_HI11	Had curry for lunch today	!
+T_BD_HI12	I'm back! Hi everyone	!
+T_BD_HI13	Good work all. Off to bed	!
+T_BD_HI14	Worn out from overtime	!
+T_BD_HI15	Logging in after drinks	!
+T_BD_WKND0	Days off mean all-day play	!
+T_BD_WKND1	Working on my day off. Ugh	!
+T_BD_WKND2	Family day. Sneaking a login	!
+T_BD_WKND3	Sunday nights are gloomy	!
+T_BD_PAYDAY0	Payday! Should I spend?	!
+T_BD_PAYDAY1	Got paid. Going for a 10x	!
+T_BD_PAYDAY2	Payday, and yet my balance...	!
+T_BD_STORY0	Two 10x pulls, one SR. Ouch	!
+T_BD_STORY1	Finally pulled an SSR!!	!
+T_BD_STORY2	Spent too much. Lesson learned	!
+T_BD_STORY3	Getting serious from today	!
+T_BD_STORY4	Fused the wrong card. Crying	!
+T_BD_STORY5	Rebuilt my deck. Way stronger	!
+T_BD_STORY6	Fell asleep. AP overflowed	!
+T_BD_STORY7	Invited a friend to the game	!
+T_BD_MISS0	Wonder how # is doing	!
+T_BD_MISS1	Miss the days when # was here	!
+T_BD_MISS2	Just remembered #'s catchphrase	!
+T_BD_REPLY0	> #: So true	!
+T_BD_REPLY1	> #: I feel you	!
+T_BD_REPLY2	> #: Seriously?	!
+T_BD_REPLY3	> #: lol	!
+T_BD_REPLY4	> #: Nice one!	!
+T_BD_REPLY5	> #: Jealous	!
+T_BD_REPLY6	> #: Same here	!
+T_BD_REPLY7	> #: Hang in there!	!
+T_BD_CONSOLE0	> #: Don't push yourself	!
+T_BD_CONSOLE1	> #: Come back anytime	!
+T_BD_CONSOLE2	> #: Gonna miss you	!
+T_BD_BYE0	Take care, #...	!
+T_BD_BYE1	# is gone	!
+T_BD_BYE2	I'll keep going for #	!
+T_BD_RE0	$ pulled %? Amazing!	!
+T_BD_RE1	Congrats $! I want an SSR too	!
+T_BD_RE2	$, share some of that luck	!
+T_BD_RE3	$, # robbed you?	!
+T_BD_RE4	Can't forgive #. Get it back!	!
+T_BD_RE5	You OK, $? Keep cards in a deck	!
+T_BD_RE6	$ passed #! Nice!	!
+T_BD_RE7	Saw the ranking, $!	!
+T_BD_RE8	What a push, $	!
+T_BD_RE9	Welcome back, $!	!
+T_BD_RE10	Long time, $! How've you been?	!
+T_BD_RE11	Lots happened while you were away, $	!
+T_BD_RE12	We won thanks to $!	!
+T_BD_RE13	Nice one, $!	!
+T_BD_RE14	War won! Good work, $	!
+T_BD_RE15	Level up! Congrats, $	!
+T_BD_RE16	Already that level, $?	!
+T_BD_RE17	You grow fast, $	!
+T_BD_RE18	$ placed high! Amazing!	!
+T_BD_RE19	$, what rewards did you get?	!
+T_BD_RE20	You really ran that event, $	!
+T_BD_RE21	You slept well, $	!
+T_BD_RE22	Morning $! How was the inn?	!
+T_BD_RE23	Didn't see you last night, $	!
 T_RIVAL	Rival	!
 T_RV_BEHIND	 is ahead by 	!
 T_RV_CHASE	 is chasing, 	!
