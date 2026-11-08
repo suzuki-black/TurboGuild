@@ -107,6 +107,21 @@
 #define OPS_HIST_SALES      17779500UL  /* 史実の選択での売上の合計（tests/test_game.c が確かめる） */
 #define OPS_HIST_PROFIT     14579500UL  /* 同じく利益（売上 - 広告費）。決算の上司のひとことはこれと比べる */
 
+/* 盗み・盗まれ（core/steal.c, DECISIONS #90） */
+#define STEAL_AP            20       /* 盗みに行くたびに払う AP（AP をすべて盗みに使っても SSR は全期間で 1〜2 枚ほど） */
+#define STEAL_SLOT_SECS     (GSEC_PER_DAY / 4)   /* 留守の間はゲーム内 6 時間ごとに盗まれるかを決める */
+#define STEAL_SLOTS_MAX     280      /* 数えるのは直近 70 日ぶんまで */
+#define STEAL_PER_CHECK     3        /* 1 回戻るたびに盗まれるのはここまで */
+#define STEAL_START_DAY     7        /* 最初の 1 週間は盗まれない */
+#define STEAL_END_DAY       270      /* サービス終了の日 */
+#define STEAL_P_BASE        6        /* 6 時間ごとに盗まれる確率（/256）: ギルドの仲間が 8 人いるとき */
+#define STEAL_P_PER_GONE    3        /* 仲間が 1 人去るごとに足す */
+#define STEAL_P_NOGUILD     30       /* ギルドに入っていない */
+#define STEAL_PCT_EVEN      50       /* 総戦力が同じ相手から盗める確率（%）。相手が強いほど下がる */
+#define STEAL_PCT_MIN       10
+#define STEAL_PCT_MAX       90
+#define STEAL_PCT_BACK      20       /* 取り返すときに足す */
+
 /* 画面 */
 #define TEXT_COLS           32
 #define LINE_H              16

@@ -556,4 +556,20 @@ T_MEMO11	抜き返された
 T_MEMO12	イベント100位以内
 T_MEMO13	イベント10位以内
 T_MEMO14	最終日もログイン
-T_MEMO15	仲間が初めて去った
+T_MEMO15	初めて盗まれた
+T_MEMO16	仲間が初めて去った
+T_STOLEN_HEAD	留守の間に
+T_STOLEN_HEAD2	枚盗まれた！
+T_STOLEN_BY	盗んだ人
+T_STOLEN_HINT	取り返しに行く
+T_STEAL_TITLE	盗みに行く
+T_STEAL_BACK	取り返す
+T_STEAL_THEM	相手の総戦力
+T_STEAL_ME	自分
+T_STEAL_NONE	盗みに行ける相手がいない
+T_STEAL_GUIDE	1〜6:盗みに行く ESC:戻る
+T_STEAL_FROM	から盗んだ！
+T_STEAL_GOTBACK	取り返した！
+T_STEAL_FAIL	見つかって逃げられた…
+T_STEAL_NOAP	AP が足りない
+T_STEAL_FULL	カードがいっぱい

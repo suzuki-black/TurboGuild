@@ -21,8 +21,9 @@
 #define MEMO_TOP100   12   /* イベントで初めて 100 位以内 */
 #define MEMO_TOP10    13   /* イベントで初めて 10 位以内 */
 #define MEMO_LASTDAY  14   /* サービス最終日にいた */
-#define MEMO_KINDS    15   /* 記録する種類 */
-#define MEMO_SLOTS    16   /* セーブの欄（1 つは予備） */
+#define MEMO_STOLEN   15   /* 初めてカードを盗まれた（v14） */
+#define MEMO_KINDS    16   /* 記録する種類 */
+#define MEMO_SLOTS    16   /* セーブの欄 */
 
 #define MEMO_MARK(k) do { if (!g_save.memo[k]) g_save.memo[k] = (u16)((u32)g_save.g_time / GSEC_PER_DAY + 1); } while (0)
 

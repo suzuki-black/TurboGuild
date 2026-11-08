@@ -117,4 +117,5 @@
 | 94 | 6000h コード | CORE8 | code: src/core/opsim.c | 運営モードの模型（NPC 1000 人の課金と引退） |
 | 95 | 6000h コード | UI_OPS | code: src/ui/ops_ui.c | 運営モードの画面（グラフ・会議・決算） |
 | 96 | 6000h コード | UI_END | code: src/ui/ending_ui.c src/core/ending.c | サービス終了の結末と思い出アルバム（バンク 14 が埋まったので結末の計算もここ） |
-| 97-127 | - | - | - | 空き |
+| 97 | 6000h コード | UI_STEAL | code: src/ui/steal_ui.c src/core/steal.c | 盗み・盗まれ（盗みに行く画面と、留守の間に盗まれる計算） |
+| 98-127 | - | - | - | 空き |

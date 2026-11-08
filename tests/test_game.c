@@ -23,6 +23,7 @@
 #include "core/board.h"
 #include "core/ending.h"
 #include "core/memo.h"
+#include "core/steal.h"
 #include "data/text_ids.h"
 
 
@@ -857,6 +858,63 @@ static void test_ops(void)
     CHECK(ops_run("999999999999") == OPS_END && g_ops.sales_total == total);   /* 範囲外の選択は史実として扱う */
 }
 
+/* 盗み・盗まれ（steal.h）: デッキのカードは盗まれず、盗まれたカードは盗んだ人から取り返せる */
+static void test_steal(void)
+{
+    StealList l, l2;
+    u16 i, before, total = 0;
+    u8 got, k, back;
+    fresh();
+    g_save.flags |= SF_STARTED;
+    g_save.guild = 1;
+    for (i = 0; i < 20; i++) inv_add((u16)(1 + i % 40));
+    for (i = 0; i < DECK_SIZE; i++) g_save.deck[i] = (u8)i;          /* 0..4 はデッキ */
+    g_save.g_time = 10UL * GSEC_PER_DAY;
+    CHECK(steal_tick() == 0 && g_save.steal_check == g_save.g_time);  /* 初めては数え始めるだけ */
+    for (k = 0; k < 40 && !total; k++) {             /* 放置すると盗まれる（1 回に 3 枚まで） */
+        before = g_save.card_count;
+        g_save.g_time += 10UL * GSEC_PER_DAY;
+        got = steal_tick();
+        CHECK(got <= STEAL_PER_CHECK && g_save.card_count == before - got);
+        total += got;
+    }
+    CHECK(total > 0 && g_save.stolen_new == total && g_save.stolen[0].card && g_save.memo[MEMO_STOLEN]);
+    for (i = 0; i < DECK_SIZE; i++) CHECK(g_save.deck[i] == i);    /* デッキは崩れない */
+    CHECK(steal_tick() == 0);                         /* 同じ時刻にもう一度数えても増えない */
+
+    /* 一覧は入り直しても同じ。取り返しが先に並ぶ */
+    steal_list(&l);
+    steal_list(&l2);
+    CHECK(l.n == l2.n && l.n >= 1 && l.r[0].npc == l2.r[0].npc && l.r[l.n - 1].card == l2.r[l.n - 1].card);
+    for (k = 0, back = 0; k < l.n; k++) {
+        CHECK(l.r[k].pct >= STEAL_PCT_MIN && l.r[k].pct <= 95 && l.r[k].card >= 1 && l.r[k].card <= CARD_COUNT_BUILT);
+        if (l.r[k].back) back++;
+        else CHECK(l.r[k].pct <= STEAL_PCT_MAX);
+    }
+    CHECK(back == 0 || l.r[0].back == 1);
+
+    /* AP が足りなければ行けない。行けば AP を払い、取り返せばカードが元の Lv で戻って記録が消える */
+    g_save.ap = STEAL_AP - 1;
+    g_save.ap_gtime = g_save.g_time;
+    CHECK(steal_try(&l, 0) == STEAL_NO_AP && g_save.ap == STEAL_AP - 1);
+    for (k = 0; k < 50; k++) {
+        u8 st, bk;
+        u16 card, n0;
+        steal_list(&l);
+        bk = l.r[0].back;
+        card = l.r[0].card;
+        n0 = g_save.card_count;
+        g_save.ap = AP_MAX;
+        st = steal_try(&l, 0);
+        CHECK(g_save.ap == AP_MAX - STEAL_AP && (st == STEAL_OK || st == STEAL_FAIL));
+        if (st == STEAL_OK) {
+            CHECK(g_save.card_count == n0 + 1 && g_save.cards[n0].id == card);
+            if (bk) { CHECK(g_save.cards[n0].lv == l.r[0].lv); break; }
+        }
+    }
+    CHECK(k < 50);                                    /* いつかは成功する */
+}
+
 /* 思い出（memo.h）は初めての日だけ残り、結末（ending.h）は上から順に当てはまったもの */
 static void test_memo_ending(void)
 {
@@ -930,6 +988,7 @@ int main(void)
     test_stance_leader_slots();
     test_ops();
     test_memo_ending();
+    test_steal();
     test_struct_sizes();
     test_battle();
     test_elem();

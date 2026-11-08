@@ -92,6 +92,10 @@
 - **An ending that depends on how you played.** Before the staff roll, one of six short endings (by total spending,
   how many kinds of cards you own, whether any guildmate stayed, guild war wins), then the mates who stayed to the
   end and their last words.
+- **Stealing.** While you are away, players near your power steal cards that are not in any of your decks — a few
+  every six in-game hours at most, more often as your guildmates leave (the ones who stay keep watch). Press 0 on
+  My Page to spend AP and steal from a weaker, an equal or a stronger player, or to take a card back from whoever
+  stole it (unless they have quit).
 - **A memory album.** Firsts are recorded with their day — first SSR, first purchase, passing your rival, being
   passed back, your first guild war win, being there on the last day, and so on. Open it from News (1), or from
   the title after the service ends.
@@ -110,6 +114,7 @@
 | 0 on the explore screen / event top | Switch the battle style (Normal → Save → All-out) |
 | 6 on the explore screen / event top | Build the deck for this enemy |
 | 7–9 on the deck screen | Switch to deck A–C |
+| 0 on My Page | Go stealing (and take stolen cards back) |
 | SPACE on the news screen | Guild board |
 | 1 on the news screen | Memory album |
 | 1–3 at an operator-mode meeting | Pick an option (1 is what history did) |
@@ -184,7 +189,7 @@ On real hardware, write `bin/TurboGuild.rom` to an ASCII8-capable flash cartridg
 ### Automated checks
 | Command | What it checks |
 |---|---|
-| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, raid, battle events, guild war, timeline, rival, decks and battle styles, operator mode, memories and endings, saves, …) |
+| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, raid, battle events, guild war, timeline, rival, decks and battle styles, operator mode, memories and endings, stealing, saves, …) |
 | `make check` | Boot → save → reset → reboot; the RTC difference × 10 is added to in-game time |
 | `make check-nodisk` | Boots without a disk and carries on when you try to save |
 | `make check-msx2` | Shows "turboR only" and stops on an MSX2 |
@@ -228,7 +233,7 @@ Built phase by phase from the design document and the implementation spec.
 | 2 | Fusion, evolution, events, rankings |
 | 3 | Operations timeline, 1,000-NPC pseudo-online world, news, FM music, economy simulation |
 | Later | Harder gacha (box gacha, no pity), 121 cards, raid and battle events, guild wars, staff roll, FAT12 save disk (v0.1.0) |
-| After 0.1.0 | Enemy weakness on screen, guild board, rival, battle styles, leader skill, three decks, operator mode, endings, memory album |
+| After 0.1.0 | Enemy weakness on screen, guild board, rival, battle styles, leader skill, three decks, operator mode, endings, memory album, stealing |
 
 ### Scope & honest positioning
 This is an **experimental study**.
@@ -334,6 +339,9 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   そしてサービス終了とスタッフロール。
 - **遊び方で変わる結末。** スタッフロールの前に、課金の合計・持っているカードの種類・ギルドの仲間が残ったか・対抗戦の勝ちで
   6 通りの短い結末を出し、最後まで残った仲間とその別れの言葉を見せる。
+- **盗み・盗まれ。** 留守の間に、総戦力の近い人がデッキに入っていないカードを盗んでいく（ゲーム内 6 時間ごとに判定。
+  ギルドの仲間が残っているほど守ってもらえ、去るほど盗まれやすい）。マイページの 0 で AP を払い、格下・同格・格上の誰かから
+  盗むか、盗んだ人から取り返しに行く（相手が引退していたら取り返せない）。
 - **思い出アルバム。** 初めての SSR・初めての課金・ライバルを抜いた日・抜き返された日・対抗戦の初勝利・最終日にいたこと などを
   日付つきで残す。お知らせの画面の 1、サービス終了後はタイトルから見られる。
 - **3 か月ごとのレア度インフレ。** 開始時は N / R / SR / SSR。90 日目に **USR**、180 日目に **XUSR** が解禁。
@@ -351,6 +359,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | 探索の画面・イベントのトップで 0 | 戦い方を替える（通常 → 節約 → 全力） |
 | 探索の画面・イベントのトップで 6 | その敵向けにおまかせ編成 |
 | デッキの画面で 7〜9 | デッキ A〜C に替える |
+| マイページで 0 | 盗みに行く（盗まれたカードを取り返す） |
 | お知らせの画面で SPACE | ギルド伝言板 |
 | お知らせの画面で 1 | 思い出アルバム |
 | 運営モードの会議で 1〜3 | 選ぶ（1 が史実） |
@@ -423,7 +432,7 @@ openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild_ja.rom -romtype ASCII8 
 ### 自動確認
 | コマンド | 確認すること |
 |---|---|
-| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・レイド・バトル・対抗戦・年表・ライバル・デッキと戦い方・運営モード・思い出と結末・セーブ など） |
+| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・レイド・バトル・対抗戦・年表・ライバル・デッキと戦い方・運営モード・思い出と結末・盗み・セーブ など） |
 | `make check` | 起動 → 保存 → リセット → 再起動で、RTC の差分 × 10 がゲーム内時間に足される |
 | `make check-nodisk` | ディスク無しで起動し、保存しようとしても続行できる |
 | `make check-msx2` | MSX2 では「turboR 専用」と出して止まる |
@@ -466,7 +475,7 @@ docs/      企画書・設計の記録
 | 2 | 合成・進化・イベント・ランキング |
 | 3 | 運営年表・NPC 1000 人の疑似オンライン・お知らせ・FM 音源・経済シミュレーション |
 | 以降 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 121 枚、レイド・バトル、ギルド対抗戦、スタッフロール、FAT12 のセーブディスク（v0.1.0） |
-| 0.1.0 の後 | 敵の弱点の表示・ギルド伝言板・ライバル・戦い方・リーダースキル・デッキ 3 つ・運営モード・結末の分岐・思い出アルバム |
+| 0.1.0 の後 | 敵の弱点の表示・ギルド伝言板・ライバル・戦い方・リーダースキル・デッキ 3 つ・運営モード・結末の分岐・思い出アルバム・盗み・盗まれ |
 
 各フェーズの確認方法と、途中で踏んだ地雷は [開発記録](docs/開発記録.md) にあります。
 

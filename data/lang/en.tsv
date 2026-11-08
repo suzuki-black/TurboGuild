@@ -946,4 +946,20 @@ T_MEMO11	Got overtaken	!
 T_MEMO12	Event top 100
 T_MEMO13	Event top 10
 T_MEMO14	Here on the last day	!
-T_MEMO15	A guildmate left
+T_MEMO15	First card stolen	!
+T_MEMO16	A guildmate left
+T_STOLEN_HEAD	Stolen while away: 	!
+T_STOLEN_HEAD2	!
+T_STOLEN_BY	Thief
+T_STOLEN_HINT	Get it back
+T_STEAL_TITLE	Go stealing	!
+T_STEAL_BACK	Retake
+T_STEAL_THEM	Their power
+T_STEAL_ME	You
+T_STEAL_NONE	No one to steal from
+T_STEAL_GUIDE	1-6:Steal ESC:Back
+T_STEAL_FROM	: stolen!
+T_STEAL_GOTBACK	Got it back!
+T_STEAL_FAIL	Spotted. They got away...	!
+T_STEAL_NOAP	Not enough AP
+T_STEAL_FULL	Cards are full

@@ -11,6 +11,7 @@ void bgm_play(u8 song);
 #include "../core/login.h"
 #include "../core/player.h"
 #include "../core/ranking.h"
+#include "../core/steal.h"
 #include "../core/save.h"
 #include "../core/time.h"
 #include "../core/wallet.h"
@@ -234,6 +235,31 @@ static u8 rival_check(void)
     return 0;
 }
 
+/* 留守の間に盗まれた: 枚数と、いちばん新しい 1 件（盗んだ人とカード）。0 で取り返しに行けると知らせる */
+static void stolen_popup(void)
+{
+    CardRec c;
+    u8 cx;
+    ui_box(16, 64, 224, 80, COL_DBLUE, COL_RED);
+    cx = txt_id(3, 68, T_STOLEN_HEAD, COL_YELLOW, COL_DBLUE);
+    cx = txt_num(cx, 68, g_save.stolen_new, COL_YELLOW, COL_DBLUE);
+    txt_id(cx, 68, T_STOLEN_HEAD2, COL_YELLOW, COL_DBLUE);
+    if (g_save.stolen[0].npc < NPC_COUNT && g_save.stolen[0].card && g_save.stolen[0].card <= tbl_card_count()) {   /* セーブから来た番号は表の範囲に限る */
+        cx = txt_id(3, 86, T_STOLEN_BY, COL_LGRAY, COL_DBLUE);
+        npc_name((u8)(cx + 1), 86, g_save.stolen[0].npc, COL_CYAN, COL_DBLUE);
+        tbl_card(g_save.stolen[0].card, &c);
+        cx = ui_rarity(3, 104, c.rarity, COL_DBLUE);
+        txt_id((u8)(cx + 1), 104, c.name_text, COL_WHITE, COL_DBLUE);
+    }
+    ui_key(0, 26, 126);
+    txt_id(5, 124, T_STOLEN_HINT, COL_LGRAY, COL_DBLUE);
+    psg_beep(0x300, 14);
+    g_save.stolen_new = 0;
+    g_save_dirty = 1;
+    ui_wait_key();
+    g_dirty = 1;
+}
+
 static void show_login_bonus(void)
 {
     screen_change(&scr_login);
@@ -263,6 +289,7 @@ FAR(void, home_init, (void))
         MEMO_MARK(MEMO_GUILD);
         g_joined = 1;
     }
+    if (steal_tick()) g_save_dirty = 1;              /* 留守の間に盗まれたカード（知らせは home_draw） */
     if (g_login.given || g_paid || g_evres.started || g_evres.ended || g_gift || g_joined ||
         g_gvgres.joined || g_gvgres.n || g_gvgres.ended) g_save_dirty = 1;
     if (g_cursor == ITEMS && !has_banner()) g_cursor = 0;
@@ -304,6 +331,7 @@ FAR(void, home_draw, (void))
         g_dirty = 1;
         return;
     }
+    if (g_save.stolen_new) { stolen_popup(); return; }
     if (g_evres.started || g_evres.ended) { screen_change(&scr_evresult); return; }
     if (g_gvgres.joined || g_gvgres.n || g_gvgres.ended) { gvg_result_show(); return; }
     if (g_login.given) { show_login_bonus(); return; }
@@ -348,6 +376,12 @@ FAR(void, home_update, (void))
     }
     if (old != g_cursor) { psg_beep(0x100, 2); redraw_sel(old); redraw_sel(g_cursor); }
     if (d == 9 && has_banner()) { g_cursor = ITEMS; open(ITEMS); return; }
+    if (d == 0) {                                  /* 盗みに行く */
+        psg_beep(0x80, 4);
+        if (g_save_dirty && !g_nosave_warned) ui_saving();
+        screen_change(&scr_steal);
+        return;
+    }
     if (d >= 1 && d <= ITEMS) { g_cursor = (u8)(d - 1); redraw_sel(old); redraw_sel(g_cursor); open(g_cursor); return; }
     if (p & BTN_OK) { open(g_cursor); return; }
     if (p & BTN_CANCEL) {

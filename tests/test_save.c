@@ -86,6 +86,16 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.ops_best == 777 && s.memo[MEMO_SSR] == 0);
+    /* v13 も読め、v14 で足した盗みの記録は 0（空き）から */
+    save_new(&s, 1);
+    s.memo[MEMO_SSR] = 5;
+    s.stolen[0].card = 9; s.steal_check = 77;
+    s.magic = SAVE_MAGIC;
+    s.version = 13;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.memo[MEMO_SSR] == 5 && s.stolen[0].card == 0 && s.steal_check == 0);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;
