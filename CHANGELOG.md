@@ -1,6 +1,10 @@
 # Changelog / 更新履歴
 
-## Unreleased / 未リリース
+## v0.2.0 — 2026-11-08
+
+People over systems: the guild mates, a rival and thieves around you, an ending that remembers how you played, and operator mode after the end. Still a prototype; checked in openMSX only, **not yet on real hardware**. Saves from v0.1.0 load as they are.
+
+仕組みより人: まわりのギルドの仲間・ライバル・泥棒、遊び方を覚えている結末、そして終わった後の運営モード。引き続き試作品で、openMSX でのみ確認していて、**実機ではまだ確認していません**。v0.1.0 のセーブもそのまま読めます。
 
 ### English
 - **A livelier guild board.** Mates now talk about their lives (work, school, payday, weekends, a bad pull, a lucky SSR), reply to the post before theirs ("> Koun: So true"), cheer up a mate who sounds tired, see off one who has left, and sometimes miss a mate who is gone. They also react to you by name: your SSR, a card stolen from you, passing your rival, a level-up, a guild war win, a high event rank, coming back after a few days, a night at the inn. The board's lines went from 45 to 138. The save format is now version 15 (20 bytes: your last four events); older saves still load.

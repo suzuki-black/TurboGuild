@@ -6,7 +6,7 @@
 </p>
 
 > ⚠️ **This is a prototype** (work in progress), published for feedback and experimentation.
-> It has not been play-tested much yet; numbers and balance will change.
+> It has had little play-testing; numbers and balance will change.
 >
 > ⚠️ **試作品（プロトタイプ・開発中）です。** フィードバックと実験のために公開しています。
 > テストプレイはまだ十分ではありません。数値やバランスは今後変わります。
@@ -16,10 +16,11 @@
 <br>**原案・コンセプト・ゲームデザイン・ディレクション:** suzuki-black　／
 **実装（プログラム・グラフィック・サウンド）:** Claude Code（Anthropic Claude）
 
-**Repository / リポジトリ:** <https://github.com/suzuki-black/TurboGuild>
+**Repository / リポジトリ:** <https://github.com/suzuki-black/TurboGuild> ·
+**Latest / 最新:** v0.2.0
 
 <p align="center">
-  <img src="docs/img/screens_events_en.png" width="640" alt="Raid, battle and guild war (English version)">
+  <img src="docs/img/screens_people_en.png" width="640" alt="Guild board, a theft, going stealing, the ending and the memory album (English version)">
 </p>
 
 **Language / 言語:** [🇬🇧 English](#english) · [🇯🇵 日本語](#japanese)
@@ -30,8 +31,12 @@
 ## English
 
 - [Story](#story)
-- [Overview](#overview)
-- [Features](#features)
+- [What it is](#what-it-is)
+- [The people](#the-people)
+- [The social-game loop](#the-social-game-loop)
+- [Time](#time)
+- [After the end](#after-the-end)
+- [Your first hour](#your-first-hour)
 - [Controls](#controls)
 - [Requirements](#requirements)
 - [Building](#building)
@@ -54,91 +59,113 @@
 > This world has an end date — day 270 after launch.
 > What kind of adventurer will you be by then?
 
-### Overview
-- **Platform:** MSX turboR software (8 Mbit (1 MB) ASCII8 MegaROM + a 2DD floppy used only for saves).
-- **Genre:** Single-player RPG that recreates the **Japanese feature-phone social-game culture of around 2011**.
-- **Fully offline.** Everything that feels "online" — other players (1,000 NPCs), rankings, operator
-  announcements, limited-time events, guild wars — is a simulation derived from the in-game date.
-- **Time runs 10× faster than real time.** 27 real days are 270 in-game days, after which the service ends.
-  However long you stay away, the results of the events and guild wars you missed appear when you return.
+### What it is
+- **An MSX turboR game** (an 8 Mbit (1 MB) ASCII8 MegaROM, plus a 2DD floppy used only for saves).
+- **A single-player RPG that recreates the Japanese feature-phone social games of around 2011** — and, more than
+  the game systems, the people around you in them: guild mates who chat, slack off, quit; a rival one step above;
+  someone who steals your card while you sleep.
+- **Fully offline.** Everything that feels "online" — 1,000 other players, rankings, operator news, events,
+  guild wars, the guild board — is worked out from the in-game date. Nothing is fetched from anywhere.
+- **Time runs 10× faster than real time**, and the service closes on day 270 (27 real days). Stay away as long as
+  you like: what happened meanwhile is waiting when you come back. Or skip ahead at the inn.
 
-### Features
-- **The feel of the era's phones:** menus picked directly with number keys, a "My Page" hub, a scrolling
-  news marquee, auto-battles you just watch, and stamina (AP) for exploring.
-- **A different opening animation for every gacha** (capsule machine, treasure chest, magic circle, scroll,
-  golden door) — guess the rarity from the colour of the light. Events use a **box gacha** (a box of 100 items).
-  There is no pity system.
-- **War funds.** Instead of real money, an in-game wallet (allowance, salaried worker, oil baron, or
-  infinite mode) buys gems. Paying makes you stronger — the social-game logic, without the real cost.
-- **121 cards** (procedurally drawn), enhancement and evolution fusion, deck building.
-- **Three event types:** hunt (repeatable bosses) / **raid** (a boss whose HP persists until it falls;
-  call guild mates for rescue) / **battle** (fight adventurers ranked below, equal to, or above you).
-- **Guilds and guild wars.** Twice a day, a one-hour battle window: attack the rival guild, build combos, cheer.
-- **A guild board.** Seven or eight guild mates, each with a payment style and a verbal tic, post about events,
-  new rarities and their day — work, school, payday, weekends, a bad pull or a lucky one. They reply to each other,
-  cheer up a mate who sounds tired, miss the ones who have left, and react to you: your SSR, a theft, passing your
-  rival, coming back after a few days. Some slowly lose interest, and one day the board just says they have left
-  the guild. Also shown on the My Page marquee.
-- **An inn.** From the shop, sleep at the inn (100 G) to skip to six the next morning with full AP, or wait (free)
-  until the next thing on the calendar — the next guild war battle (12:00 or 21:00) or the start of the next event —
-  with AP recovering only for the time that passed. Events go on while you sleep, and so do thieves.
-- **Elements.** Fire, water and thunder beat each other in a circle; light and dark beat each other. A card with the
-  advantage hits for 120%, one at a disadvantage for 80%. The explore screen and the event top show the enemy's
-  weakness, and one key builds the deck for that enemy (counting event boon cards too).
-- **Choices before a fight.** Normal, Save (half AP, 60% attack) or All-out (double AP, 250% attack) — the rewards
-  stay the same. A leader skill (+20% attack for cards of the leader's element) and three decks to switch between.
-- **A rival.** The player just above you in the ranking becomes your rival until you pass them. My Page shows the gap,
-  and during events the marquee tells you whether your pace will carry you past them by the last day.
-- **Operator mode (after the service ends).** Run the same 270 days as the operator: twelve meetings with history's choice
-  and others (including ad budgets with a CVR cutoff and platform promotion), a graph of DAU, new players, paying rate,
-  quits and sales for 1,000 NPCs, and on day 240 a verdict on whether the service goes on.
-- **An operations timeline:** rate-up campaigns, inflation (newer cards are stronger), apology gems,
-  waves of players quitting, the end-of-service notice — and finally the shutdown and staff roll.
-- **An ending that depends on how you played.** Before the staff roll, one of six short endings (by total spending,
-  how many kinds of cards you own, whether any guildmate stayed, guild war wins), then the mates who stayed to the
-  end and their last words.
-- **Stealing.** While you are away, players near your power steal cards that are not in any of your decks — a few
-  every six in-game hours at most, more often as your guildmates leave (the ones who stay keep watch). Press 0 on
-  My Page to spend AP and steal from a weaker, an equal or a stronger player, or to take a card back from whoever
-  stole it (unless they have quit).
-- **A memory album.** Firsts are recorded with their day — first SSR, first purchase, passing your rival, being
-  passed back, your first guild war win, being there on the last day, and so on. Open it from News (1), or from
-  the title after the service ends.
-- **Rarity inflation every three months:** N / R / SR / SSR at launch, then **USR** on day 90 and **XUSR** on day 180.
-  Older rarities become more common in the gacha, and event bosses are tuned for the newest rarity.
-- **FM sound (MSX-MUSIC) background music**, 5 tracks (each a 13–26 s loop in four parts).
-- The economy is tuned with a **PC-side simulation** (`make sim`): a non-paying player ends with 1–3 cards of SSR or above.
+### The people
+- **The guild board.** Each guild has seven or eight mates with a payment style and a verbal tic. Four times an
+  in-game day one of them may post — about the current event or guild war, a new rarity, work, school, payday,
+  the weekend, a terrible pull, a lucky SSR. They reply to each other ("> Koun: So true"), cheer up a mate who
+  sounds tired, see off one who leaves, and later miss them. They react to you by name, too: your SSR, a card stolen
+  from you, passing your rival, a level-up, a guild war win, a high event rank, coming back after a few days, a night
+  at the inn. As the months pass, some sound tired, and one day the board only says they have left the guild —
+  and it gets quieter. Open it from News (SPACE); posts also run on the My Page marquee.
+- **A rival.** The player just above you in the ranking becomes your rival until you pass them. My Page shows the
+  gap; they react when you pass them (during an event they may promise to pass you back on the last day), and the
+  marquee tells you whether your pace will catch them by the last day.
+- **Stealing.** While you are away, players near your power steal cards that are in none of your decks — a small
+  chance every six in-game hours, up to three each time you come back, more often as your guild mates leave (the
+  ones who stay keep watch). My Page tells you who took what. Press 0 on My Page to spend 20 AP and go stealing:
+  take your card back from the thief (at its old level), or steal from a weaker (N), an equal (R) or a stronger (SR)
+  player. A thief who has quit the game cannot be found any more.
+- **1,000 players.** They level up, pull SSRs, climb the rankings and quit in waves along the operations timeline,
+  all from formulas. The news marquee shows who pulled an SSR, who leveled up, who logged in.
+
+### The social-game loop
+- **The feel of the era's phones:** menus picked with number keys, a "My Page" hub, a scrolling marquee,
+  auto-battles you watch, and stamina (AP) for exploring.
+- **Gacha with a different opening for each type** (capsule machine, treasure chest, magic circle, scroll, golden
+  door) — read the rarity from the light. Events use a **box gacha** (100 items per box). There is no pity system.
+- **War funds** instead of real money: an in-game wallet (allowance, salaried worker, oil baron, or infinite) buys
+  gems. Paying makes you stronger — the social-game logic, without the real cost.
+- **121 cards** (procedurally drawn), enhancement and evolution fusion, three decks.
+- **Before a fight:** Normal, Save (half AP, 60% attack) or All-out (double AP, 250% attack) — the rewards are the
+  same. The deck's first card is the leader (+20% attack for cards of its element). Fire, water and thunder beat
+  each other in a circle; light and dark beat each other (120% / 80%). The screen shows the enemy's weakness, and
+  one key builds the deck for it (event boon cards included).
+- **Three event types:** hunt (repeatable bosses), **raid** (a boss whose HP stays until it falls; call your guild
+  for backup) and **battle** (pick a weaker, equal or stronger opponent).
+- **Guild wars:** a week of one-hour battle windows at 12:00 and 21:00 — attack the other guild, build combos, cheer.
+
+### Time
+- **10× real time.** 27 real days are 270 in-game days. Saves record the real clock; when you return, events,
+  guild wars, paydays and thefts are settled at once ("Continue" after a week away: about 2.3 s to My Page).
+- **The inn** (shop, item 4): **sleep** for 100 G to wake at 6 a.m. the next day with full AP, or **wait** for free
+  until the next thing on the calendar — the next guild war battle or the start of the next event — shown before
+  you choose; AP only recovers for the time that passed.
+- **The operations timeline:** rate-up campaigns, inflation (newer cards are stronger), apology gems, waves of
+  players quitting, **USR** on day 90 and **XUSR** on day 180 (older rarities become common; event bosses are tuned
+  for the newest), the end-of-service notice — and the shutdown.
+
+### After the end
+- **An ending that depends on how you played:** one of six short endings by total spending, how many kinds of cards
+  you own, whether any guild mate stayed, and guild war wins — then the mates who stayed to the end and their last
+  words, and the staff roll.
+- **A memory album:** sixteen firsts with their day (first SSR, first purchase, first evolution, passing your rival,
+  being passed back, a guild war win, a theft, being there on the last day, ...) plus the day a guild mate first left.
+  Open it any time from News (1), and from the title after the end.
+- **Operator mode:** run the same 270 days as the operator. Twelve meetings at the timeline's turning points (drop
+  rates, pity, ad budgets with a CVR cutoff, rate-ups, platform promotion, new rarities, apology gems) offer what
+  history did and other options, with a line on why the operators chose it. Watch DAU, new players, the paying rate,
+  quits and sales for 1,000 NPCs; on day 240, profit and DAU decide whether the service goes on.
+
+<p align="center">
+  <img src="docs/img/screens_ops_en.png" width="640" alt="Operator mode: a meeting, the graph and the results (English version)">
+</p>
+
+### Your first hour
+1. **Title → New game.** Enter a name, pick a wallet course, and do your first 10-pull (re-roll as often as you like).
+2. **My Page** is home: 1 quest · 2 gacha · 3 cards · 4 deck · 5 shop (and inn) · 6 ranking · 7 save · 8 news.
+   During an event or guild war, 9 opens it from the banner.
+3. **Quest (1):** pick an area and press SPACE to advance. 0 switches Normal / Save / All-out; 6 builds a deck
+   for the enemy.
+4. **Check the board:** News (8) → SPACE. Come back after a gacha or after the inn and see who noticed.
+5. **Keep cards you care about in a deck** (any of A–C) — those can't be stolen.
+6. **Short on time?** Shop (5) → 4 Inn → wait until the next event or guild war battle.
 
 ### Controls
-| Input | Action |
-|------|------|
-| Cursor keys / joystick | Select |
-| Number keys 0–9 | Pick the button with that number directly (like a phone keypad) |
-| Space / Return / trigger A | Confirm; "advance" while exploring |
-| ESC / trigger B | Back (deletes a character in name entry) |
-| 0 on the explore screen / event top | Switch the battle style (Normal → Save → All-out) |
-| 6 on the explore screen / event top | Build the deck for this enemy |
-| 7–9 on the deck screen | Switch to deck A–C |
-| 0 on My Page | Go stealing (and take stolen cards back) |
-| SPACE on the news screen | Guild board |
-| 1 on the news screen | Memory album |
-| 1–3 at an operator-mode meeting | Pick an option (1 is what history did) |
-| ESC in operator mode | Stop running the service (asks first) |
-| 0 on the title screen | License screen |
-| ESC on the title screen | Developer diagnostics |
+| Where | Input | Action |
+|---|---|---|
+| Everywhere | Cursor keys / joystick | Select |
+| | Number keys 0–9 | Pick the button with that number (like a phone keypad) |
+| | Space / Return / trigger A | Confirm; "advance" while exploring |
+| | ESC / trigger B | Back (deletes a character in name entry) |
+| My Page | 0 | Go stealing (and take stolen cards back) |
+| | 9 | The running event or guild war |
+| Explore / event top | 0 | Battle style (Normal → Save → All-out) |
+| | 6 | Build the deck for this enemy |
+| Deck | 7–9 | Switch to deck A–C |
+| News | SPACE / 1 | Guild board / memory album |
+| Shop | 4 | Inn: 1 sleep till morning, 2 wait for the next plan |
+| Operator mode | 1–3 / ESC | Pick an option (1 is history) / stop (asks first) |
+| Title | 0 / ESC | License screen / developer diagnostics |
 
-Title → (New game) name → wallet course → your first 10-pull (re-roll as often as you like) → My Page.
-From My Page: quest, gacha, cards, deck, shop (and inn), ranking, save, news.
-While an event or a guild war is running, enter it from the banner ([9]).
-After the service ends, the title screen offers Memories (the album; 1 there shows your cards, view only), Reset memories, the staff roll (ending first), and operator mode.
+After the service ends, the title offers Memories (the album; 1 there shows your cards), Reset memories, the staff
+roll (with the ending), and operator mode.
 
 ### Requirements
 - **MSX turboR only** (FS-A1ST / FS-A1GT). Anything older shows a "turboR only" message and stops.
 - For saving, put a DOS-formatted (FAT12) 2DD floppy in drive A. The save is an ordinary file, `TGSAVE.DAT`
-  (4.5 KB, in the root directory), so the disk can hold other files too, and you can back it up by copying the file
-  from DOS. On a disk without that file, the game asks before creating it (the default answer is No), and it re-reads
-  the disk before every save, so a disk swapped in mid-game is not written to blindly. Saves made by earlier versions (written straight to sectors 16–24) are registered as `TGSAVE.DAT` in place
-  on the first save. You can play without a disk (saving is disabled).
+  (4.5 KB, in the root directory), so the disk can hold other files and you can back it up from DOS. On a disk
+  without that file, the game asks before creating it (the default is No), and it re-reads the disk before every
+  save. Saves from earlier versions load as they are. You can play without a disk (saving is disabled).
 - The turboR system ROMs are copyrighted and **not included**. Development and checks use
   [openMSX](https://openmsx.org/) with a machine definition based on dumped system ROMs (Panasonic FS-A1ST).
 - **Not yet verified on real hardware** (emulator only so far).
@@ -151,32 +178,23 @@ make
 ```
 
 This produces the **English version** `bin/TurboGuild.rom` (an 8 Mbit (1 MB) ASCII8 MegaROM) and `bin/save.dsk`
-(a blank 2DD image).
-
-#### Japanese version
+(a blank 2DD image). For the **Japanese version**:
 
 ```bash
 make LANG=ja
 ```
 
-This produces `bin/TurboGuild_ja.rom`. The program is the same as the English one; only the text pages and
-the name-entry character table differ. Every other target (`make run`, `make check`, ...) also takes `LANG=ja`.
+This produces `bin/TurboGuild_ja.rom`. The program is the same; only the text pages and the name-entry table
+differ. Every other target (`make run`, `make check`, ...) also takes `LANG=ja`.
 
 #### Translations
-
-The game text is written in Japanese (`data/`) and the English build replaces it at build time.
-
-- Translations live in `data/lang/en.tsv`, one per line: UI strings (`data/text/ui.txt`) as `T_KEY<TAB>English`,
-  everything else (card names, events, news, NPC names, ...) as `Japanese<TAB>English`.
-- If a translation is missing, the build stops and writes the missing strings to
-  `data/lang/en.missing.tsv`. Fill in the English, move the lines into `en.tsv`, and build again.
-- A translation may not be wider than the Japanese (full-width characters count as 2 columns), and some places
-  have their own limit (card names: 14 columns, ...). Where the screen has room, a `!` in the third column allows more.
-- To add a language, create `data/lang/<lang>.tsv` and build with `make LANG=<lang>` (input-specific code such as
-  the name-entry table is switched with `#ifdef LANG_EN`).
-
-Saves record the language and version of the ROM that last saved them, and saves from older versions (v5 and later)
-load in newer versions as they are.
+- The game text is written in Japanese (`data/`); the English build replaces it from `data/lang/en.tsv`, one per
+  line: UI strings (`data/text/ui.txt`) as `T_KEY<TAB>English`, everything else as `Japanese<TAB>English`.
+- A missing translation stops the build and lists the strings in `data/lang/en.missing.tsv`.
+- A translation may not be wider than the Japanese (full-width characters count as 2 columns), and some places have
+  their own limit (card names: 14 columns, ...). Where the screen has room, a `!` in the third column allows more.
+- In guild board lines, `%` is the topic (an event name, a rarity, a card), `#` a player's name and `$` yours.
+- To add a language, create `data/lang/<lang>.tsv` and build with `make LANG=<lang>`.
 
 ### Running
 ```bash
@@ -189,18 +207,18 @@ When starting openMSX by hand, always pass `-romtype ASCII8`:
 openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild.rom -romtype ASCII8 -diska bin/save.dsk
 ```
 
-On real hardware, write `bin/TurboGuild.rom` to an ASCII8-capable flash cartridge with the **ASCII8 mapper type**.
+On real hardware, write the ROM to an ASCII8-capable flash cartridge with the **ASCII8 mapper type**.
 
 ### Automated checks
 | Command | What it checks |
 |---|---|
-| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, raid, battle events, guild war, timeline, rival, decks and battle styles, operator mode, memories and endings, stealing, saves, …) |
+| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, guild war, timeline, rival, board, stealing, inn, memories and endings, operator mode, saves, …) |
 | `make check` | Boot → save → reset → reboot; the RTC difference × 10 is added to in-game time |
 | `make check-nodisk` | Boots without a disk and carries on when you try to save |
 | `make check-msx2` | Shows "turboR only" and stops on an MSX2 |
 | `make play` | Plays automatically for 30 minutes (emulated) from a new game; progress matches across save → reset → load |
-| `make check-offline` | After a week away, "Continue" reaches My Page within 3 seconds (measured: 2.00 s) |
-| `make check-timeline` | Runs days 0–271: 7 events, 2 guild wars, gifts, the end-of-service notice, and the staff roll |
+| `make check-offline` | After a week away, "Continue" reaches My Page within 3 seconds (measured: 2.26 s) |
+| `make check-timeline` | Runs days 0–271: 7 events, 2 guild wars, gifts, the end-of-service notice, the ending and the staff roll |
 | `make sim` | Economy simulation: plays 270 days per wallet course and counts cards of SSR or above |
 | `make sim-ops` | Operator mode: runs every combination of meeting choices and shows how many keep the service going |
 
@@ -212,9 +230,9 @@ src/sys/   hardware layer (boot, VDP, text, kanji ROM, input, PSG, RTC, disk, ba
 src/core/  game logic (hardware-independent; unit-tested on the PC)
 src/ui/    screens, shared widgets, BGM driver, save-disk handling
 src/data/  generated headers (do not edit)
-data/      source data (UTF-8 CSV, text, MML)
+data/      source data (UTF-8 CSV, text, MML, translations)
 tools/     Python build tools (data conversion, procedural art, MML, ROM assembly)
-tests/     PC unit tests and the economy simulation
+tests/     PC unit tests and simulations
 openmsx/   Tcl scripts for the automated checks
 docs/      design documents and records
 ```
@@ -223,34 +241,34 @@ docs/      design documents and records
 (The documents are written in Japanese.)
 - **[Design document](docs/MSX_turboR_SocialRPG_Design.md)** — the concept.
 - **[Implementation spec](IMPLEMENTATION_SPEC.md)** — specification, data formats, formulas, phase plan.
-- **[DECISIONS](docs/DECISIONS.md)** — changes from the spec and provisional decisions, one line each.
+- **[DECISIONS](docs/DECISIONS.md)** — changes from the spec and provisional decisions, with the numbers behind them.
 - **[MEMORY_MAP](docs/MEMORY_MAP.md)** — ROM page allocation (the build assembles the ROM from this table).
 - **[Development log](docs/開発記録.md)** — status and checks per phase, and the pitfalls we hit.
+- **[CHANGELOG](CHANGELOG.md)** — what changed in each release.
 
 ### How it got here
-Built phase by phase from the design document and the implementation spec.
-
-| Phase | Content |
+| Stage | Content |
 |---|---|
-| 0 | Foundation: ASCII8 MegaROM, H.STKE boot, bank switching, kanji ROM, save disk, RTC |
-| 1 | Quests, AP, cards, deck, battle, gacha, login bonus |
-| 1.5 | Re-researched the era's phone UIs and made every screen picture-first; gacha opening animations; war funds |
-| 2 | Fusion, evolution, events, rankings |
-| 3 | Operations timeline, 1,000-NPC pseudo-online world, news, FM music, economy simulation |
-| Later | Harder gacha (box gacha, no pity), 121 cards, raid and battle events, guild wars, staff roll, FAT12 save disk (v0.1.0) |
-| After 0.1.0 | Enemy weakness on screen, guild board, rival, battle styles, leader skill, three decks, operator mode, endings, memory album, stealing, livelier guild board, inn |
+| Phase 0 | Foundation: ASCII8 MegaROM, H.STKE boot, bank switching, kanji ROM, save disk, RTC |
+| Phase 1 | Quests, AP, cards, deck, battle, gacha, login bonus |
+| Phase 1.5 | Re-researched the era's phone UIs and made every screen picture-first; gacha openings; war funds |
+| Phase 2 | Fusion, evolution, events, rankings |
+| Phase 3 | Operations timeline, 1,000-NPC pseudo-online world, news, FM music, economy simulation |
+| v0.1.0 | Harder gacha (box gacha, no pity), 121 cards, raid and battle events, guild wars, staff roll, FAT12 save disk |
+| v0.2.0 | "People over systems": guild board (replies, lives, reactions to you), rival, stealing, endings and the last mates, memory album, operator mode, inn; also element display, battle styles, leader skill, three decks |
 
 ### Scope & honest positioning
 This is an **experimental study**.
 
-- **The theme is recreating the atmosphere of social games of that era**; depth as a game comes second.
-  The rankings, the news and your guild mates are all "plausibility" generated from formulas.
-- **The numbers have only been tuned once, by the economy simulation**; tuning by actual play is still to come.
+- **The theme is the atmosphere of social games of that era — above all, the people in them.** Depth as a game
+  comes second. The rankings, the news and your guild mates are all "plausibility" generated from formulas.
+- **Most numbers are provisional.** The economy was tuned once by simulation (`make sim`); stealing, the inn and the
+  endings have not been tuned by play yet.
 - Operator mode runs on a small model of 1,000 NPCs tuned with `make sim-ops`, not on real data from any service.
   Running all 270 days takes about two minutes (emulated turboR).
 - **It has not yet been verified on a real turboR.**
-- A full-screen redraw takes about 0.6 s (text and VDP code run from RAM for speed). Heavier logic such as
-  the ranking calculations still runs from the cartridge ROM.
+- A full-screen redraw takes about 0.6 s. Entering a guild war takes about 4 s on My Page (the 16 guilds' strength is
+  counted from all 1,000 NPCs once a day).
 - The BGM is driven by the VBLANK interrupt. It pauses only during disk access and resumes where it left off.
 
 ### Feedback & Contributing
@@ -272,7 +290,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 ### Disclaimer
 - This is a fictional game. All guilds, adventurers (NPCs), operators and events are fictional and have no
   relation to real people, organisations or games. No specific game's names, characters, images or audio are used.
-- "War funds" and "payments" exist only inside the game. **No real money is involved.**
+- "War funds", "payments" and "stealing" exist only inside the game. **No real money is involved.**
 - MSX is a trademark of MSX Licensing Corporation. Other company and product names are trademarks or
   registered trademarks of their respective owners.
 
@@ -283,12 +301,16 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 
 <p align="center">
   <img src="docs/img/title_ja.png" width="480" alt="TurboGuild 日本語版のタイトル画面">
-  <img src="docs/img/screens_events_ja.png" width="640" alt="日本語版のレイド・バトル・ギルド対抗戦">
+  <img src="docs/img/screens_people_ja.png" width="640" alt="日本語版の伝言板・盗まれた知らせ・盗みに行く画面・結末・思い出アルバム">
 </p>
 
 - [あらすじ](#あらすじ)
-- [概要](#概要)
-- [特徴](#特徴)
+- [どんなゲームか](#どんなゲームか)
+- [人](#人)
+- [ソシャゲの循環](#ソシャゲの循環)
+- [時間](#時間)
+- [終わった後](#終わった後)
+- [はじめの 1 時間](#はじめの-1-時間)
 - [操作](#操作)
 - [動作環境](#動作環境)
 - [ビルド](#ビルド)
@@ -311,84 +333,106 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 > この世界には終わりの日が決まっている——サービス開始から 270 日目。
 > それまでに、あなたはどんな冒険者になっているだろうか。
 
-### 概要
-- **対応機種:** MSX turboR 用ソフト（8メガビット（1MB）の ASCII8 メガROM ＋ セーブ専用の 2DD フロッピー）。
-- **ジャンル:** 1人用・「2011 年頃のガラケーソシャゲ文化」を再現した RPG。
-- **完全オフライン。** 「オンラインっぽさ」——ほかのプレイヤー（NPC 1000 人）、ランキング、運営のお知らせ、
-  期間限定イベント、ギルド対抗戦——は、すべてゲーム内の日付から式で決まるシミュレーションです。
-- **時間は現実の 10 倍で進みます。** 現実の 27 日でゲーム内の 270 日が過ぎ、サービスは終了します。
-  何日放っておいても、起動すればその間のイベント・対抗戦の結果がまとめて出ます。
+### どんなゲームか
+- **MSX turboR 用ソフト**（8メガビット（1MB）の ASCII8 メガROM ＋ セーブ専用の 2DD フロッピー）。
+- **「2011 年頃のガラケーソシャゲ」を再現した 1 人用 RPG。** 再現したいのは仕組みよりも、そこにいた人たちです。
+  おしゃべりして、サボって、いつか辞めていくギルドの仲間。ひとつ上のライバル。寝ている間にカードを盗んでいく誰か。
+- **完全オフライン。** 「オンラインっぽさ」——ほかのプレイヤー 1000 人、ランキング、運営のお知らせ、イベント、
+  ギルド対抗戦、伝言板——は、すべてゲーム内の日付から式で決まります。どこからも何も取ってきません。
+- **時間は現実の 10 倍で進み**、270 日目（現実の 27 日）でサービスは終わります。何日空けても、起動すればその間の
+  出来事が待っています。宿屋で先へ進むこともできます。
 
-### 特徴
+### 人
+- **ギルド伝言板。** どのギルドにも、課金コースと口癖を持つ仲間が 7〜8 人います。ゲーム内の 1 日に 4 回、誰かが
+  書き込みます——いまのイベントや対抗戦、新しいレア度、仕事・学校・給料日・休日、ひどい爆死、まさかの SSR。
+  前の書き込みに返事をし（「＞こうんさん それな」）、弱音を吐いた仲間を励まし、辞める仲間を見送り、のちに懐かしみます。
+  あなたにも名前を呼んで反応します: SSR・カードを盗まれた・ライバルを抜いた・Lv アップ・対抗戦の勝ち・イベントの上位・
+  久しぶりに来た・宿屋に泊まった。月日がたつと弱音が増える人がいて、ある日「ギルドを脱退しました」とだけ流れ、
+  板は少しずつ静かになっていきます。お知らせの画面で SPACE。マイページの流れるお知らせにも出ます。
+- **ライバル。** ランキングで自分のすぐ上の人が、抜くまでライバル（宿敵）になります。マイページに差を出し、抜くと
+  相手がひとこと言い（イベント中なら「最終日に見てろよ」と返してくることも）、流れるお知らせで「このペースなら
+  最終日に届くか」を伝えます。
+- **盗み・盗まれ。** 留守の間に、総戦力の近い人がデッキ（A〜C のどれか）に入っていないカードを盗んでいきます。
+  ゲーム内 6 時間ごとに少しの確率で、戻ってくるたびに 3 枚まで。ギルドの仲間が去るほど盗まれやすくなります
+  （残っている仲間が見張ってくれる）。誰に何を盗まれたかはマイページで知らせます。マイページの 0 で AP 20 を払って
+  盗みに行けます。盗んだ人から取り返す（元の Lv で戻る）か、格下（N）・同格（R）・格上（SR）の誰かから盗むか。
+  盗んだ人が引退したら、もう見つかりません。
+- **1000 人のプレイヤー。** レベルを上げ、SSR を引き当て、ランキングを駆け上がり、運営年表の波に合わせて辞めていきます。
+  すべて式から。流れるお知らせには、誰が SSR を引いた、Lv が上がった、ログインした、が流れます。
+
+### ソシャゲの循環
 - **当時の携帯の手触り。** 数字キーで直接選ぶメニュー、マイページ中心の画面、流れるお知らせ（マーキー）、
   「決定を押したら見ているだけ」の自動戦闘、スタミナ（AP）制の探索。
-- **ガチャは種類ごとに違う開封演出**（カプセルマシン・宝箱・魔法陣・巻物・黄金の扉）。
-  光の色で中身を察する、あの演出。イベントは **BOX ガチャ**（100 個入りの箱）。天井はありません。
-- **軍資金。** 現実のお金の代わりに、ゲームの中のお財布（おこづかい・社会人・石油王・無敵モード）で
-  石を買います。課金すれば強くなる——ソシャゲと同じ理屈を、懐を痛めずに味わえます。
-- **カード 121 枚**（手続き生成の絵）。強化合成・進化合成・デッキ編成。
-- **イベント 3 型:** 討伐（周回ボス）／ **レイド**（倒すまで HP が残るボス、救援依頼でギルドの仲間が削る）／
-  **バトル**（格下・同格・格上の冒険者と対戦）。
-- **ギルドとギルド対抗戦。** 1 日 2 回の「戦の時間」に相手ギルドを攻撃し、コンボと応援で押し切る。
-- **ギルド伝言板。** 課金コースと口癖を持つ 7〜8 人の仲間が、イベントや新しいレア度、その日の出来事
-  （仕事・学校・給料日・休日・爆死や SSR）を書き込む。仲間どうしで返事をし、弱音には励まし、去った仲間を懐かしみ、
-  あなたの SSR・盗まれた・ライバルを抜いた・久しぶりに来た などにも反応する。
-  だんだん弱音が増えていく人がいて、ある日「ギルドを脱退しました」とだけ流れる。マイページのお知らせにも流れる。
-- **宿屋。** お店の宿屋で「翌朝まで寝る」（100 G）と、翌朝 6 時まで進んで AP が全回復する。「次の予定まで休む」（無料）と、
-  次の対抗戦の戦（12:00 か 21:00）かイベントの始まりまで一気に進む（AP は進んだぶんだけ回復）。
-  寝ている間もイベントは進み、盗まれることもある。
-- **属性。** 炎・水・雷は三すくみ、光と闇は互いに強い。有利なカードは攻撃 120%、不利なら 80%。
-  探索の画面とイベントのトップに敵の弱点を出し、キー 1 つでその敵向けに編成する（イベントの特効カードも込み）。
-- **戦う前の選択。** 通常・節約（AP 半分・攻撃 60%）・全力（AP 2 倍・攻撃 250%）を選ぶ。報酬は変わらない。
-  リーダースキル（リーダーと同じ属性のカードの攻撃 +20%）。デッキは 3 つ持てて替えられる。
-- **ライバル。** ランキングで自分のすぐ上の人が、抜くまでライバル（宿敵）になる。マイページに差を出し、
-  イベント中は「このペースなら最終日に抜ける」かどうかを流れるお知らせで伝える。
-- **運営モード（サービス終了後）。** 同じ 270 日を運営の側から回す。12 回の会議で史実かほかの手を選び（広告の予算と打ち切りの CVR、
-  プラットフォームの送客も）、NPC 1000 人の DAU・新規・課金率・引退・売上をグラフで見る。240 日目に、サービスを続けられるかが決まる。
-- **運営年表。** 確率アップ・インフレ（新しいカードほど強い）・お詫びの石・引退の波・終了の告知・
-  そしてサービス終了とスタッフロール。
-- **遊び方で変わる結末。** スタッフロールの前に、課金の合計・持っているカードの種類・ギルドの仲間が残ったか・対抗戦の勝ちで
-  6 通りの短い結末を出し、最後まで残った仲間とその別れの言葉を見せる。
-- **盗み・盗まれ。** 留守の間に、総戦力の近い人がデッキに入っていないカードを盗んでいく（ゲーム内 6 時間ごとに判定。
-  ギルドの仲間が残っているほど守ってもらえ、去るほど盗まれやすい）。マイページの 0 で AP を払い、格下・同格・格上の誰かから
-  盗むか、盗んだ人から取り返しに行く（相手が引退していたら取り返せない）。
-- **思い出アルバム。** 初めての SSR・初めての課金・ライバルを抜いた日・抜き返された日・対抗戦の初勝利・最終日にいたこと などを
-  日付つきで残す。お知らせの画面の 1、サービス終了後はタイトルから見られる。
-- **3 か月ごとのレア度インフレ。** 開始時は N / R / SR / SSR。90 日目に **USR**、180 日目に **XUSR** が解禁。
-  古いレア度ほどガチャで出やすくなり、イベントのボスは最新のレア度を持っている前提の強さになる。
-- **FM 音源（MSX-MUSIC）の BGM** 5 曲（各曲 起承転結の 13〜26 秒で 1 周）。
-- 経済は **PC 上のシミュレーション**（`make sim`）で合わせています。課金しない人は、終了時に SSR 以上が 1〜3 枚。
+- **ガチャは種類ごとに違う開封演出**（カプセルマシン・宝箱・魔法陣・巻物・黄金の扉）。光の色で中身を察する、あの演出。
+  イベントは **BOX ガチャ**（100 個入りの箱）。天井はありません。
+- **軍資金。** 現実のお金の代わりに、ゲームの中のお財布（おこづかい・社会人・石油王・無敵モード）で石を買います。
+  課金すれば強くなる——ソシャゲと同じ理屈を、懐を痛めずに味わえます。
+- **カード 121 枚**（手続き生成の絵）。強化合成・進化合成。デッキは 3 つ。
+- **戦う前の選択。** 通常・節約（AP 半分・攻撃 60%）・全力（AP 2 倍・攻撃 250%）。報酬は同じ。デッキの 1 枚目が
+  リーダー（同じ属性のカードの攻撃 +20%）。炎・水・雷は三すくみ、光と闇は互いに強い（120% / 80%）。画面に敵の
+  弱点を出し、キー 1 つでその敵向けに編成します（イベントの特効カードも込み）。
+- **イベント 3 型:** 討伐（周回ボス）／ **レイド**（倒すまで HP が残るボス。救援依頼でギルドが削る）／
+  **バトル**（格下・同格・格上から相手を選ぶ）。
+- **ギルド対抗戦:** 1 週間、毎日 12:00 と 21:00 から 1 時間の「戦の時間」。相手ギルドを攻撃し、コンボと応援で押し切る。
+
+### 時間
+- **現実の 10 倍。** 現実の 27 日でゲーム内の 270 日。セーブは現実の時計を覚えていて、戻ってくるとイベント・対抗戦・
+  給料日・盗みをまとめて片づけます（1 週間空けて「つづきから」でマイページまで約 2.3 秒）。
+- **宿屋**（お店の 4）: **翌朝まで寝る**（100 G、翌朝 6 時に AP 全回復で起きる）か、**次の予定まで休む**（無料。
+  次の対抗戦の戦かイベントの始まりまで一気に進む。行き先は選ぶ前に出ます。AP は進んだぶんだけ回復）。
+- **運営年表:** 確率アップ・インフレ（新しいカードほど強い）・お詫びの石・引退の波・90 日目に **USR**、
+  180 日目に **XUSR**（古いレア度ほど出やすくなり、イベントのボスは最新のレア度の前提に）・終了の告知——そしてサービス終了。
+
+### 終わった後
+- **遊び方で変わる結末。** 課金の合計・持っているカードの種類・ギルドの仲間が残ったか・対抗戦の勝ちで 6 通りの
+  短い結末が出て、最後まで残った仲間とその別れの言葉、そしてスタッフロールへ。
+- **思い出アルバム。** 16 の「初めて」（初めての SSR・初めての課金・初めての進化・ライバルを抜いた・抜き返された・
+  対抗戦の勝ち・盗まれた・最終日にいた など）を日付つきで残し、仲間が初めて去った日と並べます。
+  いつでもお知らせの 1 から、終了後はタイトルから。
+- **運営モード。** 同じ 270 日を運営の側から回します。年表の節目で開く 12 回の会議（排出率・天井・広告の予算と
+  打ち切りの CVR・確率アップ・一押し枠と相互送客・新しいレア度・お詫びの石）で、史実とほかの手を選べ、当時なぜ
+  そうしたかが 1 行で分かります。NPC 1000 人の DAU・新規・課金率・引退・売上を見て、240 日目に利益と DAU で
+  サービスを続けるかが決まります。
+
+<p align="center">
+  <img src="docs/img/screens_ops_ja.png" width="640" alt="日本語版の運営モード（会議・グラフ・決算）">
+</p>
+
+### はじめの 1 時間
+1. **タイトル → はじめから。** 名前を決め、お財布のコースを選び、最初の 10 連（何度でも引き直せる）。
+2. **マイページ**が拠点です: 1 冒険・2 ガチャ・3 カード・4 デッキ・5 お店（宿屋も）・6 ランク・7 保存・8 お知らせ。
+   イベントや対抗戦の開催中は、9 でバナーから入ります。
+3. **冒険（1）:** エリアを選び、スペースで進みます。0 で通常・節約・全力、6 でその敵向けに編成。
+4. **伝言板をのぞく:** お知らせ（8）→ スペース。ガチャや宿屋の後にのぞくと、誰かが気づいています。
+5. **大事なカードはデッキ（A〜C のどれか）に入れておく。** デッキのカードは盗まれません。
+6. **待てないときは:** お店（5）→ 4 宿屋 → 次のイベントや対抗戦の戦まで休む。
 
 ### 操作
-| 入力 | 動作 |
-|------|------|
-| カーソルキー／ジョイスティック | 選ぶ |
-| 数字キー 0〜9 | ボタンの左上の番号で直接選ぶ（携帯の数字キーのように） |
-| スペース／リターン／トリガA | 決定・探索で「進む」 |
-| ESC／トリガB | 戻る（名前入力では 1 文字消す） |
-| 探索の画面・イベントのトップで 0 | 戦い方を替える（通常 → 節約 → 全力） |
-| 探索の画面・イベントのトップで 6 | その敵向けにおまかせ編成 |
-| デッキの画面で 7〜9 | デッキ A〜C に替える |
-| マイページで 0 | 盗みに行く（盗まれたカードを取り返す） |
-| お知らせの画面で SPACE | ギルド伝言板 |
-| お知らせの画面で 1 | 思い出アルバム |
-| 運営モードの会議で 1〜3 | 選ぶ（1 が史実） |
-| 運営モードで ESC | 運営をやめる（確かめてから） |
-| タイトルで 0 | ライセンスの画面 |
-| タイトルで ESC | 開発用の診断画面 |
+| 場所 | 入力 | 動作 |
+|---|---|---|
+| どこでも | カーソルキー／ジョイスティック | 選ぶ |
+| | 数字キー 0〜9 | ボタンの左上の番号で直接選ぶ（携帯の数字キーのように） |
+| | スペース／リターン／トリガA | 決定・探索で「進む」 |
+| | ESC／トリガB | 戻る（名前入力では 1 文字消す） |
+| マイページ | 0 | 盗みに行く（盗まれたカードを取り返す） |
+| | 9 | 開催中のイベント・対抗戦 |
+| 探索・イベントのトップ | 0 | 戦い方を替える（通常 → 節約 → 全力） |
+| | 6 | その敵向けにおまかせ編成 |
+| デッキ | 7〜9 | デッキ A〜C に替える |
+| お知らせ | スペース／1 | ギルド伝言板／思い出アルバム |
+| お店 | 4 | 宿屋: 1 翌朝まで寝る、2 次の予定まで休む |
+| 運営モード | 1〜3／ESC | 選ぶ（1 が史実）／やめる（確かめてから） |
+| タイトル | 0／ESC | ライセンスの画面／開発用の診断画面 |
 
-タイトル →（はじめから）名前 → お財布のコース → 最初の 10 連（何度でも引き直せる）→ マイページ。
-マイページから 冒険・ガチャ・カード・デッキ・お店（宿屋も）・ランク・保存・お知らせ。
-イベントやギルド対抗戦の開催中は、バナー（[9]）から入ります。
-サービス終了後のタイトルには「思い出を見る」（アルバム。そこで 1 を押すと手持ちのカードを見るだけ）・「思い出をリセット」・「スタッフロール」（結末から）・「運営モード」が出ます。
+サービス終了後のタイトルには「思い出を見る」（アルバム。そこで 1 を押すと手持ちのカード）・「思い出をリセット」・
+「スタッフロール」（結末から）・「運営モード」が出ます。
 
 ### 動作環境
 - **MSX turboR 専用**（FS-A1ST / FS-A1GT）。turboR 未満では「turboR 専用」と出して止まります。
 - セーブには、DOS でフォーマットした（FAT12 の）2DD フロッピーを A ドライブに入れてください。セーブはルートの
-  ふつうのファイル `TGSAVE.DAT`（4.5KB）なので、ほかのファイルと同じディスクに置けて、DOS でコピーすれば
-  バックアップになります。このファイルが無いディスクには、作ってよいかを聞いてから書きます（既定は「いいえ」）。
-  保存のたびにディスクを読み直すので、途中で入れ替えた FD に確かめずに書くこともありません。以前の版のセーブ（セクタ 16〜24 に直接書いていたもの）は、最初の保存のときに
-  その場所のまま `TGSAVE.DAT` として登録します。ディスクが無くても遊べます（保存はできません）。
+  ふつうのファイル `TGSAVE.DAT`（4.5KB）なので、ほかのファイルと同じディスクに置け、DOS でコピーすればバックアップに
+  なります。このファイルが無いディスクには、作ってよいかを聞いてから書きます（既定は「いいえ」）。保存のたびに
+  ディスクを読み直します。前の版のセーブもそのまま読めます。ディスクが無くても遊べます（保存はできません）。
 - turboR の本体 ROM は著作物のため**同梱していません**。開発と確認は [openMSX](https://openmsx.org/) で、
   本体 ROM を吸い出した機種定義（Panasonic FS-A1ST）を使っています。
 - **実機での確認はまだです**（エミュレータでのみ確認しています）。
@@ -401,30 +445,23 @@ make
 ```
 
 **英語版**の `bin/TurboGuild.rom`（8メガビット（1MB）の ASCII8 メガROM）と `bin/save.dsk`（空の 2DD）ができます。
-
-#### 日本語版
+**日本語版**は:
 
 ```bash
 make LANG=ja
 ```
 
-`bin/TurboGuild_ja.rom` ができます。プログラムは英語版と同じで、文字列のページと名前入力の表だけが違います。
+`bin/TurboGuild_ja.rom` ができます。プログラムは同じで、文字列のページと名前入力の表だけが違います。
 ほかのコマンド（`make run`・`make check` など）も `LANG=ja` を付ければ日本語版で動きます。
 
 #### 翻訳
-
-ゲームの文は日本語で書き（`data/`）、英語版はビルドのときに置き換えます。
-
-- 訳は `data/lang/en.tsv` の 1 行 1 件です。UI の文（`data/text/ui.txt`）は「`T_キー`⇥英語」、それ以外
-  （カード名・イベント・お知らせ・NPC の名前など）は「日本語⇥英語」と書きます。
-- 日本語を足したり変えたりして訳が足りなくなると、ビルドは止まり、足りない文を
-  `data/lang/en.missing.tsv` に書き出します。英語を書き足して `en.tsv` へ移せば通ります。
+- ゲームの文は日本語で書き（`data/`）、英語版はビルドのときに `data/lang/en.tsv` で置き換えます。1 行 1 件で、
+  UI の文（`data/text/ui.txt`）は「`T_キー`⇥英語」、それ以外は「日本語⇥英語」です。
+- 訳が足りないとビルドは止まり、足りない文を `data/lang/en.missing.tsv` に書き出します。
 - 訳は日本語の幅（全角は 2 桁）を超えられません（カード名は 14 桁など、置き場所ごとの上限もあります）。
   画面で確かめて余裕のある所だけ、3 列目に `!` を書いて超えてよいことにします。
-- 言語を足すときは `data/lang/<言語>.tsv` を作り、`make LANG=<言語>` でビルドします
-  （名前入力の表など、入力の作りが違う所は `#ifdef LANG_EN` のように切り替えます）。
-
-セーブには、最後に保存した ROM の言語と版が入ります。古い版（v5 以降）のセーブは新しい版でそのまま読めます。
+- 伝言板の文では、`%` が話題（イベント名・レア度・カード）、`#` がほかの人の名前、`$` があなたの名前です。
+- 言語を足すときは `data/lang/<言語>.tsv` を作り、`make LANG=<言語>` でビルドします。
 
 ### 実行
 ```bash
@@ -437,18 +474,18 @@ make run
 openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild_ja.rom -romtype ASCII8 -diska bin/save.dsk
 ```
 
-実機では、ASCII8 対応のフラッシュROMカートリッジに `bin/TurboGuild_ja.rom`（英語版なら `bin/TurboGuild.rom`）を**マッパ種別 ASCII8** で書き込みます。
+実機では、ASCII8 対応のフラッシュROMカートリッジに ROM を**マッパ種別 ASCII8** で書き込みます。
 
 ### 自動確認
 | コマンド | 確認すること |
 |---|---|
-| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・レイド・バトル・対抗戦・年表・ライバル・デッキと戦い方・運営モード・思い出と結末・盗み・セーブ など） |
+| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・対抗戦・年表・ライバル・伝言板・盗み・宿屋・思い出と結末・運営モード・セーブ など） |
 | `make check` | 起動 → 保存 → リセット → 再起動で、RTC の差分 × 10 がゲーム内時間に足される |
 | `make check-nodisk` | ディスク無しで起動し、保存しようとしても続行できる |
 | `make check-msx2` | MSX2 では「turboR 専用」と出して止まる |
 | `make play` | 新規開始から 30 分（エミュレータ時間）自動で遊び、保存 → リセット → 読み込みで進行が一致する |
-| `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内（実測 2.00 秒） |
-| `make check-timeline` | 0〜271 日目まで進め、イベント 7 本・ギルド対抗戦 2 回・贈り物・終了の告知・スタッフロールまで通す |
+| `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内（実測 2.26 秒） |
+| `make check-timeline` | 0〜271 日目まで進め、イベント 7 本・ギルド対抗戦 2 回・贈り物・終了の告知・結末・スタッフロールまで通す |
 | `make sim` | 経済シミュレーション。課金コースごとに 270 日遊んで SSR 以上の枚数を数える |
 | `make sim-ops` | 運営モード。会議の選び方をすべて回し、サービスを続けられる割合を出す |
 
@@ -460,9 +497,9 @@ src/sys/   ハード依存（起動・VDP・文字・漢字ROM・入力・PSG・
 src/core/  ゲームロジック（ハード非依存。PC でテストする）
 src/ui/    画面・共通部品・BGM ドライバ・セーブディスク管理
 src/data/  生成ヘッダ（手で編集しない）
-data/      元データ（UTF-8 の CSV・文言・MML）
+data/      元データ（UTF-8 の CSV・文言・MML・訳）
 tools/     Python のビルドツール（データ変換・絵の手続き生成・MML・ROM の組み立て）
-tests/     PC 単体テストと経済シミュレーション
+tests/     PC 単体テストとシミュレーション
 openmsx/   自動確認用の Tcl
 docs/      企画書・設計の記録
 ```
@@ -470,36 +507,34 @@ docs/      企画書・設計の記録
 ### ドキュメント
 - **[企画書](docs/MSX_turboR_SocialRPG_Design.md)** — 何を作るか（コンセプト）。
 - **[実装指示書](IMPLEMENTATION_SPEC.md)** — 仕様・データ形式・式・フェーズ計画（企画書と矛盾したらこちらを優先）。
-- **[DECISIONS](docs/DECISIONS.md)** — 仕様からの変更と仮決めの記録（1 行 / 件）。
+- **[DECISIONS](docs/DECISIONS.md)** — 仕様からの変更と仮決めの記録（根拠の数字つき）。
 - **[MEMORY_MAP](docs/MEMORY_MAP.md)** — ROM のページ割り当て（ビルドはこの表から組み立てる）。
 - **[開発記録](docs/開発記録.md)** — フェーズごとの状況と確認方法、踏んだ地雷。
+- **[CHANGELOG](CHANGELOG.md)** — リリースごとの変更点。
 
 ### ここに至るまで
-本作は、企画書と実装指示書をもとに、フェーズを区切って作ってきました。
-
-| フェーズ | 内容 |
+| 段階 | 内容 |
 |---|---|
-| 0 | 土台: ASCII8 メガROM・H.STKE 起動・バンク切替・漢字ROM・セーブディスク・RTC |
-| 1 | クエスト・AP・カード・デッキ・戦闘・ガチャ・ログインボーナス |
-| 1.5 | 当時の携帯の画面を調べ直し、全画面を「絵が主役」に。ガチャの開封演出。軍資金 |
-| 2 | 合成・進化・イベント・ランキング |
-| 3 | 運営年表・NPC 1000 人の疑似オンライン・お知らせ・FM 音源・経済シミュレーション |
-| 以降 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 121 枚、レイド・バトル、ギルド対抗戦、スタッフロール、FAT12 のセーブディスク（v0.1.0） |
-| 0.1.0 の後 | 敵の弱点の表示・ギルド伝言板・ライバル・戦い方・リーダースキル・デッキ 3 つ・運営モード・結末の分岐・思い出アルバム・盗み・盗まれ・伝言板の拡充・宿屋 |
-
-各フェーズの確認方法と、途中で踏んだ地雷は [開発記録](docs/開発記録.md) にあります。
+| フェーズ 0 | 土台: ASCII8 メガROM・H.STKE 起動・バンク切替・漢字ROM・セーブディスク・RTC |
+| フェーズ 1 | クエスト・AP・カード・デッキ・戦闘・ガチャ・ログインボーナス |
+| フェーズ 1.5 | 当時の携帯の画面を調べ直し、全画面を「絵が主役」に。ガチャの開封演出。軍資金 |
+| フェーズ 2 | 合成・進化・イベント・ランキング |
+| フェーズ 3 | 運営年表・NPC 1000 人の疑似オンライン・お知らせ・FM 音源・経済シミュレーション |
+| v0.1.0 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 121 枚、レイド・バトル、ギルド対抗戦、スタッフロール、FAT12 のセーブディスク |
+| v0.2.0 | 「仕組みより人」: ギルド伝言板（返事・暮らし・自分への反応）・ライバル・盗み・盗まれ・結末と最後まで残った仲間・思い出アルバム・運営モード・宿屋。ほかに属性の表示・戦い方・リーダースキル・デッキ 3 つ |
 
 ### 位置づけ（正直な自己評価）
 本作は**実験的な習作**です。
 
-- **主題は「当時のソシャゲの空気」の再現**で、ゲームとしての面白さの追求は二の次です。
+- **主題は「当時のソシャゲの空気」——とりわけ、そこにいた人たち——の再現**で、ゲームとしての深さは二の次です。
   ランキングもお知らせもギルドの仲間も、すべて式から作った「それっぽさ」です。
-- **数値は経済シミュレーションで一度合わせただけ**です。実際に遊んでの調整はこれからです。
+- **数値の多くは仮です。** 経済はシミュレーション（`make sim`）で一度合わせただけで、盗み・宿屋・結末は実際に遊んでの
+  調整がまだです。
 - 運営モードは、`make sim-ops` で合わせた NPC 1000 人の小さな模型で動いています。実在のサービスの数字ではありません。
   270 日を回すのに 2 分ほどかかります（エミュレータの turboR で）。
 - **実機（turboR）ではまだ確認していません。**
-- 画面の描き直しは、全面で 0.6 秒ほどかかります（文字と VDP の処理は RAM で実行して速くしました）。
-  ランキングの計算などは、まだカートリッジ ROM の上で動いています。
+- 画面の描き直しは全面で 0.6 秒ほど。対抗戦に入るときは、マイページが出るまで 4 秒ほどかかります（16 ギルドの戦力を
+  1000 人ぶんから 1 日 1 回数えるため）。
 - BGM は VBLANK 割り込みで鳴らしています。ディスクの読み書きの間だけ止まり、終わると続きから鳴ります。
 
 ### フィードバック
@@ -521,5 +556,5 @@ ROM の中には SDCC のランタイムライブラリが入ります（GPL ＋
 ### 免責
 - 本作は架空のゲームです。登場するギルド・冒険者（NPC）・運営・イベントはすべて架空で、
   実在の人物・団体・ゲーム作品とは関係ありません。特定のゲーム作品の名称・キャラクター・画像・音源は使用していません。
-- 「軍資金」「課金」はゲームの中だけの数値です。**現実のお金は一切使いません。**
+- 「軍資金」「課金」「盗み」はゲームの中だけのものです。**現実のお金は一切使いません。**
 - MSX は MSX Licensing Corporation の商標です。その他の会社名・製品名は各社の商標または登録商標です。
