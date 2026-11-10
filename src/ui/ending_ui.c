@@ -187,6 +187,7 @@ FAR(void, album_update, (void))
         return;
     }
     if (d == 1 && ended()) { psg_beep(0x80, 4); g_viewonly = 1; screen_change(&scr_cardlist); return; }   /* カード一覧（見るだけ） */
+    if (d == 3 && ended()) { psg_beep(0x80, 4); screen_change(&scr_mail); return; }   /* 仲間からの最後の手紙 */
     if (p & (BTN_CANCEL | BTN_OK)) screen_change(ended() ? &scr_title : &scr_news);
 }
 

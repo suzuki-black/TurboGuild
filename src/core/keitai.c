@@ -173,16 +173,18 @@ static void maint_of(u16 d, Maint *m)
     m->kind = MAINT_NONE;
     m->day = d;
     if (d < MAINT_FROM || d >= MAINT_UNTIL) return;
-    for (i = 0; i < TIMELINE_COUNT; i++) {                     /* 対抗戦の 7 日間はしない */
-        tbl_timeline(i, &r);
-        if (r.kind == TL_GUILDWAR && d >= r.day && d < r.day + GVG_DAYS) return;
-    }
-    for (i = 1; i <= EVENT_COUNT; i++) {                       /* イベントの初日は、半分ほどで緊急メンテ */
-        tbl_event(i, &e);
-        if (e.start_day == d && (h & 0x100)) { m->kind = MAINT_EMERG; break; }
+    if (h & 0x100) {                                           /* イベントの初日は、半分ほどで緊急メンテ */
+        for (i = 1; i <= EVENT_COUNT; i++) {
+            tbl_event(i, &e);
+            if (e.start_day == d) { m->kind = MAINT_EMERG; break; }
+        }
     }
     if (!m->kind && d % MAINT_EVERY == 6) m->kind = MAINT_REG;
-    if (!m->kind) return;
+    if (!m->kind) return;                                      /* 表を読むのはメンテのある日だけ（マイページに入るたびに呼ぶ） */
+    for (i = 0; i < TIMELINE_COUNT; i++) {                     /* 対抗戦の 7 日間はしない */
+        tbl_timeline(i, &r);
+        if (r.kind == TL_GUILDWAR && d >= r.day && d < r.day + GVG_DAYS) { m->kind = MAINT_NONE; return; }
+    }
     m->start = (u32)d * GSEC_PER_DAY + (m->kind == MAINT_EMERG ? 10UL : 13UL) * 3600;
     m->end0 = m->start + 2UL * 3600;
     m->extended = (u8)((h & 3) == 0);

@@ -314,8 +314,8 @@ T_GIFT_GOT	運営から石が届きました
 T_TO_TITLE	タイトルへ戻りますか？
 T_GUIDE_HOME2	1〜8:メニュー ESC:タイトル
 T_BOARD_TITLE	ギルド伝言板
-T_NEWS_GUIDE	SPACE:伝言板 1:思い出 2:足あと
-T_BOARD_GUIDE	上下:前後 ESC:戻る
+T_NEWS_GUIDE	SP:板 1:思い出 2:足あと 3:メール
+T_BOARD_GUIDE	上下:前後 1:メンバー ESC:戻る
 T_BOARD_EMPTY	まだ書き込みはありません
 T_BOARD_HEAD	【ギルド】
 T_BOARD_SAY	：
@@ -523,6 +523,41 @@ T_BD_WHY12	#さん、凍結されたらしい…
 T_BD_WHY13	#さん、規約違反だったって
 T_BD_WHY14	#さん、機種変で引き継ぎ失敗したらしい
 T_BD_WHY15	#さん、データ消えたって。かわいそう
+T_BD_OBON0	お盆で実家に帰ってきた
+T_BD_OBON1	帰省中の電車でAP消化
+T_BD_HALW0	ハロウィンなのにイベント無いの？
+T_BD_HALW1	仮装してる人いる？
+T_BD_XMAS0	メリークリスマス！
+T_BD_XMAS1	クリスマスもログインしてる人ｗ
+T_BD_XMAS2	サンタさん、SSRください
+T_BD_NYE0	今年もお世話になりました
+T_BD_NYE1	紅白見ながらガチャ
+T_BD_NY0	あけましておめでとう！
+T_BD_NY1	今年もよろしくお願いします
+T_BD_NY2	お年玉で10連いく
+T_BD_VAL0	チョコもらえなかった…
+T_BD_VAL1	バレンタインは石で我慢
+T_BD_BDAY0	今日は#さんの誕生日！おめでとう
+T_BD_BDAY1	#さん、誕生日おめでとう！
+T_BD_BDME0	誕生日なので自分にご褒美10連
+T_BD_BDME1	みんなお祝いありがとう！
+T_BD_BDRE0	＞#さん おめでとう！
+T_BD_BDRE1	＞#さん いい1年になりますように
+T_BD_BDTY0	＞#さん ありがとう！
+T_BD_BDTY1	＞#さん 覚えててくれたんだ
+T_BD_NEWB0	はじめまして！よろしくお願いします
+T_BD_NEWB1	体験で入りました。よろしくです
+T_BD_NEWB2	初心者です、いろいろ教えてください
+T_BD_NEWRE0	＞#さん よろしく！
+T_BD_NEWRE1	＞#さん わからないことは聞いてね
+T_BD_NEWGONE	体験の#さん、来なくなっちゃったね
+T_BD_OFF	今度の週末、オフ会やりませんか？
+T_BD_OFFRE0	＞#さん 行きたい！
+T_BD_OFFRE1	＞#さん 予定が合えば！
+T_BD_OFFA0	昨日のオフ会、楽しかった！
+T_BD_OFFA1	みんな想像と違ったｗ
+T_BD_OFFA2	オフ会の写メ、送っとくね
+T_BD_OFFYOU	$さんも次はぜひ来てね
 T_RIVAL	宿敵
 T_RV_BEHIND	まで あと 
 T_RV_CHASE	が 
@@ -705,7 +740,7 @@ T_ALB_NONE	まだ思い出はない
 T_ALB_DAYP	 
 T_ALB_DAYS	日目
 T_ALB_GUIDE	左右:めくる ESC:戻る
-T_ALB_GUIDE_END	左右:めくる 1:カード ESC:戻る
+T_ALB_GUIDE_END	左右:めくる 1:カード 3:手紙
 T_MEMO0	冒険を始めた
 T_MEMO1	初めての SSR
 T_MEMO2	ギルドに入った
@@ -750,6 +785,56 @@ T_MT_GIFT	メンテのお詫びに石100個を配布しました
 T_BILL_HEAD	【ご利用料金のお知らせ】
 T_BILL_AMT	今月のご利用料金
 T_BILL_NOTE	※パケット代は含みません
+T_ML_TITLE	メール
+T_ML_COUNT	通
+T_ML_EMPTY	メールはありません
+T_ML_FROM	
+T_ML_FROM2	さんから
+T_ML_GUIDE	上下:前後 ESC:戻る
+T_ML_HELLO	$さん、ようこそ！わからないことがあったら何でも聞いてね
+T_ML_BYE0	板には書けなかったけど、明日で引退します。受験が終わったら、また
+T_ML_BYE1	実は明日で引退します。仕事が始まったら時間がなくて。ありがとう
+T_ML_BYE2	明日で引退します。結婚するので、課金はもう無理ｗ元気でね
+T_ML_BYE3	親にバレました…明日でやめます。$さん、楽しかったよ
+T_ML_BYE4	正直もう飽きちゃって。明日でやめるね。$さんは続けてね
+T_ML_BYE5	あっちのゲームに移ります。$さんも来る？招待コードあるよ
+T_ML_PHONE	機種変でデータが消えました…新しいアドレスです。もう戻れないけど、ありがとう
+T_ML_LAST0	最後まで一緒にいてくれてありがとう。$さんがいたから続けられた
+T_ML_LAST1	終わっちゃったね。いつか別のゲームで会えたら、またギルド組もう
+T_ML_LASTG0	もう遊んでなかったけど、終わるって聞いて。あの頃は楽しかった
+T_ML_LASTG1	久しぶり。サービス終了のニュースを見たよ。$さん、最後までおつかれさま
+T_RS_TITLE	メンバー
+T_PERSON_N	人
+T_RS_EMPTY	ギルドにはだれもいません
+T_RS_LV	Lv
+T_RS_MIN	分前
+T_RS_HOUR	時間前
+T_RS_DAY	日前
+T_RS_MONTH	月
+T_RS_DATE	日
+T_RS_PAY	課金:
+T_RS_PAY0	無課金
+T_RS_PAY1	微課金
+T_RS_PAY2	中課金
+T_RS_PAY3	重課金
+T_RS_TONE	口ぐせ:
+T_RS_NOTONE	なし
+T_RS_BDAY	誕生日:
+T_RS_LAST	最終ログイン:
+T_RS_GUIDE	上下:えらぶ SPACE:プロフィール
+T_TH_NOTE0	カードはいただいた。じゃあね
+T_TH_NOTE1	デッキに入れとかないからだよｗ
+T_TH_NOTE2	悪いね、もらってくよ
+T_TH_AGAIN	また来ちゃった。よろしくｗ
+T_TH_CAUGHT0	見えてるよｗ
+T_TH_CAUGHT1	残念でした
+T_TH_CAUGHT2	出直してきな
+T_TH_LOSE0	ちっ、返すよ
+T_TH_LOSE1	覚えてろよ
+T_TH_LOSE2	次はもっとうまくやる
+T_TH_VICTIM0	あっ、やられた…
+T_TH_VICTIM1	え、誰！？
+T_TH_VICTIM2	今度は取り返す
 T_STEAL_TITLE	盗みに行く
 T_STEAL_BACK	取り返す
 T_STEAL_THEM	相手の総戦力

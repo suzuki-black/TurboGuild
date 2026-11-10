@@ -12,6 +12,11 @@
 - **Online now.** News shows how many players are online right now; it peaks around 9 p.m. and is low at night.
 - **Maintenance.** Every two weeks there is a regular maintenance from 13:00 to 15:00, and some events start with an emergency maintenance from 10:00 to 12:00. Sometimes it is extended by an hour. During maintenance you cannot open My Page; wait until it ends. After an extended or emergency maintenance, 100 gems arrive as an apology.
 - **The monthly bill.** On payday you also get a bill for what you spent since the last payday. The save format is now version 17 (6 bytes added); older saves still load.
+- **Seasons and birthdays.** The game's calendar starts on 1 July 2011. Mates talk about Obon, Halloween, Christmas, New Year's Eve, New Year and Valentine's Day on those days. Each mate has a birthday; someone congratulates them in the morning and they reply at night.
+- **Visitors and meetups.** Now and then a player from another guild joins to try it out, says hello, and never posts again; days later the master notices. Every month and a half or so the master suggests an offline meetup: the board goes quiet that afternoon and evening, and the next morning everyone says it was fun.
+- **Members and profiles.** Press 1 on the board for the member list, with level and last login (a mate who stopped coming shows "12d ago" until removed). SPACE shows a profile: level, how much they pay, their verbal tic, birthday and last login.
+- **Mail.** Press 3 on News. The master welcomes you when you join; some mates who leave mail you the night before, telling you why; a mate whose phone lost the data writes from a new address. After the service ends, letters come from the mates who stayed and from some who left (3 on Memories).
+- **Thieves talk.** A thief leaves a note ("Back again" if they stole from you before), and when you go stealing, the other side says something: the thief giving a card back, the victim, or the one who caught you.
 
 ### 日本語
 - **仲間の去り方。** 辞める仲間それぞれに理由が付きました: 受験・就職・結婚・親に見つかった・飽きた・ほかのゲームへ・凍結・機種変で引き継ぎ失敗。最後の数日の弱音と、後で懐かしむ文が理由で替わります（「#さん、受験うまくいったかな」）。一部の仲間と、データが消えた人は、何も言わずに来なくなります。周りが気づき（「#さん、最近見ないね」）、2〜3 週間後にギルドマスターが整理します。
@@ -23,6 +28,11 @@
 - **冒険中の人数。** お知らせに、いまつないでいる人数が出ます。21 時ごろが多く、夜中は少なくなります。
 - **メンテナンス。** 2 週に 1 回、13〜15 時に定期メンテナンスがあり、イベントの初日には 10〜12 時の緊急メンテナンスが入ることもあります。ときどき 1 時間延長します。メンテ中はマイページに入れず、終わるまで待ちます。延長と緊急のあとは、お詫びに石 100 個が届きます。
 - **ご利用料金のお知らせ。** 給料日に、前の給料日から課金した額の明細が届きます。セーブの版は 17 になりました（6 バイト増）。前の版のセーブも読めます。
+- **年中行事と誕生日。** ゲーム内の暦は 2011 年 7 月 1 日から始まります。お盆・ハロウィン・クリスマス・大みそか・正月・バレンタインには、仲間がその話をします。仲間には誕生日があり、朝に誰かが祝い、夜に本人が書きます。
+- **体験入隊とオフ会。** ときどきよそのギルドの人が体験で入ってきてあいさつし、そのまま来なくなります（数日後にギルマスが気づきます）。1 か月半に 1 回ほど、ギルマスがオフ会に誘います。当日の午後と夜は板が静かになり、翌朝みんなが「楽しかった」と書きます。
+- **メンバーとプロフィール。** 伝言板の 1 でメンバー一覧（Lv・最終ログイン。来なくなった人は整理されるまで「○日前」）。SPACE でプロフィール（Lv・課金コース・口ぐせ・誕生日・最終ログイン）。
+- **メール。** お知らせの 3。入った日にギルマスからあいさつが届き、去る仲間の一部からは前の晩に「板には書けなかった」わけが届きます。機種変でデータが消えた人からは新しいアドレスで。サービス終了後は、残った仲間全員と、あいさつして去った仲間の一部から最後の手紙が届きます（思い出の 3）。
+- **泥棒のひとこと。** 盗まれたときに置き手紙（前にも盗んだ人なら「また来ちゃった」）。盗みに行くと、相手がひとこと言います（取り返された泥棒の捨て台詞・盗まれた人・見つけた人）。
 
 ## v0.2.0 — 2026-11-08
 

@@ -314,8 +314,8 @@ T_GIFT_GOT	A gift of gems arrived
 T_TO_TITLE	Return to the title?
 T_GUIDE_HOME2	1-8:Menu ESC:Title
 T_BOARD_TITLE	Guild Board
-T_NEWS_GUIDE	SPACE:Board 1:Album 2:Visits	!
-T_BOARD_GUIDE	U/D:More ESC:Back
+T_NEWS_GUIDE	SP:Board 1:Album 2:Visit 3:Mail
+T_BOARD_GUIDE	U/D:More 1:Members ESC:Back	!
 T_BOARD_EMPTY	No posts yet.
 T_BOARD_HEAD	[Guild] 
 T_BOARD_SAY	: 
@@ -523,6 +523,41 @@ T_BD_WHY12	Heard # got banned...	!
 T_BD_WHY13	Turns out # broke the rules	!
 T_BD_WHY14	Heard # lost the data with a new phone	!
 T_BD_WHY15	#'s data is gone. Poor thing	!
+T_BD_OBON0	Back home for the Obon holidays	!
+T_BD_OBON1	Burning AP on the train home	!
+T_BD_HALW0	Halloween and no event?	!
+T_BD_HALW1	Anyone in costume?	!
+T_BD_XMAS0	Merry Christmas!	!
+T_BD_XMAS1	Who else is logged in on Christmas lol	!
+T_BD_XMAS2	Dear Santa, one SSR please	!
+T_BD_NYE0	Thanks for this year, everyone	!
+T_BD_NYE1	Pulling while watching the year-end show	!
+T_BD_NY0	Happy New Year!	!
+T_BD_NY1	Let's keep it up this year too	!
+T_BD_NY2	New Year money goes into a 10-pull	!
+T_BD_VAL0	Didn't get any chocolate...	!
+T_BD_VAL1	Gems instead of chocolate for me	!
+T_BD_BDAY0	It's #'s birthday today! Congrats	!
+T_BD_BDAY1	Happy birthday, #!	!
+T_BD_BDME0	Birthday 10-pull for myself	!
+T_BD_BDME1	Thanks for the birthday wishes!	!
+T_BD_BDRE0	> #: Happy birthday!	!
+T_BD_BDRE1	> #: Have a great year	!
+T_BD_BDTY0	> #: Thank you!	!
+T_BD_BDTY1	> #: You remembered!	!
+T_BD_NEWB0	Hi! Nice to meet you all	!
+T_BD_NEWB1	Joined to try it out. Hello	!
+T_BD_NEWB2	I'm new. Please teach me	!
+T_BD_NEWRE0	> #: Welcome!	!
+T_BD_NEWRE1	> #: Ask us anything	!
+T_BD_NEWGONE	The new one, #, stopped coming	!
+T_BD_OFF	Offline meetup this weekend?	!
+T_BD_OFFRE0	> #: I'm in!	!
+T_BD_OFFRE1	> #: If I can make it!	!
+T_BD_OFFA0	Yesterday's meetup was fun!	!
+T_BD_OFFA1	Nobody looked like I imagined lol	!
+T_BD_OFFA2	I'll send the photos from the meetup	!
+T_BD_OFFYOU	$, come next time!	!
 T_RIVAL	Rival	!
 T_RV_BEHIND	 is ahead by 	!
 T_RV_CHASE	 is chasing, 	!
@@ -1095,7 +1130,7 @@ T_ALB_NONE	No memories yet
 T_ALB_DAYP	Day 	!
 T_ALB_DAYS	 
 T_ALB_GUIDE	L/R:Page ESC:Back
-T_ALB_GUIDE_END	L/R:Page 1:Cards ESC:Back
+T_ALB_GUIDE_END	L/R:Page 1:Cards 3:Letters
 T_MEMO0	Adventure began	!
 T_MEMO1	First SSR
 T_MEMO2	Joined a guild
@@ -1140,6 +1175,56 @@ T_MT_GIFT	Sorry for the maintenance: 100 gems sent	!
 T_BILL_HEAD	[Your monthly bill]	!
 T_BILL_AMT	This month:	!
 T_BILL_NOTE	*Data charges not included	!
+T_ML_TITLE	Mail	!
+T_ML_COUNT	mails	!
+T_ML_EMPTY	No mail	!
+T_ML_FROM	from 	!
+T_ML_FROM2		!
+T_ML_GUIDE	U/D:More ESC:Back	!
+T_ML_HELLO	Welcome, $! Ask me anything you need	!
+T_ML_BYE0	Couldn't say it on the board, but I quit tomorrow. Exams first	!
+T_ML_BYE1	I'm quitting tomorrow. No time once work starts. Thank you	!
+T_ML_BYE2	Quitting tomorrow. Getting married, so no more spending lol	!
+T_ML_BYE3	My parents found out... quitting tomorrow. It was fun, $	!
+T_ML_BYE4	Honestly I got bored. Quitting tomorrow. Keep going, $	!
+T_ML_BYE5	Moving to the other game. Want to come? I have an invite code	!
+T_ML_PHONE	New phone wiped my data. This is my new address. Thanks for everything	!
+T_ML_LAST0	Thanks for staying to the end. I kept going because of you, $	!
+T_ML_LAST1	It's over. If we meet in another game, let's form a guild again	!
+T_ML_LASTG0	I'd stopped playing, but heard it's ending. Those days were fun	!
+T_ML_LASTG1	Long time. Saw the shutdown news. Well done to the end, $	!
+T_RS_TITLE	Members	!
+T_PERSON_N	ppl	!
+T_RS_EMPTY	No one is in the guild	!
+T_RS_LV	Lv	!
+T_RS_MIN	m ago	!
+T_RS_HOUR	h ago	!
+T_RS_DAY	d ago	!
+T_RS_MONTH	/	!
+T_RS_DATE		!
+T_RS_PAY	Pays: 	!
+T_RS_PAY0	nothing	!
+T_RS_PAY1	a little	!
+T_RS_PAY2	some	!
+T_RS_PAY3	a lot	!
+T_RS_TONE	Tic: 	!
+T_RS_NOTONE	none	!
+T_RS_BDAY	Birthday: 	!
+T_RS_LAST	Last login: 	!
+T_RS_GUIDE	U/D:Pick SPACE:Profile	!
+T_TH_NOTE0	I'll be taking this card. Bye	!
+T_TH_NOTE1	Should've put it in a deck lol	!
+T_TH_NOTE2	Sorry, it's mine now	!
+T_TH_AGAIN	Back again. Hi lol	!
+T_TH_CAUGHT0	I can see you lol	!
+T_TH_CAUGHT1	Too bad	!
+T_TH_CAUGHT2	Come back later	!
+T_TH_LOSE0	Tch. Fine, take it	!
+T_TH_LOSE1	You'll regret this	!
+T_TH_LOSE2	I'll do better next time	!
+T_TH_VICTIM0	Ah, got me...	!
+T_TH_VICTIM1	Huh, who!?	!
+T_TH_VICTIM2	I'll get it back	!
 T_STEAL_TITLE	Go stealing	!
 T_STEAL_BACK	Retake
 T_STEAL_THEM	Their power

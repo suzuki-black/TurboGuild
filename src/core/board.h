@@ -13,6 +13,7 @@
 #define BOARD_NEVER       0xFFFFu
 #define BOARD_LOOKBACK    64          /* さかのぼるのは 16 日ぶん */
 #define BOARD_MAX         8
+#define MATES_MAX_PUB     8           /* 1 つのギルドの仲間の数の上限 */
 
 #define BP_POST  0
 #define BP_LEAVE 1
@@ -61,6 +62,24 @@ u16  mate_retire_day(u16 npc);         /* 仲間の引退の日（最後まで�
 u8   npc_tone(u16 npc);               /* 口癖 0..3（仲間でなくても決まる）。同じバンクから直接呼ぶ */
 u16  mate_info(u16 npc);              /* 別のバンク向け: 下位 8 ビットが引退の日（MATE_STAYS = 最後まで残る）、上位が口癖 */
 #define MATE_STAYS 0xFF
+/* ギルドのメンバー一覧（DECISIONS #96）。いまギルドにいる仲間（黙って消えた人は整理されるまで載る） */
+typedef struct {
+    u16 npc;
+    u8  gm;              /* ギルドマスター */
+    u8  course;          /* 課金コース 0..3 */
+    u8  tone;            /* 口癖 0..3 */
+    u16 bd;              /* 誕生日（2011 年 7 月 1 日からの日数, 0..364） */
+    u16 last;            /* 最後にログインしてから何分（65535 で止める） */
+} RosterRow;
+typedef struct { u8 n; RosterRow r[MATES_MAX_PUB]; } Roster;
+void board_roster(Roster *r);
+
+/* ミニメール（DECISIONS #96）。仲間から自分宛ての便り。新しい順、届いたものだけ。既読は持たない */
+#define MAIL_MAX 10
+typedef struct { u16 npc; u16 day; u16 text; } MailRow;
+typedef struct { u8 n; MailRow r[MAIL_MAX]; } MailList;
+void board_mail(MailList *l);
+
 u16  mate_fate(u16 npc);              /* 仲間の去り方（MR_* と MF_*）。board.c にあり、別のバンクからも呼べる */
 void board_list(BoardList *l);
 #endif

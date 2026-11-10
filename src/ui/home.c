@@ -243,7 +243,7 @@ static void stolen_popup(void)
 {
     CardRec c;
     u8 cx;
-    ui_box(16, 64, 224, 80, COL_DBLUE, COL_RED);
+    ui_box(16, 64, 224, 96, COL_DBLUE, COL_RED);
     cx = txt_id(3, 68, T_STOLEN_HEAD, COL_YELLOW, COL_DBLUE);
     cx = txt_num(cx, 68, g_save.stolen_new, COL_YELLOW, COL_DBLUE);
     txt_id(cx, 68, T_STOLEN_HEAD2, COL_YELLOW, COL_DBLUE);
@@ -254,8 +254,13 @@ static void stolen_popup(void)
         cx = ui_rarity(3, 104, c.rarity, COL_DBLUE);
         txt_id((u8)(cx + 1), 104, c.name_text, COL_WHITE, COL_DBLUE);
     }
-    ui_key(0, 26, 126);
-    txt_id(5, 124, T_STOLEN_HINT, COL_LGRAY, COL_DBLUE);
+    if (g_save.stolen[0].npc < NPC_COUNT && g_save.stolen[0].card) {   /* 置き手紙。同じ人が前にも盗んでいれば因縁 */
+        u8 again = (u8)((g_save.stolen[1].card && g_save.stolen[1].npc == g_save.stolen[0].npc) ||
+                        (g_save.stolen[2].card && g_save.stolen[2].npc == g_save.stolen[0].npc));
+        txt_id(3, 122, again ? T_TH_AGAIN : (u16)(T_TH_NOTE0 + g_save.stolen[0].npc % 3), COL_WHITE, COL_DBLUE);
+    }
+    ui_key(0, 26, 142);
+    txt_id(5, 140, T_STOLEN_HINT, COL_LGRAY, COL_DBLUE);
     psg_beep(0x300, 14);
     g_save.stolen_new = 0;
     g_save_dirty = 1;

@@ -811,6 +811,7 @@ static void test_board(void)
                 const BoardPost *p = &l.post[k];
                 posts++;
                 if (p->kind == BP_SYS) continue;
+                if (p->text >= T_BD_NEWB0 && p->text <= T_BD_NEWB2) { CHECK(!BOARD_IS_MATE(p->npc) && p->npc < NPC_COUNT); continue; }   /* 体験入隊はよその人 */
                 tbl_npc(p->npc, &r);
                 CHECK(BOARD_IS_MATE(p->npc) && r.guild == g - 1);
                 if (p->kind == BP_LEAVE) { CHECK(mate_retire_day(p->npc) == p->day && !(mate_fate(p->npc) & MF_GHOST)); continue; }
@@ -818,9 +819,10 @@ static void test_board(void)
                     u16 f = mate_fate(p->npc), d0 = mate_retire_day(p->npc);
                     CHECK(d0 >= p->day || (MF_BACK(f) && p->day >= d0 + MF_BACK(f) && p->day < d0 + MF_BACK(f) + BOARD_BACK_DAYS));   /* 辞めた後は、戻ってきた数日だけ */
                 }
-                CHECK(p->text >= T_BD_FADE0 && p->text <= T_BD_WHY15 && p->tone < 4);
-                if (p->text >= T_BD_KEEP0) {             /* 去り方の文（# の入る文の名前はギルドの仲間） */
-                    if (p->ref != BOARD_NOREF) CHECK(BOARD_IS_MATE(p->ref) && p->ref != p->npc && (p->ref >> 3) % GUILD_COUNT == g - 1);
+                CHECK(p->text >= T_BD_FADE0 && p->text <= T_BD_OFFYOU && p->tone < 4);
+                if (p->text >= T_BD_KEEP0) {             /* 去り方・行事の文（# の入る文の名前はギルドの仲間か、体験入隊の人） */
+                    if (p->text >= T_BD_NEWRE0 && p->text <= T_BD_NEWGONE) CHECK(p->ref < NPC_COUNT && !BOARD_IS_MATE(p->ref));
+                    else if (p->ref != BOARD_NOREF) CHECK(BOARD_IS_MATE(p->ref) && p->ref != p->npc && (p->ref >> 3) % GUILD_COUNT == g - 1);
                     continue;
                 }
                 if (p->text == T_BD_NEW0 || p->text == T_BD_NEW1 || p->text == T_BD_NEW2 || p->text == T_BD_NEW4 ||
@@ -958,6 +960,70 @@ static void test_mate_fate(void)
     CHECK(g == GUILD_COUNT + 2);
     memset(g_save.memo, 0, sizeof(g_save.memo));
     g_save.keep_got = 0;
+}
+
+/* 人からの便り（DECISIONS #96）: 行事・誕生日・体験入隊・オフ会・メンバー一覧・メール */
+static void test_letters(void)
+{
+    BoardList l;
+    BoardPost last;
+    Roster ro;
+    MailList ml;
+    u16 g, i, ny = 0, bday = 0, bdre = 0, newb = 0, newgone = 0, off = 0, offa = 0, offyou = 0, quiet_ok = 1, last_off = 0xFFFF;
+    u8 k;
+    fresh();
+    for (g = 1; g <= GUILD_COUNT; g++) {
+        g_save.guild = (u8)g;
+        memset(&last, 0xFF, sizeof(last));
+        last_off = 0xFFFF;
+        for (i = 0; i < SERVICE_END_DAY * 4; i++) {
+            const BoardPost *p = &l.post[0];
+            g_save.g_time = (u32)i * BOARD_SLOT_SECS + 1;
+            l.skip = 0; l.want = 1;
+            board_list(&l);
+            if (!l.n || p->day != i / 4) continue;
+            if (p->npc == last.npc && p->kind == last.kind && p->text == last.text && p->day == last.day) continue;
+            last = *p;
+            if (last_off != 0xFFFF && i / 4 == last_off + 5 && (i & 3) >= 2 && p->kind == BP_POST &&
+                !(p->text >= T_BD_KEEP0)) quiet_ok = 0;       /* オフ会の当日の午後と夜は、決まった書き込みしか無い */
+            if (p->text >= T_BD_NY0 && p->text <= T_BD_NY2) { CHECK(p->day >= 184 && p->day < 187); ny++; }
+            if (p->text == T_BD_BDAY0 || p->text == T_BD_BDAY1) { CHECK(BOARD_IS_MATE(p->ref) && p->ref != p->npc); bday++; }
+            if (p->text == T_BD_BDRE0 || p->text == T_BD_BDRE1) bdre++;
+            if (p->text >= T_BD_NEWB0 && p->text <= T_BD_NEWB2) newb++;
+            if (p->text == T_BD_NEWGONE) newgone++;
+            if (p->text == T_BD_OFF) { CHECK(p->gm); off++; last_off = p->day; }
+            if (p->text >= T_BD_OFFA0 && p->text <= T_BD_OFFA2) { CHECK(p->day == last_off + 6); offa++; }
+            if (p->text == T_BD_OFFYOU) offyou++;
+        }
+        /* メンバー一覧: 最後の日の朝。ギルマスは 1 人まで、黙って消えた人は「何日も前」 */
+        g_save.g_time = 269UL * GSEC_PER_DAY + 8UL * 3600;
+        board_roster(&ro);
+        for (k = 0, i = 0; k < ro.n; k++) {
+            i += ro.r[k].gm;
+            CHECK(BOARD_IS_MATE(ro.r[k].npc) && (ro.r[k].npc >> 3) % GUILD_COUNT == g - 1 && ro.r[k].course < 4 && ro.r[k].bd < 365);
+            if (mate_retire_day(ro.r[k].npc) != BOARD_NEVER) CHECK((mate_fate(ro.r[k].npc) & MF_GHOST) && ro.r[k].last >= 1440);
+            else CHECK(ro.r[k].last < 600);
+        }
+        CHECK(i <= 1);
+        /* メール: サービス終了の後は、残った人全員と、あいさつして去った人の一部から最後の手紙 */
+        g_save.memo[MEMO_GUILD] = 1;
+        g_save.g_time = 271UL * GSEC_PER_DAY;
+        board_mail(&ml);
+        CHECK(ml.n >= 1 && ml.n <= MAIL_MAX);
+        for (k = 0; k < ml.n; k++) {
+            CHECK(BOARD_IS_MATE(ml.r[k].npc) && ml.r[k].text >= T_ML_HELLO && ml.r[k].text <= T_ML_LASTG1);
+            if (k) CHECK(ml.r[k].day <= ml.r[k - 1].day);
+        }
+        g_save.g_time = 1UL * GSEC_PER_DAY;                  /* 入った次の日: ギルマスのあいさつだけ */
+        board_mail(&ml);
+        CHECK(ml.n == 1 && ml.r[0].text == T_ML_HELLO && ml.r[0].day == 0);
+        g_save.memo[MEMO_GUILD] = 0;
+    }
+    CHECK(ny > 3 && bday > 10 && bdre > 0 && newb > 20 && newgone > 10 && off > 3 && offa > 3 && offyou > 0 && quiet_ok);
+    g_save.guild = 99;                                       /* 壊れたギルド番号でも落ちない */
+    board_roster(&ro); board_mail(&ml);
+    CHECK(ro.n == 0 && ml.n == 0);
+    g_save.guild = 0;
 }
 
 /* ガラケーと 2011 年の空気（DECISIONS #95） */
@@ -1270,6 +1336,7 @@ int main(void)
     test_board();
     test_mate_fate();
     test_keitai();
+    test_letters();
     test_rival();
     test_stance_leader_slots();
     test_ops();

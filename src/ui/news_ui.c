@@ -206,6 +206,7 @@ FAR(void, news_update, (void))
     if (p & BTN_OK) { psg_beep(0x80, 4); screen_change(&scr_board); return; }
     if (input_digit() == 1) { psg_beep(0x80, 4); screen_change(&scr_album); return; }   /* 思い出アルバム */
     if (input_digit() == 2) { psg_beep(0x80, 4); screen_change(&scr_foot); return; }    /* 足あと */
+    if (input_digit() == 3) { psg_beep(0x80, 4); screen_change(&scr_mail); return; }    /* メール */
     if (p & BTN_CANCEL) screen_change(&scr_home);
 }
 
@@ -265,6 +266,7 @@ FAR(void, board_update, (void))
     u8 p = input_pressed();
     if ((p & BTN_UP) && g_cursor) { g_cursor--; psg_beep(0x100, 2); g_dirty = 1; }
     if ((p & BTN_DOWN) && board_shown > 1) { g_cursor++; psg_beep(0x100, 2); g_dirty = 1; }
+    if (input_digit() == 1) { psg_beep(0x80, 4); screen_change(&scr_roster); return; }   /* メンバー */
     if (p & (BTN_OK | BTN_CANCEL)) screen_change(&scr_news);
 }
 

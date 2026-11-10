@@ -23,106 +23,42 @@
 #include "../data/text_ids.h"
 #include "../far.h"
 
-#define SALT_MATE     0x5A17u
-#define SALT_MATE_R   0x33C5u
-#define SALT_FATE     0x2D71u
-#define SALT_FATE2    0x61B3u
-#define FADE_TEXTS    4           /* 去り方 1 つあたりの弱音の数（機種変の人には無い） */
-#define PURGE_AFTER   14          /* 何も言わずに来なくなった人を、ギルマスが整理するまでの日数（+0〜7） */
-#define NO_K          0xFF
-#define SALT_STYLE    0x4E95u
-#define SALT_POST(k)  ((u16)(0x4B1Du + (k) * 0x6C8Fu))
-#define FADE_DAYS     3
-#define TOPIC_PCT     60
-#define NEW_DAYS      7           /* 新しいレア度の話題が続く日数 */
-#define MATES_MAX     8
-#define TOPICS_MAX    6
-#define REACT_SLOTS   3           /* 自分の出来事に反応する時間帯の数 */
-#define RE_TEXTS      3           /* 反応 1 種類の文の数 */
+#include "mates_w.h"
 
-typedef struct { u16 base; u8 count; u16 param; } Topic;
-
-typedef struct {
-    u16 m[MATES_MAX];
-    u16 rd[MATES_MAX];            /* 引退の日（BOARD_NEVER = 最後まで残る） */
-    u16 f[MATES_MAX];             /* 去り方（mate_fate） */
-    u16 rb[MATES_MAX];            /* 戻ってくる日（BOARD_NEVER = 戻らない） */
-    u16 pg[MATES_MAX];            /* 何も言わずに来なくなった人を整理する日（それ以外は BOARD_NEVER） */
-    u16 joined;                   /* 自分がギルドに入った日（0xFFFF = 分からない） */
-    u8  nm;
-    u16 day;                      /* t を求めた日（0xFFFF = まだ） */
-    Topic t[TOPICS_MAX];
-    u8  nt;
-} Work;
-
-/* ranking.c の npc_hash の写し（同じ式。伝言板は前と同じ書き込みになる） */
-static u16 hash(u16 a, u16 b)
+/* 時間帯 s に板にいる仲間の数と、k 以外で最初にいる人（いなければ NO_K） */
+static u8 active_other(const Work *w, u16 s, u8 k, u8 *n)
 {
-    u16 x = (u16)(a ^ (b << 5) ^ (b >> 3) ^ 0x9E37u);
-    x ^= x << 7;
-    x ^= x >> 9;
-    x += x << 3;
-    x ^= x << 8;
-    x += b;
-    x ^= x >> 7;
-    x += x << 4;
-    x ^= x >> 8;
-    return x;
-}
-
-/* ranking.c の mate_retire_day の写し */
-static u16 retire_day(u16 i)
-{
-    u16 h = hash(i, SALT_MATE_R);
-    if ((u8)h < 77) return BOARD_NEVER;
-    return (u16)(20 + (h >> 8) % 230);
-}
-
-/* 仲間の去り方（board.h の MR_* / MF_*）。引退の日は変えないので、ランキングや結末はこれまでどおり */
-static u16 fate_of(u16 i)
-{
-    /* 理由の重み（/16）: 受験 2・就職 3・結婚 2・親 2・飽きた 3・ほかのゲーム 2・凍結 1・機種変 1 */
-    static const u8 why[16] = { MR_EXAM, MR_EXAM, MR_JOB, MR_JOB, MR_JOB, MR_MARRY, MR_MARRY, MR_PARENT,
-                                MR_PARENT, MR_BORED, MR_BORED, MR_BORED, MR_OTHER, MR_OTHER, MR_BANNED, MR_PHONE };
-    u16 h = hash(i, SALT_FATE), h2 = hash(i, SALT_FATE2), rd = retire_day(i), f, back = 0;
-    u8 r = why[(h >> 4) & 15];
-    f = (u16)(r | (((hash(i, SALT_MATE) >> 2) & 3) << 5));
-    if (r == MR_PHONE || ((h >> 8) & 7) == 0) f |= MF_GHOST;   /* 機種変の人と、ほかの 1 割ほどは黙って消える */
-    else if (r != MR_BANNED && (h & 0x2000)) f |= MF_GIVER;     /* 残りの半分はカードを置いていく */
-    if (r != MR_BANNED && rd != BOARD_NEVER && (h2 & 0xFF) < 26) {   /* 1 割は 1 度だけ戻ってくる（凍結の人は戻れない） */
-        back = (u16)(20 + ((h2 >> 8) & 31));
-        if (rd + back + BOARD_BACK_DAYS > SERVICE_END_DAY) back = 0;
+    u8 j, first = NO_K;
+    *n = 0;
+    for (j = 0; j < w->nm; j++) {
+        u8 jj = (u8)((k + 1 + j) % w->nm);
+        if (gone_at(w, jj, s)) continue;
+        (*n)++;
+        if (jj != k && first == NO_K) first = jj;
     }
-    return (u16)(f | (back << 8));
+    return first;
 }
 
-FAR(u16, mate_fate, (u16 i)) { return fate_of(i); }
-
-/* 時間帯 s に、仲間 k はもう板にいない（引退の日の昼から） */
-static u8 gone_at(const Work *w, u8 k, u16 s)
+/* d 日目に体験入隊してくる人（ギルドの仲間ではない NPC。いなければ BOARD_NOREF） */
+static u16 newbie_of(u16 d)
 {
-    u16 rd = w->rd[k], d = s >> 2;
-    return (u8)(rd != BOARD_NEVER && (d > rd || (d == rd && (s & 3) >= 2)));
+    u16 h = hash(d, (u16)(SALT_NEWBIE + g_save.guild * 3));
+    u16 i;
+    if (d < 10 || d >= 239 || h % NEWBIE_EVERY) return BOARD_NOREF;
+    i = (u16)(hash(h, SALT_NEWBIE) % NPC_COUNT);
+    if (BOARD_IS_MATE(i)) i = (u16)((i + 1) % NPC_COUNT);
+    return i;
 }
 
-/* 時間帯 s に、去った仲間 k が戻ってきている */
-static u8 back_at(const Work *w, u8 k, u16 s)
+/* d 日目の夜にオフ会の誘いがあるか（4 人以上いるときだけ） */
+static u8 off_day(const Work *w, u16 d)
 {
-    u16 d = s >> 2;
-    return (u8)(w->rb[k] != BOARD_NEVER && d >= w->rb[k] && d < w->rb[k] + BOARD_BACK_DAYS);
-}
-
-/* 時間帯 s のギルドマスター（仲間の並びで最初の、まだ役を持っている人。いなければ NO_K = 自分）。
- * 黙って消えた人は、整理される日の昼まで役を持ったまま */
-static u8 gm_of(const Work *w, u16 s)
-{
-    u8 k;
-    for (k = 0; k < w->nm; k++) {
-        u16 pg = w->pg[k], d = s >> 2;
-        if (pg == BOARD_NEVER) { if (!gone_at(w, k, s)) return k; }
-        else if (d < pg || (d == pg && (s & 3) < 2)) return k;
-    }
-    return NO_K;
+    u8 n, g;
+    u16 s = (u16)(d * 4 + 3);
+    if (d < 20 || d >= 230 || (d + g_save.guild * 7u) % OFF_EVERY || (hash(d, (u16)(SALT_OFF + g_save.guild)) & 1)) return 0;   /* 候補はギルドごとに 45 日に 1 日。その半分 */
+    active_other(w, s, 0, &n);
+    g = gm_of(w, s);
+    return (u8)(n >= 4 && g != NO_K && !gone_at(w, g, s));   /* 誘うのはギルマス */
 }
 
 static void add(Work *w, u16 base, u8 count, u16 param)
@@ -132,6 +68,18 @@ static void add(Work *w, u16 base, u8 count, u16 param)
     t = &w->t[w->nt++];
     t->base = base; t->count = count; t->param = param;
 }
+
+/* 年中行事。ゲーム内の暦は 0 日目 = 2011 年 7 月 1 日（夏祭りのイベントが 3 日目、元日が 184 日目） */
+typedef struct { u16 day; u8 days; u16 base; u8 count; } Season;
+static const Season season[] = {
+    {  44, 3, T_BD_OBON0, 2 },    /* お盆 8/14〜16 */
+    { 122, 1, T_BD_HALW0, 2 },    /* ハロウィン 10/31 */
+    { 175, 2, T_BD_XMAS0, 3 },    /* クリスマス 12/24〜25 */
+    { 183, 1, T_BD_NYE0,  2 },    /* 大みそか */
+    { 184, 3, T_BD_NY0,   3 },    /* 正月 1/1〜3 */
+    { 228, 1, T_BD_VAL0,  2 },    /* バレンタイン 2/14 */
+};
+#define SEASONS (sizeof(season) / sizeof(season[0]))
 
 /* その日の話題を年表とイベントの表から集める */
 static void topics(Work *w, u16 d)
@@ -148,6 +96,12 @@ static void topics(Work *w, u16 d)
         if (r.kind == TL_NEW_RARITY && d < r.day + NEW_DAYS) add(w, T_BD_NEW0, 8, (u16)(T_RAR_0 + r.param));
         if (r.kind == TL_GUILDWAR && d < r.day + GVG_DAYS) add(w, T_BD_GVG0, 6, 0);
         if (r.kind == TL_GACHA_RATEUP && d < r.day + RATEUP_DAYS) add(w, T_BD_RATE0, 6, 0);
+    }
+    for (i = 0; i < SEASONS; i++) {                      /* 年中行事（2 倍の重みで） */
+        if (d >= season[i].day && d < season[i].day + season[i].days) {
+            add(w, season[i].base, season[i].count, 0);
+            add(w, season[i].base, season[i].count, 0);
+        }
     }
     for (i = 1; i <= EVENT_COUNT; i++) {
         tbl_event(i, &e);
@@ -187,6 +141,21 @@ static u8 fixed_at(const Work *w, u16 s, BoardPost *p)
 {
     u16 d = s >> 2, x = (u16)(s + d);
     u8 k, g;
+    if ((s & 3) == 3 && off_day(w, d)) {   /* ほかの決まった書き込みより先に */
+        g = gm_of(w, s);   /* オフ会の誘い */
+        put(p, BP_POST, w->m[g], d, BOARD_NOREF);
+        p->text = p->alt = T_BD_OFF;
+        return 1;
+    }
+    if (d >= OFF_AFTER && off_day(w, (u16)(d - OFF_AFTER)) && ((s & 3) == 1 || (s & 3) == 3)) {   /* 翌朝「楽しかった」、夜は自分にも */
+        u8 n;
+        g = active_other(w, s, (u8)(d % w->nm), &n);
+        if (g != NO_K) {
+            put(p, BP_POST, w->m[g], d, BOARD_NOREF);
+            if ((s & 3) == 1) say(p, T_BD_OFFA0, 3, x); else p->text = p->alt = T_BD_OFFYOU;
+            return 1;
+        }
+    }
     for (k = 0; k < w->nm; k++) {
         u16 rd = w->rd[k], f = w->f[k];
         if (rd == BOARD_NEVER) continue;
@@ -227,7 +196,36 @@ static u8 fixed_at(const Work *w, u16 s, BoardPost *p)
             return 1;
         }
     }
+    for (k = 0; k < w->nm; k++) {                        /* 誕生日: 朝に誰かが祝い、夜に本人が書く */
+        u8 n;
+        if (w->bd[k] != d || gone_at(w, k, s)) continue;
+        if ((s & 3) == 1) {
+            g = active_other(w, s, k, &n);
+            if (g == NO_K) continue;
+            put(p, BP_POST, w->m[g], d, w->m[k]);
+            say(p, T_BD_BDAY0, 2, x);
+            return 1;
+        }
+        if ((s & 3) == 3) { put(p, BP_POST, w->m[k], d, BOARD_NOREF); say(p, T_BD_BDME0, 2, x); return 1; }
+    }
+    {
+        u16 nb = newbie_of(d);                           /* 体験入隊: 昼にあいさつして、そのまま来なくなる */
+        if (nb != BOARD_NOREF && (s & 3) == 2) { put(p, BP_POST, nb, d, BOARD_NOREF); say(p, T_BD_NEWB0, 3, x); return 1; }
+        nb = d >= 4 ? newbie_of((u16)(d - 4)) : BOARD_NOREF;
+        if (nb != BOARD_NOREF && (s & 3) == 1 && (g = gm_of(w, s)) != NO_K && !gone_at(w, g, s)) {
+            put(p, BP_POST, w->m[g], d, nb);
+            p->text = p->alt = T_BD_NEWGONE;
+            return 1;
+        }
+    }
     return 0;
+}
+
+/* オフ会の当日（誘いの OFF_AFTER - 1 日後）の午後と夜は、みんな出かけていて板が静か */
+static u8 quiet_at(const Work *w, u16 s)
+{
+    u16 d = s >> 2;
+    return (u8)((s & 3) >= 2 && d >= OFF_AFTER - 1 && off_day(w, (u16)(d - (OFF_AFTER - 1))));
 }
 
 /* 時間帯 s の書き込み。無ければ 0。reply = 0 のときは返事にしない（1 つ前を見に行くのは 1 段だけ） */
@@ -246,6 +244,7 @@ static u8 post_at(Work *w, u16 s, BoardPost *p, u8 reply)
         if (!gone_at(w, k, s) || back_at(w, k, s)) act[na++] = w->m[k];
     }
     if (fixed_at(w, s, p)) return 1;
+    if (quiet_at(w, s)) return 0;
     h = hash(s, SALT_POST(0));
     ev = event_at(s, &first);
     if (!na || ((h & 7) >= na && !first)) return 0;  /* 自分の出来事のあった時間帯は必ず誰かが書く */
@@ -283,6 +282,10 @@ static u8 post_at(Work *w, u16 s, BoardPost *p, u8 reply)
             else if (q.text >= T_BD_GM0 && q.text <= T_BD_GMGHOST) say(p, T_BD_GMRE0, 2, x);   /* よろしく */
             else if (q.text >= T_BD_PURGE0 && q.text < T_BD_PURGE0 + 3 && q.ref != p->npc) { p->ref = q.ref; say(p, T_BD_BYE0, 3, x); }
             else if (q.text >= T_BD_KEEP0 && q.text < T_BD_KEEP0 + 2) say(p, T_BD_CONSOLE0, 3, x);
+            else if (q.text >= T_BD_BDAY0 && q.text < T_BD_BDAY0 + 2) { if (q.ref == p->npc) say(p, T_BD_BDTY0, 2, x); else { p->ref = q.ref; say(p, T_BD_BDRE0, 2, x); } }
+            else if (q.text >= T_BD_BDME0 && q.text < T_BD_BDME0 + 2) say(p, T_BD_BDRE0, 2, x);
+            else if (q.text >= T_BD_NEWB0 && q.text < T_BD_NEWB0 + 3) say(p, T_BD_NEWRE0, 2, x);
+            else if (q.text == T_BD_OFF) say(p, T_BD_OFFRE0, 2, x);
             else say(p, T_BD_REPLY0, 8, x);
             return 1;
         }
@@ -335,25 +338,16 @@ static void out(BoardList *l, const BoardPost *p, u8 *skip)
     if (l->n < l->want && l->n < BOARD_MAX) l->post[l->n++] = *p;
 }
 
+
 FAR(void, board_list, (BoardList *l))
 {
     Work w;
     BoardPost q[2], nx;
-    u16 s = (u16)(g_save.g_time / BOARD_SLOT_SECS), i, look;
+    u16 s = (u16)(g_save.g_time / BOARD_SLOT_SECS), look;
     u8 skip = l->skip, have = 0;
     l->n = 0;
-    if (!g_save.guild) return;
-    w.nm = 0;
-    w.day = 0xFFFF;
-    w.joined = g_save.memo[MEMO_GUILD] ? (u16)(g_save.memo[MEMO_GUILD] - 1) : 0;
-    for (i = (u16)((g_save.guild - 1) * 8 + 3); i < NPC_COUNT && w.nm < MATES_MAX; i += 128) {
-        u16 rd = retire_day(i), f = fate_of(i);
-        w.rd[w.nm] = rd;
-        w.f[w.nm] = f;
-        w.rb[w.nm] = MF_BACK(f) ? (u16)(rd + MF_BACK(f)) : BOARD_NEVER;
-        w.pg[w.nm] = (rd != BOARD_NEVER && (f & MF_GHOST)) ? (u16)(rd + PURGE_AFTER + (hash(i, SALT_FATE2) >> 13)) : BOARD_NEVER;
-        w.m[w.nm++] = i;
-    }
+    if (!g_save.guild || g_save.guild > GUILD_COUNT) return;
+    setup(&w);
     /* 続けて同じ文にしない。q0 を出すときは、q1 を「その古い方（いま来た nx）と比べて直したもの」と比べる。
      * 古い方だけを見るので、新しい書き込みが来ても過去の文は変わらない */
     for (look = 0; look < BOARD_LOOKBACK && l->n < l->want && l->n < BOARD_MAX; look++, s--) {

@@ -128,6 +128,12 @@ static void go(u8 k)
                COL_WHITE, COL_DBLUE);
         psg_beep(0x400, 10);
     }
+    if (st == STEAL_OK || st == STEAL_FAIL) {        /* 相手のひとこと: 取り返された泥棒の捨て台詞・盗まれた人・見つけた人 */
+        u16 t = st == STEAL_FAIL ? T_TH_CAUGHT0 : l.r[k].back ? T_TH_LOSE0 : T_TH_VICTIM0;
+        cx = npc_name(2, (u8)(BOX_Y + 42), l.r[k].npc, COL_LGRAY, COL_DBLUE);
+        cx = txt_id(cx, (u8)(BOX_Y + 42), T_BOARD_SAY, COL_LGRAY, COL_DBLUE);
+        txt_id(cx, (u8)(BOX_Y + 42), (u16)(t + (l.r[k].npc + g_save.steal_seq) % 3), COL_WHITE, COL_DBLUE);
+    }
     if (st == STEAL_OK || st == STEAL_FAIL) g_save_dirty = 1;
     ui_wait_key();
     g_dirty = 1;
