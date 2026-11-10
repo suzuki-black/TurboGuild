@@ -1020,6 +1020,25 @@ static void test_letters(void)
         g_save.memo[MEMO_GUILD] = 0;
     }
     CHECK(ny > 3 && bday > 10 && bdre > 0 && newb > 20 && newgone > 10 && off > 3 && offa > 3 && offyou > 0 && quiet_ok);
+    /* 最後の 1 時間: 23:00 から 5 分ごとに 1 件、残った仲間が書き、新しい順に並ぶ。最後の 1 件はギルマス */
+    for (g = 1; g <= GUILD_COUNT; g++) {
+        g_save.guild = (u8)g;
+        g_save.g_time = 269UL * GSEC_PER_DAY + 23UL * 3600 + 55UL * 60 + 30;   /* 23:55:30 */
+        l.skip = 0; l.want = BOARD_MAX;
+        board_list(&l);
+        board_roster(&ro);
+        if (!ro.n) { CHECK(!l.n || l.post[0].text < T_BD_FIN0); continue; }
+        CHECK(l.n == BOARD_MAX);
+        for (k = 0; k < BOARD_MAX; k++) {
+            CHECK(l.post[k].text == T_BD_FIN0 + BOARD_FINAL_N - 1 - k && l.post[k].day == SERVICE_END_DAY - 1 && l.post[k].kind == BP_POST);
+            for (i = 0; i < ro.n && ro.r[i].npc != l.post[k].npc; i++) {}
+            CHECK(i < ro.n);                                 /* 書くのはいまギルドにいる人 */
+        }
+        CHECK(l.post[0].gm == ro.r[0].gm && l.post[0].npc == ro.r[0].npc);
+        g_save.g_time = 269UL * GSEC_PER_DAY + 23UL * 3600 + 7UL * 60;  /* 23:07 は 2 件 */
+        board_list(&l);
+        CHECK(l.post[0].text == T_BD_FIN1 && l.post[1].text == T_BD_FIN0 && l.post[2].text < T_BD_FIN0);
+    }
     g_save.guild = 99;                                       /* 壊れたギルド番号でも落ちない */
     board_roster(&ro); board_mail(&ml);
     CHECK(ro.n == 0 && ml.n == 0);
@@ -1181,9 +1200,12 @@ static void test_plan(void)
     plan_next(&p);
     tbl_event(1, &e);
     CHECK(p.kind == PLAN_EVENT && p.at == (u32)e.start_day * GSEC_PER_DAY && p.text == e.name_text);
-    g_save.g_time = 269UL * GSEC_PER_DAY;                             /* 終わりの前日: もう予定は無い */
+    g_save.g_time = 269UL * GSEC_PER_DAY;                             /* 最終日: 最後の 1 時間（23:00）へ */
     plan_next(&p);
-    CHECK(p.kind == PLAN_NONE && !player_wait(&p) && g_save.g_time == 269UL * GSEC_PER_DAY);
+    CHECK(p.kind == PLAN_LAST && p.at == 269UL * GSEC_PER_DAY + 23UL * 3600 && p.text == T_PLAN_LAST);
+    g_save.g_time = 269UL * GSEC_PER_DAY + 23UL * 3600;               /* その後はもう予定は無い */
+    plan_next(&p);
+    CHECK(p.kind == PLAN_NONE && !player_wait(&p) && g_save.g_time == 269UL * GSEC_PER_DAY + 23UL * 3600);
 }
 
 /* ギルドの戦力をまとめて数えても、1 人ずつ npc_now で数えたのと同じ（DECISIONS #93） */

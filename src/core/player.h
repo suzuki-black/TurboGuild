@@ -21,6 +21,7 @@ typedef struct {
 #define PLAN_NONE  0
 #define PLAN_GVG   1     /* ギルド対抗戦の戦の始まり */
 #define PLAN_EVENT 2     /* イベントの始まり */
+#define PLAN_LAST  3     /* サービス終了の最後の 1 時間（最終日の 23:00） */
 void plan_next(Plan *p);                  /* いまより後でいちばん近い予定（年表とイベントの表から） */
 u8   player_wait(Plan *p);                /* 宿屋で次の予定まで休む（無料。AP は進んだぶんだけ自然に回復）。予定が無ければ 0 */
 u8   player_sleep(void);          /* 宿屋に泊まる: 翌朝 6 時まで進めて AP 全回復。宿代が足りなければ 0、泊まれば寝た時間（時） */

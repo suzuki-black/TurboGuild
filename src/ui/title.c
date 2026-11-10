@@ -10,7 +10,9 @@ void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/time.h"
 #include "../core/timeline.h"
+#include "../config.h"
 #include "../data/screens.h"
+#include "../data/tables.h"
 #include "../data/text_ids.h"
 #include "../sys/input.h"
 #include "../sys/psg.h"
@@ -33,6 +35,18 @@ static u8 ended(void)
     if (!can_continue()) return 0;
     timeline_state(&tl);
     return tl.ended;
+}
+
+/* 終了後に来続けると、跡地が古びていく（DECISIONS #97）。現実の経過で: 翌日から払い戻しの受付、
+ * 30 日で受付終了、半年でページが無くなり、1 年で別の会社の広告になる */
+static u16 ended_line(void)
+{
+    u32 e = g_save.g_time - (u32)SERVICE_END_DAY * GSEC_PER_DAY, d = e / (GSEC_PER_DAY * TIME_SCALE);   /* 現実の日数 */
+    if (g_save.g_time < (u32)SERVICE_END_DAY * GSEC_PER_DAY || d < 1) return T_ENDED_TITLE;
+    if (d < 30) return T_ENDED_REFUND;
+    if (d < 182) return T_ENDED_REFUND_END;
+    if (d < 365) return T_ENDED_404;
+    return T_ENDED_AD;
 }
 
 static void draw_menu(void)
@@ -69,7 +83,8 @@ FAR(void, title_draw, (void))
     for (i = 0; i < 4; i++) gfx_card(parade[i], (u8)(10 + i * 60), (u8)(ended() ? 28 : 32 + (i & 1) * 6));   /* 終了後はメニューが 4 つなので詰める */
     if (!ended()) txt_id(5, 116, T_TITLE_SUB, COL_WHITE, COL_BLACK);
     if (ended()) {
-        txt_id(6, 102, T_ENDED_TITLE, COL_YELLOW, COL_BLACK);
+        u16 t = ended_line();
+        txt_id(t == T_ENDED_TITLE ? 6 : 1, 102, t, t == T_ENDED_AD ? COL_CYAN : t == T_ENDED_404 ? COL_LGRAY : COL_YELLOW, COL_BLACK);
     } else if (can_continue()) {
         u8 cx = txt_id(6, 130, T_TITLE_DAY, COL_LGRAY, COL_BLACK);
         cx = txt_num((u8)(cx + 1), 130, time_gday(g_save.g_time) + 1, COL_WHITE, COL_BLACK);

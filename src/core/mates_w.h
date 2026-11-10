@@ -27,7 +27,7 @@
 #define SALT_NEWBIE   0x7C21u
 #define SALT_OFF      0x15E9u
 #define NEWBIE_EVERY  30          /* 体験入隊はギルドごとにおよそ 30 日に 1 回 */
-#define OFF_EVERY     45          /* オフ会の誘いはおよそ 45 日に 1 回（4 人以上いるとき） */
+#define OFF_EVERY     45          /* オフ会の誘いの候補は 45 日おき（その半分で、4 人以上いてギルマスがいるとき） */
 #define OFF_AFTER     6           /* 誘いの何日後に「楽しかった」（その前の日の午後と夜は板が静か） */
 #define SALT_POST(k)  ((u16)(0x4B1Du + (k) * 0x6C8Fu))
 #define FADE_DAYS     3
@@ -52,6 +52,7 @@ typedef struct {
     u16 day;                      /* t を求めた日（0xFFFF = まだ） */
     Topic t[TOPICS_MAX];
     u8  nt;
+    u16 s;                        /* board_fixed に渡す時間帯 */
 } Work;
 
 /* ranking.c の npc_hash の写し（同じ式。伝言板は前と同じ書き込みになる） */
@@ -123,4 +124,19 @@ MW_FN void setup(Work *w)
     }
 }
 
+MW_FN void say(BoardPost *p, u16 base, u8 count, u16 x)
+{
+    p->text = (u16)(base + x % count);
+    p->alt = (u16)(base + (x + 1) % count);          /* 続けて同じ文になったときの代わり */
+}
+
+MW_FN void put(BoardPost *p, u8 kind, u16 npc, u16 d, u16 ref)
+{
+    p->npc = npc; p->kind = kind; p->text = p->alt = 0; p->param = 0; p->day = d; p->ref = ref;
+    p->tone = kind == BP_POST ? (u8)(hash(npc, SALT_MATE) & 3) : 0;
+}
+
+/* 時間帯 w->s の決まった時刻の書き込み（去り方・誕生日・体験入隊・オフ会）。1 = p に書いた、2 = 板が静か、0 = 無し。
+ * board_fix.c（バンク 101）。伝言板のバンク 98 が埋まったので分けた（DECISIONS #97） */
+u8 board_fixed(Work *w, BoardPost *p);
 #endif

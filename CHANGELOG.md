@@ -17,6 +17,9 @@
 - **Members and profiles.** Press 1 on the board for the member list, with level and last login (a mate who stopped coming shows "12d ago" until removed). SPACE shows a profile: level, how much they pay, their verbal tic, birthday and last login.
 - **Mail.** Press 3 on News. The master welcomes you when you join; some mates who leave mail you the night before, telling you why; a mate whose phone lost the data writes from a new address. After the service ends, letters come from the mates who stayed and from some who left (3 on Memories).
 - **Thieves talk.** A thief leaves a note ("Back again" if they stole from you before), and when you go stealing, the other side says something: the thief giving a card back, the victim, or the one who caught you.
+- **The last hour.** From 23:00 on the last day, the board stops waiting six hours between posts: every five minutes a mate who is still there writes, and the board updates by itself if you keep it open. At midnight the connection drops. The inn can now take you straight to the last hour.
+- **Coming back after the end.** The title changes with real time after the shutdown: refunds are accepted, then refunds close, then the page is gone, and after a year another company's ad takes its place.
+- **The wiki article.** Press 4 on Memories after the end for an encyclopedia-style entry on TurboGuild, partly written from your own save (your guild, spending, best event rank, mates who stayed, and how operator mode went).
 
 ### 日本語
 - **仲間の去り方。** 辞める仲間それぞれに理由が付きました: 受験・就職・結婚・親に見つかった・飽きた・ほかのゲームへ・凍結・機種変で引き継ぎ失敗。最後の数日の弱音と、後で懐かしむ文が理由で替わります（「#さん、受験うまくいったかな」）。一部の仲間と、データが消えた人は、何も言わずに来なくなります。周りが気づき（「#さん、最近見ないね」）、2〜3 週間後にギルドマスターが整理します。
@@ -33,6 +36,9 @@
 - **メンバーとプロフィール。** 伝言板の 1 でメンバー一覧（Lv・最終ログイン。来なくなった人は整理されるまで「○日前」）。SPACE でプロフィール（Lv・課金コース・口ぐせ・誕生日・最終ログイン）。
 - **メール。** お知らせの 3。入った日にギルマスからあいさつが届き、去る仲間の一部からは前の晩に「板には書けなかった」わけが届きます。機種変でデータが消えた人からは新しいアドレスで。サービス終了後は、残った仲間全員と、あいさつして去った仲間の一部から最後の手紙が届きます（思い出の 3）。
 - **泥棒のひとこと。** 盗まれたときに置き手紙（前にも盗んだ人なら「また来ちゃった」）。盗みに行くと、相手がひとこと言います（取り返された泥棒の捨て台詞・盗まれた人・見つけた人）。
+- **最後の 1 時間。** 最終日の 23:00 からは、伝言板の「6 時間に 1 件」が外れ、5 分ごとに残った仲間が書き込みます。開いたままにすると勝手に流れ、0:00 に接続が切れます。宿屋で最後の 1 時間まで休めるようになりました。
+- **終了後に来続ける。** 終了後のタイトルが、現実の時間で変わっていきます: 払い戻しの受付中、受付終了、ページが無くなり、1 年後には別の会社の広告になります。
+- **まとめ記事。** 終了後の思い出の 4 で、百科事典ふうの「TurboGuild」の項目が読めます。一部はあなたのセーブ（ギルド・課金・イベントの上位・残った仲間・運営モードの成績）から書かれます。
 
 ## v0.2.0 — 2026-11-08
 

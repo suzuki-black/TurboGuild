@@ -7,6 +7,7 @@
 #include "inventory.h"
 #include "../far.h"
 #include "../data/tables.h"
+#include "../data/text_ids.h"
 #include "event.h"
 #include "tables.h"
 #include "timeline.h"
@@ -117,6 +118,8 @@ FAR(void, plan_next, (Plan *p))
         t = (u32)e.start_day * GSEC_PER_DAY;
         if (t > now && t < p->at) { p->at = t; p->kind = PLAN_EVENT; p->text = e.name_text; }
     }
+    t = (u32)(SERVICE_END_DAY - 1) * GSEC_PER_DAY + 23UL * 3600;   /* 最後の 1 時間（DECISIONS #97） */
+    if (t > now && t < p->at) { p->at = t; p->kind = PLAN_LAST; p->text = T_PLAN_LAST; }
 }
 
 FAR(u8, player_wait, (Plan *p))

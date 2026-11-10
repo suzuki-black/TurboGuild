@@ -193,6 +193,8 @@ T_PLAN_GVG2
 T_PLAN_NONE	Nothing coming up
 T_INN_WAITED_GVG	Guild war time!
 T_INN_WAITED_EV	The event starts!
+T_PLAN_LAST	The last hour	!
+T_INN_WAITED_LAST	One hour left before the end	!
 T_INN_SLEPT	Slept well. It's morning
 T_INN_NO_GOLD	Not enough gold for the inn	!
 T_SPENT	Spent
@@ -307,6 +309,29 @@ T_STAFFROLL	Staff roll
 T_RATEUP_ON	SSR rate UP!
 T_END_SOON	Ends in
 T_ENDED_TITLE	The service has ended
+T_ENDED_REFUND	Refunds are being accepted	!
+T_ENDED_REFUND_END	Refunds are now closed	!
+T_ENDED_404	404 This page does not exist	!
+T_ENDED_AD	[AD] Starsong Ark: sign up now	!
+T_WK_TITLE	Wiki	!
+T_WK_HEAD	TurboGuild (discontinued)	!
+T_WK_P1	A social game for mobile phones, run from 1 July 2011 to 26 March 2012.	!
+T_WK_H_HIST	- History	!
+T_WK_HIST1	Sep 2011: the USR rarity arrived. Inflation drove free players away.	!
+T_WK_HIST2	Nov: first guild war. Dec: XUSR. Feb 2012: the end was announced.	!
+T_WK_H_PL	- One player	!
+T_WK_PL1	"$" belonged to the guild "#" and spent % yen in all.	!
+T_WK_PL1N	"$" never joined a guild and spent % yen in all.	!
+T_WK_PL_TOP10	Once made the top 10 in an event.	!
+T_WK_PL_TOP100	Once made the top 100 in an event.	!
+T_WK_PL_MATES	% guildmates were still there on the last day.	!
+T_WK_PL_ALONE	On the last day, only this player was left in the guild.	!
+T_WK_H_EVAL	- Reception	!
+T_WK_EV_SAVED	Some analyses show it could have survived with other decisions.	!
+T_WK_EV_OPS	An operator-side analysis put the best possible profit at % man-yen.	!
+T_WK_EV0	Its fast inflation was criticized, but many still miss the guild life.	!
+T_WK_LAST	At its peak it had over 100,000 players.	!
+T_WK_GUIDE	U/D:Scroll ESC:Back	!
 T_MEMORIES	Memories
 T_RESET	Reset memories
 T_RESET_CONFIRM	Start over from scratch?
@@ -558,6 +583,19 @@ T_BD_OFFA0	Yesterday's meetup was fun!	!
 T_BD_OFFA1	Nobody looked like I imagined lol	!
 T_BD_OFFA2	I'll send the photos from the meetup	!
 T_BD_OFFYOU	$, come next time!	!
+T_BD_FIN0	One hour left	!
+T_BD_FIN1	Everyone here? Let's stay to the end	!
+T_BD_FIN2	I still have my first gacha card	!
+T_BD_FIN3	The guild wars were fun	!
+T_BD_FIN4	Wish the ones who left could see this	!
+T_BD_FIN5	$, are you here too?	!
+T_BD_FIN6	30 minutes...	!
+T_BD_FIN7	Glad I met you all here	!
+T_BD_FIN8	Got a screenshot!	!
+T_BD_FIN9	I'm about to cry	!
+T_BD_FIN10	10 minutes. Thank you, everyone	!
+T_BD_FIN11	See you somewhere. Good night	!
+T_BD_DISCONN	Connection to the server was lost	!
 T_RIVAL	Rival	!
 T_RV_BEHIND	 is ahead by 	!
 T_RV_CHASE	 is chasing, 	!
@@ -1130,7 +1168,7 @@ T_ALB_NONE	No memories yet
 T_ALB_DAYP	Day 	!
 T_ALB_DAYS	 
 T_ALB_GUIDE	L/R:Page ESC:Back
-T_ALB_GUIDE_END	L/R:Page 1:Cards 3:Letters
+T_ALB_GUIDE_END	L/R 1:Cards 3:Mail 4:Wiki
 T_MEMO0	Adventure began	!
 T_MEMO1	First SSR
 T_MEMO2	Joined a guild

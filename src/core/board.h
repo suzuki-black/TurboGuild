@@ -7,6 +7,7 @@
 #define CORE_BOARD_H
 #include "../types.h"
 #include "../config.h"
+#include "../data/tables.h"
 
 #define BOARD_IS_MATE(i)  (((i) & 7) == 3)
 #define BOARD_SLOT_SECS   (GSEC_PER_DAY / 4)
@@ -49,6 +50,10 @@ typedef struct {
     u16 ref;             /* 文の # に入れる人（NPC 番号。BOARD_NOREF = なし）。$ には自分の名前が入る */
 } BoardPost;
 #define BOARD_NOREF 0xFFFFu
+/* 最後の 1 時間（DECISIONS #97）: 最終日の 23:00 から 5 分ごとに、残った仲間が順に書く（6 時間に 1 件の決まりを外す） */
+#define BOARD_FINAL_AT    ((u32)(SERVICE_END_DAY - 1) * GSEC_PER_DAY + 23UL * 3600)
+#define BOARD_FINAL_STEP  300UL
+#define BOARD_FINAL_N     12
 
 typedef struct {
     u8 skip;             /* 入力: 新しい順に何件飛ばすか */

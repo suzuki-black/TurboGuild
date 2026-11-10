@@ -218,6 +218,7 @@ SCREEN(scr_news, 0, news_update, news_draw, 0)
 #define BOARD_END 196
 
 static u8 board_shown;          /* いま見えている件数（下へ送れるか） */
+static u8 board_step;           /* 最後の 1 時間: 描いたときの 5 分の区切り（変わったら描き直す） */
 
 /* g_ticker_buf を 32 桁で折り返したときの行数 */
 static u8 lines_of_buf(void)
@@ -233,7 +234,12 @@ static u8 lines_of_buf(void)
     return (u8)((w + 31) >> 5);
 }
 
-FAR(void, board_init, (void)) { g_cursor = 0; }
+FAR(void, board_init, (void))
+{
+    u32 t = g_save.g_time;
+    g_cursor = 0;
+    board_step = (u8)(t >= BOARD_FINAL_AT ? (t - BOARD_FINAL_AT) / BOARD_FINAL_STEP : 0xFF);
+}
 
 FAR(void, board_draw, (void))
 {
@@ -264,6 +270,18 @@ FAR(void, board_draw, (void))
 FAR(void, board_update, (void))
 {
     u8 p = input_pressed();
+    u32 t = g_save.g_time;
+    if (t >= (u32)SERVICE_END_DAY * GSEC_PER_DAY) {          /* 0:00 で止まる */
+        ui_msg(T_BD_DISCONN);
+        screen_change(&scr_home);                            /* マイページが結末へ回す */
+        return;
+    }
+    if (t >= BOARD_FINAL_AT && (u8)((t - BOARD_FINAL_AT) / BOARD_FINAL_STEP) != board_step) {   /* 最後の 1 時間は開いたまま流れる */
+        board_step = (u8)((t - BOARD_FINAL_AT) / BOARD_FINAL_STEP);
+        g_cursor = 0;
+        psg_beep(0x200, 2);
+        g_dirty = 1;
+    }
     if ((p & BTN_UP) && g_cursor) { g_cursor--; psg_beep(0x100, 2); g_dirty = 1; }
     if ((p & BTN_DOWN) && board_shown > 1) { g_cursor++; psg_beep(0x100, 2); g_dirty = 1; }
     if (input_digit() == 1) { psg_beep(0x80, 4); screen_change(&scr_roster); return; }   /* メンバー */

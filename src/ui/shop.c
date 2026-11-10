@@ -154,7 +154,7 @@ static void act(void)
             ui_msg(T_INN_SLEPT);
         } else if (k == 2) {
             if (!player_wait(&pl)) { ui_msg(T_PLAN_NONE); return; }
-            ui_msg(pl.kind == PLAN_GVG ? T_INN_WAITED_GVG : T_INN_WAITED_EV);
+            ui_msg(pl.kind == PLAN_GVG ? T_INN_WAITED_GVG : pl.kind == PLAN_LAST ? T_INN_WAITED_LAST : T_INN_WAITED_EV);
         } else return;
         g_save_dirty = 1;
         psg_beep(0x200, 20);

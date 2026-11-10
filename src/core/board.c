@@ -25,41 +25,8 @@
 
 #include "mates_w.h"
 
-/* 時間帯 s に板にいる仲間の数と、k 以外で最初にいる人（いなければ NO_K） */
-static u8 active_other(const Work *w, u16 s, u8 k, u8 *n)
-{
-    u8 j, first = NO_K;
-    *n = 0;
-    for (j = 0; j < w->nm; j++) {
-        u8 jj = (u8)((k + 1 + j) % w->nm);
-        if (gone_at(w, jj, s)) continue;
-        (*n)++;
-        if (jj != k && first == NO_K) first = jj;
-    }
-    return first;
-}
 
-/* d 日目に体験入隊してくる人（ギルドの仲間ではない NPC。いなければ BOARD_NOREF） */
-static u16 newbie_of(u16 d)
-{
-    u16 h = hash(d, (u16)(SALT_NEWBIE + g_save.guild * 3));
-    u16 i;
-    if (d < 10 || d >= 239 || h % NEWBIE_EVERY) return BOARD_NOREF;
-    i = (u16)(hash(h, SALT_NEWBIE) % NPC_COUNT);
-    if (BOARD_IS_MATE(i)) i = (u16)((i + 1) % NPC_COUNT);
-    return i;
-}
 
-/* d 日目の夜にオフ会の誘いがあるか（4 人以上いるときだけ） */
-static u8 off_day(const Work *w, u16 d)
-{
-    u8 n, g;
-    u16 s = (u16)(d * 4 + 3);
-    if (d < 20 || d >= 230 || (d + g_save.guild * 7u) % OFF_EVERY || (hash(d, (u16)(SALT_OFF + g_save.guild)) & 1)) return 0;   /* 候補はギルドごとに 45 日に 1 日。その半分 */
-    active_other(w, s, 0, &n);
-    g = gm_of(w, s);
-    return (u8)(n >= 4 && g != NO_K && !gone_at(w, g, s));   /* 誘うのはギルマス */
-}
 
 static void add(Work *w, u16 base, u8 count, u16 param)
 {
@@ -112,11 +79,6 @@ static void topics(Work *w, u16 d)
     }
 }
 
-static void say(BoardPost *p, u16 base, u8 count, u16 x)
-{
-    p->text = (u16)(base + x % count);
-    p->alt = (u16)(base + (x + 1) % count);          /* 続けて同じ文になったときの代わり */
-}
 
 /* 時間帯 s の、反応すべき自分の出来事（無ければ 0）。出来事のあった時間帯なら *first = 1 */
 static const PlayerEv *event_at(u16 s, u8 *first)
@@ -130,103 +92,8 @@ static const PlayerEv *event_at(u16 s, u8 *first)
     return 0;
 }
 
-static void put(BoardPost *p, u8 kind, u16 npc, u16 d, u16 ref)
-{
-    p->npc = npc; p->kind = kind; p->text = p->alt = 0; p->param = 0; p->day = d; p->ref = ref;
-    p->tone = kind == BP_POST ? (u8)(hash(npc, SALT_MATE) & 3) : 0;
-}
 
-/* 去り方の決まった時刻の書き込み（形見分け・復帰・整理・ギルマスの交代）。無ければ 0 */
-static u8 fixed_at(const Work *w, u16 s, BoardPost *p)
-{
-    u16 d = s >> 2, x = (u16)(s + d);
-    u8 k, g;
-    if ((s & 3) == 3 && off_day(w, d)) {   /* ほかの決まった書き込みより先に */
-        g = gm_of(w, s);   /* オフ会の誘い */
-        put(p, BP_POST, w->m[g], d, BOARD_NOREF);
-        p->text = p->alt = T_BD_OFF;
-        return 1;
-    }
-    if (d >= OFF_AFTER && off_day(w, (u16)(d - OFF_AFTER)) && ((s & 3) == 1 || (s & 3) == 3)) {   /* 翌朝「楽しかった」、夜は自分にも */
-        u8 n;
-        g = active_other(w, s, (u8)(d % w->nm), &n);
-        if (g != NO_K) {
-            put(p, BP_POST, w->m[g], d, BOARD_NOREF);
-            if ((s & 3) == 1) say(p, T_BD_OFFA0, 3, x); else p->text = p->alt = T_BD_OFFYOU;
-            return 1;
-        }
-    }
-    for (k = 0; k < w->nm; k++) {
-        u16 rd = w->rd[k], f = w->f[k];
-        if (rd == BOARD_NEVER) continue;
-        if ((f & MF_GIVER) && s == rd * 4 + 1 && w->joined <= rd) {   /* 辞める日の朝: カードを置いていく */
-            put(p, BP_POST, w->m[k], d, BOARD_NOREF);
-            say(p, T_BD_KEEP0, 2, x);
-            return 1;
-        }
-        if (w->rb[k] != BOARD_NEVER) {
-            if (s == w->rb[k] * 4 + 1) {                 /* 戻ってきた朝 */
-                put(p, BP_POST, w->m[k], d, BOARD_NOREF);
-                if (MF_REASON(f) == MR_PHONE) p->text = p->alt = T_BD_RETPH;
-                else say(p, T_BD_RET0, 3, x);
-                return 1;
-            }
-            if (s == (w->rb[k] + BOARD_BACK_DAYS - 1) * 4 + 3) {   /* 最後の夜にまた去る */
-                put(p, BP_POST, w->m[k], d, BOARD_NOREF);
-                say(p, T_BD_REBYE0, 2, x);
-                return 1;
-            }
-        }
-        if (s == w->pg[k] * 4 + 2) {                     /* 黙って消えた人を、ギルマスが整理する */
-            u8 was = gm_of(w, (u16)(s - 1));
-            g = gm_of(w, s);
-            if (g == NO_K) { if (was == k) { put(p, BP_SYS, 0, d, BOARD_NOREF); return 1; } continue; }
-            if (gone_at(w, g, s)) continue;              /* ギルマスも来ていない */
-            put(p, BP_POST, w->m[g], d, w->m[k]);
-            if (was == k) p->text = p->alt = T_BD_GMGHOST;
-            else say(p, T_BD_PURGE0, 3, x);
-            return 1;
-        }
-        if (!(f & MF_GHOST) && s == rd * 4 + 3 && gm_of(w, (u16)(rd * 4 + 1)) == k) {   /* ギルマスが辞めた日の夜に、次の人が継ぐ */
-            g = gm_of(w, s);
-            if (g == NO_K) { put(p, BP_SYS, 0, d, BOARD_NOREF); return 1; }   /* 最後は自分に回ってくる */
-            if (gone_at(w, g, s)) continue;
-            put(p, BP_POST, w->m[g], d, w->m[k]);
-            say(p, T_BD_GM0, 3, x);
-            return 1;
-        }
-    }
-    for (k = 0; k < w->nm; k++) {                        /* 誕生日: 朝に誰かが祝い、夜に本人が書く */
-        u8 n;
-        if (w->bd[k] != d || gone_at(w, k, s)) continue;
-        if ((s & 3) == 1) {
-            g = active_other(w, s, k, &n);
-            if (g == NO_K) continue;
-            put(p, BP_POST, w->m[g], d, w->m[k]);
-            say(p, T_BD_BDAY0, 2, x);
-            return 1;
-        }
-        if ((s & 3) == 3) { put(p, BP_POST, w->m[k], d, BOARD_NOREF); say(p, T_BD_BDME0, 2, x); return 1; }
-    }
-    {
-        u16 nb = newbie_of(d);                           /* 体験入隊: 昼にあいさつして、そのまま来なくなる */
-        if (nb != BOARD_NOREF && (s & 3) == 2) { put(p, BP_POST, nb, d, BOARD_NOREF); say(p, T_BD_NEWB0, 3, x); return 1; }
-        nb = d >= 4 ? newbie_of((u16)(d - 4)) : BOARD_NOREF;
-        if (nb != BOARD_NOREF && (s & 3) == 1 && (g = gm_of(w, s)) != NO_K && !gone_at(w, g, s)) {
-            put(p, BP_POST, w->m[g], d, nb);
-            p->text = p->alt = T_BD_NEWGONE;
-            return 1;
-        }
-    }
-    return 0;
-}
 
-/* オフ会の当日（誘いの OFF_AFTER - 1 日後）の午後と夜は、みんな出かけていて板が静か */
-static u8 quiet_at(const Work *w, u16 s)
-{
-    u16 d = s >> 2;
-    return (u8)((s & 3) >= 2 && d >= OFF_AFTER - 1 && off_day(w, (u16)(d - (OFF_AFTER - 1))));
-}
 
 /* 時間帯 s の書き込み。無ければ 0。reply = 0 のときは返事にしない（1 つ前を見に行くのは 1 段だけ） */
 static u8 post_at(Work *w, u16 s, BoardPost *p, u8 reply)
@@ -243,8 +110,11 @@ static u8 post_at(Work *w, u16 s, BoardPost *p, u8 reply)
         }
         if (!gone_at(w, k, s) || back_at(w, k, s)) act[na++] = w->m[k];
     }
-    if (fixed_at(w, s, p)) return 1;
-    if (quiet_at(w, s)) return 0;
+    w->s = s;
+    first = board_fixed(w, p);                       /* 決まった時刻の書き込み（バンク 101） */
+    if (first == 1) return 1;
+    if (first == 2) return 0;                        /* オフ会の当日は静か */
+    first = 0;
     h = hash(s, SALT_POST(0));
     ev = event_at(s, &first);
     if (!na || ((h & 7) >= na && !first)) return 0;  /* 自分の出来事のあった時間帯は必ず誰かが書く */
@@ -339,6 +209,13 @@ static void out(BoardList *l, const BoardPost *p, u8 *skip)
 }
 
 
+/* 文体: 半分ほどはふつう、2 割が半角ｶﾅ、残りが小さい「ぁぃぅ」 */
+static u8 style_of(u16 npc)
+{
+    u8 v = (u8)(hash(npc, SALT_STYLE) % 20);
+    return v < 11 ? 0 : v < 15 ? 1 : 2;
+}
+
 FAR(void, board_list, (BoardList *l))
 {
     Work w;
@@ -348,17 +225,26 @@ FAR(void, board_list, (BoardList *l))
     l->n = 0;
     if (!g_save.guild || g_save.guild > GUILD_COUNT) return;
     setup(&w);
+    if (g_save.g_time >= BOARD_FINAL_AT && g_save.g_time < (u32)SERVICE_END_DAY * GSEC_PER_DAY) {   /* 最後の 1 時間 */
+        u8 act[MATES_MAX], na = 0, j = (u8)((g_save.g_time - BOARD_FINAL_AT) / BOARD_FINAL_STEP), g = gm_of(&w, s);
+        for (look = 0; look < w.nm; look++) if (!gone_at(&w, (u8)look, s)) act[na++] = (u8)look;
+        for (; na && l->n < l->want && l->n < BOARD_MAX; j--) {
+            u8 k = act[(BOARD_FINAL_N - 1 - j) % na];        /* 最後の 1 件はいつもギルマス（並びの最初の人）から */
+            put(&nx, BP_POST, w.m[k], (u16)(SERVICE_END_DAY - 1), BOARD_NOREF);
+            nx.text = nx.alt = (u16)(T_BD_FIN0 + j);
+            nx.gm = (u8)(g == k);
+            nx.style = style_of(nx.npc);
+            out(l, &nx, &skip);
+            if (!j) break;
+        }
+    }
     /* 続けて同じ文にしない。q0 を出すときは、q1 を「その古い方（いま来た nx）と比べて直したもの」と比べる。
      * 古い方だけを見るので、新しい書き込みが来ても過去の文は変わらない */
     for (look = 0; look < BOARD_LOOKBACK && l->n < l->want && l->n < BOARD_MAX; look++, s--) {
         if (post_at(&w, s, &nx, 1)) {
             u8 g = gm_of(&w, s);
             nx.gm = (u8)(nx.kind != BP_SYS && g != NO_K && w.m[g] == nx.npc);
-            nx.style = 0;
-            if (nx.kind == BP_POST) {                    /* 文体: 半分ほどはふつう、2 割が半角ｶﾅ、残りが小さい「ぁぃぅ」 */
-                u8 v = (u8)(hash(nx.npc, SALT_STYLE) % 20);
-                nx.style = v < 11 ? 0 : v < 15 ? 1 : 2;
-            }
+            nx.style = nx.kind == BP_POST ? style_of(nx.npc) : 0;
             if (have == 2) {
                 BoardPost q1f = q[1];
                 fix(&q1f, &nx);
