@@ -89,6 +89,8 @@ static void add_text_param(u16 id, u16 param, u16 ref)
 /* 伝言板の 1 件を文にする */
 static void post_text(const BoardPost *p)
 {
+    if (p->kind == BP_SYS) { add_text_param(T_BOARD_YOUGM, 0, BOARD_NOREF); return; }   /* 自分がギルドマスターに */
+    if (p->gm) add_text(T_BOARD_GM);
     add_npc(p->npc);
     if (p->kind == BP_LEAVE) { add_text(T_BOARD_LEFT); return; }
     add_text(T_BOARD_SAY);
@@ -245,7 +247,7 @@ FAR(void, board_draw, (void))
         add_str(" ");
         post_text(p);
         if (y + lines_of_buf() * 16 > BOARD_END) break;     /* 入りきらない件は次の画面で */
-        y = wrapped(y, p->kind == BP_LEAVE ? COL_LGRAY : COL_WHITE, k & 1 ? COL_BLACK : COL_DGRAY, BOARD_END);
+        y = wrapped(y, p->kind == BP_LEAVE ? COL_LGRAY : p->kind == BP_SYS ? COL_YELLOW : COL_WHITE, k & 1 ? COL_BLACK : COL_DGRAY, BOARD_END);
         board_shown++;
     }
     ui_guide(T_BOARD_GUIDE);

@@ -106,6 +106,16 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.stolen[0].card == 9 && s.pev[0].kind == 0);
+    /* v15 も読め、v16 で足した形見分けの印は 0 から */
+    save_new(&s, 1);
+    s.pev[0].kind = 3;
+    s.keep_got = 0x5A;
+    s.magic = SAVE_MAGIC;
+    s.version = 15;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.pev[0].kind == 3 && s.keep_got == 0);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;

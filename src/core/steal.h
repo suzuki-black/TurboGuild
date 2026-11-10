@@ -39,4 +39,9 @@ typedef struct {
 void steal_list(StealList *l);           /* 取り返せる相手（先）と盗める相手を並べる */
 u8   steal_try(StealList *l, u16 k);      /* l->r[k] へ盗みに行く。STEAL_*。l は呼ぶ前に steal_list で作る */
 u8   steal_tick(void);                   /* 前に数えたときから今までに盗まれた枚数（マイページに入るたび） */
+/* 形見分け（DECISIONS #94）: 去った仲間がカードを 1 枚置いていく（board.h の MF_GIVER）。受け取ったら
+ * KEEP_NPC(v) にその仲間、KEEP_CARD(v) にカード。無ければ 0。1 回に 1 枚だけ（マイページに入るたび） */
+u16  keep_tick(void);
+#define KEEP_K(v)      ((u8)((v) >> 12))
+#define KEEP_CARD(v)   ((u16)((v) & 0x0FFF))
 #endif

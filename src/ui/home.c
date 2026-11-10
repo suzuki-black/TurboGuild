@@ -173,12 +173,12 @@ static void rival_header(void)
     txt_num(cx, 0, d, r.value >= r.player ? COL_ORANGE : COL_CYAN, COL_DBLUE);
 }
 
-static void npc_name(u8 cx, u8 y, u16 npc, u8 fg, u8 bg)
+static u8 npc_name(u8 cx, u8 y, u16 npc, u8 fg, u8 bg)
 {
     NpcRec n;
     tbl_npc(npc, &n);
     cx = txt_id(cx, y, (u16)(NPC_PRE_TEXT + n.name_id / NPC_SUF_COUNT), fg, bg);
-    txt_id(cx, y, (u16)(NPC_SUF_TEXT + n.name_id % NPC_SUF_COUNT), fg, bg);
+    return txt_id(cx, y, (u16)(NPC_SUF_TEXT + n.name_id % NPC_SUF_COUNT), fg, bg);
 }
 
 /* 知らせの箱。相手の名前とひとこと（comment = 0 なら無し）。出している間に次のライバルを指名する */
@@ -262,6 +262,30 @@ static void stolen_popup(void)
     g_dirty = 1;
 }
 
+static u16 keep_got;            /* マイページに入ったときに受け取った形見分け（keep_tick の値。0 = なし） */
+
+/* 去った仲間が置いていったカード */
+static void keep_popup(void)
+{
+    CardRec c;
+    u16 card = KEEP_CARD(keep_got);
+    u8 cx;
+    ui_box(16, 64, 224, 80, COL_DBLUE, COL_CYAN);
+    txt_id(3, 68, T_KEEP_HEAD, COL_YELLOW, COL_DBLUE);
+    cx = npc_name(3, 86, (u16)((g_save.guild - 1) * 8 + 3 + KEEP_K(keep_got) * 128), COL_CYAN, COL_DBLUE);
+    txt_id(cx, 86, T_KEEP_FROM, COL_WHITE, COL_DBLUE);
+    if (card && card <= tbl_card_count()) {
+        tbl_card(card, &c);
+        cx = ui_rarity(3, 104, c.rarity, COL_DBLUE);
+        txt_id((u8)(cx + 1), 104, c.name_text, COL_WHITE, COL_DBLUE);
+    }
+    txt_id(3, 124, T_KEEP_HINT, COL_LGRAY, COL_DBLUE);
+    psg_beep(0x0A0, 12);
+    keep_got = 0;
+    ui_wait_key();
+    g_dirty = 1;
+}
+
 static void show_login_bonus(void)
 {
     screen_change(&scr_login);
@@ -294,6 +318,8 @@ FAR(void, home_init, (void))
     if (g_save.steal_check && g_save.g_time - g_save.steal_check >= 2 * GSEC_PER_DAY)   /* 久しぶりに来た（前にマイページへ来た時刻） */
         pev_push(PEV_BACK, (u16)((g_save.g_time - g_save.steal_check) / GSEC_PER_DAY));
     if (steal_tick()) g_save_dirty = 1;              /* 留守の間に盗まれたカード（知らせは home_draw） */
+    keep_got = keep_tick();                          /* 去った仲間が置いていったカード */
+    if (keep_got) g_save_dirty = 1;
     if (g_login.given || g_paid || g_evres.started || g_evres.ended || g_gift || g_joined ||
         g_gvgres.joined || g_gvgres.n || g_gvgres.ended) g_save_dirty = 1;
     if (g_cursor == ITEMS && !has_banner()) g_cursor = 0;
@@ -336,6 +362,7 @@ FAR(void, home_draw, (void))
         return;
     }
     if (g_save.stolen_new) { stolen_popup(); return; }
+    if (keep_got) { keep_popup(); return; }
     if (g_evres.started || g_evres.ended) { screen_change(&scr_evresult); return; }
     if (g_gvgres.joined || g_gvgres.n || g_gvgres.ended) { gvg_result_show(); return; }
     if (g_login.given) { show_login_bonus(); return; }

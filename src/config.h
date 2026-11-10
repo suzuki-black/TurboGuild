@@ -125,6 +125,7 @@
 #define STEAL_PCT_MIN       10
 #define STEAL_PCT_MAX       90
 #define STEAL_PCT_BACK      20       /* 取り返すときに足す */
+#define KEEP_DAYS           30       /* 去った仲間の形見分けを受け取れるのは、去った日からこの日数まで（古いセーブで一度に届かないように） */
 
 /* 画面 */
 #define TEXT_COLS           32

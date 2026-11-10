@@ -324,14 +324,36 @@ T_BOARD_DAY	d
 T_BOARD_TONE1	 lol	!
 T_BOARD_TONE2	 :)
 T_BOARD_TONE3	 ^^;
-T_BD_FADE0	Busy lately. Might not be around much	!
-T_BD_FADE1	I just log in and log out these days	!
-T_BD_FADE2	Work's getting busy. Taking a break	!
-T_BD_FADE3	Honestly, I'm getting tired of it	!
-T_BD_FADE4	Pulls don't excite me anymore	!
-T_BD_FADE5	Real life's been hectic	!
-T_BD_FADE6	Just grabbing the login bonus. Night	!
-T_BD_FADE7	I can't keep up with you all	!
+T_BOARD_YOUGM	$ is now the guild master	!
+T_BOARD_GM	*	!
+T_BD_FADE0	Exams are coming. I should study	!
+T_BD_FADE1	My mock exam went badly...	!
+T_BD_FADE2	More cram school lately	!
+T_BD_FADE3	I'll be on less until exams are over	!
+T_BD_FADE4	Job hunting started. Hard to log in	!
+T_BD_FADE5	Got a job offer! Training is busy, though	!
+T_BD_FADE6	New job has more overtime than I thought	!
+T_BD_FADE7	Work's getting busy. Taking a break	!
+T_BD_FADE8	Actually... I'm getting married	!
+T_BD_FADE9	Busy getting ready for the wedding	!
+T_BD_FADE10	I need to tell my partner about the spending...	!
+T_BD_FADE11	Not sure I can keep playing after we move	!
+T_BD_FADE12	My parents may have seen this month's bill	!
+T_BD_FADE13	Mom asked what I spent the money on	!
+T_BD_FADE14	Uh oh. Got yelled at over the phone bill	!
+T_BD_FADE15	I might lose my phone for a while	!
+T_BD_FADE16	I just log in and log out these days	!
+T_BD_FADE17	Pulls don't excite me anymore	!
+T_BD_FADE18	Just grabbing the login bonus. Night	!
+T_BD_FADE19	I can't keep up with you all	!
+T_BD_FADE20	A friend got me into another game. It's fun	!
+T_BD_FADE21	I pre-registered for that other game	!
+T_BD_FADE22	I mostly play the other game now	!
+T_BD_FADE23	I do like this guild, though	!
+T_BD_FADE24	Found a site that sells gems cheap	!
+T_BD_FADE25	Wouldn't a second account make it easier?	!
+T_BD_FADE26	Got a mail from the operator. What's this?	!
+T_BD_FADE27	I think I found an exploit	!
 T_BD_END0	Shutting down? Can't believe it	!
 T_BD_END1	I'm staying to the end. You too?	!
 T_BD_END2	What happens to all I spent?	!
@@ -462,6 +484,45 @@ T_BD_RE20	You really ran that event, $	!
 T_BD_RE21	You slept well, $	!
 T_BD_RE22	Morning $! How was the inn?	!
 T_BD_RE23	Didn't see you last night, $	!
+T_BD_KEEP0	$, I'm leaving you a card I don't use	!
+T_BD_KEEP1	$, this card is yours. Take care of it	!
+T_BD_RET0	I'm back! Feels like Rip Van Winkle	!
+T_BD_RET1	I'm back! Is everyone still here?	!
+T_BD_RET2	Long time no see. A lot has changed	!
+T_BD_RETPH	Lost my data with a new phone. Started over	!
+T_BD_REBYE0	I just don't have the time... see you	!
+T_BD_REBYE1	Good to see you all. Someday again	!
+T_BD_PURGE0	# hasn't been on for ages. Removed	!
+T_BD_PURGE1	Removed #, who's been away a long time	!
+T_BD_PURGE2	Removed #. Thanks for everything	!
+T_BD_GM0	I've taken over as master from #	!
+T_BD_GM1	I'm the guild master from today!	!
+T_BD_GM2	I'll lead the guild in #'s place	!
+T_BD_GMGHOST	Our master # stopped coming. I took over	!
+T_BD_GMRE0	>#: Glad to have you!	!
+T_BD_GMRE1	>#: Thanks for leading us	!
+T_BD_WB0	>#: Welcome back!	!
+T_BD_WB1	>#: Whoa, long time!	!
+T_BD_WB2	>#: How have you been?	!
+T_BD_GHOST0	Haven't seen # lately	!
+T_BD_GHOST1	# doesn't seem to log in	!
+T_BD_GHOST2	Wonder what happened to #	!
+T_BD_WHY0	Hope # did well on the exams	!
+T_BD_WHY1	# is probably studying right now	!
+T_BD_WHY2	Hope #'s doing well at work	!
+T_BD_WHY3	# has a real job now, huh	!
+T_BD_WHY4	Wonder how married life is for #	!
+T_BD_WHY5	Wish I could've gone to #'s wedding	!
+T_BD_WHY6	Hope # was OK after the parents found out	!
+T_BD_WHY7	Did # get the phone back?	!
+T_BD_WHY8	# must have gotten bored	!
+T_BD_WHY9	Hope # drops by again sometime	!
+T_BD_WHY10	Heard # is doing fine in the other game	!
+T_BD_WHY11	# runs a guild in the other game now	!
+T_BD_WHY12	Heard # got banned...	!
+T_BD_WHY13	Turns out # broke the rules	!
+T_BD_WHY14	Heard # lost the data with a new phone	!
+T_BD_WHY15	#'s data is gone. Poor thing	!
 T_RIVAL	Rival	!
 T_RV_BEHIND	 is ahead by 	!
 T_RV_CHASE	 is chasing, 	!
@@ -1056,6 +1117,9 @@ T_STOLEN_HEAD	Stolen while away: 	!
 T_STOLEN_HEAD2	!
 T_STOLEN_BY	Thief
 T_STOLEN_HINT	Get it back
+T_KEEP_HEAD	A parting gift	!
+T_KEEP_FROM	 left this	!
+T_KEEP_HINT	Left on the way out
 T_STEAL_TITLE	Go stealing	!
 T_STEAL_BACK	Retake
 T_STEAL_THEM	Their power

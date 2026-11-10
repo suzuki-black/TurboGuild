@@ -16,10 +16,29 @@
 
 #define BP_POST  0
 #define BP_LEAVE 1
+#define BP_SYS   2       /* 仲間が誰もいなくなり、自分がギルドマスターになった（npc は使わない） */
+
+/* 仲間の去り方（mate_fate の値。DECISIONS #94）。引退の日（mate_retire_day）は変えず、去り方だけを足す */
+#define MR_EXAM    0     /* 受験 */
+#define MR_JOB     1     /* 就職 */
+#define MR_MARRY   2     /* 結婚 */
+#define MR_PARENT  3     /* 親に見つかった */
+#define MR_BORED   4     /* 飽きた */
+#define MR_OTHER   5     /* ほかのゲームへ */
+#define MR_BANNED  6     /* 凍結 */
+#define MR_PHONE   7     /* 機種変で引き継ぎ失敗（弱音も脱退も無く、突然来なくなる） */
+#define MR_COUNT   8
+#define MF_REASON(f)  ((u8)((f) & 7))
+#define MF_GHOST      0x08u    /* 何も言わずに来なくなる（脱退の知らせも無く、後でギルマスが整理する） */
+#define MF_GIVER      0x10u    /* 最後の日にカードを 1 枚置いていく */
+#define MF_COURSE(f)  ((u8)(((f) >> 5) & 3))   /* 課金コース 0..3（伝言板の課金の話と同じ） */
+#define MF_BACK(f)    ((u8)((f) >> 8))         /* 引退の何日後に 1 度だけ戻ってくるか（0 = 戻らない） */
+#define BOARD_BACK_DAYS 3                      /* 戻ってきて板にいる日数 */
 
 typedef struct {
     u16 npc;
-    u8  kind;            /* BP_POST / BP_LEAVE */
+    u8  kind;            /* BP_POST / BP_LEAVE / BP_SYS */
+    u8  gm;              /* 書いた人がギルドマスター */
     u8  tone;            /* 口癖 0..3（0 = なし） */
     u16 text;            /* 文言 id（BP_POST のとき） */
     u16 alt;             /* 1 つ前（古い方）と同じ文になったときの代わり */
@@ -41,5 +60,6 @@ u16  mate_retire_day(u16 npc);         /* 仲間の引退の日（最後まで�
 u8   npc_tone(u16 npc);               /* 口癖 0..3（仲間でなくても決まる）。同じバンクから直接呼ぶ */
 u16  mate_info(u16 npc);              /* 別のバンク向け: 下位 8 ビットが引退の日（MATE_STAYS = 最後まで残る）、上位が口癖 */
 #define MATE_STAYS 0xFF
+u16  mate_fate(u16 npc);              /* 仲間の去り方（MR_* と MF_*）。board.c にあり、別のバンクからも呼べる */
 void board_list(BoardList *l);
 #endif

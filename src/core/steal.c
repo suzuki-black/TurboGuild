@@ -59,12 +59,11 @@ static u16 active_near(s16 rank, u32 *power)
     return NO_NPC;
 }
 
-/* そのレア度の、いま出回っている通常のカード（無ければ 1 段下げる）を h で 1 枚 */
-static u16 card_of(u8 rar, u16 h)
+/* そのレア度の、d 日目に出回っている通常のカード（無ければ 1 段下げる）を h で 1 枚 */
+static u16 card_on(u8 rar, u16 h, u16 d)
 {
     CardRec c;
     u16 n = tbl_card_count(), id, hits;
-    u16 d = today();
     for (;;) {
         hits = 0;
         for (id = 1; id <= n; id++) {
@@ -83,6 +82,8 @@ static u16 card_of(u8 rar, u16 h)
     }
     return 1;
 }
+
+static u16 card_of(u8 rar, u16 h) { return card_on(rar, h, today()); }
 
 static u8 pct_of(u32 me, u32 their, u8 back)
 {
@@ -218,4 +219,27 @@ FAR(u8, steal_tick, (void))
         got++;
     }
     return got;
+}
+
+/* 形見分け: 去った日の昼（脱退の知らせが流れる時刻）を過ぎた仲間から、課金コースに合ったレア度のカードを 1 枚 */
+FAR(u16, keep_tick, (void))
+{
+    static const u8 rar[4] = { RARITY_N, RARITY_R, RARITY_R, RARITY_SR };
+    u16 i, d = today(), joined, c, f;
+    u8 k = 0;
+    if (!g_save.guild) return 0;
+    joined = g_save.memo[MEMO_GUILD] ? (u16)(g_save.memo[MEMO_GUILD] - 1) : 0;
+    for (i = (u16)((g_save.guild - 1) * 8 + 3); i < NPC_COUNT && k < 8; i += 128, k++) {
+        u8 rd = (u8)mate_info(i), bit = (u8)(1 << k);
+        if (rd == MATE_STAYS || (g_save.keep_got & bit) || rd < joined) continue;
+        if (g_save.g_time < (u32)rd * GSEC_PER_DAY + 2 * STEAL_SLOT_SECS) continue;   /* 去る日の昼から */
+        f = mate_fate(i);
+        if (!(f & MF_GIVER)) continue;
+        if (d > rd + KEEP_DAYS) { g_save.keep_got |= bit; continue; }                 /* 古すぎる（前の版のセーブ） */
+        c = card_on(rar[MF_COURSE(f)], mix(i, 0x4B1Du), rd);
+        if (inv_add(c) == INV_FULL) return 0;                                          /* いっぱいなら次に来たとき */
+        g_save.keep_got |= bit;
+        return (u16)(((u16)k << 12) | c);
+    }
+    return 0;
 }

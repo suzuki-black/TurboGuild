@@ -773,7 +773,7 @@ static void test_board(void)
     g_save.guild = 1;
     for (i = 3; i < NPC_COUNT; i += 128) {             /* ギルド 1 の仲間で、辞める人を 1 人 */
         u16 d = mate_retire_day(i);
-        if (d != BOARD_NEVER && d > 40) { rd = d; who = i; break; }
+        if (d != BOARD_NEVER && d > 40 && !(mate_fate(i) & MF_GHOST)) { rd = d; who = i; break; }   /* 黙って消える人は脱退の知らせが無い */
     }
     CHECK(rd != 0);
     g_save.g_time = (u32)rd * GSEC_PER_DAY + 13UL * 3600;   /* 辞める日の昼 */
@@ -809,11 +809,19 @@ static void test_board(void)
             for (k = 0; k < l.n; k++) {
                 const BoardPost *p = &l.post[k];
                 posts++;
+                if (p->kind == BP_SYS) continue;
                 tbl_npc(p->npc, &r);
                 CHECK(BOARD_IS_MATE(p->npc) && r.guild == g - 1);
-                if (p->kind == BP_LEAVE) { CHECK(mate_retire_day(p->npc) == p->day); continue; }
-                CHECK(mate_retire_day(p->npc) >= p->day);
-                CHECK(p->text >= T_BD_FADE0 && p->text <= T_BD_RE23 && p->tone < 4);
+                if (p->kind == BP_LEAVE) { CHECK(mate_retire_day(p->npc) == p->day && !(mate_fate(p->npc) & MF_GHOST)); continue; }
+                {
+                    u16 f = mate_fate(p->npc), d0 = mate_retire_day(p->npc);
+                    CHECK(d0 >= p->day || (MF_BACK(f) && p->day >= d0 + MF_BACK(f) && p->day < d0 + MF_BACK(f) + BOARD_BACK_DAYS));   /* 辞めた後は、戻ってきた数日だけ */
+                }
+                CHECK(p->text >= T_BD_FADE0 && p->text <= T_BD_WHY15 && p->tone < 4);
+                if (p->text >= T_BD_KEEP0) {             /* 去り方の文（# の入る文の名前はギルドの仲間） */
+                    if (p->ref != BOARD_NOREF) CHECK(BOARD_IS_MATE(p->ref) && p->ref != p->npc && (p->ref >> 3) % GUILD_COUNT == g - 1);
+                    continue;
+                }
                 if (p->text == T_BD_NEW0 || p->text == T_BD_NEW1 || p->text == T_BD_NEW2 || p->text == T_BD_NEW4 ||
                     p->text == T_BD_NEW5 || p->text == T_BD_NEW7) { CHECK(p->param == T_RAR_4 || p->param == T_RAR_5); news++; }
                 if (p->text >= T_BD_MISS0 && p->text <= T_BD_BYE2) {   /* # の入る文: 名前はギルドの仲間 */
@@ -846,6 +854,109 @@ static void test_board(void)
         CHECK(l.n == 0 || l.post[0].text < T_BD_RE0);
         memset(g_save.pev, 0, sizeof(g_save.pev));
     }
+}
+
+/* 仲間の去り方（DECISIONS #94）: 引退の理由・黙って消える・ギルマスの交代・復帰・形見分け */
+static void test_mate_fate(void)
+{
+    BoardList l;
+    u16 i, g, gone = 0, ghosts = 0, givers = 0, backs = 0, why[MR_COUNT] = {0};
+    u16 rets = 0, rebyes = 0, purges = 0, gms = 0, sys = 0, keeps = 0, wbs = 0, ghost_miss = 0, gm_mark = 0;
+    u8 k;
+    BoardPost last;
+    memset(&last, 0xFF, sizeof(last));
+    for (i = 3; i < NPC_COUNT; i += 8) {
+        u16 f = mate_fate(i), rd = mate_retire_day(i);
+        CHECK(f == mate_fate(i));                          /* 何度でも同じ */
+        if (rd == BOARD_NEVER) continue;
+        gone++;
+        why[MF_REASON(f)]++;
+        if (f & MF_GHOST) ghosts++;
+        if (f & MF_GIVER) { givers++; CHECK(!(f & MF_GHOST) && MF_REASON(f) != MR_BANNED); }
+        if (MF_REASON(f) == MR_PHONE) CHECK(f & MF_GHOST);  /* 機種変の人は突然いなくなる */
+        if (MF_BACK(f)) {
+            backs++;
+            CHECK(MF_REASON(f) != MR_BANNED && rd + MF_BACK(f) + BOARD_BACK_DAYS <= SERVICE_END_DAY);
+        }
+    }
+    CHECK(ghosts * 100 / gone >= 15 && ghosts * 100 / gone <= 32);   /* 2 割ほどが黙って消える */
+    CHECK(givers * 100 / gone >= 25 && givers * 100 / gone <= 50);
+    CHECK(backs * 100 / gone >= 4 && backs * 100 / gone <= 18);     /* 1 割ほどが 1 度だけ戻る */
+    for (k = 0; k < MR_COUNT; k++) CHECK(why[k] > 0);
+    CHECK(why[MR_BANNED] * 8 < gone && why[MR_PHONE] * 8 < gone);   /* 凍結と機種変はまれ */
+    /* 全ギルドの全期間を 1 時間帯ずつ見る（新しい 1 件だけ） */
+    fresh();
+    for (g = 1; g <= GUILD_COUNT; g++) {
+        u8 had_sys = 0;
+        g_save.guild = (u8)g;
+        for (i = 0; i < SERVICE_END_DAY * 4; i++) {
+            const BoardPost *p = &l.post[0];
+            g_save.g_time = (u32)i * BOARD_SLOT_SECS + 1;
+            l.skip = 0; l.want = 1;
+            board_list(&l);
+            if (!l.n || p->day != i / 4) continue;
+            if (p->npc == last.npc && p->kind == last.kind && p->text == last.text && p->day == last.day) continue;   /* この時間帯は書き込みが無かった */
+            last = *p;
+            if (p->kind == BP_SYS) { CHECK(!had_sys); had_sys = 1; sys++; continue; }   /* 自分に回ってくるのは 1 度だけ */
+            if (p->gm) gm_mark++;
+            if (p->kind != BP_POST) continue;
+            if (p->text == T_BD_KEEP0 || p->text == T_BD_KEEP1) {
+                CHECK((mate_fate(p->npc) & MF_GIVER) && mate_retire_day(p->npc) == p->day && (i & 3) == 1);
+                keeps++;
+            }
+            if (p->text >= T_BD_RET0 && p->text <= T_BD_RETPH) {
+                u16 f = mate_fate(p->npc);
+                CHECK(MF_BACK(f) && p->day == mate_retire_day(p->npc) + MF_BACK(f));
+                CHECK((p->text == T_BD_RETPH) == (MF_REASON(f) == MR_PHONE));
+                rets++;
+            }
+            if (p->text == T_BD_REBYE0 || p->text == T_BD_REBYE1) rebyes++;
+            if (p->text >= T_BD_PURGE0 && p->text <= T_BD_PURGE2) {
+                CHECK((mate_fate(p->ref) & MF_GHOST) && p->day >= mate_retire_day(p->ref) + 14 && p->gm);
+                purges++;
+            }
+            if (p->text >= T_BD_GM0 && p->text <= T_BD_GMGHOST) { CHECK(p->gm && p->ref != p->npc); gms++; }
+            if (p->text >= T_BD_WB0 && p->text <= T_BD_WB2) wbs++;
+            if (p->text >= T_BD_GHOST0 && p->text <= T_BD_GHOST2) { CHECK(mate_fate(p->ref) & MF_GHOST); ghost_miss++; }
+            if (p->text >= T_BD_WHY0 && p->text <= T_BD_WHY15) CHECK((p->text - T_BD_WHY0) / 2 == MF_REASON(mate_fate(p->ref)));
+            if (p->text >= T_BD_FADE0 && p->text < T_BD_FADE0 + 28) {
+                u16 f = mate_fate(p->npc);
+                CHECK(!(f & MF_GHOST) && (p->text - T_BD_FADE0) / 4 == MF_REASON(f));
+            }
+        }
+    }
+    CHECK(keeps > 5 && rets > 0 && rebyes * 4 >= rets * 3 && rebyes <= rets &&   /* またね はギルマスの交代と重なると出ない */
+           purges > 3 && gms > 3 && sys > 0 && wbs > 0 && ghost_miss > 0 && gm_mark > 100);
+    /* 形見分け: 去る日の昼から受け取れる。1 回に 1 枚、2 度は受け取らない */
+    fresh();
+    for (g = 1; g <= GUILD_COUNT; g++) {
+        for (k = 0, i = (u16)((g - 1) * 8 + 3); i < NPC_COUNT; i += 128, k++) {
+            u16 f = mate_fate(i), rd = mate_retire_day(i), v, n0;
+            if (rd == BOARD_NEVER || !(f & MF_GIVER)) continue;
+            g_save.guild = (u8)g;
+            g_save.keep_got = 0;
+            g_save.memo[MEMO_GUILD] = 1;
+            g_save.g_time = (u32)rd * GSEC_PER_DAY + 2 * BOARD_SLOT_SECS - 1;   /* 昼の前 */
+            for (v = 0; v < 8; v++) if (v != k) g_save.keep_got |= (u8)(1 << v);   /* ほかの仲間はもう受け取った */
+            CHECK(keep_tick() == 0);
+            g_save.g_time += 1;
+            n0 = g_save.card_count;
+            v = keep_tick();
+            CHECK(v && KEEP_K(v) == k && g_save.card_count == n0 + 1 && g_save.cards[n0].id == KEEP_CARD(v));
+            CHECK(keep_tick() == 0);
+            g_save.memo[MEMO_GUILD] = (u16)(rd + 2);       /* 去った後に入ったなら受け取らない */
+            g_save.keep_got = (u8)~(1 << k);
+            CHECK(keep_tick() == 0);
+            g_save.memo[MEMO_GUILD] = 1;
+            g_save.g_time = (u32)(rd + KEEP_DAYS + 1) * GSEC_PER_DAY;   /* 古すぎるものは黙って印だけ */
+            CHECK(keep_tick() == 0 && (g_save.keep_got & (1 << k)));
+            g = GUILD_COUNT + 1;
+            break;
+        }
+    }
+    CHECK(g == GUILD_COUNT + 2);
+    memset(g_save.memo, 0, sizeof(g_save.memo));
+    g_save.keep_got = 0;
 }
 
 /* 運営モード（DECISIONS #88）: 史実の選択は終了、選び方によっては継続。同じ選択なら同じ数字 */
@@ -1071,6 +1182,7 @@ int main(void)
     test_guildwar();
     test_ranking();
     test_board();
+    test_mate_fate();
     test_rival();
     test_stance_leader_slots();
     test_ops();

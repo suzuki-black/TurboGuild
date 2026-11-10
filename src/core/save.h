@@ -7,7 +7,7 @@
 #include "memo.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  15
+#define SAVE_VERSION  16
 #define SAVE_MIN_VERSION 5           /* 読めるいちばん古い版（それより前はカードの形が違う） */
 /* ★上位互換の決まり（DECISIONS #78）: 欄は必ず末尾に足し、SAVE_VERSION を 1 上げ、
  *   save.c の save_size[] にその版の大きさを足す。古い版は「その版の大きさ」で検査して読み、
@@ -96,6 +96,8 @@ typedef struct {
     StolenRec stolen[STOLEN_MAX];   /* 盗まれたカードと盗んだ人（新しい順） */
     /* v15: 自分の最近の出来事（core/pev.h, DECISIONS #91）。伝言板の仲間が反応する */
     PlayerEv pev[PEV_MAX];
+    /* v16: 形見分け（DECISIONS #94）。去る仲間からカードを受け取った（ギルドの仲間の並び順のビット） */
+    u8  keep_got;
 } SaveData;
 
 u16 save_crc(const SaveData *s);           /* その版の大きさで計算する */

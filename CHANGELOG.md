@@ -1,5 +1,19 @@
 # Changelog / 更新履歴
 
+## Unreleased
+
+### English
+- **How mates leave.** Each guildmate who quits now has a reason: exams, a new job, marriage, parents finding out, boredom, another game, a ban, or a new phone that lost the data. The tired posts in their last days and the way the others remember them later depend on the reason ("Hope # did well on the exams"). Some mates, and everyone who lost their data, simply stop coming without a word; the others notice ("Haven't seen # lately"), and two or three weeks later the guild master removes them.
+- **The guild master.** The board marks the guild master with *. When the master quits, the next mate takes over and says so; if nobody is left, the board tells you that you are now the guild master.
+- **Coming back.** About one in ten mates who quit comes back once, 20 to 51 days later, for three days ("I'm back!"), is welcomed, and leaves again.
+- **A parting gift.** About half of the mates who quit with a goodbye leave you a card on their last morning: N, R or SR depending on how much they paid. It arrives the next time you open My Page. The save format is now version 16 (1 byte added); older saves still load.
+
+### 日本語
+- **仲間の去り方。** 辞める仲間それぞれに理由が付きました: 受験・就職・結婚・親に見つかった・飽きた・ほかのゲームへ・凍結・機種変で引き継ぎ失敗。最後の数日の弱音と、後で懐かしむ文が理由で替わります（「#さん、受験うまくいったかな」）。一部の仲間と、データが消えた人は、何も言わずに来なくなります。周りが気づき（「#さん、最近見ないね」）、2〜3 週間後にギルドマスターが整理します。
+- **ギルドマスター。** 伝言板でギルドマスターに ★ が付きます。ギルマスが辞めると次の仲間が引き継いで挨拶し、誰も残らなければ、あなたがギルドマスターになったと流れます。
+- **復帰。** 辞めた仲間の 1 割ほどが、20〜51 日後に 1 度だけ戻ってきて 3 日だけ板にいます（「復帰しました、浦島です」）。仲間に迎えられ、また去ります。
+- **置き土産。** 挨拶して去る仲間の半分ほどが、最後の日の朝にカードを 1 枚置いていきます（課金コースで N・R・SR）。次にマイページを開いたときに届きます。セーブの版は 16 になりました（1 バイト増）。前の版のセーブも読めます。
+
 ## v0.2.0 — 2026-11-08
 
 People over systems: the guild mates, a rival and thieves around you, an ending that remembers how you played, and operator mode after the end. Still a prototype; checked in openMSX only, **not yet on real hardware**. Saves from v0.1.0 load as they are.
