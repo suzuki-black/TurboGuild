@@ -314,7 +314,7 @@ T_GIFT_GOT	運営から石が届きました
 T_TO_TITLE	タイトルへ戻りますか？
 T_GUIDE_HOME2	1〜8:メニュー ESC:タイトル
 T_BOARD_TITLE	ギルド伝言板
-T_NEWS_GUIDE	SPACE:伝言板 1:思い出 ESC:戻る
+T_NEWS_GUIDE	SPACE:伝言板 1:思い出 2:足あと
 T_BOARD_GUIDE	上下:前後 ESC:戻る
 T_BOARD_EMPTY	まだ書き込みはありません
 T_BOARD_HEAD	【ギルド】
@@ -730,6 +730,26 @@ T_STOLEN_HINT	取り返しに行く
 T_KEEP_HEAD	置き土産
 T_KEEP_FROM	さんから
 T_KEEP_HINT	去り際に置いていきました
+T_ONLINE	冒険中
+T_FOOT_TITLE	足あと
+T_FOOT_EMPTY	まだ誰も来ていません
+T_FOOT_HOUR	時
+T_FOOT_K0	ギルド
+T_FOOT_K1	宿敵
+T_FOOT_K2	盗
+T_FOOT_K3	最後
+T_FOOT_GUIDE	ESC:戻る
+T_MT_TITLE	メンテナンス
+T_MT_EMERG	緊急メンテナンス
+T_MT_NOW	ただいまメンテナンス中です
+T_MT_END	終了予定
+T_MT_EXT	延長しています
+T_MT_SORRY	ご迷惑をおかけしております
+T_MT_GUIDE	SPACE:終わるまで待つ
+T_MT_GIFT	メンテのお詫びに石100個を配布しました
+T_BILL_HEAD	【ご利用料金のお知らせ】
+T_BILL_AMT	今月のご利用料金
+T_BILL_NOTE	※パケット代は含みません
 T_STEAL_TITLE	盗みに行く
 T_STEAL_BACK	取り返す
 T_STEAL_THEM	相手の総戦力

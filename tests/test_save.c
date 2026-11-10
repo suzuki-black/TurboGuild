@@ -116,6 +116,16 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.pev[0].kind == 3 && s.keep_got == 0);
+    /* v16 も読め、v17 で足した請求とメンテのお詫びは 0 から */
+    save_new(&s, 1);
+    s.keep_got = 3;
+    s.bill_base = 999; s.maint_paid = 9;
+    s.magic = SAVE_MAGIC;
+    s.version = 16;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.keep_got == 3 && s.bill_base == 0 && s.maint_paid == 0);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;

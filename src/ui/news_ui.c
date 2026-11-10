@@ -6,6 +6,7 @@
 #include "../far.h"
 #include "../ram.h"
 #include "../core/board.h"
+#include "../core/keitai.h"
 #include "../core/ranking.h"
 #include "../core/save.h"
 #include "../core/tables.h"
@@ -65,13 +66,14 @@ static void feed_text(const FeedLine *f)
 /* 文言を写す。% には param の文言、# には ref の人の名前、$ には自分の名前を入れる
  * （Shift-JIS の 2 バイト目は 40h 以上なので、%・#・$ と取り違えない）。
  * txt_ptr の窓は次の add_text で替わるので、先に手元へ写してから組み立てる */
-static void add_text_param(u16 id, u16 param, u16 ref)
+static void add_text_param(u16 id, u16 param, u16 ref, u8 style)
 {
     char tmp[64];
     const char *s = txt_ptr(id);
     u8 n = 0;
     while (s[n] && n < sizeof(tmp) - 1) { tmp[n] = s[n]; n++; }
     tmp[n] = 0;
+    if (style) style_apply(tmp, style);              /* 書いた人の文体（名前と話題には掛けない） */
     for (n = 0; tmp[n]; n++) {
         if (tmp[n] == '%') { if (param) add_text(param); continue; }
         if (tmp[n] == '#') { if (ref < NPC_COUNT) add_npc(ref); continue; }
@@ -89,12 +91,12 @@ static void add_text_param(u16 id, u16 param, u16 ref)
 /* 伝言板の 1 件を文にする */
 static void post_text(const BoardPost *p)
 {
-    if (p->kind == BP_SYS) { add_text_param(T_BOARD_YOUGM, 0, BOARD_NOREF); return; }   /* 自分がギルドマスターに */
+    if (p->kind == BP_SYS) { add_text_param(T_BOARD_YOUGM, 0, BOARD_NOREF, 0); return; }   /* 自分がギルドマスターに */
     if (p->gm) add_text(T_BOARD_GM);
     add_npc(p->npc);
     if (p->kind == BP_LEAVE) { add_text(T_BOARD_LEFT); return; }
     add_text(T_BOARD_SAY);
-    add_text_param(p->text, p->param, p->ref);
+    add_text_param(p->text, p->param, p->ref, p->style);
     if (p->tone) add_text((u16)(T_BOARD_TONE1 + p->tone - 1));
 }
 
@@ -170,12 +172,13 @@ static u8 wrapped(u8 y, u8 fg, u8 bg, u8 limit)
 FAR(void, news_draw, (void))
 {
     FeedLine f;
-    u16 tx;
+    u16 tx, act;
     u8 k, y, cx;
     ui_clear();
     ui_header(T_NEWS_TITLE);
+    act = npc_active_count() + 1;
     cx = txt_id(20, 0, T_PLAYERS, COL_LGRAY, COL_DBLUE);
-    cx = txt_num(cx, 0, npc_active_count() + 1, COL_YELLOW, COL_DBLUE);
+    cx = txt_num(cx, 0, act, COL_YELLOW, COL_DBLUE);
     txt_id(cx, 0, T_PERSON, COL_LGRAY, COL_DBLUE);
     for (k = 0, y = 18; k < 3 && timeline_news(k, &tx); k++) {
         len = 0;
@@ -185,6 +188,9 @@ FAR(void, news_draw, (void))
     vdp_fill(0, 100, SCREEN_W, 16, COL_DBLUE);
     gfx_sprite(ATL_ICON_NEWS, 2, 96);
     txt_id(4, 100, T_FEED_TITLE, COL_WHITE, COL_DBLUE);
+    cx = txt_id(18, 100, T_ONLINE, COL_LGRAY, COL_DBLUE);   /* いまつないでいる人数 */
+    cx = txt_num(cx, 100, online_now(act), COL_CYAN, COL_DBLUE);
+    txt_id(cx, 100, T_PERSON, COL_LGRAY, COL_DBLUE);
     for (k = 0, y = 118; k < 4; k++) {
         len = 0;
         feed_line(k, &f);
@@ -199,6 +205,7 @@ FAR(void, news_update, (void))
     u8 p = input_pressed();
     if (p & BTN_OK) { psg_beep(0x80, 4); screen_change(&scr_board); return; }
     if (input_digit() == 1) { psg_beep(0x80, 4); screen_change(&scr_album); return; }   /* 思い出アルバム */
+    if (input_digit() == 2) { psg_beep(0x80, 4); screen_change(&scr_foot); return; }    /* 足あと */
     if (p & BTN_CANCEL) screen_change(&scr_home);
 }
 

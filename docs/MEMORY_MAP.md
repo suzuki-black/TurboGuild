@@ -119,4 +119,5 @@
 | 96 | 6000h コード | UI_END | code: src/ui/ending_ui.c src/core/ending.c | サービス終了の結末と思い出アルバム（バンク 14 が埋まったので結末の計算もここ） |
 | 97 | 6000h コード | UI_STEAL | code: src/ui/steal_ui.c src/core/steal.c | 盗み・盗まれ（盗みに行く画面と、留守の間に盗まれる計算） |
 | 98 | 6000h コード | CORE9 | code: src/core/board.c | ギルド伝言板（話題・返事・自分への反応。バンク 14 が埋まったので分けた） |
-| 99-127 | - | - | - | 空き |
+| 99 | 6000h コード | UI_KEITAI | code: src/ui/keitai_ui.c src/core/keitai.c | ガラケーの空気（伝言板の文体・冒険中の人数・足あと・メンテ） |
+| 100-127 | - | - | - | 空き |

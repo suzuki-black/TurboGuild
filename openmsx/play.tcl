@@ -32,7 +32,7 @@ set ::A_SAVEST [sym _g_save_status]
 set ::A_QR    [sym _g_qr]
 set ::A_DIGIT [sym _g_test_digit]
 set ::SCR {}
-foreach n {title name course firstgacha home login area explore boss gacha gacharesult cardlist carddetail deck deckpick shop p0menu event evresult ranking fuse evolve} {
+foreach n {title name course firstgacha home login area explore boss gacha gacharesult cardlist carddetail deck deckpick shop p0menu event evresult ranking fuse evolve maint} {
     dict set ::SCR [sym _scr_$n] $n
 }
 # SaveData の欄の位置（tests/save_offsets.c が offsetof から生成する）

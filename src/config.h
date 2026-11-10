@@ -125,6 +125,7 @@
 #define STEAL_PCT_MIN       10
 #define STEAL_PCT_MAX       90
 #define STEAL_PCT_BACK      20       /* 取り返すときに足す */
+#define MAINT_GEMS          100      /* 延長したメンテと緊急メンテのあとのお詫びの石 */
 #define KEEP_DAYS           30       /* 去った仲間の形見分けを受け取れるのは、去った日からこの日数まで（古いセーブで一度に届かないように） */
 
 /* 画面 */

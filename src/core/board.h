@@ -39,6 +39,7 @@ typedef struct {
     u16 npc;
     u8  kind;            /* BP_POST / BP_LEAVE / BP_SYS */
     u8  gm;              /* 書いた人がギルドマスター */
+    u8  style;           /* 文体（core/keitai.h の STYLE_*） */
     u8  tone;            /* 口癖 0..3（0 = なし） */
     u16 text;            /* 文言 id（BP_POST のとき） */
     u16 alt;             /* 1 つ前（古い方）と同じ文になったときの代わり */

@@ -25,6 +25,7 @@
 #include "core/memo.h"
 #include "core/steal.h"
 #include "core/pev.h"
+#include "core/keitai.h"
 #include "data/text_ids.h"
 
 
@@ -959,6 +960,91 @@ static void test_mate_fate(void)
     g_save.keep_got = 0;
 }
 
+/* ガラケーと 2011 年の空気（DECISIONS #95） */
+static void style_is(const char *in, u8 st, const char *want)
+{
+    char b[64];
+    strcpy(b, in);
+    style_apply(b, st);
+    CHECK(!strcmp(b, want));
+}
+
+static void test_keitai(void)
+{
+    BoardList bl;
+    FootList l;
+    Maint m;
+    u16 d, i, styles[3] = {0}, reg = 0, emerg = 0, ext = 0;
+    u8 k;
+    /* 文体: か が ー ガ ぱ ヴ 亜 → ｶ ｶﾞ ｰ ｶﾞ ﾊﾟ ｳﾞ 亜。あい → ぁぃ。英語は小文字と you → u */
+    style_is("\x82\xA9\x82\xAA\x81\x5B\x83\x4B\x82\xCF\x83\x94\x88\x9F!", STYLE_KANA, "\xB6\xB6\xDE\xB0\xB6\xDE\xCA\xDF\xB3\xDE\x88\x9F!");
+    style_is("\x82\xA0\x82\xA2\x82\xA9\x82\xA8", STYLE_SMALL, "\x82\x9F\x82\xA1\x82\xA9\x82\xA7");
+#ifdef LANG_EN
+    style_is("See YOU", STYLE_KANA, "see you");
+#else
+    style_is("AP Lv", STYLE_KANA, "AP Lv");                          /* 日本語版は英字をそのまま */
+#endif
+    style_is("thank you, you!", STYLE_SMALL, "thank u, u!");
+    style_is("%\x82\xA0#", STYLE_KANA, "%\xB1#");                      /* 差し込みの印は残る */
+    fresh();
+    for (d = 30; d < 200; d += 7) {                                     /* 仲間ごとに文体が決まっている */
+        g_save.guild = (u8)(1 + d % GUILD_COUNT);
+        g_save.g_time = (u32)d * GSEC_PER_DAY + 23UL * 3600;
+        bl.skip = 0; bl.want = BOARD_MAX;
+        board_list(&bl);
+        for (k = 0; k < bl.n; k++) {
+            CHECK(bl.post[k].style <= STYLE_SMALL);
+            if (bl.post[k].kind == BP_POST) styles[bl.post[k].style]++; else CHECK(bl.post[k].style == 0);
+        }
+    }
+    CHECK(styles[0] && styles[1] && styles[2]);
+    /* 冒険中: 21 時が多く、夜中の 3 時は少ない。残っている人数を超えない */
+    g_save.g_time = 50UL * GSEC_PER_DAY + 21UL * 3600;
+    i = online_now(900);
+    g_save.g_time = 50UL * GSEC_PER_DAY + 3UL * 3600;
+    CHECK(i > 200 && i <= 900 && online_now(900) < 40 && online_now(900) > 0 && online_now(0) == 0);
+    /* 足あと: 新しい順・いまより前・盗んだ人は盗んだ時間帯に */
+    fresh();
+    g_save.guild = 3;
+    g_save.g_time = 100UL * GSEC_PER_DAY + 20UL * 3600;
+    memset(g_save.pev, 0, sizeof(g_save.pev));
+    pev_push(PEV_STOLEN, 444);
+    foot_list(&l);
+    CHECK(l.n == FOOT_MAX && l.r[0].kind == FOOT_THIEF && l.r[0].npc == 444 && l.r[0].day == 100 && l.r[0].hour >= 18);
+    for (k = 1; k < l.n; k++) {
+        CHECK(l.r[k].day <= l.r[k - 1].day && l.r[k].day >= 84 && l.r[k].kind <= FOOT_OTHER && l.r[k].npc < NPC_COUNT && l.r[k].hour < 24);
+        if (l.r[k].kind == FOOT_MATE) CHECK(BOARD_IS_MATE(l.r[k].npc) && (l.r[k].npc >> 3) % GUILD_COUNT == 2);
+    }
+    memset(g_save.pev, 0, sizeof(g_save.pev));
+    g_save.guild = 0;
+    foot_list(&l);
+    CHECK(l.n == 0);
+    /* メンテ: 2 週に 1 回の昼と、イベント初日の緊急。対抗戦の間と終了の告知の後はしない */
+    for (d = 0; d < SERVICE_END_DAY; d++) {
+        g_save.g_time = (u32)d * GSEC_PER_DAY + 11UL * 3600;
+        if (maint_now(&m)) { CHECK(m.kind == MAINT_EMERG && m.day == d); emerg++; }
+        g_save.g_time = (u32)d * GSEC_PER_DAY + 14UL * 3600;
+        if (maint_now(&m)) { CHECK(m.kind == MAINT_REG && d % 14 == 6); reg++; ext += m.extended; }
+        if (m.kind) CHECK(d >= 7 && d < 240 && !(d >= 140 && d < 147) && !(d >= 215 && d < 222) && m.end > m.start);
+    }
+    CHECK(reg >= 10 && emerg >= 1 && ext >= 1 && ext < reg);
+    /* お詫びの石: 延長か緊急のあとに 1 回だけ */
+    fresh();
+    for (d = 7; d < 240; d++) {
+        g_save.g_time = (u32)d * GSEC_PER_DAY + 11UL * 3600;
+        maint_now(&m);
+        if (m.kind && (m.kind == MAINT_EMERG || m.extended)) break;
+    }
+    CHECK(d < 240);
+    g_save.g_time = m.end - 1;
+    i = (u16)g_save.gems;
+    CHECK(maint_now(&m) && maint_comp() == 0);
+    g_save.g_time = m.end;
+    CHECK(!maint_now(&m) && maint_comp() == MAINT_GEMS && g_save.gems == (u32)i + MAINT_GEMS && maint_comp() == 0);
+    g_save.g_time += 3 * GSEC_PER_DAY;
+    CHECK(maint_comp() == 0);
+}
+
 /* 運営モード（DECISIONS #88）: 史実の選択は終了、選び方によっては継続。同じ選択なら同じ数字 */
 static u8 ops_run(const char *pick)
 {
@@ -1183,6 +1269,7 @@ int main(void)
     test_ranking();
     test_board();
     test_mate_fate();
+    test_keitai();
     test_rival();
     test_stance_leader_slots();
     test_ops();

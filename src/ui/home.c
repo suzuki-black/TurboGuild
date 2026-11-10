@@ -12,6 +12,7 @@ void bgm_play(u8 song);
 #include "../core/player.h"
 #include "../core/ranking.h"
 #include "../core/steal.h"
+#include "../core/keitai.h"
 #include "../core/pev.h"
 #include "../core/save.h"
 #include "../core/time.h"
@@ -286,6 +287,28 @@ static void keep_popup(void)
     g_dirty = 1;
 }
 
+static u8 maint_gift;           /* メンテのお詫びの石が届いた */
+
+/* 給料日: 軍資金が入ったことと、前の給料日からのご利用料金（課金した額） */
+static void payday_popup(void)
+{
+    u32 b = g_save.spent - g_save.bill_base;
+    u8 cx;
+    if (g_save.spent <= g_save.bill_base) { g_save.bill_base = g_save.spent; ui_msg(T_PAYDAY); return; }
+    g_save.bill_base = g_save.spent;
+    g_save_dirty = 1;
+    ui_box(16, 56, 224, 96, COL_DBLUE, COL_WHITE);
+    txt_id(3, 60, T_PAYDAY, COL_YELLOW, COL_DBLUE);
+    txt_id(3, 84, T_BILL_HEAD, COL_CYAN, COL_DBLUE);
+    cx = txt_id(3, 102, T_BILL_AMT, COL_WHITE, COL_DBLUE);
+    cx = txt_num((u8)(cx + 1), 102, b, COL_ORANGE, COL_DBLUE);
+    txt_id(cx, 102, T_YEN, COL_WHITE, COL_DBLUE);
+    txt_id(3, 126, T_BILL_NOTE, COL_LGRAY, COL_DBLUE);
+    psg_beep(0x200, 8);
+    ui_wait_key();
+    g_dirty = 1;
+}
+
 static void show_login_bonus(void)
 {
     screen_change(&scr_login);
@@ -294,6 +317,10 @@ static void show_login_bonus(void)
 FAR(void, home_init, (void))
 {
     g_cursor = g_menu_pos;
+    {
+        Maint m;
+        if (maint_now(&m)) { screen_change(&scr_maint); return; }   /* メンテ中は入れない */
+    }
     bgm_play(BGM_HOME);
     player_ap_update();
     login_check(&g_login);
@@ -320,6 +347,8 @@ FAR(void, home_init, (void))
     if (steal_tick()) g_save_dirty = 1;              /* 留守の間に盗まれたカード（知らせは home_draw） */
     keep_got = keep_tick();                          /* 去った仲間が置いていったカード */
     if (keep_got) g_save_dirty = 1;
+    maint_gift = (u8)(maint_comp() != 0);            /* メンテ明けのお詫びの石 */
+    if (maint_gift) g_save_dirty = 1;
     if (g_login.given || g_paid || g_evres.started || g_evres.ended || g_gift || g_joined ||
         g_gvgres.joined || g_gvgres.n || g_gvgres.ended) g_save_dirty = 1;
     if (g_cursor == ITEMS && !has_banner()) g_cursor = 0;
@@ -345,7 +374,8 @@ FAR(void, home_draw, (void))
     if (!g_ticker_buf[0]) ticker_next();
     g_ticker = 0;
     g_ticker_gap = 0;
-    if (g_paid) { g_paid = 0; ui_msg(T_PAYDAY); return; }
+    if (g_paid) { g_paid = 0; payday_popup(); return; }
+    if (maint_gift) { maint_gift = 0; ui_msg(T_MT_GIFT); return; }
     if (g_gift) { g_gift = 0; ui_msg(T_GIFT_GOT); return; }
     if (g_joined) {
         g_joined = 0;

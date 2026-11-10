@@ -7,12 +7,22 @@
 - **The guild master.** The board marks the guild master with *. When the master quits, the next mate takes over and says so; if nobody is left, the board tells you that you are now the guild master.
 - **Coming back.** About one in ten mates who quit comes back once, 20 to 51 days later, for three days ("I'm back!"), is welcomed, and leaves again.
 - **A parting gift.** About half of the mates who quit with a goodbye leave you a card on their last morning: N, R or SR depending on how much they paid. It arrives the next time you open My Page. The save format is now version 16 (1 byte added); older saves still load.
+- **Footprints.** Press 2 on News to see who visited your My Page: guildmates, your rival, strangers. A thief leaves a footprint when stealing, and a mate who is leaving drops by on the last morning.
+- **Everyone writes differently.** Some mates post in half-width kana or with small vowels (in English: all lowercase, or "u" for "you").
+- **Online now.** News shows how many players are online right now; it peaks around 9 p.m. and is low at night.
+- **Maintenance.** Every two weeks there is a regular maintenance from 13:00 to 15:00, and some events start with an emergency maintenance from 10:00 to 12:00. Sometimes it is extended by an hour. During maintenance you cannot open My Page; wait until it ends. After an extended or emergency maintenance, 100 gems arrive as an apology.
+- **The monthly bill.** On payday you also get a bill for what you spent since the last payday. The save format is now version 17 (6 bytes added); older saves still load.
 
 ### 日本語
 - **仲間の去り方。** 辞める仲間それぞれに理由が付きました: 受験・就職・結婚・親に見つかった・飽きた・ほかのゲームへ・凍結・機種変で引き継ぎ失敗。最後の数日の弱音と、後で懐かしむ文が理由で替わります（「#さん、受験うまくいったかな」）。一部の仲間と、データが消えた人は、何も言わずに来なくなります。周りが気づき（「#さん、最近見ないね」）、2〜3 週間後にギルドマスターが整理します。
 - **ギルドマスター。** 伝言板でギルドマスターに ★ が付きます。ギルマスが辞めると次の仲間が引き継いで挨拶し、誰も残らなければ、あなたがギルドマスターになったと流れます。
 - **復帰。** 辞めた仲間の 1 割ほどが、20〜51 日後に 1 度だけ戻ってきて 3 日だけ板にいます（「復帰しました、浦島です」）。仲間に迎えられ、また去ります。
 - **置き土産。** 挨拶して去る仲間の半分ほどが、最後の日の朝にカードを 1 枚置いていきます（課金コースで N・R・SR）。次にマイページを開いたときに届きます。セーブの版は 16 になりました（1 バイト増）。前の版のセーブも読めます。
+- **足あと。** お知らせの 2 で、マイページに来た人（仲間・ライバル・知らない人）が見られます。盗んだ人は盗むときに、去る仲間は最後の日の朝に足あとを残します。
+- **人それぞれの書き方。** 半角ｶﾅで書く仲間や、小さい「ぁぃぅ」で書く仲間がいます。
+- **冒険中の人数。** お知らせに、いまつないでいる人数が出ます。21 時ごろが多く、夜中は少なくなります。
+- **メンテナンス。** 2 週に 1 回、13〜15 時に定期メンテナンスがあり、イベントの初日には 10〜12 時の緊急メンテナンスが入ることもあります。ときどき 1 時間延長します。メンテ中はマイページに入れず、終わるまで待ちます。延長と緊急のあとは、お詫びに石 100 個が届きます。
+- **ご利用料金のお知らせ。** 給料日に、前の給料日から課金した額の明細が届きます。セーブの版は 17 になりました（6 バイト増）。前の版のセーブも読めます。
 
 ## v0.2.0 — 2026-11-08
 

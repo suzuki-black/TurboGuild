@@ -30,6 +30,7 @@
 #define FADE_TEXTS    4           /* 去り方 1 つあたりの弱音の数（機種変の人には無い） */
 #define PURGE_AFTER   14          /* 何も言わずに来なくなった人を、ギルマスが整理するまでの日数（+0〜7） */
 #define NO_K          0xFF
+#define SALT_STYLE    0x4E95u
 #define SALT_POST(k)  ((u16)(0x4B1Du + (k) * 0x6C8Fu))
 #define FADE_DAYS     3
 #define TOPIC_PCT     60
@@ -359,6 +360,11 @@ FAR(void, board_list, (BoardList *l))
         if (post_at(&w, s, &nx, 1)) {
             u8 g = gm_of(&w, s);
             nx.gm = (u8)(nx.kind != BP_SYS && g != NO_K && w.m[g] == nx.npc);
+            nx.style = 0;
+            if (nx.kind == BP_POST) {                    /* 文体: 半分ほどはふつう、2 割が半角ｶﾅ、残りが小さい「ぁぃぅ」 */
+                u8 v = (u8)(hash(nx.npc, SALT_STYLE) % 20);
+                nx.style = v < 11 ? 0 : v < 15 ? 1 : 2;
+            }
             if (have == 2) {
                 BoardPost q1f = q[1];
                 fix(&q1f, &nx);

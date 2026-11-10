@@ -314,7 +314,7 @@ T_GIFT_GOT	A gift of gems arrived
 T_TO_TITLE	Return to the title?
 T_GUIDE_HOME2	1-8:Menu ESC:Title
 T_BOARD_TITLE	Guild Board
-T_NEWS_GUIDE	SPACE:Board 1:Album ESC:Back
+T_NEWS_GUIDE	SPACE:Board 1:Album 2:Visits	!
 T_BOARD_GUIDE	U/D:More ESC:Back
 T_BOARD_EMPTY	No posts yet.
 T_BOARD_HEAD	[Guild] 
@@ -1120,6 +1120,26 @@ T_STOLEN_HINT	Get it back
 T_KEEP_HEAD	A parting gift	!
 T_KEEP_FROM	 left this	!
 T_KEEP_HINT	Left on the way out
+T_ONLINE	Online 	!
+T_FOOT_TITLE	Footprints	!
+T_FOOT_EMPTY	No visitors yet	!
+T_FOOT_HOUR	h	!
+T_FOOT_K0	Guild	!
+T_FOOT_K1	Rival	!
+T_FOOT_K2	Thief	!
+T_FOOT_K3	Last	!
+T_FOOT_GUIDE	ESC:Back	!
+T_MT_TITLE	Maintenance	!
+T_MT_EMERG	Emergency maint.	!
+T_MT_NOW	Under maintenance	!
+T_MT_END	Ends at	!
+T_MT_EXT	Extended to	!
+T_MT_SORRY	Sorry for the trouble	!
+T_MT_GUIDE	SPACE:Wait	!
+T_MT_GIFT	Sorry for the maintenance: 100 gems sent	!
+T_BILL_HEAD	[Your monthly bill]	!
+T_BILL_AMT	This month:	!
+T_BILL_NOTE	*Data charges not included	!
 T_STEAL_TITLE	Go stealing	!
 T_STEAL_BACK	Retake
 T_STEAL_THEM	Their power
