@@ -17,7 +17,7 @@
 **実装（プログラム・グラフィック・サウンド）:** Claude Code（Anthropic Claude）
 
 **Repository / リポジトリ:** <https://github.com/suzuki-black/TurboGuild> ·
-**Latest / 最新:** v0.2.0
+**Latest / 最新:** v0.3.0
 
 <p align="center">
   <img src="docs/img/screens_people_en.png" width="640" alt="Guild board, a theft, going stealing, the ending and the memory album (English version)">
@@ -77,6 +77,19 @@
   from you, passing your rival, a level-up, a guild war win, a high event rank, coming back after a few days, a night
   at the inn. As the months pass, some sound tired, and one day the board only says they have left the guild —
   and it gets quieter. Open it from News (SPACE); posts also run on the My Page marquee.
+- **How mates leave.** Each mate who quits has a reason — exams, a new job, marriage, parents finding out, boredom,
+  another game, a ban, a new phone that lost the data — and their last posts and how the others remember them depend
+  on it. Some simply stop coming; weeks later the guild master (marked ★) removes them. When the master quits, the
+  next mate takes over — and if nobody is left, you do. About one in ten comes back once for three days. Half of
+  those who say goodbye leave you a card.
+- **Small moments.** The game's calendar starts on 1 July 2011: mates talk about Obon, Christmas and New Year, and
+  celebrate each other's birthdays. Visitors from other guilds drop in to try it out and never come back; now and
+  then the master suggests an offline meetup, and the board goes quiet that evening. Each mate writes in their own
+  style (half-width kana, small vowels).
+- **Members, mail and footprints.** On the board, 1 shows the member list with levels and last logins (SPACE for a
+  profile: payment style, verbal tic, birthday). News 2 shows who visited your My Page — a thief leaves footprints too
+  — and News 3 opens your mail: the master's welcome, the reason a mate couldn't write on the board, letters after
+  the end.
 - **A rival.** The player just above you in the ranking becomes your rival until you pass them. My Page shows the
   gap; they react when you pass them (during an event they may promise to pass you back on the last day), and the
   marquee tells you whether your pace will catch them by the last day.
@@ -109,22 +122,35 @@
   guild wars, paydays and thefts are settled at once ("Continue" after a week away: about 2.3 s to My Page).
 - **The inn** (shop, item 4): **sleep** for 100 G to wake at 6 a.m. the next day with full AP, or **wait** for free
   until the next thing on the calendar — the next guild war battle or the start of the next event — shown before
-  you choose; AP only recovers for the time that passed.
+  you choose; AP only recovers for the time that passed. On the last day it can take you to the final hour.
+- **Maintenance** every two weeks (13:00–15:00) and some emergency ones on event start days; you can't enter until
+  it ends, it is sometimes extended, and apology gems follow. Payday also brings your monthly bill, and News shows
+  how many players are online right now.
 - **The operations timeline:** rate-up campaigns, inflation (newer cards are stronger), apology gems, waves of
   players quitting, **USR** on day 90 and **XUSR** on day 180 (older rarities become common; event bosses are tuned
   for the newest), the end-of-service notice — and the shutdown.
 
 ### After the end
+- **The last hour:** from 23:00 on the last day, the mates still there post every five minutes; keep the board open
+  and it scrolls by itself until the connection drops at midnight.
 - **An ending that depends on how you played:** one of six short endings by total spending, how many kinds of cards
   you own, whether any guild mate stayed, and guild war wins — then the mates who stayed to the end and their last
   words, and the staff roll.
 - **A memory album:** sixteen firsts with their day (first SSR, first purchase, first evolution, passing your rival,
   being passed back, a guild war win, a theft, being there on the last day, ...) plus the day a guild mate first left.
-  Open it any time from News (1), and from the title after the end.
-- **Operator mode:** run the same 270 days as the operator. Twelve meetings at the timeline's turning points (drop
-  rates, pity, ad budgets with a CVR cutoff, rate-ups, platform promotion, new rarities, apology gems) offer what
-  history did and other options, with a line on why the operators chose it. Watch DAU, new players, the paying rate,
-  quits and sales for 1,000 NPCs; on day 240, profit and DAU decide whether the service goes on.
+  Open it any time from News (1), and from the title after the end. After the end, 3 there opens the mates' last
+  letters and 4 an encyclopedia-style article about TurboGuild, partly written from your save. The title itself
+  ages with real time: refunds, then refunds closed, then a 404, then another company's ad.
+- **Operator mode** (title, 3 — open from the start; history stays hidden as "???" until you finish the main game):
+  run the same 270 days as the operator. Twelve meetings at the timeline's turning points (drop rates, pity, ad
+  budgets with a CVR cutoff, rate-ups, platform promotion, new rarities, apology gems) offer what history did and
+  other options. Every 15 days a **planning meeting** offers five cards: an event (raid boss, East-West guild war,
+  anime collab, ranking), a gacha (step-up, multi-tier box, complete gacha, a rerun), monetization (monthly pass,
+  lucky bag, rewards for payers only) or a squeeze (quietly cut the odds, remove the pity, skimp on apology gems) —
+  or skip. Choose **Fast** (meetings only, ~2 minutes) or **Full**, which adds sixteen daily calls: server trouble,
+  support mails from players in the model, and the CEO's ideas. Watch DAU, new players, the paying rate, quits and
+  sales for 1,000 NPCs (with history drawn as dotted lines once you have finished the game); on day 240, profit
+  and DAU decide whether the service goes on. A report card and one of six operator endings close the run.
 
 <p align="center">
   <img src="docs/img/screens_ops_en.png" width="640" alt="Operator mode: a meeting, the graph and the results (English version)">
@@ -152,10 +178,12 @@
 | Explore / event top | 0 | Battle style (Normal → Save → All-out) |
 | | 6 | Build the deck for this enemy |
 | Deck | 7–9 | Switch to deck A–C |
-| News | SPACE / 1 | Guild board / memory album |
+| News | SPACE / 1 / 2 / 3 | Guild board / memory album / footprints / mail |
+| Guild board | 1 | Members (SPACE: profile) |
+| Memories (after the end) | 1 / 3 / 4 | Cards / last letters / wiki article |
 | Shop | 4 | Inn: 1 sleep till morning, 2 wait for the next plan |
-| Operator mode | 1–3 / ESC | Pick an option (1 is history) / stop (asks first) |
-| Title | 0 / ESC | License screen / developer diagnostics |
+| Operator mode | 1–5 / ESC | Pick an option (1 is history, or skip in a planning meeting) / stop (asks first) |
+| Title | 3 / 0 / ESC | Operator mode / license screen / developer diagnostics |
 
 After the service ends, the title offers Memories (the album; 1 there shows your cards), Reset memories, the staff
 roll (with the ending), and operator mode.
@@ -217,10 +245,10 @@ On real hardware, write the ROM to an ASCII8-capable flash cartridge with the **
 | `make check-nodisk` | Boots without a disk and carries on when you try to save |
 | `make check-msx2` | Shows "turboR only" and stops on an MSX2 |
 | `make play` | Plays automatically for 30 minutes (emulated) from a new game; progress matches across save → reset → load |
-| `make check-offline` | After a week away, "Continue" reaches My Page within 3 seconds (measured: 2.26 s) |
+| `make check-offline` | After a week away, "Continue" reaches My Page within 3 seconds (measured: about 2.3 s) |
 | `make check-timeline` | Runs days 0–271: 7 events, 2 guild wars, gifts, the end-of-service notice, the ending and the staff roll |
 | `make sim` | Economy simulation: plays 270 days per wallet course and counts cards of SSR or above |
-| `make sim-ops` | Operator mode: runs every combination of meeting choices and shows how many keep the service going |
+| `make sim-ops` | Operator mode: runs every combination of meeting choices and shows how many keep the service going (`build/sim_ops single` and `plans` compare the planning-meeting moves) |
 
 Results are left in `build/run*/` as text and screenshots.
 
@@ -256,6 +284,7 @@ docs/      design documents and records
 | Phase 3 | Operations timeline, 1,000-NPC pseudo-online world, news, FM music, economy simulation |
 | v0.1.0 | Harder gacha (box gacha, no pity), 121 cards, raid and battle events, guild wars, staff roll, FAT12 save disk |
 | v0.2.0 | "People over systems": guild board (replies, lives, reactions to you), rival, stealing, endings and the last mates, memory album, operator mode, inn; also element display, battle styles, leader skill, three decks |
+| v0.3.0 | How mates leave, the feature-phone air (writing styles, footprints, maintenance, bills), letters and seasons, the last hour and the afterlife of the title, and a much deeper operator mode (planning meetings, full mode, report card, six endings) |
 
 ### Scope & honest positioning
 This is an **experimental study**.
@@ -349,6 +378,16 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   あなたにも名前を呼んで反応します: SSR・カードを盗まれた・ライバルを抜いた・Lv アップ・対抗戦の勝ち・イベントの上位・
   久しぶりに来た・宿屋に泊まった。月日がたつと弱音が増える人がいて、ある日「ギルドを脱退しました」とだけ流れ、
   板は少しずつ静かになっていきます。お知らせの画面で SPACE。マイページの流れるお知らせにも出ます。
+- **仲間の去り方。** 辞める仲間それぞれに理由があります——受験・就職・結婚・親に見つかった・飽きた・ほかのゲーム・凍結・
+  機種変で引き継ぎ失敗。最後の弱音と、後で懐かしむ文が理由で替わります。何も言わずに来なくなる人もいて、数週間後に
+  ギルドマスター（★）が整理します。ギルマスが辞めると次の仲間が継ぎ、誰もいなければあなたに回ってきます。
+  1 割ほどは 1 度だけ戻ってきて 3 日いて、あいさつして去る人の半分はカードを置いていきます。
+- **小さな出来事。** ゲーム内の暦は 2011 年 7 月 1 日から。お盆・クリスマス・正月の話をし、仲間の誕生日を祝います。
+  よそのギルドの人が体験で入ってきて、そのまま来なくなります。ときどきギルマスがオフ会に誘い、その夜は板が静かに。
+  仲間ごとに書き方があります（半角ｶﾅ・小さい「ぁぃぅ」）。
+- **メンバー・メール・足あと。** 伝言板の 1 でメンバー一覧（Lv・最終ログイン。SPACE でプロフィール: 課金コース・
+  口ぐせ・誕生日）。お知らせの 2 で足あと（泥棒も付けていきます）、3 でメール（ギルマスのあいさつ、
+  板には書けなかったわけ、終了後の手紙）。
 - **ライバル。** ランキングで自分のすぐ上の人が、抜くまでライバル（宿敵）になります。マイページに差を出し、抜くと
   相手がひとこと言い（イベント中なら「最終日に見てろよ」と返してくることも）、流れるお知らせで「このペースなら
   最終日に届くか」を伝えます。
@@ -379,20 +418,31 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **現実の 10 倍。** 現実の 27 日でゲーム内の 270 日。セーブは現実の時計を覚えていて、戻ってくるとイベント・対抗戦・
   給料日・盗みをまとめて片づけます（1 週間空けて「つづきから」でマイページまで約 2.3 秒）。
 - **宿屋**（お店の 4）: **翌朝まで寝る**（100 G、翌朝 6 時に AP 全回復で起きる）か、**次の予定まで休む**（無料。
-  次の対抗戦の戦かイベントの始まりまで一気に進む。行き先は選ぶ前に出ます。AP は進んだぶんだけ回復）。
+  次の対抗戦の戦かイベントの始まりまで一気に進む。行き先は選ぶ前に出ます。AP は進んだぶんだけ回復）。最終日は
+  「最後の 1 時間」まで休めます。
+- **メンテナンス**は 2 週に 1 回（13〜15 時）と、イベント初日の緊急メンテ。終わるまで入れず、ときどき延長し、
+  詫び石が届きます。給料日にはご利用料金の明細も。お知らせにはいま冒険中の人数が出ます。
 - **運営年表:** 確率アップ・インフレ（新しいカードほど強い）・お詫びの石・引退の波・90 日目に **USR**、
   180 日目に **XUSR**（古いレア度ほど出やすくなり、イベントのボスは最新のレア度の前提に）・終了の告知——そしてサービス終了。
 
 ### 終わった後
+- **最後の 1 時間。** 最終日の 23:00 からは、残った仲間が 5 分ごとに書き込みます。伝言板を開いたままにすると
+  勝手に流れ、0:00 に接続が切れます。
 - **遊び方で変わる結末。** 課金の合計・持っているカードの種類・ギルドの仲間が残ったか・対抗戦の勝ちで 6 通りの
   短い結末が出て、最後まで残った仲間とその別れの言葉、そしてスタッフロールへ。
 - **思い出アルバム。** 16 の「初めて」（初めての SSR・初めての課金・初めての進化・ライバルを抜いた・抜き返された・
   対抗戦の勝ち・盗まれた・最終日にいた など）を日付つきで残し、仲間が初めて去った日と並べます。
-  いつでもお知らせの 1 から、終了後はタイトルから。
-- **運営モード。** 同じ 270 日を運営の側から回します。年表の節目で開く 12 回の会議（排出率・天井・広告の予算と
-  打ち切りの CVR・確率アップ・一押し枠と相互送客・新しいレア度・お詫びの石）で、史実とほかの手を選べ、当時なぜ
-  そうしたかが 1 行で分かります。NPC 1000 人の DAU・新規・課金率・引退・売上を見て、240 日目に利益と DAU で
-  サービスを続けるかが決まります。
+  いつでもお知らせの 1 から、終了後はタイトルから。終了後はそこで 3 を押すと仲間からの最後の手紙、4 でまとめ記事
+  （一部はあなたのセーブから書かれます）。タイトルも現実の時間で古びていきます（払い戻し受付中 → 受付終了 →
+  404 → 別の会社の広告）。
+- **運営モード**（タイトルの 3。最初から入れます。本編を終えるまで史実は「？？？」）。同じ 270 日を運営の側から
+  回します。年表の節目で開く 12 回の会議（排出率・天井・広告の予算と打ち切りの CVR・確率アップ・一押し枠と相互送客・
+  新しいレア度・お詫びの石）で、史実とほかの手を選べます。15 日ごとの**企画会議**では 5 枚の札から 1 つ——イベント
+  （レイドボス・東西対抗戦・アニメコラボ・ランキング）・ガチャ（ステップアップ・多段 BOX・コンプガチャ・復刻）・
+  課金（月パス・福袋・報酬を課金者だけに）・締め付け（確率をこっそり絞る・天井を外す・詫び石を渋る）・見送る。
+  **早回し**（会議だけ、2 分ほど）か**じっくり**（障害・プレイヤーからの CS のメール・社長の思いつきが 16 回）を選べます。
+  NPC 1000 人の DAU・新規・課金率・引退・売上を見て（本編を終えた後は史実を点線で重ねます）、240 日目に利益と DAU で
+  サービスを続けるかが決まります。最後に通信簿と、6 通りの運営の結末。
 
 <p align="center">
   <img src="docs/img/screens_ops_ja.png" width="640" alt="日本語版の運営モード（会議・グラフ・決算）">
@@ -419,10 +469,12 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | 探索・イベントのトップ | 0 | 戦い方を替える（通常 → 節約 → 全力） |
 | | 6 | その敵向けにおまかせ編成 |
 | デッキ | 7〜9 | デッキ A〜C に替える |
-| お知らせ | スペース／1 | ギルド伝言板／思い出アルバム |
+| お知らせ | スペース／1／2／3 | ギルド伝言板／思い出アルバム／足あと／メール |
+| ギルド伝言板 | 1 | メンバー（スペースでプロフィール） |
+| 思い出（終了後） | 1／3／4 | カード／最後の手紙／まとめ記事 |
 | お店 | 4 | 宿屋: 1 翌朝まで寝る、2 次の予定まで休む |
-| 運営モード | 1〜3／ESC | 選ぶ（1 が史実）／やめる（確かめてから） |
-| タイトル | 0／ESC | ライセンスの画面／開発用の診断画面 |
+| 運営モード | 1〜5／ESC | 選ぶ（1 が史実。企画会議では見送る）／やめる（確かめてから） |
+| タイトル | 3／0／ESC | 運営モード／ライセンスの画面／開発用の診断画面 |
 
 サービス終了後のタイトルには「思い出を見る」（アルバム。そこで 1 を押すと手持ちのカード）・「思い出をリセット」・
 「スタッフロール」（結末から）・「運営モード」が出ます。
@@ -484,10 +536,10 @@ openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild_ja.rom -romtype ASCII8 
 | `make check-nodisk` | ディスク無しで起動し、保存しようとしても続行できる |
 | `make check-msx2` | MSX2 では「turboR 専用」と出して止まる |
 | `make play` | 新規開始から 30 分（エミュレータ時間）自動で遊び、保存 → リセット → 読み込みで進行が一致する |
-| `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内（実測 2.26 秒） |
+| `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内（実測 約 2.3 秒） |
 | `make check-timeline` | 0〜271 日目まで進め、イベント 7 本・ギルド対抗戦 2 回・贈り物・終了の告知・結末・スタッフロールまで通す |
 | `make sim` | 経済シミュレーション。課金コースごとに 270 日遊んで SSR 以上の枚数を数える |
-| `make sim-ops` | 運営モード。会議の選び方をすべて回し、サービスを続けられる割合を出す |
+| `make sim-ops` | 運営モード。会議の選び方をすべて回し、サービスを続けられる割合を出す（企画会議の施策の比べは `build/sim_ops single`・`plans`） |
 
 結果は `build/run*/` にテキストとスクリーンショットで残ります。
 
@@ -522,6 +574,7 @@ docs/      企画書・設計の記録
 | フェーズ 3 | 運営年表・NPC 1000 人の疑似オンライン・お知らせ・FM 音源・経済シミュレーション |
 | v0.1.0 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 121 枚、レイド・バトル、ギルド対抗戦、スタッフロール、FAT12 のセーブディスク |
 | v0.2.0 | 「仕組みより人」: ギルド伝言板（返事・暮らし・自分への反応）・ライバル・盗み・盗まれ・結末と最後まで残った仲間・思い出アルバム・運営モード・宿屋。ほかに属性の表示・戦い方・リーダースキル・デッキ 3 つ |
+| v0.3.0 | 仲間の去り方、ガラケーの空気（書き方・足あと・メンテ・請求）、便りと年中行事、最後の 1 時間と終了後のタイトル、そして運営モードを深く（企画会議・じっくり・通信簿・6 通りの結末） |
 
 ### 位置づけ（正直な自己評価）
 本作は**実験的な習作**です。

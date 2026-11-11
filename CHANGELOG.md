@@ -1,6 +1,10 @@
 # Changelog / 更新履歴
 
-## Unreleased
+## v0.3.0 — 2026-11-11
+
+More people, more of the era, and an operator mode with teeth: mates who leave in their own ways, the feature-phone air, letters and seasons, the last hour, and planning meetings with events, gacha tricks, a monthly pass and squeezes. Still a prototype; checked in openMSX only, **not yet on real hardware**. Saves from v0.1.0 and v0.2.0 load as they are.
+
+人をもっと、あの頃の空気をもっと、そして手ごたえのある運営モード: それぞれの去り方をする仲間、ガラケーの空気、便りと年中行事、最後の 1 時間、そしてイベント・ガチャの仕掛け・月パス・締め付けを選ぶ企画会議。引き続き試作品で、openMSX でのみ確認していて、**実機ではまだ確認していません**。v0.1.0・v0.2.0 のセーブもそのまま読めます。
 
 ### English
 - **How mates leave.** Each guildmate who quits now has a reason: exams, a new job, marriage, parents finding out, boredom, another game, a ban, or a new phone that lost the data. The tired posts in their last days and the way the others remember them later depend on the reason ("Hope # did well on the exams"). Some mates, and everyone who lost their data, simply stop coming without a word; the others notice ("Haven't seen # lately"), and two or three weeks later the guild master removes them.

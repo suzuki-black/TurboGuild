@@ -4,6 +4,8 @@
 #   (1) 電源投入（リセット）からタイトルが操作できるまで
 #   (2) 「つづきから」を押してからマイページが操作できるまで（イベントの終了処理・順位計算・年表を含む）
 # を測る。出力は $OUT（最後の行が RESULT PASS / FAIL）。
+# 段階 3 でイベント画面に残っていたら ESC を押し直す（戦いの後の ESC が受け付けられず、SPACE を押し続けて止まることがあった）。
+# switch の中には注釈を書かない（Tcl では腕の並びが崩れる）。
 set renderer none
 set throttle off
 set ::log [open $::env(OUT) w]
@@ -30,7 +32,7 @@ proc tick {} {
         0 { if {[at home] && [rd8 $::ST] == 1} { wr32 [sv gtime] [expr {3 * 86400 + 3600}] ; set ::phase 1 ; digit 4 } else { press 16 } }
         1 { if {[at deck]} { press 32 } elseif {[at home] && [rd8 $::ST] == 1} { set ::phase 2 ; digit 9 } else { press 16 } }
         2 { if {[at event] && $::fights < 3} { incr ::fights ; digit 1 } elseif {[at event]} { press 32 ; set ::phase 3 } else { press 16 } }
-        3 { if {[at home]} { set ::phase 4 ; digit 7 } else { press 16 } }
+        3 { if {[at home]} { set ::phase 4 ; digit 7 } elseif {[at event]} { press 32 } else { press 16 } }
         4 { if {[at home] && [rd8 $::ST] == 1} {
                 say "saved at day 3 event_pt=[rd16 [sv event_pt]] event_id=[rd16 [sv event_id]]"
                 debug write memory $::MAGIC 0 ; set ::t_reset [machine_info time] ; reset ; set ::phase 5
