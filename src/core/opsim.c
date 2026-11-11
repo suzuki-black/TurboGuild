@@ -241,6 +241,7 @@ static void act(u8 a)
         static const u8 tens[4] = { 3, 5, 10, 30 };   /* 百個 */
         static const u8 feel[4] = { 3, 5, 9, 16 };    /* 嬉しさは配った数ほどには増えない */
         u8 h = tens[a - A_GIFT300];
+        g_ops.gems += (g_ops.sq & OPS_SQ_STINGY) ? (u16)((h + 1) / 2) : h;   /* 通信簿の「配った石」 */
         s16 v = (s16)(feel[a - A_GIFT300] * OPS_GIFT_RELIEF);
         if (g_ops.sq & OPS_SQ_STINGY) { h = 0; v /= 2; }      /* 詫び石を渋る: 半分しか配らないので喜ばれないが、石が余らず課金は減らない */
         add_all(-v, -v, -v / 2, -v / 4);
@@ -430,11 +431,12 @@ static void daily(void)
     }
     if (g_ops.day == OPS_COMP_BAN_DAY) {                     /* 業界の自主規制 */
         if (g_ops.sq & OPS_SQ_COMP) {
+            g_ops.sq |= OPS_SQ_COMPHIT;
             add_all(OPS_P_SCANDAL * 3 / 2, OPS_P_SCANDAL * 3 / 2, OPS_P_SCANDAL, OPS_P_SCANDAL);
             g_ops.sales_total -= g_ops.sales_total / 10;     /* 返金の対応 */
             g_ops.news = OPS_NEWS_COMP;
         }
-        g_ops.sq = (u8)((g_ops.sq & ~OPS_SQ_COMP) | OPS_SQ_COMPBAN);
+        g_ops.sq = (u8)((g_ops.sq & ~OPS_SQ_COMP) | OPS_SQ_COMPBAN);   /* COMPHIT は残す */
     }
     if (g_ops.collab == 1) add_all(OPS_P_COLLAB_LEAVE, OPS_P_COLLAB_LEAVE / 2, 0, 0);   /* コラボ目当ての人が抜ける */
     g_ops.tempt += OPS_TEMPT_DAILY;
@@ -585,4 +587,16 @@ FAR(u16, ops_chat, (void))
     else if (g_ops.sales_day >= OPS_CHAT_GOOD_SALES) cat = 1;
     else cat = 0;
     return (u16)(T_OPS_CH0 + cat * 3 + (g_ops.day / 15) % 3);
+}
+
+/* 運営の結末（DECISIONS #100）。270 日を回し終えたあとに呼ぶ */
+FAR(u8, ops_ending, (void))
+{
+    s32 profit = (s32)(g_ops.sales_total - g_ops.ad_total);
+    u8 cont = (u8)(g_ops.verdict == OPS_CONTINUE), flame = (u8)((g_ops.sq & (OPS_SQ_RIGOUT | OPS_SQ_COMPHIT)) != 0);
+    if (cont) return (u8)(profit > (s32)OPS_HIST_PROFIT && !flame ? OPS_E_GOD : OPS_E_SURVIVE);
+    if (flame) return OPS_E_FLAME;
+    if (profit > (s32)OPS_HIST_PROFIT) return OPS_E_FOLD;
+    if (profit < 0) return OPS_E_RED;
+    return OPS_E_HIST;
 }

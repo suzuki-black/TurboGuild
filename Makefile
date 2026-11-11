@@ -56,7 +56,7 @@ LDFLAGS  := -mz80 --no-std-crt0 --code-loc 0x4010 --data-loc 0xC000 \
 CSRC     := $(wildcard src/*.c src/sys/*.c src/core/*.c src/ui/*.c)
 ASRC     := $(filter-out src/sys/crt0.s,$(wildcard src/sys/*.s))
 GENH     := src/data/cards.h src/data/rompages.h src/data/screens.h src/data/tables.h src/data/text_ids.h \
-            src/data/art.h src/data/palette.h src/data/bgm_data.h
+            src/data/art.h src/data/palette.h src/data/bgm_data.h src/data/ops_hist.h
 HDRS     := $(wildcard src/*.h src/*/*.h) $(GENH)
 COBJ     := $(patsubst src/%.c,$(OBJ)/%.rel,$(CSRC))
 AOBJ     := $(patsubst src/%.s,$(OBJ)/%.rel,$(ASRC)) $(OBJ)/far_stubs.rel
@@ -84,6 +84,12 @@ $(B)/art.stamp: $(ARTSRC)
 	@touch $@
 src/data/art.h src/data/palette.h: $(B)/art.stamp
 	@:
+
+# 運営モードのグラフに重ねる史実の線（DECISIONS #100）。模型（PC でも ROM と同じコード）を回して作る
+src/data/ops_hist.h: tests/sim_ops.c src/core/opsim.c src/core/opsim.h src/config.h tests/tables_pc.c $(B)/data.stamp
+	@mkdir -p $(B)
+	gcc -std=c99 -O2 -Wall -Wextra -Werror -Isrc -o $(B)/sim_ops tests/sim_ops.c src/core/*.c tests/tables_pc.c
+	$(B)/sim_ops histh > $@
 
 src/data/bgm_data.h: tools/mml.py $(wildcard data/bgm/*.mml)
 	@mkdir -p $(B)
@@ -147,7 +153,7 @@ sim-ops: $(B)/data.stamp
 
 # ---- PC 単体テスト ----
 TESTS := $(wildcard tests/test_*.c)
-test: $(B)/data.stamp
+test: $(B)/data.stamp src/data/ops_hist.h
 	@mkdir -p $(B)/tests
 	@set -e; for t in $(TESTS); do \
 	  n=$$(basename $$t .c); \

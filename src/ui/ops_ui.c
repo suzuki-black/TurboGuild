@@ -13,6 +13,7 @@ void bgm_play(u8 song);
 #include "../core/save.h"
 #include "../core/tables.h"
 #include "../data/tables.h"
+#include "../data/ops_hist.h"
 #include "../data/screens.h"
 #include "../data/text_ids.h"
 #include "../sys/input.h"
@@ -33,9 +34,13 @@ void bgm_play(u8 song);
 #define ST_MEET 1
 #define ST_DONE 2
 #define ST_MODE 3                 /* 早回しかじっくりかを選ぶ（DECISIONS #98） */
+#define ST_REPORT 4               /* 通信簿（DECISIONS #100） */
+#define ST_ENDING 5               /* 運営の結末 */
+#define STAT   4                  /* 1 日ぶんの DAU と引退の累計（VRAM2_STAT） */
 
 static u8 st;
 static u8 newrec;                 /* 決算で新記録だった */
+static u8 ending;                 /* 運営の結末 OPS_E_* */
 static u8 ad_seen;                /* 知らせた広告の止まり方（下の帯に出す） */
 static OpsMeeting mt;
 static u8 last[4];                /* 前の日の点（線をつなぐ） */
@@ -95,6 +100,15 @@ static void graph(void)
     u16 d = 0;
     VdpXfer x;
     ui_box(GX - 2, GB - GH - 4, GW + 4, GH + 8, COL_BLACK, COL_DGRAY);
+    if (g_save.credits_seen) {                   /* 史実の線を点線で（本編を終える前は伏せる, DECISIONS #100） */
+        for (d = 0; d < OPS_DAYS; d += 2) {
+            u8 hx = day_x(d);
+            vline(hx, ops_hist[0][d], ops_hist[0][d], COL_WHITE);
+            if (ops_hist[1][d]) vline(hx, ops_hist[1][d], ops_hist[1][d], COL_ORANGE);
+        }
+        txt_id(22, (u8)(GB - GH - 2), T_OPS_HISTLEG, COL_LGRAY, COL_BLACK);
+        d = 0;
+    }
     while (d < g_ops.day) {
         u8 n = (u8)(g_ops.day - d > 12 ? 12 : g_ops.day - d), k;
         x.addr = (u16)(VRAM2_HIST + d * HIST); x.src = buf; x.len = (u8)(n * HIST);
@@ -260,12 +274,75 @@ static void result_box(void)
     ui_guide(T_OPS_GUIDE_NEXT);
 }
 
+/* 日ごとの数字を VRAM から読む（d 日目の DAU と引退の累計） */
+static void stat_of(u16 d, u16 *dau, u16 *ret)
+{
+    u8 b[STAT];
+    VdpXfer x;
+    x.addr = (u16)(VRAM2_STAT + d * STAT); x.src = b; x.len = STAT;
+    vdp_page2_read(&x);
+    *dau = (u16)(b[0] | (b[1] << 8));
+    *ret = (u16)(b[2] | (b[3] << 8));
+}
+
+/* 通信簿: 最大の DAU の日、いちばん辞めた日、配った石、最後に残った人、見た結末 */
+static void report_box(void)
+{
+    u16 d, dau, ret, prev = 0, best = 0, bestd = 0, most = 0, mostd = 0;
+    u8 cx, k, n = 0;
+    for (d = 0; d < OPS_DAYS; d++) {
+        stat_of(d, &dau, &ret);
+        if (dau > best) { best = dau; bestd = d; }
+        if (ret - prev > most) { most = (u16)(ret - prev); mostd = d; }
+        prev = ret;
+    }
+    for (k = 0; k < OPS_E_COUNT; k++) if (g_save.ops_ends & (1 << k)) n++;
+    if (!(g_save.flags & SF_STARTED)) n = 1;         /* セーブに残さないときは今回のぶんだけ */
+    ui_box(GX, BOX_Y, GW, BOX_H, COL_DBLUE, COL_CYAN);
+    line(0, T_OPS_RP_TITLE, COL_CYAN);
+    cx = line(1, T_OPS_RP_DAU, COL_GREEN);
+    cx = txt_num((u8)(cx + 1), row_y(1), best, COL_WHITE, COL_DBLUE);
+    cx = txt_id(cx, row_y(1), T_OPS_NIN, COL_LGRAY, COL_DBLUE);
+    cx = txt_num((u8)(cx + 1), row_y(1), bestd + 1, COL_LGRAY, COL_DBLUE);
+    txt_id(cx, row_y(1), T_OPS_DAYS, COL_LGRAY, COL_DBLUE);
+    cx = line(2, T_OPS_RP_QUIT, COL_RED);
+    cx = txt_num((u8)(cx + 1), row_y(2), most, COL_WHITE, COL_DBLUE);
+    cx = txt_id(cx, row_y(2), T_OPS_NIN, COL_LGRAY, COL_DBLUE);
+    cx = txt_num((u8)(cx + 1), row_y(2), mostd + 1, COL_LGRAY, COL_DBLUE);
+    txt_id(cx, row_y(2), T_OPS_DAYS, COL_LGRAY, COL_DBLUE);
+    cx = line(3, T_OPS_RP_GEMS, COL_CYAN);
+    cx = txt_num((u8)(cx + 1), row_y(3), (u32)g_ops.gems * 100, COL_WHITE, COL_DBLUE);
+    txt_id(cx, row_y(3), T_OPS_RP_KO, COL_LGRAY, COL_DBLUE);
+    cx = line(4, T_OPS_R_STAY, COL_GREEN);
+    cx = txt_num((u8)(cx + 1), row_y(4), (u32)(g_ops.reg - g_ops.retired), COL_WHITE, COL_DBLUE);
+    txt_id(cx, row_y(4), T_OPS_NIN, COL_LGRAY, COL_DBLUE);
+    cx = line(5, T_OPS_RP_SEEN, COL_YELLOW);
+    cx = txt_num((u8)(cx + 1), row_y(5), n, COL_WHITE, COL_DBLUE);
+    cx = txt_draw(cx, row_y(5), "/", COL_LGRAY, COL_DBLUE);
+    txt_num(cx, row_y(5), OPS_E_COUNT, COL_LGRAY, COL_DBLUE);
+    ui_guide(T_OPS_GUIDE_NEXT);
+}
+
+/* 運営の結末: 題と 3 行 */
+static void ending_box(void)
+{
+    u16 t = (u16)(T_OPS_E0 + ending * 4);
+    u8 k;
+    ui_box(GX, BOX_Y, GW, BOX_H, COL_DBLUE, COL_YELLOW);
+    line(0, T_OPS_E_HEAD, COL_LGRAY);
+    line(1, t, COL_YELLOW);
+    for (k = 1; k < 4; k++) line((u8)(2 + k), (u16)(t + k), COL_WHITE);
+    ui_guide(T_OPS_GUIDE_NEXT);
+}
+
 /* 270 日を回し終えた: 最高の利益と「続けられた」をセーブに残す */
 static void finish(void)
 {
     s32 v = profit();
     newrec = (u8)(v > 0 && (u32)v > g_save.ops_best);
+    ending = ops_ending();
     if (g_save.flags & SF_STARTED) {                 /* 本編を始めていないセーブには書かない（タイトルから入ったとき） */
+        g_save.ops_ends |= (u8)(1 << ending);
         if (newrec) g_save.ops_best = (u32)v;
         g_save.ops_flags |= (u8)(OPS_PLAYED | (g_ops.verdict == OPS_CONTINUE ? OPS_SAVED : 0));
         g_save_dirty = 1;
@@ -314,6 +391,8 @@ FAR(void, ops_draw, (void))
     if (st == ST_MEET) meeting_box();
     else if (st == ST_DONE) result_box();
     else if (st == ST_MODE) mode_box();
+    else if (st == ST_REPORT) report_box();
+    else if (st == ST_ENDING) ending_box();
     else guide_run();
 }
 
@@ -336,8 +415,12 @@ FAR(void, ops_update, (void))
         }
         return;
     }
-    if (st == ST_DONE) {
-        if (p & (BTN_OK | BTN_CANCEL)) screen_change(&scr_title);
+    if (st == ST_DONE || st == ST_REPORT || st == ST_ENDING) {   /* 決算 → 通信簿 → 結末 → タイトル */
+        if (!(p & (BTN_OK | BTN_CANCEL))) return;
+        psg_beep(0x080, 4);
+        if (st == ST_ENDING || (p & BTN_CANCEL)) { screen_change(&scr_title); return; }
+        st = st == ST_DONE ? ST_REPORT : ST_ENDING;
+        if (st == ST_REPORT) report_box(); else ending_box();
         return;
     }
     if (p & BTN_CANCEL) {
@@ -355,6 +438,12 @@ FAR(void, ops_update, (void))
     {
         u8 meet = (u8)(g_ops.next && g_ops.day == mt.day);   /* 会議の日の点に印 */
         ops_step();
+        {
+            u8 b[STAT];
+            b[0] = (u8)g_ops.dau; b[1] = (u8)(g_ops.dau >> 8); b[2] = (u8)g_ops.retired; b[3] = (u8)(g_ops.retired >> 8);
+            x.addr = (u16)(VRAM2_STAT + (g_ops.day - 1) * STAT); x.src = b; x.len = STAT;
+            vdp_page2_write(&x);
+        }
         points(pt);
         if (meet) pt[0] |= MEET;
         x.addr = (u16)(VRAM2_HIST + (g_ops.day - 1) * HIST); x.src = pt; x.len = HIST;

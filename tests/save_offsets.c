@@ -17,7 +17,7 @@ int main(void)
     F("deck", deck); F("event_id", event_id); F("event_pt", event_pt); F("savecnt", save_count);
     F("funds", funds); F("spent", spent); F("last_event", last_event); F("last_rank", last_rank);
     F("guild", guild); F("gvg_last_war", gvg_last_war); F("gvg_last_rank", gvg_last_rank); F("raid_lv", raid_lv); F("credits_seen", credits_seen);
-    F("rival", rival); F("rival_event", rival_event); F("chaser", chaser); F("memo", memo); F("steal_check", steal_check); F("stolen", stolen); F("keep_got", keep_got); F("bill_base", bill_base); F("maint_paid", maint_paid);
+    F("rival", rival); F("rival_event", rival_event); F("chaser", chaser); F("memo", memo); F("steal_check", steal_check); F("stolen", stolen); F("keep_got", keep_got); F("bill_base", bill_base); F("maint_paid", maint_paid); F("ops_ends", ops_ends);
     printf(" card_size %u size %u}\n", (unsigned)sizeof(OwnedCard), (unsigned)sizeof(SaveData));
     return 0;
 }

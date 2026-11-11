@@ -33,6 +33,14 @@
 #define OPS_AD_SPENT  1          /* 予算を使い切った */
 #define OPS_AD_CVR    2          /* CVR が基準を割った */
 
+/* 運営の結末（DECISIONS #100）。g_save.ops_ends に見たもののビット */
+#define OPS_E_GOD     0          /* 神運営: 続けられ、史実より儲かり、炎上もしなかった */
+#define OPS_E_SURVIVE 1          /* 延命しただけ: 続けられた（それ以外） */
+#define OPS_E_FLAME   2          /* 炎上して終わった: 確率を絞ったのがばれたか、コンプガチャが規制に当たった */
+#define OPS_E_FOLD    3          /* 黒字で畳んだ: 終わったが史実より儲かった */
+#define OPS_E_RED     4          /* 赤字で終わった */
+#define OPS_E_HIST    5          /* 史実どおり終わった */
+#define OPS_E_COUNT   6
 #define OPS_PLAYED    0x01       /* g_save.ops_flags */
 #define OPS_SAVED     0x02
 
@@ -82,6 +90,7 @@ typedef struct {
     u8  sq;                      /* 続いている施策（OPS_SQ_*） */
     u8  news;                    /* 下の帯で知らせること（OPS_NEWS_*。画面が出したら 0 に） */
     u8  womcut;                  /* 口コミが止まっている残り日数（確率を絞ったのがばれた） */
+    u16 gems;                    /* 配った石（百個。通信簿, DECISIONS #100） */
 } OpsState;
 
 /* 企画会議の施策。0 = 見送る（史実。いつも選択肢 1） */
@@ -110,9 +119,12 @@ typedef struct {
 #define OPS_SQ_COMP    0x10
 #define OPS_SQ_RIGOUT  0x20      /* 絞ったのがばれた（もう絞れない） */
 #define OPS_SQ_COMPBAN 0x40      /* コンプガチャは規制された */
+#define OPS_SQ_COMPHIT 0x80      /* 入れていたコンプガチャが規制に当たった */
 #define OPS_NEWS_RIG   1         /* 検証班にばれた */
 #define OPS_NEWS_COMP  2         /* コンプガチャの規制 */
 #define OPS_COMP_BAN_DAY 200
+#define OPS_GRAPH_H      120     /* グラフの高さ（点は 0..これ）。DAU は 1000 人で、売上は 1 日 OPS_GRAPH_SALES 円で上まで */
+#define OPS_GRAPH_SALES  400000UL
 
 typedef struct { u16 day; u8 n; u16 text; } OpsMeeting;   /* text: 題 / 議題 / 史実のわけ / 選択肢 × n */
 
@@ -123,6 +135,7 @@ u8   ops_meeting(OpsMeeting *m);     /* 今日が会議の日なら 1（m に中
 void ops_decide(u8 pick);            /* 会議で選ぶ（0 = 史実）。判定の会議は 0 を渡すと判定する */
 void ops_step(void);                 /* 1 日回す */
 u16  ops_chat(void);
+u8   ops_ending(void);                /* 運営の結末 OPS_E_*（270 日を回し終えたあと） */
 u8   ops_plan_offer(u8 slot);       /* いまの企画会議の slot 番目（0..OPS_PLAN_OPTS-1）の施策（OPS_P_*） */                 /* 今日の社内チャットの文（無ければ 0）。15 日ごと、模型の様子で選ぶ */
 #define OPS_INCS      16             /* じっくりの日々の判断の数 */
 #define OPS_INC_KINDS 8              /* 障害・CS 4 種・社長の思いつき 3 種（文は T_OPS_I0 から OPS_TEXTS ずつ） */

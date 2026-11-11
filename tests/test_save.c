@@ -126,6 +126,16 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.keep_got == 3 && s.bill_base == 0 && s.maint_paid == 0);
+    /* v17 も読め、v18 で足した運営の結末は 0 から */
+    save_new(&s, 1);
+    s.maint_paid = 7;
+    s.ops_ends = 0x15;
+    s.magic = SAVE_MAGIC;
+    s.version = 17;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.maint_paid == 7 && s.ops_ends == 0);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;

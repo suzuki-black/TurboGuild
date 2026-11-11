@@ -24,6 +24,7 @@ void vdp_page2_read(const VdpXfer *x);     /* VRAM 10000h + addr から len バ�
 void vdp_page2_write(const VdpXfer *x);
 #define VRAM2_OPS   0x0000                 /* 運営モード: 1000 人 × 5 バイト */
 #define VRAM2_HIST  0x1400                 /* 運営モード: 日ごとのグラフの点 × 5 バイト */
+#define VRAM2_STAT  0x1A00                 /* 運営モード: 日ごとの DAU と引退の累計（u16 × 2）。通信簿に使う（DECISIONS #100） */
 
 void vdp_init_screen5(void);
 void vdp_fill(u16 x, u16 y, u16 w, u16 h, u8 color);

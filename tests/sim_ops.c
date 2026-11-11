@@ -2,6 +2,7 @@
 /* sim_ops.c — 運営モード（core/opsim.c）を PC で回して数字を合わせる。
  *   sim_ops <選択 10 桁>   その選択で 270 日回し、10 日ごとの DAU・課金した人・引退・売上を出す（0000000000 = 史実）
  *   sim_ops all            選べる組み合わせをすべて回し、継続になる割合と売上の幅を出す（企画会議は見送る）
+ *   sim_ops histh          史実の選択の DAU と売上を、グラフの点（0..120）にした表を C のヘッダで出す（src/data/ops_hist.h, DECISIONS #100）
  *   sim_ops plans [N]      会議と企画会議（DECISIONS #99）を無作為に N 回（既定 20000）選び、施策ごとの継続の割合・利益・DAU を出す */
 #include <stdio.h>
 #include <string.h>
@@ -33,6 +34,28 @@ int main(int argc, char **argv)
     static const u8 n[OPS_MEETINGS] = { 3, 2, 3, 3, 2, 3, 3, 3, 3, 3, 3, 1 };
     u8 pick[OPS_MEETINGS] = { 0 };
     int i;
+    if (argc > 1 && !strcmp(argv[1], "histh")) {
+        u8 dau[OPS_DAYS], sal[OPS_DAYS];
+        OpsMeeting m;
+        ops_start();
+        while (g_ops.day < OPS_DAYS) {
+            while (ops_meeting(&m)) ops_decide(0);
+            ops_step();
+            dau[g_ops.day - 1] = (u8)(g_ops.dau >= 1000 ? OPS_GRAPH_H : (u32)g_ops.dau * OPS_GRAPH_H / 1000);
+            sal[g_ops.day - 1] = (u8)(g_ops.sales_day >= OPS_GRAPH_SALES ? OPS_GRAPH_H : g_ops.sales_day * OPS_GRAPH_H / OPS_GRAPH_SALES);
+        }
+        printf("/* SPDX-License-Identifier: MIT */\n/* ops_hist.h — 生成物: build/sim_ops histh（tests/sim_ops.c）。史実の選択で回したときの日ごとの DAU と売上を\n"
+               " * グラフの点（0..OPS_GRAPH_H）にしたもの。運営モードのグラフに点線で重ねる（DECISIONS #100）。模型を変えたら作り直す（テストが比べる） */\n");
+        printf("#ifndef DATA_OPS_HIST_H\n#define DATA_OPS_HIST_H\nstatic const u8 ops_hist[2][%d] = {\n", OPS_DAYS);
+        for (i = 0; i < 2; i++) {
+            int d;
+            printf("    {");
+            for (d = 0; d < OPS_DAYS; d++) printf("%s%s%u", d ? "," : "", d % 30 ? "" : "\n     ", i ? sal[d] : dau[d]);
+            printf(" },\n");
+        }
+        printf("};\n#endif\n");
+        return 0;
+    }
     if (argc > 1 && !strcmp(argv[1], "single")) {      /* 会議は史実、企画会議ではその施策が出たら必ず選ぶ */
         int a;
         for (a = 0; a < OPS_P_COUNT; a++) {

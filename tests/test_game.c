@@ -27,6 +27,7 @@
 #include "core/pev.h"
 #include "core/keitai.h"
 #include "data/text_ids.h"
+#include "data/ops_hist.h"
 
 
 static void fresh(void) { save_new(&g_save, 1000); }
@@ -1257,6 +1258,30 @@ static void test_ops_slow(void)
     CHECK(ops_run("000000000000") == OPS_END && g_ops.sales_total == OPS_HIST_SALES && !g_ops.inc);   /* 早回しは変わらない */
 }
 
+/* 史実の線（DECISIONS #100）: ROM の表は、いまの模型で史実の選択を回した数字と同じ。通信簿と運営の結末 */
+static void test_ops_report(void)
+{
+    OpsMeeting m;
+    u32 p;
+    u16 d;
+    u8 n;
+    ops_start();
+    while (g_ops.day < OPS_DAYS) {
+        while (ops_meeting(&m)) ops_decide(0);
+        ops_step();
+        CHECK(ops_hist[0][g_ops.day - 1] == (g_ops.dau >= 1000 ? OPS_GRAPH_H : g_ops.dau * OPS_GRAPH_H / 1000));
+        CHECK(ops_hist[1][g_ops.day - 1] == (g_ops.sales_day >= OPS_GRAPH_SALES ? OPS_GRAPH_H : g_ops.sales_day * OPS_GRAPH_H / OPS_GRAPH_SALES));
+    }
+    CHECK(ops_ending() == OPS_E_HIST && g_ops.gems == 5);   /* 110 日目の石 500 個 */
+    ops_policy(OPS_P_COMP, &p, &d, &n);                    /* コンプガチャが規制に当たって終わる */
+    CHECK(g_ops.verdict == OPS_END && (g_ops.sq & OPS_SQ_COMPHIT) && ops_ending() == OPS_E_FLAME);
+    ops_slow(2, &p, &d);                                   /* 手厚い対応で続けられたが、史実ほど儲からない */
+    CHECK(g_ops.verdict == OPS_CONTINUE && ops_ending() == OPS_E_SURVIVE && g_ops.gems > 5);
+    ops_run("000000000000");                               /* 早回しで続けられる選び方（儲かるかで神運営か延命か） */
+    CHECK(ops_run("101202012000") == OPS_CONTINUE && (ops_ending() == OPS_E_GOD || ops_ending() == OPS_E_SURVIVE));
+}
+
+
 
 /* 宿屋（DECISIONS #91）: 翌朝 6 時まで進んで AP が全回復し、宿代を払う。夜明け前なら同じ日の朝 */
 static void test_inn(void)
@@ -1457,6 +1482,7 @@ int main(void)
     test_ops();
     test_ops_slow();
     test_ops_plans();
+    test_ops_report();
     test_memo_ending();
     test_steal();
     test_inn();
