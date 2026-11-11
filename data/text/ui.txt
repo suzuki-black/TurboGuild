@@ -774,6 +774,26 @@ T_OPS_SLOW	じっくり
 T_OPS_SLOW2	日々の判断あり。20分ほど
 T_OPS_RTC	この間も本編の時間は進みます
 T_OPS_GUIDE_MODE	1:早回し 2:じっくり ESC:戻る
+T_OPS_PLAN	企画会議
+T_OPS_PLAN_B	今月の施策を1つ選ぶ
+T_OPS_GUIDE_PLAN	1〜5:選ぶ（1は見送る）
+T_OPS_PA0	見送る
+T_OPS_PA1	レイドボス（100万）
+T_OPS_PA2	東西対抗戦（200万）
+T_OPS_PA3	アニメコラボ（300万）
+T_OPS_PA4	ランキング（50万）
+T_OPS_PA5	ステップアップガチャ
+T_OPS_PA6	多段BOXガチャ
+T_OPS_PA7	コンプガチャ
+T_OPS_PA8	限定SSRの復刻
+T_OPS_PA9	月パス（980円）
+T_OPS_PA10	福袋ガチャ
+T_OPS_PA11	報酬を課金者だけに
+T_OPS_PA12	確率をこっそり絞る
+T_OPS_PA13	天井を外す
+T_OPS_PA14	詫び石を渋る
+T_OPS_NEWS1	確率操作が検証班にばれた！
+T_OPS_NEWS2	コンプガチャが規制された
 T_OPS_MENU	運営モード
 T_OPS_TITLE	運営モード
 T_OPS_DAU	DAU
@@ -804,7 +824,7 @@ T_OPS_BOSS3	上司「稼げず、続かずか…」
 T_OPS_QUIT	運営をやめますか？
 T_OPS_NEW	新規
 T_OPS_PROFIT	利益
-T_OPS_AD	広告費
+T_OPS_AD	広告・開発費
 T_OPS_ADON	広告中
 T_OPS_AD_SPENT	広告: 予算を使い切った
 T_OPS_AD_CVR	広告: CVR が基準を割り停止

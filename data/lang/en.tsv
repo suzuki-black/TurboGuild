@@ -1164,6 +1164,26 @@ T_OPS_SLOW	Full	!
 T_OPS_SLOW2	Daily calls too, ~20 min	!
 T_OPS_RTC	Game time keeps running meanwhile	!
 T_OPS_GUIDE_MODE	1:Fast 2:Full ESC:Back	!
+T_OPS_PLAN	Planning:	!
+T_OPS_PLAN_B	Pick one move this month	!
+T_OPS_GUIDE_PLAN	1-5:Pick (1 = skip)	!
+T_OPS_PA0	Skip	!
+T_OPS_PA1	Raid boss (1M)	!
+T_OPS_PA2	East-West war (2M)	!
+T_OPS_PA3	Anime collab (3M)	!
+T_OPS_PA4	Ranking event (0.5M)	!
+T_OPS_PA5	Step-up gacha	!
+T_OPS_PA6	Multi-tier box gacha	!
+T_OPS_PA7	Complete gacha	!
+T_OPS_PA8	Rerun a limited SSR	!
+T_OPS_PA9	Monthly pass (980)	!
+T_OPS_PA10	Lucky-bag gacha	!
+T_OPS_PA11	Rewards for payers only	!
+T_OPS_PA12	Quietly cut the odds	!
+T_OPS_PA13	Remove the pity	!
+T_OPS_PA14	Skimp on apology gems	!
+T_OPS_NEWS1	The rigged odds were exposed!	!
+T_OPS_NEWS2	Complete gacha was banned	!
 T_OPS_MENU	Operator mode	!
 T_OPS_TITLE	Operator mode	!
 T_OPS_DAU	DAU
@@ -1194,7 +1214,7 @@ T_OPS_BOSS3	Boss: "No cash, no future."	!
 T_OPS_QUIT	Stop running the service?	!
 T_OPS_NEW	New
 T_OPS_PROFIT	Profit	!
-T_OPS_AD	Ads
+T_OPS_AD	Ads & dev
 T_OPS_ADON	Ads on
 T_OPS_AD_SPENT	Ads: budget used up
 T_OPS_AD_CVR	Ads: CVR fell, stopped

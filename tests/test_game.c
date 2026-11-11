@@ -1138,6 +1138,7 @@ static u8 ops_run(const char *pick)
     ops_start();
     while (g_ops.day < OPS_DAYS) {
         while (ops_meeting(&m)) {
+            if (m.text == T_OPS_PLAN) { CHECK(m.n == OPS_PLAN_OPTS); ops_decide(0); continue; }   /* 企画会議は見送る（史実） */
             CHECK(m.text == T_OPS_M0 + g_ops.next * OPS_TEXTS);
             met++;
             ops_decide((u8)(pick[g_ops.next] - '0'));
@@ -1165,6 +1166,54 @@ static void test_ops(void)
     CHECK(ops_run("999999999999") == OPS_END && g_ops.sales_total == total);   /* 範囲外の選択は史実として扱う */
 }
 
+/* 企画会議（DECISIONS #99）: 16 回、5 枚の札。会議は史実のまま、その施策が出たら必ず選んだときの向き */
+static void ops_policy(u8 a, u32 *profit, u16 *dau, u8 *times)
+{
+    OpsMeeting m;
+    u8 plans = 0;
+    *times = 0;
+    ops_start();
+    while (g_ops.day < OPS_DAYS) {
+        while (ops_meeting(&m)) {
+            u8 k = 0;
+            if (m.text == T_OPS_PLAN) {
+                plans++;
+                CHECK(m.n == OPS_PLAN_OPTS && ops_plan_offer(0) == OPS_P_SKIP);
+                for (k = 1; k < OPS_PLAN_OPTS; k++) CHECK(ops_plan_offer(k) < OPS_P_COUNT);
+                for (k = OPS_PLAN_OPTS - 1; k && ops_plan_offer(k) != a; k--) {}
+                if (k) (*times)++;
+            }
+            ops_decide(k);
+        }
+        ops_step();
+    }
+    CHECK(plans == OPS_PLANS);
+    *profit = (u32)g_ops.profit_judge;
+    *dau = g_ops.dau_judge;
+}
+
+static void test_ops_plans(void)
+{
+    u32 p0, p;
+    u16 d0, d;
+    u8 n;
+    ops_run("000000000000");
+    p = (u32)g_ops.profit_judge;
+    d = g_ops.dau_judge;
+    ops_policy(OPS_P_SKIP, &p0, &d0, &n);
+    CHECK(n == 0 && p0 == p && d0 == d);                  /* 見送れば史実のまま */
+    ops_policy(OPS_P_COMP, &p, &d, &n);                   /* コンプガチャ: 儲かるが規制で人が減る */
+    CHECK(n == 1 && p > p0 && d < d0 && (g_ops.sq & OPS_SQ_COMPBAN) && !(g_ops.sq & OPS_SQ_COMP));
+    ops_policy(OPS_P_EASTWEST, &p, &d, &n);               /* 東西対抗戦: 費用はかかるが人が残る */
+    CHECK(n > 1 && p < p0 && d > d0);
+    ops_policy(OPS_P_RIG, &p, &d, &n);                    /* 確率を絞る: 儲かるが、ばれる */
+    CHECK(n == 1 && p > p0 && d < d0 && (g_ops.sq & OPS_SQ_RIGOUT));
+    ops_policy(OPS_P_PASS, &p, &d, &n);                   /* 月パス: 1 回だけ選べる */
+    CHECK(n == 1 && (g_ops.sq & OPS_SQ_PASS));
+    ops_policy(OPS_P_COLLAB, &p, &d, &n);
+    CHECK(n > 1 && g_ops.ad_total > (u32)n * OPS_P_COLLAB_MAN * 10000);   /* 版権料は費用に入る */
+}
+
 /* じっくり（DECISIONS #98）: 日々の判断が 16 回来て、選び方で DAU と売上が変わる。早回しは前と同じ */
 static u8 ops_slow(u8 policy, u32 *profit, u16 *dau)
 {
@@ -1174,7 +1223,8 @@ static u8 ops_slow(u8 policy, u32 *profit, u16 *dau)
     g_ops.slow = 1;
     while (g_ops.day < OPS_DAYS) {
         while (ops_meeting(&m)) {
-            if (m.text >= T_OPS_I0) { CHECK(m.n == 3 && m.text < T_OPS_I0 + OPS_INC_KINDS * OPS_TEXTS); incs++; ops_decide(policy); }
+            if (m.text == T_OPS_PLAN) ops_decide(0);
+            else if (m.text >= T_OPS_I0) { CHECK(m.n == 3 && m.text < T_OPS_I0 + OPS_INC_KINDS * OPS_TEXTS); incs++; ops_decide(policy); }
             else ops_decide(0);
         }
         ops_step();
@@ -1406,6 +1456,7 @@ int main(void)
     test_stance_leader_slots();
     test_ops();
     test_ops_slow();
+    test_ops_plans();
     test_memo_ending();
     test_steal();
     test_inn();

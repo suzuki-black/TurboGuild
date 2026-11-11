@@ -136,6 +136,51 @@ static const Inc incs[OPS_INCS] = {
 
 static u8 meeting_today(void) { return (u8)(g_ops.next < OPS_MEETINGS && meets[g_ops.next].day == g_ops.day); }
 
+/* 企画会議（DECISIONS #99）。7 日目から 15 日ごと。札は回ごとにずらして出す */
+#define PLAN_DAY(k) ((u16)(7 + (k) * 15))
+static u8 plan_today(void) { return (u8)(g_ops.pnext < OPS_PLANS && PLAN_DAY(g_ops.pnext) == g_ops.day); }
+
+static const u8 ev_cards[4] = { OPS_P_RAID, OPS_P_EASTWEST, OPS_P_COLLAB, OPS_P_RANK };
+static const u8 ga_cards[4] = { OPS_P_STEP, OPS_P_BOX, OPS_P_COMP, OPS_P_REVIVAL };
+static const u8 mo_cards[3] = { OPS_P_PASS, OPS_P_FUKU, OPS_P_PAYWALL };
+static const u8 sq_cards[3] = { OPS_P_RIG, OPS_P_NOPITY, OPS_P_STINGY };
+
+/* いま選べるか（続いているものと、もう選べないもの） */
+static u8 usable(u8 a)
+{
+    switch (a) {
+    case OPS_P_COMP:    return (u8)(!(g_ops.sq & (OPS_SQ_COMP | OPS_SQ_COMPBAN)) && g_ops.day + 15 < OPS_COMP_BAN_DAY);
+    case OPS_P_PASS:    return (u8)!(g_ops.sq & OPS_SQ_PASS);
+    case OPS_P_PAYWALL: return (u8)!(g_ops.sq & OPS_SQ_PAYWALL);
+    case OPS_P_RIG:     return (u8)!(g_ops.sq & (OPS_SQ_RIG | OPS_SQ_RIGOUT));
+    case OPS_P_NOPITY:  return (u8)(g_ops.pick[1] == PITY_ON);
+    case OPS_P_STINGY:  return (u8)!(g_ops.sq & OPS_SQ_STINGY);
+    default:            return 1;
+    }
+}
+
+static u8 pick_card(const u8 *cards, u8 n, u8 k)
+{
+    u8 i;
+    for (i = 0; i < n; i++) {
+        u8 a = cards[(k + i) % n];
+        if (usable(a)) return a;
+    }
+    return OPS_P_SKIP;
+}
+
+FAR(u8, ops_plan_offer, (u8 slot))
+{
+    u8 k = g_ops.pnext;
+    switch (slot) {
+    case 1:  return pick_card(ev_cards, 4, k);
+    case 2:  return pick_card(ga_cards, 4, (u8)(k + 1));
+    case 3:  return pick_card(mo_cards, 3, k);
+    case 4:  return pick_card(sq_cards, 3, k);
+    default: return OPS_P_SKIP;
+    }
+}
+
 FAR(u8, ops_meeting, (OpsMeeting *m))
 {
     const Meet *t;
@@ -144,6 +189,12 @@ FAR(u8, ops_meeting, (OpsMeeting *m))
         m->day = t->day;
         m->n = t->n;
         m->text = (u16)(T_OPS_M0 + g_ops.next * OPS_TEXTS);
+        return 1;
+    }
+    if (plan_today()) {
+        m->day = g_ops.day;
+        m->n = OPS_PLAN_OPTS;
+        m->text = T_OPS_PLAN;
         return 1;
     }
     if (g_ops.slow && g_ops.inc < OPS_INCS && incs[g_ops.inc].day == g_ops.day) {
@@ -191,6 +242,7 @@ static void act(u8 a)
         static const u8 feel[4] = { 3, 5, 9, 16 };    /* 嬉しさは配った数ほどには増えない */
         u8 h = tens[a - A_GIFT300];
         s16 v = (s16)(feel[a - A_GIFT300] * OPS_GIFT_RELIEF);
+        if (g_ops.sq & OPS_SQ_STINGY) { h = 0; v /= 2; }      /* 詫び石を渋る: 半分しか配らないので喜ばれないが、石が余らず課金は減らない */
         add_all(-v, -v, -v / 2, -v / 4);
         g_ops.glut = (u8)(h * OPS_GLUT_DAYS > 255 ? 255 : h * OPS_GLUT_DAYS);
         break;
@@ -250,8 +302,64 @@ static void inc_act(u8 kind, u8 pick)
     }
 }
 
+/* 企画会議の施策の効き目（DAU と売上に直接）。開発費・版権料は広告費と一緒に費用へ */
+static void cost(u16 man) { g_ops.ad_total += (u32)man * 10000; }
+
+static void plan_act(u8 a)
+{
+    switch (a) {
+    case OPS_P_RAID:
+        if (g_ops.event < 10) g_ops.event = 10;
+        add_all(-OPS_EVENT_RELIEF, -OPS_EVENT_RELIEF, -OPS_EVENT_RELIEF / 2, -OPS_EVENT_RELIEF / 2);
+        if (g_ops.spike < 5) g_ops.spike = 5;                /* 救援で課金が増える */
+        cost(OPS_P_RAID_MAN);
+        break;
+    case OPS_P_EASTWEST:                                     /* 盛り上がるが、初日はサーバーが落ちる */
+        if (g_ops.event < 7) g_ops.event = 7;
+        add_all(-OPS_EVENT_RELIEF * 3 / 2, -OPS_EVENT_RELIEF * 3 / 2, -OPS_EVENT_RELIEF, -OPS_EVENT_RELIEF);
+        g_ops.push = OPS_PUSH_DAYS;
+        g_ops.outage = 1;
+        cost(OPS_P_EW_MAN);
+        break;
+    case OPS_P_COLLAB:                                       /* 人が一気に入るが、終わると抜ける */
+        g_ops.collab = OPS_COLLAB_DAYS;
+        g_ops.spike = OPS_COLLAB_DAYS;
+        cost(OPS_P_COLLAB_MAN);
+        break;
+    case OPS_P_RANK:
+        if (g_ops.event < 7) g_ops.event = 7;
+        g_ops.spike = 7;
+        add(OPS_FREE, OPS_P_PRESSURE);
+        cost(OPS_P_RANK_MAN);
+        break;
+    case OPS_P_STEP: case OPS_P_BOX:
+        g_ops.gkind = a;
+        g_ops.gtimer = OPS_P_GACHA_DAYS;
+        add(OPS_FREE, OPS_P_PRESSURE / 2);
+        if (a == OPS_P_BOX) add(OPS_LIGHT, OPS_P_PRESSURE);
+        break;
+    case OPS_P_COMP:    g_ops.sq |= OPS_SQ_COMP; break;
+    case OPS_P_REVIVAL:                                      /* 持っていた人は怒り、持っていない人は喜ぶ */
+        add_all(-OPS_P_PRESSURE / 2, -OPS_P_PRESSURE / 2, OPS_P_PRESSURE, OPS_P_PRESSURE);
+        g_ops.spike = 5;
+        break;
+    case OPS_P_PASS:    g_ops.sq |= OPS_SQ_PASS; break;
+    case OPS_P_FUKU:    if (g_ops.spike < 3) g_ops.spike = 3; add(OPS_HEAVY, OPS_P_PRESSURE / 2); break;
+    case OPS_P_PAYWALL: g_ops.sq |= OPS_SQ_PAYWALL; break;
+    case OPS_P_RIG:     g_ops.sq |= OPS_SQ_RIG; break;
+    case OPS_P_NOPITY:  g_ops.pick[1] = 0; add(OPS_HEAVY, OPS_P_PRESSURE / 2); add(OPS_WHALE, OPS_P_PRESSURE / 2); break;
+    case OPS_P_STINGY:  g_ops.sq |= OPS_SQ_STINGY; break;
+    default: break;
+    }
+}
+
 FAR(void, ops_decide, (u8 pick))
 {
+    if (!meeting_today() && plan_today()) {                 /* 企画会議（選択肢 1 は見送る） */
+        plan_act(ops_plan_offer((u8)(pick < OPS_PLAN_OPTS ? pick : 0)));
+        g_ops.pnext++;
+        return;
+    }
     if (!meeting_today()) {                                  /* じっくりの日々の判断 */
         if (g_ops.slow && g_ops.inc < OPS_INCS && incs[g_ops.inc].day == g_ops.day) {
             inc_act(incs[g_ops.inc].kind, (u8)(pick < OPS_OPTIONS ? pick : 0));
@@ -310,6 +418,25 @@ static void daily(void)
         add(OPS_HEAVY, v); add(OPS_WHALE, v);
     }
     if (g_ops.verdict == OPS_END) add_all(OPS_END_DAILY, OPS_END_DAILY, OPS_END_DAILY, OPS_END_DAILY);
+    /* 企画会議の続いている施策（DECISIONS #99） */
+    if (g_ops.sq & OPS_SQ_COMP) { add(OPS_FREE, 3); add(OPS_LIGHT, 2); }
+    if (g_ops.sq & OPS_SQ_PAYWALL) add(OPS_FREE, 4);
+    if (g_ops.sq & OPS_SQ_PASS) g_ops.tempt += OPS_P_PASS_TEMPT;   /* 月パスは安く見えるので転びやすい */
+    if ((g_ops.sq & OPS_SQ_RIG) && !(rnd() & OPS_P_RIG_FIND)) {   /* 攻略スレの検証班に見つかる */
+        g_ops.sq = (u8)((g_ops.sq & ~OPS_SQ_RIG) | OPS_SQ_RIGOUT);
+        add_all(OPS_P_SCANDAL, OPS_P_SCANDAL, OPS_P_SCANDAL * 3 / 4, OPS_P_SCANDAL / 2);
+        g_ops.womcut = 30;
+        g_ops.news = OPS_NEWS_RIG;
+    }
+    if (g_ops.day == OPS_COMP_BAN_DAY) {                     /* 業界の自主規制 */
+        if (g_ops.sq & OPS_SQ_COMP) {
+            add_all(OPS_P_SCANDAL * 3 / 2, OPS_P_SCANDAL * 3 / 2, OPS_P_SCANDAL, OPS_P_SCANDAL);
+            g_ops.sales_total -= g_ops.sales_total / 10;     /* 返金の対応 */
+            g_ops.news = OPS_NEWS_COMP;
+        }
+        g_ops.sq = (u8)((g_ops.sq & ~OPS_SQ_COMP) | OPS_SQ_COMPBAN);
+    }
+    if (g_ops.collab == 1) add_all(OPS_P_COLLAB_LEAVE, OPS_P_COLLAB_LEAVE / 2, 0, 0);   /* コラボ目当ての人が抜ける */
     g_ops.tempt += OPS_TEMPT_DAILY;
     if (g_ops.boost) g_ops.tempt += (u16)(g_ops.boost_x * OPS_TEMPT_BOOST);
     if (g_ops.pick[1] == PITY_ON || g_ops.pick[0] == RATE_HIGH) g_ops.tempt += OPS_TEMPT_PITY;   /* 当たると思えば転ぶ */
@@ -331,6 +458,12 @@ static void want(u8 *w, u8 *amt)
         if (g_ops.pick[0] == RATE_HIGH) m = (u16)(m * 3 / 4);
         if (g_ops.pick[1] == PITY_ON && c >= OPS_HEAVY) m = (u16)(m * 4 / 5);
         if (g_ops.cap && c <= OPS_HEAVY) m = (u16)(m * 4 / 5);   /* 月額の上限 */
+        if (g_ops.gtimer && g_ops.gkind == OPS_P_STEP && c <= OPS_HEAVY) m = (u16)(m * 2);   /* ステップアップ: 段を上がるほど払う */
+        if (g_ops.gtimer && g_ops.gkind == OPS_P_BOX && c >= OPS_HEAVY) v = (u16)(v * 2);       /* 多段 BOX: 引き切るまで回す */
+        if ((g_ops.sq & OPS_SQ_COMP) && c >= OPS_HEAVY) { v = (u16)(v * 3 / 2); m = (u16)(m * 5 / 4); }
+        if (g_ops.sq & OPS_SQ_PAYWALL) v = (u16)(v * 5 / 4);
+        if (g_ops.sq & OPS_SQ_RIG) m = (u16)(m * 6 / 5);     /* 出ないので余計に払う */
+        if ((g_ops.sq & OPS_SQ_PASS) && c == OPS_LIGHT) v = (u16)(v * 7 / 8);   /* 月パスで足りる */
         w[c] = (u8)(v > 255 ? 255 : v);
         amt[c] = (u8)(m > 255 ? 255 : m);
     }
@@ -347,8 +480,10 @@ static void inflow(void)
         if (g_ops.pick[0] == RATE_HIGH) wom += OPS_WOM_RATE;
         if (g_ops.pick[0] == RATE_LOW) wom = wom > OPS_WOM_RATE ? wom - OPS_WOM_RATE : 0;
         if (g_ops.pick[1] == PITY_ON) wom += OPS_WOM_PITY;
+        if (g_ops.womcut) wom = 0;                           /* 確率を絞ったのがばれて、口コミが止まる */
         v = (u32)g_ops.dau * wom * (OPS_DAYS + 30 - g_ops.day) / (OPS_DAYS + 30) / 100;   /* 古くなるほど細る */
         if (g_ops.push) v += (u32)OPS_PUSH_NEW * 256;
+        if (g_ops.collab) v += (u32)OPS_COLLAB_NEW * 256;
     }
     if (g_ops.ad_on) {
         u32 spend = g_ops.ad_left < OPS_AD_DAILY ? g_ops.ad_left : OPS_AD_DAILY;
@@ -373,7 +508,7 @@ static void inflow(void)
 FAR(void, ops_step, (void))
 {
     u8 buf[CHUNK * OPS_REC], w[OPS_CLASSES], amt[OPS_CLASSES], lim[OPS_CLASSES];
-    u16 i, dau = 0, payers = 0, retired = 0, pos = 0;
+    u16 i, dau = 0, payers = 0, retired = 0, pos = 0, light = 0;
     u32 sales = 0;                                          /* 百円 */
     u8 k, c, n, bonus, conv;
     if (g_ops.day >= OPS_DAYS) return;
@@ -409,10 +544,12 @@ FAR(void, ops_step, (void))
             if (g_ops.outage) p >>= 1;                               /* 障害の日 */
             if ((u8)rnd() >= p) continue;
             dau++;
+            if (c == OPS_LIGHT || c == OPS_HEAVY) light++;
             if (c && (u8)(rnd() >> 8) < w[c]) { payers++; sales += amt[c]; }
         }
         ops_mem_write((u16)(i * OPS_REC), (u8)(n * OPS_REC), buf);
     }
+    if ((g_ops.sq & OPS_SQ_PASS) && g_ops.day % 30 == 0) sales += (u32)light * OPS_P_PASS_PCT / 100 * OPS_P_PASS_PRICE;   /* 月パス */
     g_ops.dau = dau;
     g_ops.payers = payers;
     g_ops.retired = retired;
@@ -430,6 +567,9 @@ FAR(void, ops_step, (void))
     if (g_ops.event) g_ops.event--;
     if (g_ops.push) g_ops.push--;
     g_ops.outage = 0;
+    if (g_ops.gtimer) g_ops.gtimer--;
+    if (g_ops.collab) g_ops.collab--;
+    if (g_ops.womcut) g_ops.womcut--;
     g_ops.day++;
 }
 

@@ -113,6 +113,20 @@
 #define OPS_I_AD_MAN        300      /* 社長の言う追加の広告（万円） */
 #define OPS_CHAT_LOW_DAU    150      /* 社内チャットが弱音になる DAU */
 #define OPS_CHAT_GOOD_SALES 300000UL /* 浮かれる 1 日の売上（円） */
+#define OPS_P_RAID_MAN      100      /* 企画会議（DECISIONS #99）: レイドの開発費（万円） */
+#define OPS_P_EW_MAN        200      /* 東西対抗戦 */
+#define OPS_P_COLLAB_MAN    300     /* コラボの版権料 */
+#define OPS_P_RANK_MAN      50
+#define OPS_COLLAB_DAYS     10
+#define OPS_COLLAB_NEW      25       /* コラボの間に毎日入る人 */
+#define OPS_P_COLLAB_LEAVE  80      /* コラボが終わると無課金の不満が跳ねる */
+#define OPS_P_PRESSURE      60       /* ランキング・ガチャ・復刻・天井を外すの不満 */
+#define OPS_P_GACHA_DAYS    10
+#define OPS_P_PASS_TEMPT    3
+#define OPS_P_PASS_PCT      70       /* 微課金・重課金のうち月パスを買う割合 */
+#define OPS_P_PASS_PRICE    20       /* 月パスの 1 か月（百円。石が多く付く上位のパスを含めた平均） */
+#define OPS_P_RIG_FIND      63       /* 確率を絞ると、毎日 1/64 で見つかる */
+#define OPS_P_SCANDAL       400      /* 見つかった・規制されたときの不満 */
 #define OPS_HIST_PROFIT     14579500UL  /* 同じく利益（売上 - 広告費）。決算の上司のひとことはこれと比べる */
 
 /* 宿屋（core/player.c player_sleep, DECISIONS #91）: 泊まると翌朝まで進み、AP が全回復する */

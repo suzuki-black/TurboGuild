@@ -74,7 +74,45 @@ typedef struct {
     u8  inc;                     /* 次の日々の判断の番号 */
     u8  outage;                  /* 今日は障害でログインが半分 */
     u8  cap;                     /* 月額の上限を入れた（微課金・重課金の 1 回の額が減る） */
+    /* 企画会議（DECISIONS #99）: 15 日ごとに施策を 1 つ。早回しでもじっくりでも開く */
+    u8  pnext;                   /* 次の企画会議の番号 */
+    u8  gtimer;                  /* 期間つきのガチャの残り日数 */
+    u8  gkind;                   /* そのガチャ（OPS_P_STEP / OPS_P_BOX） */
+    u8  collab;                  /* コラボの残り日数 */
+    u8  sq;                      /* 続いている施策（OPS_SQ_*） */
+    u8  news;                    /* 下の帯で知らせること（OPS_NEWS_*。画面が出したら 0 に） */
+    u8  womcut;                  /* 口コミが止まっている残り日数（確率を絞ったのがばれた） */
 } OpsState;
+
+/* 企画会議の施策。0 = 見送る（史実。いつも選択肢 1） */
+#define OPS_P_SKIP     0
+#define OPS_P_RAID     1
+#define OPS_P_EASTWEST 2         /* 東西対抗戦（全ギルドの大規模戦） */
+#define OPS_P_COLLAB   3         /* アニメとのコラボ */
+#define OPS_P_RANK     4         /* ランキングイベント */
+#define OPS_P_STEP     5         /* ステップアップガチャ */
+#define OPS_P_BOX      6         /* 多段の BOX ガチャ */
+#define OPS_P_COMP     7         /* コンプガチャ（200 日目に業界の自主規制） */
+#define OPS_P_REVIVAL  8         /* 限定 SSR の復刻 */
+#define OPS_P_PASS     9         /* 月パス（サブスク） */
+#define OPS_P_FUKU     10        /* 福袋 */
+#define OPS_P_PAYWALL  11        /* イベントの報酬を課金者だけに */
+#define OPS_P_RIG      12        /* 確率をこっそり絞る */
+#define OPS_P_NOPITY   13        /* 天井を外す */
+#define OPS_P_STINGY   14        /* 詫び石を渋る */
+#define OPS_P_COUNT    15
+#define OPS_PLANS      16        /* 企画会議の数（7 日目から 15 日ごと） */
+#define OPS_PLAN_OPTS  5         /* 見送る・イベント・ガチャ・課金・締め付け */
+#define OPS_SQ_PASS    0x01
+#define OPS_SQ_PAYWALL 0x02
+#define OPS_SQ_RIG     0x04
+#define OPS_SQ_STINGY  0x08
+#define OPS_SQ_COMP    0x10
+#define OPS_SQ_RIGOUT  0x20      /* 絞ったのがばれた（もう絞れない） */
+#define OPS_SQ_COMPBAN 0x40      /* コンプガチャは規制された */
+#define OPS_NEWS_RIG   1         /* 検証班にばれた */
+#define OPS_NEWS_COMP  2         /* コンプガチャの規制 */
+#define OPS_COMP_BAN_DAY 200
 
 typedef struct { u16 day; u8 n; u16 text; } OpsMeeting;   /* text: 題 / 議題 / 史実のわけ / 選択肢 × n */
 
@@ -84,7 +122,8 @@ void ops_start(void);
 u8   ops_meeting(OpsMeeting *m);     /* 今日が会議の日なら 1（m に中身）。選ぶまで ops_step を呼ばない */
 void ops_decide(u8 pick);            /* 会議で選ぶ（0 = 史実）。判定の会議は 0 を渡すと判定する */
 void ops_step(void);                 /* 1 日回す */
-u16  ops_chat(void);                 /* 今日の社内チャットの文（無ければ 0）。15 日ごと、模型の様子で選ぶ */
+u16  ops_chat(void);
+u8   ops_plan_offer(u8 slot);       /* いまの企画会議の slot 番目（0..OPS_PLAN_OPTS-1）の施策（OPS_P_*） */                 /* 今日の社内チャットの文（無ければ 0）。15 日ごと、模型の様子で選ぶ */
 #define OPS_INCS      16             /* じっくりの日々の判断の数 */
 #define OPS_INC_KINDS 8              /* 障害・CS 4 種・社長の思いつき 3 種（文は T_OPS_I0 から OPS_TEXTS ずつ） */
 

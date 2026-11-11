@@ -182,9 +182,28 @@ static void npc_at(u8 cx, u8 y, u16 npc)
     txt_id(cx, y, (u16)(NPC_SUF_TEXT + r.name_id % NPC_SUF_COUNT), COL_CYAN, COL_DBLUE);
 }
 
+/* 企画会議（DECISIONS #99）: 見送る・イベント・ガチャ・課金・締め付けの 5 枚から 1 つ */
+static void plan_box(void)
+{
+    u8 k, cx, y;
+    ui_box(GX, BOX_Y, GW, BOX_H, COL_DBLUE, COL_CYAN);
+    cx = line(0, T_OPS_PLAN, COL_CYAN);
+    cx = txt_num((u8)(cx + 1), row_y(0), mt.day, COL_CYAN, COL_DBLUE);
+    txt_id(cx, row_y(0), T_OPS_DAYS, COL_CYAN, COL_DBLUE);
+    line(1, T_OPS_PLAN_B, COL_WHITE);
+    for (k = 0; k < OPS_PLAN_OPTS; k++) {
+        u8 a = ops_plan_offer(k);
+        y = row_y((u8)(2 + k));
+        ui_key((u8)(k + 1), 16, (u8)(y + 2));
+        txt_id(4, y, (u16)(T_OPS_PA0 + a), k == 4 ? COL_ORANGE : COL_WHITE, COL_DBLUE);   /* 締め付けは橙 */
+    }
+    ui_guide(T_OPS_GUIDE_PLAN);
+}
+
 static void meeting_box(void)
 {
-    u8 k, cx, y, inc = (u8)(mt.text >= T_OPS_I0);
+    u8 k, cx, y, inc = (u8)(mt.text >= T_OPS_I0 && mt.text < T_OPS_I0 + OPS_INC_KINDS * OPS_TEXTS);
+    if (mt.text == T_OPS_PLAN) { plan_box(); return; }
     ui_box(GX, BOX_Y, GW, BOX_H, COL_DBLUE, COL_YELLOW);
     cx = line(0, inc ? T_OPS_INC : T_OPS_MEETING, COL_YELLOW);
     cx = txt_num((u8)(cx + 1), row_y(0), mt.day, COL_YELLOW, COL_DBLUE);
@@ -342,7 +361,11 @@ FAR(void, ops_update, (void))
         vdp_page2_write(&x);
         plot((u16)(g_ops.day - 1), pt, last);
         kpi();
-        if (g_ops.ad_stop != ad_seen || g_ops.day % 15 == 0) guide_run();
+        if (g_ops.news) {                                /* 確率操作がばれた・コンプガチャの規制 */
+            ui_guide((u16)(T_OPS_NEWS1 + g_ops.news - 1));
+            psg_beep(0x300, 12);
+            g_ops.news = 0;
+        } else if (g_ops.ad_stop != ad_seen || g_ops.day % 15 == 0) guide_run();
         else if (!ad_seen) {                             /* 社内チャット（15 日ごと。次の区切りまで下の帯に出す） */
             u16 c = ops_chat();
             if (c) ui_guide(c);

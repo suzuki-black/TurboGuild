@@ -23,6 +23,7 @@
 - **Operator mode from the start.** Operator mode is now on the title screen from the beginning. Until you finish the main game, the "history" lines in meetings are hidden as "???". Choose Fast (meetings only, about 2 minutes, as before) or Full.
 - **Full operator mode.** Sixteen daily calls arrive between meetings: server trouble (how to announce the maintenance and how many gems to give), support mails from real players in the model (missing gems, a child's purchase, a hacked account, a thank-you), and the CEO's sudden ideas. They change dissatisfaction, logins and sales directly: cold answers earn more but lose players; generous ones keep players but earn less.
 - **Office chat.** Every 15 days a coworker says something at the bottom of the screen, depending on how things are going.
+- **Planning meetings.** Every 15 days (16 times, in both Fast and Full), pick one move from five cards: skip, an event (raid boss, East-West guild war, anime collab, ranking), a gacha (step-up, multi-tier box, complete gacha, rerun of a limited SSR), monetization (monthly pass, lucky bag, rewards for payers only), or a squeeze (quietly cut the odds, remove the pity, skimp on apology gems). The moves that earn the most lose the most players: complete gacha is banned by industry self-regulation on day 200, and rigged odds get exposed sooner or later. Events cost money but keep people playing.
 
 ### 日本語
 - **仲間の去り方。** 辞める仲間それぞれに理由が付きました: 受験・就職・結婚・親に見つかった・飽きた・ほかのゲームへ・凍結・機種変で引き継ぎ失敗。最後の数日の弱音と、後で懐かしむ文が理由で替わります（「#さん、受験うまくいったかな」）。一部の仲間と、データが消えた人は、何も言わずに来なくなります。周りが気づき（「#さん、最近見ないね」）、2〜3 週間後にギルドマスターが整理します。
@@ -45,6 +46,7 @@
 - **運営モードを最初から。** タイトルから最初から運営モードに入れます。本編を終えるまでは、会議の「史実」の行は「？？？」で伏せます。始めるときに「早回し」（会議だけ、2 分ほど、今までどおり）か「じっくり」を選びます。
 - **じっくり。** 会議の合間に 16 回、日々の判断が来ます: サーバー障害（メンテの告知の仕方と詫び石）、模型の中のプレイヤーからの CS のメール（石が減った・子どもの課金・乗っ取り・お礼）、社長の思いつき。不満・ログイン・売上に直接効きます。冷たく返すと儲かるが人が減り、手厚く返すと人は残るが儲からない。
 - **社内チャット。** 15 日ごとに、同僚のひとことが画面の下に出ます（数字の調子で変わります）。
+- **企画会議。** 15 日ごとに 16 回（早回しでもじっくりでも）、5 枚の札から 1 つを選びます: 見送る・イベント（レイドボス・東西対抗戦・アニメコラボ・ランキング）・ガチャ（ステップアップ・多段 BOX・コンプガチャ・限定 SSR の復刻）・課金（月パス・福袋・報酬を課金者だけに）・締め付け（確率をこっそり絞る・天井を外す・詫び石を渋る）。儲かる手ほど人が減ります。コンプガチャは 200 日目に業界の自主規制で廃止になり、絞った確率はいずれ検証班にばれます。イベントはお金がかかりますが、人が残ります。
 
 ## v0.2.0 — 2026-11-08
 
