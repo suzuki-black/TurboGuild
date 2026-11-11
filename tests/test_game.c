@@ -1165,6 +1165,49 @@ static void test_ops(void)
     CHECK(ops_run("999999999999") == OPS_END && g_ops.sales_total == total);   /* 範囲外の選択は史実として扱う */
 }
 
+/* じっくり（DECISIONS #98）: 日々の判断が 16 回来て、選び方で DAU と売上が変わる。早回しは前と同じ */
+static u8 ops_slow(u8 policy, u32 *profit, u16 *dau)
+{
+    OpsMeeting m;
+    u8 incs = 0;
+    ops_start();
+    g_ops.slow = 1;
+    while (g_ops.day < OPS_DAYS) {
+        while (ops_meeting(&m)) {
+            if (m.text >= T_OPS_I0) { CHECK(m.n == 3 && m.text < T_OPS_I0 + OPS_INC_KINDS * OPS_TEXTS); incs++; ops_decide(policy); }
+            else ops_decide(0);
+        }
+        ops_step();
+    }
+    CHECK(incs == OPS_INCS);
+    *profit = g_ops.sales_total - g_ops.ad_total;
+    *dau = g_ops.dau_judge;
+    return g_ops.verdict;
+}
+
+static void test_ops_slow(void)
+{
+    u32 pr[3], p2;
+    u16 du[3], d2, fast_dau20;
+    u8 k;
+    OpsMeeting m;
+    for (k = 0; k < 3; k++) ops_slow(k, &pr[k], &du[k]);
+    ops_slow(0, &p2, &d2);
+    CHECK(p2 == pr[0] && d2 == du[0]);                     /* 何度でも同じ */
+    CHECK(pr[0] != pr[1] && pr[1] != pr[2] && du[0] != du[2]);
+    CHECK(pr[1] > pr[0] && pr[0] > pr[2] && du[2] > du[0] && du[0] > du[1]);   /* 冷たいと儲かるが人が減り、手厚いと人が残るが儲からない */
+    /* 障害の日（20 日目）は早回しよりログインが少ない */
+    ops_start();
+    while (g_ops.day < 21) { while (ops_meeting(&m)) ops_decide(0); ops_step(); }
+    fast_dau20 = g_ops.dau;
+    ops_start();
+    g_ops.slow = 1;
+    while (g_ops.day < 21) { while (ops_meeting(&m)) ops_decide(0); ops_step(); }
+    CHECK(g_ops.dau * 10 < fast_dau20 * 7);
+    CHECK(ops_run("000000000000") == OPS_END && g_ops.sales_total == OPS_HIST_SALES && !g_ops.inc);   /* 早回しは変わらない */
+}
+
+
 /* 宿屋（DECISIONS #91）: 翌朝 6 時まで進んで AP が全回復し、宿代を払う。夜明け前なら同じ日の朝 */
 static void test_inn(void)
 {
@@ -1362,6 +1405,7 @@ int main(void)
     test_rival();
     test_stance_leader_slots();
     test_ops();
+    test_ops_slow();
     test_memo_ending();
     test_steal();
     test_inn();

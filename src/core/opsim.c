@@ -118,16 +118,41 @@ FAR(void, ops_start, (void))
     }
 }
 
+/* じっくりの日々の判断（DECISIONS #98）。会議の日とは重ねない。選択肢 1 が当時ありがちだった対応 */
+#define I_MAINT  0               /* 障害でメンテ。告知の仕方と詫び石 */
+#define I_CS0    1               /* CS: 石が減った */
+#define I_CS1    2               /* CS: 子どもが勝手に課金した。返金してほしい */
+#define I_CS2    3               /* CS: アカウントを乗っ取られた */
+#define I_CS3    4               /* CS: 引退します、楽しかった */
+#define I_BOSS0  5               /* 社長: 来週もう 1 本イベントをやれ */
+#define I_BOSS1  6               /* 社長: 知り合いの描いたカードを入れろ */
+#define I_BOSS2  7               /* 社長: 広告をもっと打て */
+typedef struct { u16 day; u8 kind; } Inc;
+static const Inc incs[OPS_INCS] = {
+    {   8, I_CS0 }, {  20, I_MAINT }, {  27, I_CS1 }, {  45, I_BOSS0 }, {  52, I_CS2 }, {  70, I_MAINT },
+    {  83, I_CS3 }, { 101, I_CS0 }, { 118, I_MAINT }, { 130, I_CS1 }, { 150, I_BOSS1 }, { 160, I_CS2 },
+    { 185, I_MAINT }, { 200, I_CS1 }, { 205, I_BOSS2 }, { 225, I_CS3 },
+};
+
+static u8 meeting_today(void) { return (u8)(g_ops.next < OPS_MEETINGS && meets[g_ops.next].day == g_ops.day); }
+
 FAR(u8, ops_meeting, (OpsMeeting *m))
 {
     const Meet *t;
-    if (g_ops.next >= OPS_MEETINGS) return 0;
-    t = &meets[g_ops.next];
-    if (t->day != g_ops.day) return 0;
-    m->day = t->day;
-    m->n = t->n;
-    m->text = (u16)(T_OPS_M0 + g_ops.next * OPS_TEXTS);
-    return 1;
+    if (meeting_today()) {
+        t = &meets[g_ops.next];
+        m->day = t->day;
+        m->n = t->n;
+        m->text = (u16)(T_OPS_M0 + g_ops.next * OPS_TEXTS);
+        return 1;
+    }
+    if (g_ops.slow && g_ops.inc < OPS_INCS && incs[g_ops.inc].day == g_ops.day) {
+        m->day = g_ops.day;
+        m->n = OPS_OPTIONS;
+        m->text = (u16)(T_OPS_I0 + incs[g_ops.inc].kind * OPS_TEXTS);
+        return 1;
+    }
+    return 0;
 }
 
 static void act(u8 a)
@@ -174,8 +199,66 @@ static void act(u8 a)
     }
 }
 
+/* 日々の判断の効き目（DAU と売上に直接） */
+static void inc_act(u8 kind, u8 pick)
+{
+    switch (kind) {
+    case I_MAINT:                                            /* どれを選んでも今日はログインが半分 */
+        g_ops.outage = 1;
+        if (pick == 0) { add_all(OPS_I_MAINT_EXT, OPS_I_MAINT_EXT, OPS_I_MAINT_EXT, OPS_I_MAINT_EXT); act(A_GIFT300); }   /* 短く言って延長を重ね、詫び石 */
+        else if (pick == 1) add_all(OPS_I_MAINT_LONG, OPS_I_MAINT_LONG, OPS_I_MAINT_LONG, OPS_I_MAINT_LONG);   /* 長めに言って早く開ける */
+        else { add_all(OPS_I_MAINT_EXT, OPS_I_MAINT_EXT, OPS_I_MAINT_EXT, OPS_I_MAINT_EXT); act(A_GIFT1000); }   /* 大盤振る舞い */
+        break;
+    case I_CS0:
+        if (pick == 0) add_all(-OPS_I_CS, -OPS_I_CS, 0, 0);                         /* 調べて補填 */
+        else if (pick == 2) add_all(OPS_I_CS * 2, OPS_I_CS * 2, OPS_I_CS, OPS_I_CS / 2);   /* 放置 */
+        break;
+    case I_CS1:
+        if (pick == 0) {                                                            /* 返金する */
+            g_ops.sales_total = g_ops.sales_total > OPS_I_REFUND ? g_ops.sales_total - OPS_I_REFUND : 0;
+            add_all(-OPS_I_CS, -OPS_I_CS, 0, 0);
+        } else if (pick == 1) add_all(OPS_I_CS, OPS_I_CS, OPS_I_CS, OPS_I_CS);   /* 規約どおり断る */
+        else { g_ops.cap = 1; add_all(-OPS_I_CS * 2, -OPS_I_CS * 2, 0, 0); }      /* 月額の上限を入れる */
+        break;
+    case I_CS2:
+        if (pick == 0) add_all(-OPS_I_CS, -OPS_I_CS, -OPS_I_CS, -OPS_I_CS);
+        else if (pick == 1) add_all(OPS_I_CS / 2, OPS_I_CS / 2, OPS_I_CS / 2, OPS_I_CS / 2);
+        else add_all(OPS_I_CS * 2, OPS_I_CS * 2, OPS_I_CS * 2, OPS_I_CS * 2);
+        break;
+    case I_CS3:
+        if (pick == 0) add_all(-OPS_I_CS / 2, -OPS_I_CS / 2, -OPS_I_CS / 2, -OPS_I_CS / 2);   /* 丁寧に返す */
+        break;
+    case I_BOSS0:
+        if (pick == 0) { g_ops.event = 5; add_all(-OPS_EVENT_RELIEF / 2, -OPS_EVENT_RELIEF / 2, OPS_I_RUSH, OPS_I_RUSH); }   /* 急いだぶん出来が悪い */
+        else if (pick == 2) { g_ops.event = 3; add_all(-OPS_EVENT_RELIEF / 4, -OPS_EVENT_RELIEF / 4, 0, 0); }
+        break;
+    case I_BOSS1:
+        if (pick == 0) { g_ops.spike = 5; add(OPS_HEAVY, OPS_I_RUSH * 2); add(OPS_WHALE, OPS_I_RUSH * 2); }   /* 弱くて浮いたカード */
+        else if (pick == 1) g_ops.tempt = g_ops.tempt > OPS_I_RUSH ? g_ops.tempt - OPS_I_RUSH : 0;   /* 断ると新しいカードが 1 枚減る */
+        else { g_ops.spike = 5; add(OPS_HEAVY, OPS_I_RUSH); add(OPS_WHALE, OPS_I_RUSH); }   /* 限定ガチャの隅で */
+        break;
+    case I_BOSS2:
+        if (pick == 0) {                                     /* 打つ（古い広告なので CVR は低め） */
+            g_ops.ad_left = (u32)OPS_I_AD_MAN * 10000;
+            g_ops.ad_cut = OPS_AD_CUT2;
+            g_ops.ad_cvr = OPS_AD_CVR_LATER / 2;
+            g_ops.ad_on = 1;
+            g_ops.ad_stop = 0;
+        } else if (pick == 2) g_ops.push = OPS_PUSH_DAYS;    /* 送客を頼む */
+        break;
+    default: break;
+    }
+}
+
 FAR(void, ops_decide, (u8 pick))
 {
+    if (!meeting_today()) {                                  /* じっくりの日々の判断 */
+        if (g_ops.slow && g_ops.inc < OPS_INCS && incs[g_ops.inc].day == g_ops.day) {
+            inc_act(incs[g_ops.inc].kind, (u8)(pick < OPS_OPTIONS ? pick : 0));
+            g_ops.inc++;
+        }
+        return;
+    }
     if (g_ops.next >= OPS_MEETINGS) return;
     if (g_ops.next == OPS_VERDICT) {
         u32 pts = (g_ops.profit_judge > 0 ? (u32)g_ops.profit_judge / OPS_CONT_PROFIT : 0) + (u32)g_ops.dau_judge * 100 / OPS_CONT_DAU;
@@ -247,6 +330,7 @@ static void want(u8 *w, u8 *amt)
         if (g_ops.pick[0] == RATE_LOW) m = (u16)(m * 13 / 10);
         if (g_ops.pick[0] == RATE_HIGH) m = (u16)(m * 3 / 4);
         if (g_ops.pick[1] == PITY_ON && c >= OPS_HEAVY) m = (u16)(m * 4 / 5);
+        if (g_ops.cap && c <= OPS_HEAVY) m = (u16)(m * 4 / 5);   /* 月額の上限 */
         w[c] = (u8)(v > 255 ? 255 : v);
         amt[c] = (u8)(m > 255 ? 255 : m);
     }
@@ -322,6 +406,7 @@ FAR(void, ops_step, (void))
             }
             if ((f & F_CONV) && !(f & F_PAID) && conv >= e[2]) { e[0] = (u8)((f & ~F_CLS) | F_PAID | OPS_LIGHT); c = OPS_LIGHT; }
             p = (u8)(OPS_ACT_BASE + (e[3] > 255 - OPS_ACT_BASE - OPS_ACT_EVENT ? 255 - OPS_ACT_BASE - OPS_ACT_EVENT : e[3]) + bonus);
+            if (g_ops.outage) p >>= 1;                               /* 障害の日 */
             if ((u8)rnd() >= p) continue;
             dau++;
             if (c && (u8)(rnd() >> 8) < w[c]) { payers++; sales += amt[c]; }
@@ -344,5 +429,20 @@ FAR(void, ops_step, (void))
     if (g_ops.glut) g_ops.glut--;
     if (g_ops.event) g_ops.event--;
     if (g_ops.push) g_ops.push--;
+    g_ops.outage = 0;
     g_ops.day++;
+}
+
+/* 社内チャット（DECISIONS #98）: 15 日ごとの 7 日目に、模型の様子で 1 本。文は「名前：ひとこと」 */
+FAR(u16, ops_chat, (void))
+{
+    u8 cat;
+    if (g_ops.day % 15 != 7) return 0;
+    if (g_ops.verdict == OPS_END) cat = 5;
+    else if (g_ops.verdict == OPS_CONTINUE) cat = 4;
+    else if (g_ops.day >= OPS_JUDGE_DAY - 15) cat = 3;      /* 判定が近い */
+    else if (g_ops.dau < OPS_CHAT_LOW_DAU) cat = 2;
+    else if (g_ops.sales_day >= OPS_CHAT_GOOD_SALES) cat = 1;
+    else cat = 0;
+    return (u16)(T_OPS_CH0 + cat * 3 + (g_ops.day / 15) % 3);
 }

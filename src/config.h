@@ -105,6 +105,14 @@
 #define OPS_AD_CPC          200      /* 1 クリックの単価（円） */
 #define OPS_AD_FATIGUE      97       /* 打つたびに CVR がこの % になる */
 #define OPS_HIST_SALES      17779500UL  /* 史実の選択での売上の合計（tests/test_game.c が確かめる） */
+#define OPS_I_MAINT_EXT     120      /* じっくり（DECISIONS #98）: 延長を重ねたメンテの不満 */
+#define OPS_I_MAINT_LONG    50       /* 長めに告知して早く開けたメンテの不満 */
+#define OPS_I_CS            30       /* CS の返し方 1 回ぶんの不満 */
+#define OPS_I_REFUND        30000UL  /* 返金する額（円） */
+#define OPS_I_RUSH          60       /* 社長の思いつきを急いで入れた出来の悪さ */
+#define OPS_I_AD_MAN        300      /* 社長の言う追加の広告（万円） */
+#define OPS_CHAT_LOW_DAU    150      /* 社内チャットが弱音になる DAU */
+#define OPS_CHAT_GOOD_SALES 300000UL /* 浮かれる 1 日の売上（円） */
 #define OPS_HIST_PROFIT     14579500UL  /* 同じく利益（売上 - 広告費）。決算の上司のひとことはこれと比べる */
 
 /* 宿屋（core/player.c player_sleep, DECISIONS #91）: 泊まると翌朝まで進み、AP が全回復する */

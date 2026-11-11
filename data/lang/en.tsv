@@ -1088,6 +1088,82 @@ T_OPS_M11R	History: fell short, closed	!
 T_OPS_M11O1	-
 T_OPS_M11O2	-
 T_OPS_M11O3	-
+T_OPS_I0	Server down: maintenance	!
+T_OPS_I1	How to announce and apologize	!
+T_OPS_I2	Repeated extensions anger people	!
+T_OPS_I3	Short notice, 300 gems	!
+T_OPS_I4	Long notice, no gems	!
+T_OPS_I5	Extend, 1000 gems	!
+T_OPS_I6	CS: My gems are gone	!
+T_OPS_I7	"I paid but got nothing"	!
+T_OPS_I8	-	!
+T_OPS_I9	Check and refund gems	!
+T_OPS_I10	Send the template	!
+T_OPS_I11	Ignore it	!
+T_OPS_I12	CS: My kid spent money	!
+T_OPS_I13	"Please refund it"	!
+T_OPS_I14	-	!
+T_OPS_I15	Refund (30,000 yen)	!
+T_OPS_I16	Refuse per the terms	!
+T_OPS_I17	Add a monthly cap	!
+T_OPS_I18	CS: I was hacked	!
+T_OPS_I19	"Give my account back"	!
+T_OPS_I20	-	!
+T_OPS_I21	Investigate and restore	!
+T_OPS_I22	Send the template	!
+T_OPS_I23	Ignore it	!
+T_OPS_I24	CS: I'm quitting	!
+T_OPS_I25	"It was fun"	!
+T_OPS_I26	-	!
+T_OPS_I27	Reply warmly	!
+T_OPS_I28	Send the template	!
+T_OPS_I29	Don't reply	!
+T_OPS_I30	CEO: One more event	!
+T_OPS_I31	next week, he says	!
+T_OPS_I32	Rushing hurts quality	!
+T_OPS_I33	Accept (5 days)	!
+T_OPS_I34	Refuse	!
+T_OPS_I35	Only 3 days	!
+T_OPS_I36	CEO: Add this card	!
+T_OPS_I37	A friend of his drew it	!
+T_OPS_I38	Off-style cards annoy users	!
+T_OPS_I39	Add it as is	!
+T_OPS_I40	Refuse	!
+T_OPS_I41	Hide it in a gacha	!
+T_OPS_I42	CEO: More ads!	!
+T_OPS_I43	The numbers look thin	!
+T_OPS_I44	Old ads work poorly	!
+T_OPS_I45	Spend 3M yen	!
+T_OPS_I46	Refuse	!
+T_OPS_I47	Ask for promotion	!
+T_OPS_CH0	Planner: Next event is planned	!
+T_OPS_CH1	Artist: New cards this week	!
+T_OPS_CH2	CS: Quiet day for support	!
+T_OPS_CH3	Sales: Great numbers today!	!
+T_OPS_CH4	Manager: Keep it up	!
+T_OPS_CH5	Planner: BBQ party, on me	!
+T_OPS_CH6	Server: Fewer users lately...	!
+T_OPS_CH7	CS: More goodbye mails	!
+T_OPS_CH8	Manager: Any ideas?	!
+T_OPS_CH9	Manager: The verdict is close	!
+T_OPS_CH10	Sales: Will we make it?	!
+T_OPS_CH11	Server: If it ends...	!
+T_OPS_CH12	Manager: We get to continue!	!
+T_OPS_CH13	Artist: I can keep drawing	!
+T_OPS_CH14	CS: Users are happy too	!
+T_OPS_CH15	CS: Refund requests...	!
+T_OPS_CH16	Artist: Drawing the last card	!
+T_OPS_CH17	Planner: Make the end fun	!
+T_OPS_INC	Incident: day	!
+T_OPS_FROM	From:	!
+T_OPS_HIDDEN	History: ???
+T_OPS_MODE	How do you want to run it?	!
+T_OPS_FAST	Fast	!
+T_OPS_FAST2	Meetings only, ~2 min	!
+T_OPS_SLOW	Full	!
+T_OPS_SLOW2	Daily calls too, ~20 min	!
+T_OPS_RTC	Game time keeps running meanwhile	!
+T_OPS_GUIDE_MODE	1:Fast 2:Full ESC:Back	!
 T_OPS_MENU	Operator mode	!
 T_OPS_TITLE	Operator mode	!
 T_OPS_DAU	DAU

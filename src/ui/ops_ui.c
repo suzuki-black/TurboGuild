@@ -11,6 +11,8 @@ void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/opsim.h"
 #include "../core/save.h"
+#include "../core/tables.h"
+#include "../data/tables.h"
 #include "../data/screens.h"
 #include "../data/text_ids.h"
 #include "../sys/input.h"
@@ -30,6 +32,7 @@ void bgm_play(u8 song);
 #define ST_RUN  0
 #define ST_MEET 1
 #define ST_DONE 2
+#define ST_MODE 3                 /* 早回しかじっくりかを選ぶ（DECISIONS #98） */
 
 static u8 st;
 static u8 newrec;                 /* 決算で新記録だった */
@@ -150,21 +153,53 @@ static void points_text(u8 cx, u8 y, u16 v, u8 fg)
     txt_id(cx, y, T_OPS_PT, fg, COL_DBLUE);
 }
 
+/* 本編を終える前は史実を伏せる（DECISIONS #98）: 史実のわけの行を「？？？」に、選択肢 1 の「（史実）」を外す */
+static u8 hidden(void) { return (u8)(!g_save.credits_seen && mt.text < T_OPS_I0); }
+
+static void option(u8 y, u16 id, u8 first)
+{
+    char b[48];
+    const char *s = txt_ptr(id);
+    u8 n = 0, cut = 0;
+    while (s[n] && n < sizeof(b) - 1) { b[n] = s[n]; n++; }
+    b[n] = 0;
+    if (first && hidden()) {
+        for (n = 0; b[n]; n++) {
+            if ((u8)b[n] == 0x81 && (u8)b[n + 1] == 0x69) cut = n;   /* 「（」 */
+            if (b[n] == ' ' && b[n + 1] == '(') cut = n;
+            if ((((u8)b[n] >= 0x81 && (u8)b[n] <= 0x9F) || (u8)b[n] >= 0xE0) && b[n + 1]) n++;   /* 2 バイトの字（途中で切れていたら進めない） */
+        }
+        if (cut) b[cut] = 0;
+    }
+    txt_draw(4, y, b, COL_WHITE, COL_DBLUE);
+}
+
+static void npc_at(u8 cx, u8 y, u16 npc)
+{
+    NpcRec r;
+    tbl_npc(npc, &r);
+    cx = txt_id(cx, y, (u16)(NPC_PRE_TEXT + r.name_id / NPC_SUF_COUNT), COL_CYAN, COL_DBLUE);
+    txt_id(cx, y, (u16)(NPC_SUF_TEXT + r.name_id % NPC_SUF_COUNT), COL_CYAN, COL_DBLUE);
+}
+
 static void meeting_box(void)
 {
-    u8 k, cx, y;
+    u8 k, cx, y, inc = (u8)(mt.text >= T_OPS_I0);
     ui_box(GX, BOX_Y, GW, BOX_H, COL_DBLUE, COL_YELLOW);
-    cx = line(0, T_OPS_MEETING, COL_YELLOW);
+    cx = line(0, inc ? T_OPS_INC : T_OPS_MEETING, COL_YELLOW);
     cx = txt_num((u8)(cx + 1), row_y(0), mt.day, COL_YELLOW, COL_DBLUE);
     txt_id(cx, row_y(0), T_OPS_DAYS, COL_YELLOW, COL_DBLUE);
     line(1, mt.text, COL_WHITE);
     line(2, (u16)(mt.text + 1), COL_WHITE);
-    line(3, (u16)(mt.text + 2), COL_CYAN);
+    if (inc && mt.text >= T_OPS_I0 + OPS_TEXTS && mt.text < T_OPS_I0 + 5 * OPS_TEXTS) {   /* CS のメール: 差出人は 1000 人の誰か */
+        cx = line(3, T_OPS_FROM, COL_CYAN);
+        npc_at((u8)(cx + 1), row_y(3), (u16)(((u32)mt.day * 389 + 77) % NPC_COUNT));
+    } else line(3, hidden() ? T_OPS_HIDDEN : (u16)(mt.text + 2), COL_CYAN);
     if (mt.n) {
         for (k = 0; k < mt.n; k++) {
             y = row_y((u8)(4 + k));
             ui_key((u8)(k + 1), 16, (u8)(y + 2));
-            txt_id(4, y, (u16)(mt.text + 3 + k), COL_WHITE, COL_DBLUE);
+            option(y, (u16)(mt.text + 3 + k), (u8)(k == 0));
         }
         ui_guide(T_OPS_GUIDE_PICK);
         return;
@@ -211,9 +246,11 @@ static void finish(void)
 {
     s32 v = profit();
     newrec = (u8)(v > 0 && (u32)v > g_save.ops_best);
-    if (newrec) g_save.ops_best = (u32)v;
-    g_save.ops_flags |= (u8)(OPS_PLAYED | (g_ops.verdict == OPS_CONTINUE ? OPS_SAVED : 0));
-    g_save_dirty = 1;
+    if (g_save.flags & SF_STARTED) {                 /* 本編を始めていないセーブには書かない（タイトルから入ったとき） */
+        if (newrec) g_save.ops_best = (u32)v;
+        g_save.ops_flags |= (u8)(OPS_PLAYED | (g_ops.verdict == OPS_CONTINUE ? OPS_SAVED : 0));
+        g_save_dirty = 1;
+    }
     st = ST_DONE;
     result_box();
 }
@@ -225,10 +262,25 @@ static void guide_run(void)
     ui_guide(ad_seen == OPS_AD_CVR ? T_OPS_AD_CVR : ad_seen == OPS_AD_SPENT ? T_OPS_AD_SPENT : T_OPS_GUIDE_RUN);
 }
 
+/* 早回しかじっくりか。本編の途中なら、その間も本編の時間が進むと知らせる */
+static void mode_box(void)
+{
+    ui_box(GX, BOX_Y, GW, BOX_H, COL_DBLUE, COL_YELLOW);
+    line(0, T_OPS_MODE, COL_YELLOW);
+    ui_key(1, 16, (u8)(row_y(1) + 2));
+    txt_id(4, row_y(1), T_OPS_FAST, COL_WHITE, COL_DBLUE);
+    line(2, T_OPS_FAST2, COL_LGRAY);
+    ui_key(2, 16, (u8)(row_y(3) + 2));
+    txt_id(4, row_y(3), T_OPS_SLOW, COL_WHITE, COL_DBLUE);
+    line(4, T_OPS_SLOW2, COL_LGRAY);
+    if ((g_save.flags & SF_STARTED) && !g_save.credits_seen) line(6, T_OPS_RTC, COL_ORANGE);
+    ui_guide(T_OPS_GUIDE_MODE);
+}
+
 FAR(void, ops_init, (void))
 {
     ops_start();
-    st = ST_RUN;
+    st = ST_MODE;
     ad_seen = 0;
     pay_avg = 0;
     bgm_play(BGM_EVENT);
@@ -242,6 +294,7 @@ FAR(void, ops_draw, (void))
     graph();
     if (st == ST_MEET) meeting_box();
     else if (st == ST_DONE) result_box();
+    else if (st == ST_MODE) mode_box();
     else guide_run();
 }
 
@@ -249,6 +302,11 @@ FAR(void, ops_update, (void))
 {
     u8 p = input_pressed(), d = input_digit(), pt[HIST];
     VdpXfer x;
+    if (st == ST_MODE) {
+        if (d == 1 || d == 2) { psg_beep(0x080, 4); g_ops.slow = (u8)(d == 2); st = ST_RUN; g_dirty = 1; }
+        else if (p & BTN_CANCEL) screen_change(&scr_title);
+        return;
+    }
     if (st == ST_MEET) {
         if (mt.n ? (d >= 1 && d <= mt.n) : (p & BTN_OK) != 0) {
             psg_beep(0x080, 4);
@@ -284,7 +342,11 @@ FAR(void, ops_update, (void))
         vdp_page2_write(&x);
         plot((u16)(g_ops.day - 1), pt, last);
         kpi();
-        if (g_ops.ad_stop != ad_seen) guide_run();
+        if (g_ops.ad_stop != ad_seen || g_ops.day % 15 == 0) guide_run();
+        else if (!ad_seen) {                             /* 社内チャット（15 日ごと。次の区切りまで下の帯に出す） */
+            u16 c = ops_chat();
+            if (c) ui_guide(c);
+        }
     }
     if (g_ops.day >= OPS_DAYS) finish();
 }

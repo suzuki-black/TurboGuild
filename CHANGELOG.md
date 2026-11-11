@@ -20,6 +20,9 @@
 - **The last hour.** From 23:00 on the last day, the board stops waiting six hours between posts: every five minutes a mate who is still there writes, and the board updates by itself if you keep it open. At midnight the connection drops. The inn can now take you straight to the last hour.
 - **Coming back after the end.** The title changes with real time after the shutdown: refunds are accepted, then refunds close, then the page is gone, and after a year another company's ad takes its place.
 - **The wiki article.** Press 4 on Memories after the end for an encyclopedia-style entry on TurboGuild, partly written from your own save (your guild, spending, best event rank, mates who stayed, and how operator mode went).
+- **Operator mode from the start.** Operator mode is now on the title screen from the beginning. Until you finish the main game, the "history" lines in meetings are hidden as "???". Choose Fast (meetings only, about 2 minutes, as before) or Full.
+- **Full operator mode.** Sixteen daily calls arrive between meetings: server trouble (how to announce the maintenance and how many gems to give), support mails from real players in the model (missing gems, a child's purchase, a hacked account, a thank-you), and the CEO's sudden ideas. They change dissatisfaction, logins and sales directly: cold answers earn more but lose players; generous ones keep players but earn less.
+- **Office chat.** Every 15 days a coworker says something at the bottom of the screen, depending on how things are going.
 
 ### 日本語
 - **仲間の去り方。** 辞める仲間それぞれに理由が付きました: 受験・就職・結婚・親に見つかった・飽きた・ほかのゲームへ・凍結・機種変で引き継ぎ失敗。最後の数日の弱音と、後で懐かしむ文が理由で替わります（「#さん、受験うまくいったかな」）。一部の仲間と、データが消えた人は、何も言わずに来なくなります。周りが気づき（「#さん、最近見ないね」）、2〜3 週間後にギルドマスターが整理します。
@@ -39,6 +42,9 @@
 - **最後の 1 時間。** 最終日の 23:00 からは、伝言板の「6 時間に 1 件」が外れ、5 分ごとに残った仲間が書き込みます。開いたままにすると勝手に流れ、0:00 に接続が切れます。宿屋で最後の 1 時間まで休めるようになりました。
 - **終了後に来続ける。** 終了後のタイトルが、現実の時間で変わっていきます: 払い戻しの受付中、受付終了、ページが無くなり、1 年後には別の会社の広告になります。
 - **まとめ記事。** 終了後の思い出の 4 で、百科事典ふうの「TurboGuild」の項目が読めます。一部はあなたのセーブ（ギルド・課金・イベントの上位・残った仲間・運営モードの成績）から書かれます。
+- **運営モードを最初から。** タイトルから最初から運営モードに入れます。本編を終えるまでは、会議の「史実」の行は「？？？」で伏せます。始めるときに「早回し」（会議だけ、2 分ほど、今までどおり）か「じっくり」を選びます。
+- **じっくり。** 会議の合間に 16 回、日々の判断が来ます: サーバー障害（メンテの告知の仕方と詫び石）、模型の中のプレイヤーからの CS のメール（石が減った・子どもの課金・乗っ取り・お礼）、社長の思いつき。不満・ログイン・売上に直接効きます。冷たく返すと儲かるが人が減り、手厚く返すと人は残るが儲からない。
+- **社内チャット。** 15 日ごとに、同僚のひとことが画面の下に出ます（数字の調子で変わります）。
 
 ## v0.2.0 — 2026-11-08
 

@@ -69,6 +69,11 @@ typedef struct {
     s32 profit_judge;            /* 判定に使う 239 日目までの利益 */
     u16 dau_judge;               /* 判定の日（239 日目）の DAU */
     u16 points;                  /* 判定の点（/100）。OPS_CONT_POINTS 以上で継続 */
+    /* じっくり（DECISIONS #98）: 日々の判断。早回しでは 0 のまま（全通りの検査は早回しで回す） */
+    u8  slow;                    /* じっくりで遊んでいる */
+    u8  inc;                     /* 次の日々の判断の番号 */
+    u8  outage;                  /* 今日は障害でログインが半分 */
+    u8  cap;                     /* 月額の上限を入れた（微課金・重課金の 1 回の額が減る） */
 } OpsState;
 
 typedef struct { u16 day; u8 n; u16 text; } OpsMeeting;   /* text: 題 / 議題 / 史実のわけ / 選択肢 × n */
@@ -79,6 +84,9 @@ void ops_start(void);
 u8   ops_meeting(OpsMeeting *m);     /* 今日が会議の日なら 1（m に中身）。選ぶまで ops_step を呼ばない */
 void ops_decide(u8 pick);            /* 会議で選ぶ（0 = 史実）。判定の会議は 0 を渡すと判定する */
 void ops_step(void);                 /* 1 日回す */
+u16  ops_chat(void);                 /* 今日の社内チャットの文（無ければ 0）。15 日ごと、模型の様子で選ぶ */
+#define OPS_INCS      16             /* じっくりの日々の判断の数 */
+#define OPS_INC_KINDS 8              /* 障害・CS 4 種・社長の思いつき 3 種（文は T_OPS_I0 から OPS_TEXTS ずつ） */
 
 /* 1000 人の状態の置き場（ROM: sys/vdp.c, PC: tests/tables_pc.c） */
 void ops_mem_read(u16 off, u8 n, u8 *buf);

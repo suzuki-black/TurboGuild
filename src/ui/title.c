@@ -51,15 +51,16 @@ static u16 ended_line(void)
 
 static void draw_menu(void)
 {
-    static const u16 normal[2] = { T_TITLE_NEW, T_TITLE_CONT };
+    static const u16 normal[3] = { T_TITLE_NEW, T_TITLE_CONT, T_OPS_MENU };   /* 運営モードは最初から入れる（DECISIONS #98） */
     static const u16 after[4] = { T_MEMORIES, T_RESET, T_STAFFROLL, T_OPS_MENU };   /* サービス終了後 */
     const u16 *items = ended() ? after : normal;
-    u8 i, n = ended() ? 4 : can_continue() ? 2 : 1;
+    u8 i, n = ended() ? 4 : 3;
     for (i = 0; i < n; i++) {
-        u8 y = (u8)(ended() ? 120 + i * 19 : 146 + i * 20), on = (u8)(i == g_cursor);
-        ui_box(48, y, 160, ended() ? 19 : 20, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);   /* 「思い出をリセット」が入る幅 */
+        u8 y = (u8)(ended() ? 120 + i * 19 : 138 + i * 19), on = (u8)(i == g_cursor);
+        u8 off = (u8)(!ended() && i == 1 && !can_continue());   /* セーブが無ければ「つづきから」は選べない */
+        ui_box(48, y, 160, 19, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);   /* 「思い出をリセット」が入る幅 */
         ui_key((u8)(i + 1), 52, (u8)(y + 4));
-        txt_id(9, (u8)(y + 2), items[i], on ? COL_YELLOW : COL_WHITE, on ? COL_BLUE : COL_DBLUE);
+        txt_id(9, (u8)(y + 2), items[i], off ? COL_DGRAY : on ? COL_YELLOW : COL_WHITE, on ? COL_BLUE : COL_DBLUE);
     }
 }
 
@@ -81,14 +82,14 @@ FAR(void, title_draw, (void))
     gfx_sprite(ATL_SPARK, 76, 2);
     gfx_sprite(ATL_SPARK, 172, 10);
     for (i = 0; i < 4; i++) gfx_card(parade[i], (u8)(10 + i * 60), (u8)(ended() ? 28 : 32 + (i & 1) * 6));   /* 終了後はメニューが 4 つなので詰める */
-    if (!ended()) txt_id(5, 116, T_TITLE_SUB, COL_WHITE, COL_BLACK);
+    if (!ended() && !can_continue()) txt_id(5, 116, T_TITLE_SUB, COL_WHITE, COL_BLACK);
     if (ended()) {
         u16 t = ended_line();
         txt_id(t == T_ENDED_TITLE ? 6 : 1, 102, t, t == T_ENDED_AD ? COL_CYAN : t == T_ENDED_404 ? COL_LGRAY : COL_YELLOW, COL_BLACK);
     } else if (can_continue()) {
-        u8 cx = txt_id(6, 130, T_TITLE_DAY, COL_LGRAY, COL_BLACK);
-        cx = txt_num((u8)(cx + 1), 130, time_gday(g_save.g_time) + 1, COL_WHITE, COL_BLACK);
-        txt_id(cx, 130, T_DAY, COL_LGRAY, COL_BLACK);
+        u8 cx = txt_id(6, 116, T_TITLE_DAY, COL_LGRAY, COL_BLACK);        /* 運営モードの行が増えたので副題の位置に */
+        cx = txt_num((u8)(cx + 1), 116, time_gday(g_save.g_time) + 1, COL_WHITE, COL_BLACK);
+        txt_id(cx, 116, T_DAY, COL_LGRAY, COL_BLACK);
     }
     draw_menu();
     if (g_save_status == SD_NODISK) txt_id(1, 176, T_TITLE_NOSAVE, COL_LGRAY, COL_BLACK);
@@ -110,8 +111,8 @@ FAR(void, title_update, (void))
 {
     u8 p = input_pressed();
     u8 d = input_digit();
-    if (can_continue() && ui_menu_input(&g_cursor, (u8)(ended() ? 4 : 2), p)) draw_menu();
-    if (d == 1 || (d == 2 && can_continue()) || ((d == 3 || d == 4) && ended())) { g_cursor = (u8)(d - 1); p = BTN_OK; }
+    if (ui_menu_input(&g_cursor, (u8)(ended() ? 4 : 3), p)) draw_menu();
+    if (d == 1 || (d == 2 && can_continue()) || d == 3 || (d == 4 && ended())) { g_cursor = (u8)(d - 1); p = BTN_OK; }
     if (d == 0) { screen_change(&scr_license); return; }
     if (p & BTN_OK) {
         psg_beep(0x80, 4);
@@ -122,7 +123,8 @@ FAR(void, title_update, (void))
             else if (ui_confirm(T_RESET_CONFIRM)) { save_new(&g_save, rtc_now_secs()); screen_change(&scr_name); }
             else g_dirty = 1;
         } else if (g_cursor == 0) start_new();
-        else { g_from_title = 1; screen_change(&scr_home); }
+        else if (g_cursor == 2) screen_change(&scr_ops);                   /* 運営モード（本編の前でも） */
+        else if (can_continue()) { g_from_title = 1; screen_change(&scr_home); }
     }
     if (p & BTN_CANCEL) screen_change(&scr_p0menu);
 }
