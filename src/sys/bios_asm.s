@@ -9,10 +9,12 @@ SNSMAT	= 0x0141
 PHYDIO	= 0x0144
 EXTROM	= 0x015F
 SUB_REDCLK = 0x01F5		; ★SUB-ROM のエントリ。メインROMの 01F5h は RDSLT の内部なので直接呼ぶと暴走する
+SUB_WRTCLK = 0x01F9		; 同じく SUB-ROM（C = ブロック<<4 | レジスタ、A = 値）
 
 	.globl	_bios_chgmod
 	.globl	_bios_snsmat
 	.globl	_bios_redclk
+	.globl	_bios_wrtclk
 	.globl	_bios_phydio
 
 	.area	_CODE
@@ -47,6 +49,19 @@ _bios_redclk:
 	pop	iy
 	pop	ix
 	ei			; ★EXTROM(CALSLT) は割り込み禁止のまま戻る。戻さないと JIFFY が止まりフレーム待ちで固まる
+	ret
+
+; void bios_wrtclk(u8 reg, u8 val)   sdcccall(1): reg = A, val = L（時計を合わせる画面, DECISIONS #101）
+_bios_wrtclk:
+	push	ix
+	push	iy
+	ld	c, a
+	ld	a, l
+	ld	ix, #SUB_WRTCLK
+	call	EXTROM
+	pop	iy
+	pop	ix
+	ei			; EXTROM は割り込み禁止のまま戻る
 	ret
 
 ; u8 bios_phydio(DiskReq *r)  HL -> { u8 write; u8 drive; u8 count; u8 media;

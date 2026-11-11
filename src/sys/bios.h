@@ -16,6 +16,7 @@ typedef struct {
 void bios_chgmod(u8 mode);
 u8   bios_snsmat(u8 row);
 u8   bios_redclk(u8 reg);
+void bios_wrtclk(u8 reg, u8 val);      /* reg = ブロック<<4 | レジスタ、val は下位 4bit */
 u8   bios_phydio(DiskReq *r);
 u8   bios_getcpu(void);
 

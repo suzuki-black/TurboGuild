@@ -1,5 +1,13 @@
 # Changelog / 更新履歴
 
+## Unreleased
+
+### English
+- **Setting the clock on real hardware.** A turboR without a clock battery forgets the date at every power-on, so time spent away never counted. If the clock reads earlier than 2026 at boot, the game now asks you to set the date and time (cursor keys or number keys) before loading the save. ESC skips it. Not yet checked on real hardware.
+
+### 日本語
+- **実機で時計を合わせる。** 時計の電池が入っていない turboR は電源を入れるたびに日付を忘れるので、留守の間の時間が数えられていませんでした。起動したときに時計が 2026 年より前なら、セーブを読む前に日時を入れてもらうようにしました（カーソルキーか数字キー）。ESC で飛ばせます。実機ではまだ確かめていません。
+
 ## v0.3.0 — 2026-11-11
 
 More people, more of the era, and an operator mode with teeth: mates who leave in their own ways, the feature-phone air, letters and seasons, the last hour, and planning meetings with events, gacha tricks, a monthly pass and squeezes. Still a prototype; checked in openMSX only, **not yet on real hardware**. Saves from v0.1.0 and v0.2.0 load as they are.

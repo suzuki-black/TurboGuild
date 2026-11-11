@@ -194,6 +194,9 @@ roll (with the ending), and operator mode.
   (4.5 KB, in the root directory), so the disk can hold other files and you can back it up from DOS. On a disk
   without that file, the game asks before creating it (the default is No), and it re-reads the disk before every
   save. Saves from earlier versions load as they are. You can play without a disk (saving is disabled).
+- In-game time follows the turboR's built-in clock. **If the clock battery is dead** (the clock goes back at every
+  power-on), the game notices a date before 2026 at boot and asks you to set the date and time before loading the
+  save; otherwise time spent away would not count. The clock covers 1980–2079.
 - The turboR system ROMs are copyrighted and **not included**. Development and checks use
   [openMSX](https://openmsx.org/) with a machine definition based on dumped system ROMs (Panasonic FS-A1ST).
 - **Not yet verified on real hardware** (emulator only so far).
@@ -485,6 +488,9 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   ふつうのファイル `TGSAVE.DAT`（4.5KB）なので、ほかのファイルと同じディスクに置け、DOS でコピーすればバックアップに
   なります。このファイルが無いディスクには、作ってよいかを聞いてから書きます（既定は「いいえ」）。保存のたびに
   ディスクを読み直します。前の版のセーブもそのまま読めます。ディスクが無くても遊べます（保存はできません）。
+- ゲーム内の時間は turboR の内蔵時計で進みます。**時計の電池が切れていて**電源を入れるたびに日付が戻る機械では、
+  起動したときに 2026 年より前の日付に気づき、セーブを読む前に日時を入れてもらいます（入れないと留守の間の時間が
+  数えられません）。内蔵時計が表せるのは 1980〜2079 年です。
 - turboR の本体 ROM は著作物のため**同梱していません**。開発と確認は [openMSX](https://openmsx.org/) で、
   本体 ROM を吸い出した機種定義（Panasonic FS-A1ST）を使っています。
 - **実機での確認はまだです**（エミュレータでのみ確認しています）。

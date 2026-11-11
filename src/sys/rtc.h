@@ -7,4 +7,6 @@
 void rtc_read(DateTime *dt);
 u32  rtc_now_secs(void);
 u8   rtc_sec(void);            /* 秒だけ（毎フレームの変化検出用） */
+void rtc_write(const DateTime *dt);   /* 時計を合わせる */
+u8   rtc_stale(void);          /* 時計が止まっていた（電池切れで昔の日付）なら 1 */
 #endif

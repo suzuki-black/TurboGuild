@@ -5,6 +5,7 @@
 
 /* 時間（仕様 §3） */
 #define TIME_SCALE          10UL        /* 現実1日 = ゲーム内10日 */
+#define CLOCK_MIN_YEAR      2026        /* 起動時の RTC がこれより前なら、時計を合わせ直してもらう（電池切れ, DECISIONS #101）。RTC は 1980〜2079 年 */
 #define GSEC_PER_DAY        86400UL
 #define OFFLINE_MAX_REAL    (30UL * 86400UL)  /* 現実30日分まで加算 */
 #define AP_RECOVER_REAL     300UL       /* 現実5分で AP+1 */
