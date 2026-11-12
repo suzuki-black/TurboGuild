@@ -1,6 +1,10 @@
 # Changelog / 更新履歴
 
-## Unreleased
+## v0.3.1 — 2026-11-12
+
+A clock for real hardware. The ROM now runs on a real FS-A1ST (through a RAM cartridge), and the title shows the MSX's clock with a way to set it, because a turboR without a clock battery wakes up with a wrong date. Saving to a floppy is still **not checked on real hardware**.
+
+実機のための時計。実機の FS-A1ST（RAM カートリッジ経由）で動くことを確かめ、時計の電池が無い turboR は日時がでたらめになるので、タイトルに本体の時計と合わせる手段を置きました。フロッピーへの保存は、まだ**実機で確かめていません**。
 
 ### English
 - **The clock on the title.** The title now shows the MSX's clock with [9] Set clock next to it. A turboR without a clock battery comes up with a wrong date (one showed 2059); if the clock is earlier than your last save, more than 30 days after it, or out of range, the game does not count time away yet and shows the clock in red. Set it with [9] and the time away is counted from the corrected clock; choosing Continue without fixing it counts none. Number keys fill the fields in order (2026 11 12 21 38). Not yet checked on real hardware.

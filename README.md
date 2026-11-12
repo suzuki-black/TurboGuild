@@ -7,9 +7,11 @@
 
 > ⚠️ **This is a prototype** (work in progress), published for feedback and experimentation.
 > It has had little play-testing; numbers and balance will change.
+> **On real hardware, always use a floppy you do not need as the save disk.**
 >
 > ⚠️ **試作品（プロトタイプ・開発中）です。** フィードバックと実験のために公開しています。
 > テストプレイはまだ十分ではありません。数値やバランスは今後変わります。
+> **実機では、セーブ用のフロッピーに必ず要らないディスクを使ってください。**
 
 **Original concept / game design / direction:** suzuki-black　/
 **Implementation (program, graphics, sound):** Claude Code (Anthropic Claude)
@@ -17,7 +19,7 @@
 **実装（プログラム・グラフィック・サウンド）:** Claude Code（Anthropic Claude）
 
 **Repository / リポジトリ:** <https://github.com/suzuki-black/TurboGuild> ·
-**Latest / 最新:** v0.3.0
+**Latest / 最新:** v0.3.1
 
 <p align="center">
   <img src="docs/img/screens_people_en.png" width="640" alt="Guild board, a theft, going stealing, the ending and the memory album (English version)">
@@ -190,6 +192,8 @@ roll (with the ending), and operator mode.
 
 ### Requirements
 - **MSX turboR only** (FS-A1ST / FS-A1GT). Anything older shows a "turboR only" message and stops.
+- ⚠️ **Always use a floppy you do not need** (one whose contents you can afford to lose) **as the save disk.**
+  Saving to a floppy has not been checked on real hardware yet, so never use a disk with files you care about.
 - For saving, put a DOS-formatted (FAT12) 2DD floppy in drive A. The save is an ordinary file, `TGSAVE.DAT`
   (4.5 KB, in the root directory), so the disk can hold other files and you can back it up from DOS. On a disk
   without that file, the game asks before creating it (the default is No), and it re-reads the disk before every
@@ -200,7 +204,8 @@ roll (with the ending), and operator mode.
   The clock covers 1980–2079.
 - The turboR system ROMs are copyrighted and **not included**. Development and checks use
   [openMSX](https://openmsx.org/) with a machine definition based on dumped system ROMs (Panasonic FS-A1ST).
-- **Not yet verified on real hardware** (emulator only so far).
+- **On real hardware**, the game has run on a Panasonic FS-A1ST (from a RAM cartridge), including the clock.
+  **Saving to a floppy has not been checked on real hardware yet.**
 
 ### Building
 Requires SDCC 4.x (`sdcc`, `sdasz80`), Python 3.11+ (Pillow, for the procedural art), gcc, and GNU make.
@@ -288,6 +293,7 @@ docs/      design documents and records
 | Phase 3 | Operations timeline, 1,000-NPC pseudo-online world, news, FM music, economy simulation |
 | v0.1.0 | Harder gacha (box gacha, no pity), 121 cards, raid and battle events, guild wars, staff roll, FAT12 save disk |
 | v0.2.0 | "People over systems": guild board (replies, lives, reactions to you), rival, stealing, endings and the last mates, memory album, operator mode, inn; also element display, battle styles, leader skill, three decks |
+| v0.3.1 | The MSX clock on the title with a way to set it (for a turboR without a clock battery); first run on a real FS-A1ST |
 | v0.3.0 | How mates leave, the feature-phone air (writing styles, footprints, maintenance, bills), letters and seasons, the last hour and the afterlife of the title, and a much deeper operator mode (planning meetings, full mode, report card, six endings) |
 
 ### Scope & honest positioning
@@ -485,6 +491,8 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 
 ### 動作環境
 - **MSX turboR 専用**（FS-A1ST / FS-A1GT）。turboR 未満では「turboR 専用」と出して止まります。
+- ⚠️ **セーブ用のフロッピーには、必ず要らないディスク（中身が消えても困らないもの）を使ってください。**
+  フロッピーへの保存はまだ実機で確かめていません。大事なファイルが入ったディスクは使わないでください。
 - セーブには、DOS でフォーマットした（FAT12 の）2DD フロッピーを A ドライブに入れてください。セーブはルートの
   ふつうのファイル `TGSAVE.DAT`（4.5KB）なので、ほかのファイルと同じディスクに置け、DOS でコピーすればバックアップに
   なります。このファイルが無いディスクには、作ってよいかを聞いてから書きます（既定は「いいえ」）。保存のたびに
@@ -494,7 +502,8 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   範囲外のときは時計が赤くなり、合わせるまで留守の間の時間を数えません。内蔵時計が表せるのは 1980〜2079 年です。
 - turboR の本体 ROM は著作物のため**同梱していません**。開発と確認は [openMSX](https://openmsx.org/) で、
   本体 ROM を吸い出した機種定義（Panasonic FS-A1ST）を使っています。
-- **実機での確認はまだです**（エミュレータでのみ確認しています）。
+- **実機では**、Panasonic FS-A1ST（RAM カートリッジから）で起動し、時計まで動くことを確かめました。
+  **フロッピーへの保存は、まだ実機で確かめていません。**
 
 ### ビルド
 SDCC 4.x（`sdcc`, `sdasz80`）、Python 3.11 以上（絵の生成に Pillow）、gcc、GNU make が必要です。
@@ -581,6 +590,7 @@ docs/      企画書・設計の記録
 | フェーズ 3 | 運営年表・NPC 1000 人の疑似オンライン・お知らせ・FM 音源・経済シミュレーション |
 | v0.1.0 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 121 枚、レイド・バトル、ギルド対抗戦、スタッフロール、FAT12 のセーブディスク |
 | v0.2.0 | 「仕組みより人」: ギルド伝言板（返事・暮らし・自分への反応）・ライバル・盗み・盗まれ・結末と最後まで残った仲間・思い出アルバム・運営モード・宿屋。ほかに属性の表示・戦い方・リーダースキル・デッキ 3 つ |
+| v0.3.1 | タイトルに本体の時計と時刻修正（時計の電池が無い turboR のため）。実機の FS-A1ST で初めて動かした |
 | v0.3.0 | 仲間の去り方、ガラケーの空気（書き方・足あと・メンテ・請求）、便りと年中行事、最後の 1 時間と終了後のタイトル、そして運営モードを深く（企画会議・じっくり・通信簿・6 通りの結末） |
 
 ### 位置づけ（正直な自己評価）
@@ -592,7 +602,7 @@ docs/      企画書・設計の記録
   調整がまだです。
 - 運営モードは、`make sim-ops` で合わせた NPC 1000 人の小さな模型で動いています。実在のサービスの数字ではありません。
   270 日を回すのに 2 分ほどかかります（エミュレータの turboR で）。
-- **実機（turboR）ではまだ確認していません。**
+- **フロッピーへの保存は、まだ実機（turboR）で確認していません。**
 - 画面の描き直しは全面で 0.6 秒ほど。対抗戦に入るときは、マイページが出るまで 4 秒ほどかかります（16 ギルドの戦力を
   1000 人ぶんから 1 日 1 回数えるため）。
 - BGM は VBLANK 割り込みで鳴らしています。ディスクの読み書きの間だけ止まり、終わると続きから鳴ります。
