@@ -183,7 +183,7 @@
 | Memories (after the end) | 1 / 3 / 4 | Cards / last letters / wiki article |
 | Shop | 4 | Inn: 1 sleep till morning, 2 wait for the next plan |
 | Operator mode | 1–5 / ESC | Pick an option (1 is history, or skip in a planning meeting) / stop (asks first) |
-| Title | 3 / 0 / ESC | Operator mode / license screen / developer diagnostics |
+| Title | 3 / 9 / 0 / ESC | Operator mode / set the clock / license screen / developer diagnostics |
 
 After the service ends, the title offers Memories (the album; 1 there shows your cards), Reset memories, the staff
 roll (with the ending), and operator mode.
@@ -194,9 +194,10 @@ roll (with the ending), and operator mode.
   (4.5 KB, in the root directory), so the disk can hold other files and you can back it up from DOS. On a disk
   without that file, the game asks before creating it (the default is No), and it re-reads the disk before every
   save. Saves from earlier versions load as they are. You can play without a disk (saving is disabled).
-- In-game time follows the turboR's built-in clock. **If the clock battery is dead** (the clock goes back at every
-  power-on), the game notices a date before 2026 at boot and asks you to set the date and time before loading the
-  save; otherwise time spent away would not count. The clock covers 1980–2079.
+- In-game time follows the turboR's built-in clock, shown at the bottom of the title with **[9] Set clock**. **If the
+  clock battery is dead**, the clock comes up with a wrong date at power-on. When the clock is before your last save,
+  more than 30 days after it, or out of range, the clock turns red and time away is not counted until you set it.
+  The clock covers 1980–2079.
 - The turboR system ROMs are copyrighted and **not included**. Development and checks use
   [openMSX](https://openmsx.org/) with a machine definition based on dumped system ROMs (Panasonic FS-A1ST).
 - **Not yet verified on real hardware** (emulator only so far).
@@ -477,7 +478,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | 思い出（終了後） | 1／3／4 | カード／最後の手紙／まとめ記事 |
 | お店 | 4 | 宿屋: 1 翌朝まで寝る、2 次の予定まで休む |
 | 運営モード | 1〜5／ESC | 選ぶ（1 が史実。企画会議では見送る）／やめる（確かめてから） |
-| タイトル | 3／0／ESC | 運営モード／ライセンスの画面／開発用の診断画面 |
+| タイトル | 3／9／0／ESC | 運営モード／時刻修正／ライセンスの画面／開発用の診断画面 |
 
 サービス終了後のタイトルには「思い出を見る」（アルバム。そこで 1 を押すと手持ちのカード）・「思い出をリセット」・
 「スタッフロール」（結末から）・「運営モード」が出ます。
@@ -488,9 +489,9 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   ふつうのファイル `TGSAVE.DAT`（4.5KB）なので、ほかのファイルと同じディスクに置け、DOS でコピーすればバックアップに
   なります。このファイルが無いディスクには、作ってよいかを聞いてから書きます（既定は「いいえ」）。保存のたびに
   ディスクを読み直します。前の版のセーブもそのまま読めます。ディスクが無くても遊べます（保存はできません）。
-- ゲーム内の時間は turboR の内蔵時計で進みます。**時計の電池が切れていて**電源を入れるたびに日付が戻る機械では、
-  起動したときに 2026 年より前の日付に気づき、セーブを読む前に日時を入れてもらいます（入れないと留守の間の時間が
-  数えられません）。内蔵時計が表せるのは 1980〜2079 年です。
+- ゲーム内の時間は turboR の内蔵時計で進みます。時計はタイトルの最下行に出て、**[9] 時刻修正**で合わせられます。
+  **時計の電池が切れている**と、電源を入れたときにでたらめな日時になります。時計が前回の保存より前・30 日より先・
+  範囲外のときは時計が赤くなり、合わせるまで留守の間の時間を数えません。内蔵時計が表せるのは 1980〜2079 年です。
 - turboR の本体 ROM は著作物のため**同梱していません**。開発と確認は [openMSX](https://openmsx.org/) で、
   本体 ROM を吸い出した機種定義（Panasonic FS-A1ST）を使っています。
 - **実機での確認はまだです**（エミュレータでのみ確認しています）。

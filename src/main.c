@@ -10,7 +10,6 @@
 #include "sys/gfx.h"
 #include "ui/screen.h"
 #include "ui/savedisk.h"
-#include "sys/rtc.h"
 #include "data/screens.h"
 
 /* ページ HOTCODE を RAM の HOT_ADDR へ写す（MEMORY_MAP の hot: 行, DECISIONS #72）。窓 A だけを使う */
@@ -30,11 +29,8 @@ void main(void)
     bgm_install();           /* BGM を VBLANK 割り込みで進める */
     gfx_load_atlas();        /* 画面部品を VRAM ページ 1 へ（★忘れると部品が全部ただの四角になる） */
     psg_init();
-    if (rtc_stale()) screen_change(&scr_clock);   /* 時計の電池が切れていた: 合わせてからセーブを読む（DECISIONS #101） */
-    else {
-        savedisk_boot();
-        screen_change(&scr_title);
-    }
+    savedisk_boot();                              /* 時計が怪しければ、留守の時間は足さずに TIME_ASK_* にする（タイトルの時計が赤くなる, DECISIONS #101） */
+    screen_change(&scr_title);
     g_boot_magic = BOOT_MAGIC;
     screen_run();
 }

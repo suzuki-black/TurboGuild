@@ -7,17 +7,26 @@ T_TITLE_DAY	サービス開始から
 T_DAY	日目
 T_TITLE_ENDED	サービスは終了しました
 T_TITLE_OVERWRITE	データを消して始めますか？
-T_TITLE_NOSAVE	セーブディスクが無いのでセーブできません
+T_TITLE_NOSAVE	ディスクが無く、保存できません
 T_CLK_TITLE	時計を合わせてください
 T_CLK_NOTE1	本体の時計が止まっていました
 T_CLK_NOTE2	（時計の電池が切れていると、
 T_CLK_NOTE3	　電源を入れるたびに戻ります）
+T_CLK_CTITLE	時計を確かめてください
+T_CLK_C1	前回の保存と時計が合いません
+T_CLK_C2	（時計の電池が切れていると、
+T_CLK_C3	　でたらめな日時になります）
+T_CLK_MTITLE	時刻修正
+T_CLK_M1	本体の時計を合わせます
+T_CLK_M2	（留守の間の時間は、本体の
+T_CLK_M3	　時計で数えます）
+T_CLK_FIX	時刻修正
 T_CLK_Y	年
 T_CLK_M	月
 T_CLK_D	日
 T_CLK_HOW1	左右:えらぶ 上下:変える
 T_CLK_HOW2	数字キー:直接入れる
-T_CLK_GUIDE	SPACE:決定 ESC:合わせずに進む
+T_CLK_GUIDE	SPACE:決定 ESC:戻る
 T_NAME_PROMPT	あなたの名前を決めてください
 T_NAME_END	決定
 T_NAME_HELP	SPACE:えらぶ ESC:けす

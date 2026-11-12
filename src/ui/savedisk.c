@@ -76,11 +76,23 @@ static u8 load_best(void)
     return 1;
 }
 
+/* 時計を合わせた後（DECISIONS #101）。起動時に時計を疑って留守の時間を足していなければ、合わせた時刻で足す。
+ * skip = 1（直さずに「つづきから」）なら足さない。ふだんの時刻修正（疑っていなかった）は、合わせた時刻を今として扱うだけ */
+FAR(void, savedisk_clock_done, (u8 skip))
+{
+    u32 now = rtc_now_secs(), before = g_save.g_time;
+    if (g_time_status >= TIME_ASK_SET && g_save_status == SD_LOADED && !skip)
+        g_save.g_time = time_advance(before, g_save.real_time_last, now, &g_time_status);
+    g_time_status = TIME_OK;
+    g_save.real_time_last = now;
+    g_time_added = g_save.g_time - before;
+}
+
 FAR(void, savedisk_boot, (void))
 {
     u32 now = rtc_now_secs();
-    u8 e = fat_open();
-    g_time_status = TIME_OK;
+    u8 e = fat_open(), stale = rtc_stale();
+    g_time_status = stale ? TIME_ASK_SET : TIME_OK;
     g_time_added = 0;
     if (e == DISK_OK && (g_fat.state == FS_FILE || g_fat.state == FS_LEGACY)) e = disk_read(g_fat.sec[FSEC_ID], 1, g_sector);
     if (e != DISK_OK) {
@@ -91,6 +103,10 @@ FAR(void, savedisk_boot, (void))
         g_save_status = SD_NOID;
     } else if (load_best()) {
         u32 before = g_save.g_time;
+        g_save_status = SD_LOADED;
+        if (!stale && (now < g_save.real_time_last || now - g_save.real_time_last > OFFLINE_MAX_REAL))
+            g_time_status = TIME_ASK_CHECK;              /* 時計がでたらめでも、日付として正しく見えることがある（実機で 2059 年） */
+        if (g_time_status >= TIME_ASK_SET) return;      /* 時計を確かめてもらってから savedisk_clock_done で足す */
         g_save.g_time = time_advance(before, g_save.real_time_last, now, &g_time_status);
         g_save.real_time_last = now;
         g_time_added = g_save.g_time - before;
@@ -158,6 +174,7 @@ FAR(void, time_sync, (void))
 {
     u32 now = rtc_now_secs();
     u8 st;
+    if (g_time_status >= TIME_ASK_SET) return;     /* 時計を疑っている間は進めない（2059 年のままだと 300 日ぶん進む） */
     g_save.g_time = time_advance(g_save.g_time, g_save.real_time_last, now, &st);
     g_save.real_time_last = now;
 }

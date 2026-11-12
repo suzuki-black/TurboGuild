@@ -3,10 +3,12 @@
 ## Unreleased
 
 ### English
-- **Setting the clock on real hardware.** A turboR without a clock battery forgets the date at every power-on, so time spent away never counted. If the clock reads earlier than 2026 at boot, the game now asks you to set the date and time (cursor keys or number keys) before loading the save. ESC skips it. Not yet checked on real hardware.
+- **The clock on the title.** The title now shows the MSX's clock with [9] Set clock next to it. A turboR without a clock battery comes up with a wrong date (one showed 2059); if the clock is earlier than your last save, more than 30 days after it, or out of range, the game does not count time away yet and shows the clock in red. Set it with [9] and the time away is counted from the corrected clock; choosing Continue without fixing it counts none. Number keys fill the fields in order (2026 11 12 21 38). Not yet checked on real hardware.
+- Without a save disk, the "no save disk" notice on the title covered the third item, Operator mode. It now replaces the subtitle line instead.
 
 ### 日本語
-- **実機で時計を合わせる。** 時計の電池が入っていない turboR は電源を入れるたびに日付を忘れるので、留守の間の時間が数えられていませんでした。起動したときに時計が 2026 年より前なら、セーブを読む前に日時を入れてもらうようにしました（カーソルキーか数字キー）。ESC で飛ばせます。実機ではまだ確かめていません。
+- **タイトルに時計。** タイトルの最下行に本体の時計と [9] 時刻修正を出します。時計の電池が入っていない turboR は電源を入れると日時がでたらめになります（2059 年になっていたことも）。時計が前回の保存より前・30 日より先・範囲外のときは、留守の時間をまだ数えず、時計を赤くします。[9] で合わせると、合わせた時刻で留守の時間を数えます。直さずに「つづきから」を選ぶと数えません。数字キーで年月日時分を続けて打てます（2026 11 12 21 38）。実機ではまだ確かめていません。
+- セーブディスクが無いとき、タイトルの「ディスクが無い」知らせが 3 つ目の「運営モード」の欄に重なって隠していました。知らせは副題の行に出すようにしました。
 
 ## v0.3.0 — 2026-11-11
 

@@ -16,7 +16,7 @@
 
 /* 上書きで前の文字が残らないよう同じ長さに揃える */
 static const char * const sd_names[5] = { "LOADED       ", "NEW (EMPTY)  ", "NOT SAVE DISK", "NO DISK      ", "DISK ERROR   " };
-static const char * const ts_names[3] = { "OK         ", "BACKWARD   ", "CLAMPED 30D" };
+static const char * const ts_names[5] = { "OK         ", "BACKWARD   ", "CLAMPED 30D", "ASK SET    ", "ASK CHECK  " };
 static const char * const de_names[7] = { "OK           ", "WRITE PROTECT", "NO DISK      ", "CRC ERROR    ", "ERROR        ", "NO FDD       ", "NO SAVE FILE " };
 
 static void put2(u8 cx, u8 cy, u8 v)

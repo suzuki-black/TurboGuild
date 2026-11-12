@@ -11,17 +11,26 @@ T_TITLE_DAY	Since launch:
 T_DAY	 day
 T_TITLE_ENDED	The service has ended
 T_TITLE_OVERWRITE	Erase data and restart?
-T_TITLE_NOSAVE	No save disk - saving is disabled
+T_TITLE_NOSAVE	No save disk - saving is off
 T_CLK_TITLE	Please set the clock	!
 T_CLK_NOTE1	The MSX clock had stopped.	!
 T_CLK_NOTE2	(A dead clock battery resets	!
 T_CLK_NOTE3	 it at every power-on.)	!
+T_CLK_CTITLE	Please check the clock	!
+T_CLK_C1	Clock doesn't match your save	!
+T_CLK_C2	(A dead clock battery can make it	!
+T_CLK_C3	 show any date at all.)	!
+T_CLK_MTITLE	Set the clock	!
+T_CLK_M1	Set the MSX clock	!
+T_CLK_M2	(Time away is counted from the	!
+T_CLK_M3	 MSX clock.)	!
+T_CLK_FIX	Set clock	!
 T_CLK_Y	/	!
 T_CLK_M	/	!
 T_CLK_D	 	!
 T_CLK_HOW1	L/R:Field  U/D:Change	!
 T_CLK_HOW2	Number keys:Type	!
-T_CLK_GUIDE	SPACE:Set  ESC:Skip	!
+T_CLK_GUIDE	SPACE:Set  ESC:Back	!
 T_NAME_PROMPT	Enter your name
 T_NAME_END	OK
 T_NAME_HELP	SPACE:pick ESC:erase

@@ -78,11 +78,13 @@ FAR(void, title_draw, (void))
     ui_clear();
     for (k = 0; k < 6; k++) vdp_fill(0, (u16)(k * 4), SCREEN_W, 4, (u8)(k & 1 ? COL_RED : COL_DRED));
     vdp_fill(0, 24, SCREEN_W, 2, COL_YELLOW);
-    txt_draw(11, 4, "TurboGuild", COL_YELLOW, COL_DRED);
-    gfx_sprite(ATL_SPARK, 76, 2);
-    gfx_sprite(ATL_SPARK, 172, 10);
+    txt_draw(1, 4, "TurboGuild", COL_YELLOW, COL_DRED);
+    txt_draw(12, 4, "(C)2026 suzuki-black", COL_WHITE, COL_DRED);               /* 著作権表示（仕様 §11.5）。下の行は時計に使う */
     for (i = 0; i < 4; i++) gfx_card(parade[i], (u8)(10 + i * 60), (u8)(ended() ? 28 : 32 + (i & 1) * 6));   /* 終了後はメニューが 4 つなので詰める */
-    if (!ended() && !can_continue()) txt_id(5, 116, T_TITLE_SUB, COL_WHITE, COL_BLACK);
+    if (!ended() && !can_continue()) {          /* ディスクが無ければ副題の代わりに知らせる（下に出すと 3 つ目の運営モードの欄に重なった） */
+        if (g_save_status == SD_NODISK) txt_id(2, 116, T_TITLE_NOSAVE, COL_LGRAY, COL_BLACK);
+        else txt_id(5, 116, T_TITLE_SUB, COL_WHITE, COL_BLACK);
+    }
     if (ended()) {
         u16 t = ended_line();
         txt_id(t == T_ENDED_TITLE ? 6 : 1, 102, t, t == T_ENDED_AD ? COL_CYAN : t == T_ENDED_404 ? COL_LGRAY : COL_YELLOW, COL_BLACK);
@@ -92,9 +94,8 @@ FAR(void, title_draw, (void))
         txt_id(cx, 116, T_DAY, COL_LGRAY, COL_BLACK);
     }
     draw_menu();
-    if (g_save_status == SD_NODISK) txt_id(1, 176, T_TITLE_NOSAVE, COL_LGRAY, COL_BLACK);
-    txt_draw(1, 196, "(C)2026 suzuki-black", COL_LGRAY, COL_BLACK);            /* 著作権表示（仕様 §11.5） */
-    if (!ended()) txt_id(26, 196, T_TITLE_LICENSE, COL_DGRAY, COL_BLACK);
+    clock_title();                                                             /* 本体の時計と [9] 時刻修正（DECISIONS #101） */
+    if (!ended()) txt_id(27, 196, T_TITLE_LICENSE, COL_DGRAY, COL_BLACK);
 }
 
 static void start_new(void)
@@ -104,6 +105,7 @@ static void start_new(void)
         return;
     }
     save_new(&g_save, rtc_now_secs());
+    g_time_status = TIME_OK;                     /* 新しく始めるなら、疑っていた時計の分は関係ない */
     screen_change(&scr_name);
 }
 
@@ -114,17 +116,23 @@ FAR(void, title_update, (void))
     if (ui_menu_input(&g_cursor, (u8)(ended() ? 4 : 3), p)) draw_menu();
     if (d == 1 || (d == 2 && can_continue()) || d == 3 || (d == 4 && ended())) { g_cursor = (u8)(d - 1); p = BTN_OK; }
     if (d == 0) { screen_change(&scr_license); return; }
+    if (d == 9) { psg_beep(0x80, 4); screen_change(&scr_clock); return; }   /* 時刻修正 */
+    if (g_frames == 0) clock_title();                                        /* 時計は 1 秒ごとに描き直す */
     if (p & BTN_OK) {
         psg_beep(0x80, 4);
         if (ended()) {
             if (g_cursor == 0) screen_change(&scr_album);                        /* 思い出を見る（アルバム） */
             else if (g_cursor == 2) screen_change(&scr_ending);                  /* 結末からスタッフロール */
             else if (g_cursor == 3) screen_change(&scr_ops);              /* 運営モード（裏面） */
-            else if (ui_confirm(T_RESET_CONFIRM)) { save_new(&g_save, rtc_now_secs()); screen_change(&scr_name); }
+            else if (ui_confirm(T_RESET_CONFIRM)) { save_new(&g_save, rtc_now_secs()); g_time_status = TIME_OK; screen_change(&scr_name); }
             else g_dirty = 1;
         } else if (g_cursor == 0) start_new();
         else if (g_cursor == 2) screen_change(&scr_ops);                   /* 運営モード（本編の前でも） */
-        else if (can_continue()) { g_from_title = 1; screen_change(&scr_home); }
+        else if (can_continue()) {
+            if (g_time_status >= TIME_ASK_SET) savedisk_clock_done(1);   /* 時計を直さずに進む: 留守の時間は足さない */
+            g_from_title = 1;
+            screen_change(&scr_home);
+        }
     }
     if (p & BTN_CANCEL) screen_change(&scr_p0menu);
 }

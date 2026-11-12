@@ -10,6 +10,8 @@ typedef struct { u16 year; u8 mon, day, hour, min, sec; } DateTime;
 #define TIME_OK        0
 #define TIME_BACKWARD  1   /* 時刻が逆行した */
 #define TIME_CLAMPED   2   /* オフライン上限で切り捨てた */
+#define TIME_ASK_SET   3   /* 起動時: 時計が止まっていた（年が範囲外）。合わせてもらうまで時間を進めない（DECISIONS #101） */
+#define TIME_ASK_CHECK 4   /* 起動時: 前の保存より前か 30 日より先。確かめてもらうまで時間を進めない */
 
 u32 time_to_secs(const DateTime *dt);       /* 1980-01-01 00:00:00 からの秒 */
 u32 time_advance(u32 gtime, u32 real_last, u32 real_now, u8 *status);
