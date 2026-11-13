@@ -204,6 +204,8 @@ FAR(void, news_draw, (void))
     vdp_fill(0, 168, SCREEN_W, 16, COL_BLACK);       /* 携帯サイトの下のリンク: ヘルプ・規約・お問い合わせ（DECISIONS #103） */
     ui_key(4, 12, 170);
     txt_id(3, 168, T_HL_LINK, COL_CYAN, COL_BLACK);
+    ui_key(5, 172, 170);                              /* 攻略スレ（DECISIONS #104） */
+    txt_id(23, 168, T_TH_LINK, COL_CYAN, COL_BLACK);
     ui_guide(T_NEWS_GUIDE);
 }
 
@@ -214,6 +216,7 @@ FAR(void, news_update, (void))
     if (input_digit() == 1) { psg_beep(0x80, 4); screen_change(&scr_album); return; }   /* 思い出アルバム */
     if (input_digit() == 2) { psg_beep(0x80, 4); screen_change(&scr_foot); return; }    /* 足あと */
     if (input_digit() == 3) { psg_beep(0x80, 4); screen_change(&scr_mail); return; }    /* メール */
+    if (input_digit() == 5) { psg_beep(0x80, 4); g_cursor = 0; screen_change(&scr_thread); return; }   /* 攻略スレ */
     if (input_digit() == 4) { psg_beep(0x80, 4); g_cursor = 0; screen_change(&scr_help); return; }   /* ヘルプ・規約・お問い合わせ */
     if (p & BTN_CANCEL) screen_change(&scr_home);
 }

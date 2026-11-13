@@ -1388,7 +1388,7 @@ T_ML_ASK0	Thank you for contacting us.   We checked your history: your  gems wer
 T_ML_ASK1	Thank you for contacting us.   We are sorry, but under our    terms we cannot give refunds.  Thank you for playing.
 T_ML_ASK2	Thank you for contacting us.   We looked into it but found no sign of unauthorized access.   Thank you for playing.
 T_ML_ASK3	Thank you for contacting us.   We value your feedback and willuse it to improve the service. Thank you for playing.
-T_HL_LINK	Help / Terms / Contact
+T_HL_LINK	Help/Contact
 T_HL_TITLE	Help
 T_HL_M0	FAQ
 T_HL_M1	Legal notice
@@ -1422,6 +1422,61 @@ T_HL_QUIT1	You will lose all your cardsand gems. Are you sure?
 T_HL_QUIT2	Leave your guild behind?
 T_HL_STAY	Thank you! We hope you keep enjoying TurboGuild!
 T_HL_PC	Please use our PC site to   delete your account.	!
+T_TH_LINK	Guide BBS	!
+T_TH_TITLE	Guide BBS	!
+T_TH_PART	Part	!
+T_TH_NANASHI	Anonymous	!
+T_TH_GUIDE	U/D:More ESC:Back	!
+T_TH_UNIT	k	!
+T_TH_BD0	Top 10 needs % at least	!
+T_TH_BD1	Want top 10? Expect %	!
+T_TH_BD2	My 100th place guess: %	!
+T_TH_BD3	100th: % is safe	!
+T_TH_BD4	500th is easy with %	!
+T_TH_BD5	500th line looks like %	!
+T_TH_BDZ	Anyone who plays gets top 500	!
+T_TH_DEMA0	Fake. It won't go that high	!
+T_TH_DEMA1	That's way too low. Trolling?	!
+T_TH_BOON0	This event's boon is %. Get it	!
+T_TH_BOON1	% made my runs so much easier	!
+T_TH_NEXT0	Heard % is a must next event	!
+T_TH_NEXT1	Level up % while you can	!
+T_TH_RE0	So true	!
+T_TH_RE1	Source?	!
+T_TH_RE2	Deets	!
+T_TH_RE3	Nice troll	!
+T_TH_RE4	No way...	!
+T_TH_RE5	Thx	!
+T_TH_CHAT0	The gacha hates me	!
+T_TH_CHAT1	10-pull, all N. Again	!
+T_TH_CHAT2	F2P here. Can I make top 10?	!
+T_TH_CHAT3	Rent money went to gacha	!
+T_TH_CHAT4	Guild recruiting. Chill	!
+T_TH_CHAT5	Busted on gacha. Bed	!
+T_TH_CHAT6	Devs, reading? Gems pls	!
+T_TH_CHAT7	Do you guys ever sleep?	!
+T_TH_CHAT8	AP refill when	!
+T_TH_CHAT9	This thread is so nice	!
+T_TH_EV0	Grinding is boring	!
+T_TH_EV1	Out of AP. Use gems?	!
+T_TH_EV2	Boss too tanky lol	!
+T_TH_EV3	Backup pls	!
+T_TH_EV4	How many hours you grinding?	!
+T_TH_EV5	Top ranks are all whales	!
+T_TH_USR0	USR is broken. Inflation	!
+T_TH_USR1	My SSRs are trash now	!
+T_TH_USR2	Pulling till I get USR	!
+T_TH_USR3	SSR can't win anymore	!
+T_TH_XUSR0	XUSR? I'm lost now	!
+T_TH_XUSR1	XXUSR next?	!
+T_TH_XUSR2	Can't do anything F2P	!
+T_TH_XUSR3	Can't keep up anymore	!
+T_TH_END0	Shutting down? Really	!
+T_TH_END1	What about refunds?	!
+T_TH_END2	Thanks for everything	!
+T_TH_END3	Running to the very end	!
+T_TH_END4	Spend all your gems	!
+T_TH_END5	See you in another game	!
 T_RS_TITLE	Members	!
 T_PERSON_N	ppl	!
 T_RS_EMPTY	No one is in the guild	!

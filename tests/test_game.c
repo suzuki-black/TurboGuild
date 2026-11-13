@@ -28,6 +28,8 @@
 #include "core/keitai.h"
 #include "data/text_ids.h"
 #include "data/ops_hist.h"
+#include "data/border.h"
+#include "core/thread.h"
 
 
 static void fresh(void) { save_new(&g_save, 1000); }
@@ -1472,6 +1474,77 @@ static void test_memo_ending(void)
     CHECK(e.kinds == 2 && e.kinds_all == CARD_COUNT_BUILT && e.spent == 0 && e.kind == (stay ? END_FREE : END_ALONE));
 }
 
+/* 攻略スレ（DECISIONS #104）: 正解の表がランキングの式と合い、デマと突っ込みの関係が正しい */
+static void test_thread(void)
+{
+    static const u16 tiers[TH_TIERS] = { 10, 100, 500 };
+    SaveData keep = g_save;
+    EventRec e;
+    ThPost o, q;
+    u16 p, last, k, nb = 0, nlie = 0, ndema = 0, nboon = 0, nboonlie = 0, nnext = 0, nre = 0, nend = 0, nz = 0;
+    u8 ev, t;
+    for (ev = 1; ev <= EVENT_COUNT; ev++) {
+        tbl_event(ev, &e);
+        g_save.event_id = ev;
+        g_save.g_time = ((u32)e.start_day + e.duration) * GSEC_PER_DAY - 1;
+        for (t = 0; t < TH_TIERS; t++) {
+            u32 v = th_border[ev - 1][t];
+            if (!v) { nz++; continue; }                     /* 参加すれば入れる */
+            g_save.event_pt = v;     CHECK(ranking_final_rank() <= tiers[t]);
+            g_save.event_pt = v - 1; CHECK(ranking_final_rank() > tiers[t]);
+        }
+        CHECK(th_border[ev - 1][0] > th_border[ev - 1][1]);
+    }
+    CHECK(nz <= 1);
+    g_save = keep;
+    g_save.g_time = (u32)SERVICE_END_DAY * GSEC_PER_DAY + 5000;   /* 終わったら止まる */
+    last = thread_last();
+    CHECK(last == (u16)(((u32)SERVICE_END_DAY * GSEC_PER_DAY - 1) / TH_SECS));
+    for (p = 0; p <= last; p++) {
+        u16 day = (u16)(p / (GSEC_PER_DAY / TH_SECS));
+        u8 cur = thread_event_at(day);
+        thread_post(p, &o);
+        CHECK(o.no == p % TH_PART + 1);
+        switch (o.kind) {
+        case TH_BORDER:
+            nb++;
+            CHECK(cur && o.ev == cur && o.tier < TH_TIERS && o.text == T_TH_BD0 + o.tier * 2 + (o.text - T_TH_BD0) % 2);
+            if (o.lie) { nlie++; CHECK(o.pct <= 60 || o.pct >= 160); } else CHECK(o.pct >= 85 && o.pct <= 115);
+            break;
+        case TH_DEMA:
+            ndema++;
+            CHECK(cur && o.ref && o.ref < o.no && o.no - o.ref <= 6);
+            thread_post((u16)(p - (o.no - o.ref)), &q);
+            CHECK(q.kind == TH_BORDER && q.lie && o.text == (q.pct > 100 ? T_TH_DEMA0 : T_TH_DEMA1));
+            break;
+        case TH_BOON:
+        case TH_NEXT:
+            if (o.kind == TH_BOON) { CHECK(cur); nboon++; tbl_event(cur, &e); }
+            else {
+                CHECK(!cur); nnext++;
+                for (k = 1; k <= EVENT_COUNT; k++) { tbl_event((u8)k, &e); if (e.start_day > day) break; }
+                CHECK(k <= EVENT_COUNT);
+            }
+            if (o.lie) { nboonlie++; CHECK(o.card != e.bonus_card && o.card >= 1 && o.card <= tbl_card_count()); }
+            else CHECK(o.card == e.bonus_card);
+            break;
+        case TH_REPLY:
+            nre++;
+            CHECK(o.ref >= 1 && o.ref < o.no && o.text >= T_TH_RE0 && o.text <= T_TH_RE5);
+            break;
+        default:
+            CHECK(o.kind == TH_CHAT && !o.ref && o.text >= T_TH_CHAT0 && o.text <= T_TH_END5);
+            if (o.text >= T_TH_END0) { nend++; CHECK(day >= SERVICE_END_DAY - 30); }
+            if (o.text >= T_TH_XUSR0 && o.text <= T_TH_XUSR3) CHECK(day >= 180);
+            if (o.text >= T_TH_USR0 && o.text <= T_TH_USR3) CHECK(day >= 90);
+            if (o.text >= T_TH_EV0 && o.text <= T_TH_EV5) CHECK(cur);
+            break;
+        }
+    }
+    CHECK(nb > 300 && nlie > nb / 6 && nlie < nb / 3 && ndema > 50 && nboon > 100 && nnext > 100 && nboonlie > 30 && nre > 500 && nend > 100);
+    g_save = keep;
+}
+
 int main(void)
 {
     test_timeline();
@@ -1499,6 +1572,7 @@ int main(void)
     test_guild_strengths();
     test_struct_sizes();
     test_battle();
+    test_thread();
     test_elem();
     test_auto_for();
     test_ap();

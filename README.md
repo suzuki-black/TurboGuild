@@ -136,6 +136,10 @@
 - **The phone's edges.** My Page has the antenna, battery (your AP) and clock at the bottom left, the marquee runs
   ads for other (made-up) games, and News links to Help / Terms / Contact: an FAQ, the legal notice, an inquiry form
   (a form reply arrives in your mail the next day) and a "delete account" button that begs you to stay.
+- **The guide BBS** (News, 5): an anonymous board in the style of the era's forums — post numbers, IDs, a new part
+  every 1,000 posts. People guess the ranking borders, name the event's boon card, and chat as the timeline moves on.
+  About a quarter of the "info" is wrong, and sometimes someone calls it out. The real borders come from the same
+  formulas as the rankings, so you can check at the end of the event.
 - **The clock.** The title shows the MSX's clock with **[9] Set clock**. If the clock looks wrong at boot (before your
   last save, more than 30 days after it, or out of range), it turns red and time away is not counted until you set
   it — a turboR without a clock battery comes up with a random date.
@@ -209,7 +213,7 @@ Title, 3 — open from the start. Run the same 270 days from the other side.
 | Explore / event top | 0 | Battle style (Normal → Save → All-out) |
 | | 6 | Build the deck for this enemy |
 | Deck | 7–9 | Switch to deck A–C |
-| News | SPACE / 1 / 2 / 3 / 4 | Guild board / memory album / footprints / mail / help |
+| News | SPACE / 1 / 2 / 3 / 4 / 5 | Guild board / memory album / footprints / mail / help / guide BBS |
 | Guild board | 1 | Members (SPACE: profile) |
 | Memories (after the end) | 1 / 3 / 4 | Cards / last letters / wiki article |
 | Shop | 4 | Inn: 1 sleep till morning, 2 wait for the next plan |
@@ -473,6 +477,9 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **携帯の画面の端っこ。** マイページの左下にアンテナ・電池（AP）・時計。流れるお知らせには（架空の）よそのゲームの広告。
   お知らせの下には「ﾍﾙﾌﾟ・規約・お問い合わせ」: よくある質問、特定商取引法に基づく表記、お問い合わせ（翌日に定型の
   返事がメールで届く）、そして引き止められる「退会はこちら」。
+- **攻略スレ**（お知らせの 5）。当時の匿名掲示板ふう——レス番・ID・1000 レスで次の Part。ボーダー予想、特効カードの話、
+  年表に合わせた雑談が流れます。「情報」の 4 分の 1 ほどはデマで、ときどき誰かが突っ込みます。本当のボーダーは
+  ランキングと同じ式から決まるので、イベントの終わりに答え合わせができます。
 - **時計。** タイトルに本体の時計と **[9] 時刻修正** があります。起動したときに時計がおかしい（前回の保存より前・
   30 日より先・範囲外）と赤くなり、合わせるまで留守の間の時間を数えません。時計の電池が無い turboR は、
   電源を入れるとでたらめな日時になるためです。
@@ -541,7 +548,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | 探索・イベントのトップ | 0 | 戦い方を替える（通常 → 節約 → 全力） |
 | | 6 | その敵向けにおまかせ編成 |
 | デッキ | 7〜9 | デッキ A〜C に替える |
-| お知らせ | スペース／1／2／3／4 | ギルド伝言板／思い出アルバム／足あと／メール／ヘルプ |
+| お知らせ | スペース／1／2／3／4／5 | ギルド伝言板／思い出アルバム／足あと／メール／ヘルプ／攻略スレ |
 | ギルド伝言板 | 1 | メンバー（スペースでプロフィール） |
 | 思い出（終了後） | 1／3／4 | カード／最後の手紙／まとめ記事 |
 | お店 | 4 | 宿屋: 1 翌朝まで寝る、2 次の予定まで休む |

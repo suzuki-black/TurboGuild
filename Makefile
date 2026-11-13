@@ -56,7 +56,7 @@ LDFLAGS  := -mz80 --no-std-crt0 --code-loc 0x4010 --data-loc 0xC000 \
 CSRC     := $(wildcard src/*.c src/sys/*.c src/core/*.c src/ui/*.c)
 ASRC     := $(filter-out src/sys/crt0.s,$(wildcard src/sys/*.s))
 GENH     := src/data/cards.h src/data/rompages.h src/data/screens.h src/data/tables.h src/data/text_ids.h \
-            src/data/art.h src/data/palette.h src/data/bgm_data.h src/data/ops_hist.h
+            src/data/art.h src/data/palette.h src/data/bgm_data.h src/data/ops_hist.h src/data/border.h
 HDRS     := $(wildcard src/*.h src/*/*.h) $(GENH)
 COBJ     := $(patsubst src/%.c,$(OBJ)/%.rel,$(CSRC))
 AOBJ     := $(patsubst src/%.s,$(OBJ)/%.rel,$(ASRC)) $(OBJ)/far_stubs.rel
@@ -90,6 +90,12 @@ src/data/ops_hist.h: tests/sim_ops.c src/core/opsim.c src/core/opsim.h src/confi
 	@mkdir -p $(B)
 	gcc -std=c99 -O2 -Wall -Wextra -Werror -Isrc -o $(B)/sim_ops tests/sim_ops.c src/core/*.c tests/tables_pc.c
 	$(B)/sim_ops histh > $@
+
+# 攻略スレの「正解」: イベントごとの終了の日のボーダー（DECISIONS #104）。ランキングの式（PC でも ROM と同じコード）で探す
+src/data/border.h: tests/gen_border.c src/core/ranking.c src/core/ranking.h src/core/timeline.c src/config.h tests/tables_pc.c $(B)/data.stamp
+	@mkdir -p $(B)
+	gcc -std=c99 -O2 -Wall -Wextra -Werror -Isrc -o $(B)/gen_border tests/gen_border.c src/core/*.c tests/tables_pc.c
+	$(B)/gen_border > $@
 
 src/data/bgm_data.h: tools/mml.py $(wildcard data/bgm/*.mml)
 	@mkdir -p $(B)
@@ -153,7 +159,7 @@ sim-ops: $(B)/data.stamp
 
 # ---- PC 単体テスト ----
 TESTS := $(wildcard tests/test_*.c)
-test: $(B)/data.stamp src/data/ops_hist.h
+test: $(B)/data.stamp src/data/ops_hist.h src/data/border.h
 	@mkdir -p $(B)/tests
 	@set -e; for t in $(TESTS); do \
 	  n=$$(basename $$t .c); \

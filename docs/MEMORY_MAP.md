@@ -124,4 +124,5 @@
 | 101 | 6000h コード | CORE11 | code: src/core/board_fix.c | 伝言板の決まった時刻の書き込み（バンク 98 が埋まったので分けた） |
 | 102 | 6000h コード | UI_WIKI | code: src/ui/wiki_ui.c src/ui/clock_ui.c | サービス終了後のまとめ記事、時計を合わせる画面とタイトルの時計（バンク 2 が埋まったので） |
 | 103 | 6000h コード | UI_HELP | code: src/ui/help_ui.c | ヘルプ・規約・お問い合わせ・退会（お知らせの 4） |
-| 104-127 | - | - | - | 空き |
+| 104 | 6000h コード | UI_THREAD | code: src/ui/thread_ui.c src/core/thread.c | 攻略スレ（お知らせの 5）。ボーダーの正解は data/border.h |
+| 105-127 | - | - | - | 空き |
