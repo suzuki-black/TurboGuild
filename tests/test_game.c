@@ -1515,7 +1515,7 @@ static void test_thread(void)
             ndema++;
             CHECK(cur && o.ref && o.ref < o.no && o.no - o.ref <= 6);
             thread_post((u16)(p - (o.no - o.ref)), &q);
-            CHECK(q.kind == TH_BORDER && q.lie && o.text == (q.pct > 100 ? T_TH_DEMA0 : T_TH_DEMA1));
+            CHECK(q.kind == TH_BORDER && q.lie && o.text >= T_TH_DEMA0 && o.text <= T_TH_DEMA3 && (o.text - T_TH_DEMA0) % 2 == (q.pct > 100 ? 0 : 1));
             break;
         case TH_BOON:
         case TH_NEXT:
@@ -1525,6 +1525,7 @@ static void test_thread(void)
                 for (k = 1; k <= EVENT_COUNT; k++) { tbl_event((u8)k, &e); if (e.start_day > day) break; }
                 CHECK(k <= EVENT_COUNT);
             }
+            CHECK(o.real == e.bonus_card);
             if (o.lie) { nboonlie++; CHECK(o.card != e.bonus_card && o.card >= 1 && o.card <= tbl_card_count()); }
             else CHECK(o.card == e.bonus_card);
             break;

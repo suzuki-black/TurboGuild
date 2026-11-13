@@ -7,6 +7,7 @@
 #include "../far.h"
 #include "../ram.h"
 #include "../config.h"
+#include "../core/opsim.h"
 #include "../core/save.h"
 #include "../core/tables.h"
 #include "../core/thread.h"
@@ -53,13 +54,24 @@ static void put_pts(Bld *w, u32 v)
     put(w, txt_ptr(T_TH_UNIT));
 }
 
-/* 文の % に入れるもの */
-static void compose(Bld *w, const ThPost *o)
+/* 文を写して % に点（card = 0）かカード名を入れる */
+static void fill(Bld *w, u16 id, u32 v, u16 card)
 {
     char tmp[80];
-    const char *s;
+    const char *s = txt_ptr(id);
     u8 n = 0, k;
-    u16 id = o->text;
+    while (s[n] && n < sizeof(tmp) - 1) { tmp[n] = s[n]; n++; }
+    tmp[n] = 0;
+    for (k = 0; tmp[k]; k++) {
+        if (tmp[k] != '%') { char c[2]; c[0] = tmp[k]; c[1] = 0; put(w, c); continue; }
+        if (card) { CardRec c; tbl_card(card, &c); put(w, txt_ptr(c.name_text)); }
+        else put_pts(w, v);
+    }
+}
+
+/* レスの本文（id は文。運営モードでは雑談を模型の様子の文に替えて渡す） */
+static void compose(Bld *w, const ThPost *o, u16 id)
+{
     u32 v = 0;
     if (o->kind == TH_BORDER) {
         v = th_border[o->ev - 1][o->tier];
@@ -68,14 +80,21 @@ static void compose(Bld *w, const ThPost *o)
     }
     w->n = 0; w->b[0] = 0;
     if (o->ref) { put(w, ">>"); put_num(w, o->ref); put(w, " "); }
-    s = txt_ptr(id);
-    while (s[n] && n < sizeof(tmp) - 1) { tmp[n] = s[n]; n++; }
-    tmp[n] = 0;
-    for (k = 0; tmp[k]; k++) {
-        if (tmp[k] != '%') { char c[2]; c[0] = tmp[k]; c[1] = 0; put(w, c); continue; }
-        if (o->kind == TH_BORDER) put_pts(w, v);
-        else if (o->card) { CardRec c; tbl_card(o->card, &c); put(w, txt_ptr(c.name_text)); }
+    fill(w, id, v, o->kind == TH_BORDER ? 0 : o->card);
+}
+
+/* 運営モードの答え合わせ: 「→デマ（正解 2.1万）」。無ければ 0 */
+static u8 truth(Bld *w, const ThPost *o)
+{
+    w->n = 0; w->b[0] = 0;
+    if (o->kind == TH_BORDER) {
+        u32 v = th_border[o->ev - 1][o->tier];
+        if (!v) return 0;
+        fill(w, o->lie ? T_TH_LIE : T_TH_TRUE, v, 0);
+        return 1;
     }
+    if ((o->kind == TH_BOON || o->kind == TH_NEXT) && o->lie) { fill(w, T_TH_LIEC, 0, o->real); return 1; }
+    return 0;
 }
 
 /* レスの頭の行: 123 名無しさん ID:aB3x */
@@ -108,35 +127,99 @@ static u8 rows(const char *t)
     return n;
 }
 
-FAR(void, thread_draw, (void))
+/* 運営モード: 雑談の文を模型の様子で替える（グラフの人間語訳）。
+ * その時々のこと（詫び石・確率アップ・コラボ・障害・ばれた・規制・判定）を先に、無ければ直近 7 日の引退と DAU の動きで */
+static u16 stat7(u8 k)                            /* 7 日前と今日の DAU（k = 0）か引退の累計（k = 1）の差の元 */
+{
+    u8 b[4];
+    VdpXfer x;
+    u16 d = g_ops.day > 7 ? (u16)(g_ops.day - 8) : 0;
+    x.addr = (u16)(VRAM2_STAT + d * 4); x.src = b; x.len = 4;
+    vdp_page2_read(&x);
+    return k ? (u16)(b[2] | (b[3] << 8)) : (u16)(b[0] | (b[1] << 8));
+}
+
+static u16 mood(const ThPost *o)
+{
+    u16 h = o->id, quit, dau0;
+    if (o->kind != TH_CHAT) return o->text;
+    if ((h & 3) == 0) {                            /* 4 本に 1 本は、その時々のこと */
+        if (g_ops.verdict == OPS_END) return T_TH_OEND;
+        if (g_ops.verdict == OPS_CONTINUE) return T_TH_OCONT;
+        if (g_ops.sq & OPS_SQ_RIGOUT) return T_TH_ORIG;
+        if (g_ops.outage) return T_TH_OOUT;
+        if (g_ops.sq & OPS_SQ_COMPBAN) return T_TH_OCOMP;
+        if (g_ops.glut) return T_TH_OGLUT;
+        if (g_ops.boost) return T_TH_OBOOST;
+        if (g_ops.collab) return T_TH_OCOLLAB;
+    }
+    quit = (u16)(g_ops.retired - stat7(1));
+    dau0 = stat7(0);
+    h = (u16)((h >> 2) & 3);
+    if (quit >= 20) return (u16)(T_TH_OQ0 + h);                       /* 引退が続く */
+    if (dau0 && g_ops.dau * 100UL < dau0 * 85UL) return (u16)(T_TH_OD0 + h);   /* 減っている */
+    if (g_ops.dau * 100UL > dau0 * 110UL) return (u16)(T_TH_OU0 + h);          /* 増えている */
+    return (u16)(T_TH_ON0 + h);
+}
+
+/* 新しいレス p から下へ、入るだけ描く（ops = 運営モード: 雑談を替え、答え合わせを足す） */
+static void list(u16 p, u8 ops)
 {
     ThPost o;
-    Bld w;
-    u16 last = thread_last(), p;
-    u8 y = TH_Y, cx, bg, i = 0;
-    ui_clear();
-    ui_header(T_TH_TITLE);
-    cx = txt_id(16, 0, T_TH_PART, COL_LGRAY, COL_DBLUE);
-    txt_num(cx, 0, last / TH_PART + 1, COL_YELLOW, COL_DBLUE);
-    if (g_cursor > last) g_cursor = (u8)last;
-    for (p = (u16)(last - g_cursor); y + 32 <= TH_END; p--, i++) {
+    Bld w, t;
+    u8 y = TH_Y, bg, i = 0, tr;
+    for (;; p--, i++) {
         const char *s;
         thread_post(p, &o);
-        compose(&w, &o);
-        if (y + 16 * (1 + rows(w.b)) > TH_END) break;   /* 入り切らないレスは描かない */
+        compose(&w, &o, ops ? mood(&o) : o.text);
+        tr = (u8)(ops && truth(&t, &o));
+        if (y + 16 * (1 + rows(w.b) + (tr ? rows(t.b) : 0)) > TH_END) break;   /* 入り切らないレスは描かない */
         bg = i & 1 ? COL_BLACK : COL_DGRAY;
         head(y, &o, bg);
         y = (u8)(y + 16);
         s = w.b;
-        while (*s && y + 16 <= TH_END) {
+        while (*s) {
             vdp_fill(0, y, SCREEN_W, 16, bg);
             txt_draw(2, y, s, o.ref ? COL_CYAN : COL_WHITE, bg);
             s = g_txt_rest;
             y = (u8)(y + 16);
         }
+        for (s = t.b; tr && *s; y = (u8)(y + 16)) {
+            vdp_fill(0, y, SCREEN_W, 16, bg);
+            txt_draw(2, y, s, o.lie ? COL_ORANGE : COL_GREEN, bg);
+            s = g_txt_rest;
+        }
         if (!p || o.no == 1) break;               /* スレの頭より前は前のスレ */
     }
+}
+
+FAR(void, thread_draw, (void))
+{
+    u16 last = thread_last();
+    u8 cx;
+    ui_clear();
+    ui_header(T_TH_TITLE);
+    cx = txt_id(16, 0, T_TH_PART, COL_LGRAY, COL_DBLUE);
+    txt_num(cx, 0, last / TH_PART + 1, COL_YELLOW, COL_DBLUE);
+    if (g_cursor > last) g_cursor = (u8)last;
+    list((u16)(last - g_cursor), 0);
     ui_guide(T_TH_GUIDE);
+}
+
+/* 運営モード（5）: その日の終わりまでのスレ。押されたら戻る（呼んだ側が描き直す） */
+FAR(void, ops_thread, (void))
+{
+    u16 day = g_ops.day ? g_ops.day : 1;
+    u8 cx;
+    ui_clear();
+    ui_header(T_TH_OHEAD);
+    cx = txt_num(18, 0, day, COL_YELLOW, COL_DBLUE);
+    txt_id(cx, 0, T_OPS_DAYS, COL_LGRAY, COL_DBLUE);
+    list((u16)(day * (u16)(GSEC_PER_DAY / TH_SECS) - 1), 1);
+    ui_guide(T_OPS_GUIDE_NEXT);
+    psg_beep(0x80, 4);
+    ui_wait_key();
+    g_dirty = 1;
 }
 
 FAR(void, thread_update, (void))

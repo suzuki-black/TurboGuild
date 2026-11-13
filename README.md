@@ -182,6 +182,8 @@ Title, 3 — open from the start. Run the same 270 days from the other side.
   Complete gacha is banned by industry self-regulation on day 200; rigged odds get exposed sooner or later.
 - **A graph of 1,000 NPCs:** DAU, new players, the paying rate, quits and sales. After you finish the main game,
   history's DAU and sales are drawn as dotted lines. On day 240, profit and DAU decide whether the service goes on.
+- **The guide BBS from the other side** (5 while it runs): the same board, but the chatter follows your numbers
+  (quitting, a shrinking or growing DAU, gems, rate-ups, an exposed rate cut), and only you see which "info" was true.
 - **At the end:** the results, a report card (peak DAU, the worst day for quitting, gems given, who was left) and one
   of six operator endings. Office chat runs at the bottom of the screen every 15 days.
 
@@ -219,6 +221,7 @@ Title, 3 — open from the start. Run the same 270 days from the other side.
 | Shop | 4 | Inn: 1 sleep till morning, 2 wait for the next plan |
 | Operator mode | 1 / 2 | At the start: Fast / Full |
 | | 1–5 / ESC | Pick an option (1 is history, or skip in a planning meeting) / stop (asks first) |
+| | 5 (while running) | Read the guide BBS |
 | Title | 3 / 9 / 0 / ESC | Operator mode / set the clock / license screen / developer diagnostics |
 | Set clock | ←→ / ↑↓ / 0–9 / SPACE | Pick a field / change it / type the digits (it moves to the next field) / write the clock |
 
@@ -518,6 +521,8 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   検証班にばれます。
 - **NPC 1000 人のグラフ:** DAU・新規・課金率・引退・売上。本編を終えた後は、史実の DAU と売上を点線で重ねます。
   240 日目に、利益と DAU でサービスを続けるかが決まります。
+- **運営側から攻略スレ**（回している間に 5）: 同じスレですが、雑談が模型の数字に合わせて替わり（引退・DAU の増減・
+  詫び石・確率アップ・確率操作がばれた）、どの「情報」が本当だったかが運営にだけ分かります。
 - **終わると:** 決算、通信簿（最大の DAU・いちばん辞めた日・配った石・残った人）、6 通りの運営の結末。
   15 日ごとに、画面の下に社内チャットが流れます。
 
@@ -554,6 +559,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | お店 | 4 | 宿屋: 1 翌朝まで寝る、2 次の予定まで休む |
 | 運営モード | 1／2 | 始めるとき: 早回し／じっくり |
 | | 1〜5／ESC | 選ぶ（1 が史実。企画会議では見送る）／やめる（確かめてから） |
+| | 5（回している間） | 攻略スレをのぞく |
 | タイトル | 3／9／0／ESC | 運営モード／時刻修正／ライセンスの画面／開発用の診断画面 |
 | 時刻修正 | ←→／↑↓／0〜9／スペース | 欄を選ぶ／変える／数字を打つ（桁が埋まると次の欄へ）／時計に書く |
 

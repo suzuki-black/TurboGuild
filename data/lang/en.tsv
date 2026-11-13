@@ -1252,7 +1252,7 @@ T_OPS_NIN	 left	!
 T_OPS_MEETING	Meeting, day	!
 T_OPS_DAYP	Day
 T_OPS_DAYS	 
-T_OPS_GUIDE_RUN	ESC:Quit
+T_OPS_GUIDE_RUN	5:BBS ESC:Quit
 T_OPS_GUIDE_PICK	1-3:Pick
 T_OPS_GUIDE_NEXT	SPACE:Next
 T_OPS_JUDGE	Score	!
@@ -1437,6 +1437,8 @@ T_TH_BD5	500th line looks like %	!
 T_TH_BDZ	Anyone who plays gets top 500	!
 T_TH_DEMA0	Fake. It won't go that high	!
 T_TH_DEMA1	That's way too low. Trolling?	!
+T_TH_DEMA2	Way too high. Nobody gets that	!
+T_TH_DEMA3	Too low. You'd miss the cut	!
 T_TH_BOON0	This event's boon is %. Get it	!
 T_TH_BOON1	% made my runs so much easier	!
 T_TH_NEXT0	Heard % is a must next event	!
@@ -1477,6 +1479,34 @@ T_TH_END2	Thanks for everything	!
 T_TH_END3	Running to the very end	!
 T_TH_END4	Spend all your gems	!
 T_TH_END5	See you in another game	!
+T_TH_OHEAD	Read the BBS	!
+T_TH_TRUE	-> About right (real: %)	!
+T_TH_LIE	-> Fake (real: %)	!
+T_TH_LIEC	-> Fake (real boon: %)	!
+T_TH_OEND	So it's shutting down...	!
+T_TH_OCONT	It's staying open!	!
+T_TH_ORIG	They cut the rates?! No more money	!
+T_TH_OOUT	Server down? Can't log in	!
+T_TH_OCOMP	Complete gacha is gone	!
+T_TH_OGLUT	Free gems, yum	!
+T_TH_OBOOST	Rate up! Time to pull	!
+T_TH_OCOLLAB	Collab is great. Love that anime	!
+T_TH_OQ0	Everyone's quitting	!
+T_TH_OQ1	This game is done	!
+T_TH_OQ2	All my friends are gone	!
+T_TH_OQ3	Devs, reading? People are leaving	!
+T_TH_OD0	Getting quiet in here	!
+T_TH_OD1	Half my guild never logs in	!
+T_TH_OD2	This thread is slow lately	!
+T_TH_OD3	Anyone still running the event?	!
+T_TH_OU0	Lots of people now	!
+T_TH_OU1	Best devs ever	!
+T_TH_OU2	So many new players	!
+T_TH_OU3	Best time to play	!
+T_TH_ON0	Devs, are you reading?	!
+T_TH_ON1	Gems pls	!
+T_TH_ON2	Next event when?	!
+T_TH_ON3	New gacha when?	!
 T_RS_TITLE	Members	!
 T_PERSON_N	ppl	!
 T_RS_EMPTY	No one is in the guild	!

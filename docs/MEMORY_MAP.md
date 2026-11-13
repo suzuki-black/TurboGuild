@@ -50,10 +50,7 @@
 | 27 | 8000h データA | NPC1 | build/npc1.bin | NPC（後半） |
 | 28 | 8000h データA | NPCPOW | build/npcpow.bin | 総戦力順の NPC 添字 |
 | 29 | 8000h データA | TIMELINE | build/timeline.bin | 運営年表 |
-| 30 | A000h データB | TEXT0 | build/text0.dat | 文字列の目次と本体 |
-| 31 | A000h データB | TEXT1 | build/text1.dat | 文字列（溢れ） |
-| 32 | A000h データB | TEXT2 | build/text2.dat | 文字列（溢れ） |
-| 33 | A000h データB | TEXT3 | build/text3.dat | 文字列（溢れ） |
+| 30-33 | - | - | - | 空き（文字列は 4 ページで足りなくなったので、続けて 5 ページ取れる 105〜109 へ移した） |
 | 34 | VRAM へ | ATLAS0 | build/atlas0.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
 | 35 | VRAM へ | ATLAS1 | build/atlas1.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
 | 36 | VRAM へ | ATLAS2 | build/atlas2.bin | 画面部品のアトラス（起動時に VRAM ページ 1 へ） |
@@ -125,4 +122,9 @@
 | 102 | 6000h コード | UI_WIKI | code: src/ui/wiki_ui.c src/ui/clock_ui.c | サービス終了後のまとめ記事、時計を合わせる画面とタイトルの時計（バンク 2 が埋まったので） |
 | 103 | 6000h コード | UI_HELP | code: src/ui/help_ui.c | ヘルプ・規約・お問い合わせ・退会（お知らせの 4） |
 | 104 | 6000h コード | UI_THREAD | code: src/ui/thread_ui.c src/core/thread.c | 攻略スレ（お知らせの 5）。ボーダーの正解は data/border.h |
-| 105-127 | - | - | - | 空き |
+| 105 | A000h データB | TEXT0 | build/text0.dat | 文字列の目次と本体（文字列のページは続いていること。text.c は TEXT0 + n を開く） |
+| 106 | A000h データB | TEXT1 | build/text1.dat | 文字列（溢れ） |
+| 107 | A000h データB | TEXT2 | build/text2.dat | 文字列（溢れ） |
+| 108 | A000h データB | TEXT3 | build/text3.dat | 文字列（溢れ） |
+| 109 | A000h データB | TEXT4 | build/text4.dat | 文字列（溢れ） |
+| 110-127 | - | - | - | 空き |

@@ -74,7 +74,7 @@ FAR(void, thread_post, (u16 p, ThPost *o))
     ThPost q;
     o->no = (u16)(p % TH_PART + 1);
     o->id = th_hash(p, 0x1D2D);
-    o->card = 0; o->ref = 0; o->ev = 0; o->tier = 0; o->pct = 0; o->lie = 0;
+    o->card = 0; o->ref = 0; o->real = 0; o->ev = 0; o->tier = 0; o->pct = 0; o->lie = 0;
     o->kind = TH_BORDER;
     if (border_of(p, o)) return;
     o->ev = 0;
@@ -83,7 +83,7 @@ FAR(void, thread_post, (u16 p, ThPost *o))
             if (!border_of((u16)(p - k), &q) || !q.lie) continue;
             o->kind = TH_DEMA;
             o->ref = (u16)(o->no - k);
-            o->text = q.pct > 100 ? T_TH_DEMA0 : T_TH_DEMA1;
+            o->text = (u16)((q.pct > 100 ? T_TH_DEMA0 : T_TH_DEMA1) + 2 * (g & 1));   /* 盛りすぎ / 甘すぎ、2 通り */
             return;
         }
     }
@@ -95,6 +95,7 @@ FAR(void, thread_post, (u16 p, ThPost *o))
             if (e.bonus_card) {
                 o->kind = ev ? TH_BOON : TH_NEXT;
                 o->lie = (u8)((g & 3) == 0);
+                o->real = e.bonus_card;
                 o->card = o->lie ? other_card(g >> 2, e.bonus_card) : e.bonus_card;
                 o->text = (u16)((ev ? T_TH_BOON0 : T_TH_NEXT0) + ((g >> 8) & 1));
                 return;

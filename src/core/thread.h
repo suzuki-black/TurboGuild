@@ -28,6 +28,7 @@ typedef struct {
     u16 text;        /* 文（% にカード名か点を入れる） */
     u16 card;        /* TH_BOON / TH_NEXT のカード */
     u16 ref;         /* >>N（0 = なし） */
+    u16 real;        /* TH_BOON / TH_NEXT: 本当の特効カード（運営モードの答え合わせ） */
     u8  kind;
     u8  ev;          /* TH_BORDER: イベント（1..EVENT_COUNT） */
     u8  tier;        /* TH_BORDER: 0 = 10 位・1 = 100 位・2 = 500 位 */
@@ -38,4 +39,5 @@ typedef struct {
 u16  thread_last(void);                 /* いちばん新しいレスの通し番号（ゲーム内の時刻から。終了の日で止まる） */
 void thread_post(u16 p, ThPost *o);     /* 通し番号 p のレス */
 u8   thread_event_at(u16 day);          /* その日に開催中のイベント（無ければ 0） */
+void ops_thread(void);                  /* 運営モード（ui/thread_ui.c）: その日のスレを、模型の様子と答え合わせつきで見せる */
 #endif

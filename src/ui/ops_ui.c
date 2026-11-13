@@ -10,6 +10,7 @@
 void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/opsim.h"
+#include "../core/thread.h"
 #include "../core/save.h"
 #include "../core/tables.h"
 #include "../data/tables.h"
@@ -428,6 +429,7 @@ FAR(void, ops_update, (void))
         g_dirty = 1;
         return;
     }
+    if (d == 5 && g_ops.day) { ops_thread(); return; }   /* 攻略スレをのぞく（DECISIONS #105） */
     if (ops_meeting(&mt)) {
         if (!mt.n) ops_decide(0);          /* 判定の会議は選ばない（先に決めて、箱で見せる） */
         st = ST_MEET;

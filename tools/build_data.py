@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "build"
 GEN = ROOT / "src" / "data"
 PAGE_PAYLOAD = 8192 - 16
-TEXT_PAGES = 4                     # docs/MEMORY_MAP.md の TEXT0..TEXT3 と一致させる
+TEXT_PAGES = 5                     # docs/MEMORY_MAP.md の TEXT0..TEXT4 と一致させる
 
 RARITY = {"N": 0, "R": 1, "SR": 2, "SSR": 3, "USR": 4, "XUSR": 5}
 ELEMENT = {"炎": 0, "水": 1, "雷": 2, "光": 3, "闇": 4}
