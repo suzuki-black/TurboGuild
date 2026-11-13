@@ -81,7 +81,8 @@ void board_roster(Roster *r);
 
 /* ミニメール（DECISIONS #96）。仲間から自分宛ての便り。新しい順、届いたものだけ。既読は持たない */
 #define MAIL_MAX 10
-typedef struct { u16 npc; u16 day; u16 text; } MailRow;
+typedef struct { u16 npc; u16 day; u16 text; } MailRow;   /* npc = MAIL_OPS は運営事務局から（お問い合わせの返事） */
+#define MAIL_OPS 0xFFFFu
 typedef struct { u8 n; MailRow r[MAIL_MAX]; } MailList;
 void board_mail(MailList *l);
 

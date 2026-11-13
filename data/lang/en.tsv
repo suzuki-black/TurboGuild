@@ -358,10 +358,15 @@ T_GIFT_GOT	A gift of gems arrived
 T_TO_TITLE	Return to the title?
 T_GUIDE_HOME2	1-8:Menu ESC:Title
 T_BOARD_TITLE	Guild Board
-T_NEWS_GUIDE	SP:Board 1:Album 2:Visit 3:Mail
+T_NEWS_GUIDE	SP:Board 1:Album 2:Visit 3:Mail	!
 T_BOARD_GUIDE	U/D:More 1:Members ESC:Back	!
 T_BOARD_EMPTY	No posts yet.
 T_BOARD_HEAD	[Guild] 
+T_AD0	[AD] New RPG "Starsong Ark": pre-register now!	!
+T_AD1	[AD] Relax on a sheep farm in "Fluffy Farm"	!
+T_AD2	[AD] "Battle! Cat Shogun": 10 free pulls now	!
+T_AD3	[AD] Be a writer on "Mobile Novel Square"	!
+T_AD_II	[AD] "TurboGuild II": pre-register for a bonus!	!
 T_BOARD_SAY	: 
 T_BOARD_LEFT	 has left the guild.
 T_BOARD_DAY	d
@@ -1378,6 +1383,45 @@ T_ML_LAST0	Thanks for staying to the end. I kept going because of you, $	!
 T_ML_LAST1	It's over. If we meet in another game, let's form a guild again	!
 T_ML_LASTG0	I'd stopped playing, but heard it's ending. Those days were fun	!
 T_ML_LASTG1	Long time. Saw the shutdown news. Well done to the end, $	!
+T_ML_OPS	from TurboGuild Support	!
+T_ML_ASK0	Thank you for contacting us.   We checked your history: your  gems were granted correctly.   Thank you for playing.
+T_ML_ASK1	Thank you for contacting us.   We are sorry, but under our    terms we cannot give refunds.  Thank you for playing.
+T_ML_ASK2	Thank you for contacting us.   We looked into it but found no sign of unauthorized access.   Thank you for playing.
+T_ML_ASK3	Thank you for contacting us.   We value your feedback and willuse it to improve the service. Thank you for playing.
+T_HL_LINK	Help / Terms / Contact
+T_HL_TITLE	Help
+T_HL_M0	FAQ
+T_HL_M1	Legal notice
+T_HL_M2	Contact us
+T_HL_M3	Delete account	!
+T_HL_NOTE	Try the FAQ first
+T_HL_GUIDE	1-4:Pick ESC:Back
+T_HL_BACK	SPACE:Back
+T_HL_FAQ0	Q. What are the gacha rates?	!
+T_HL_FAQ1	A. The rates are only a guide.
+T_HL_FAQ2	Q. A card was stolen
+T_HL_FAQ3	A. Cards in a deck are safe.
+T_HL_FAQ4	Q. Do I pay for data?
+T_HL_FAQ5	A. Yes. A flat-rate plan helps.
+T_HL_LAW0	Seller: TurboGuild Support
+T_HL_LAW1	Address: given on request
+T_HL_LAW2	Price: shown when buying
+T_HL_LAW3	Payment: with your phone bill
+T_HL_LAW4	Returns: not accepted (digital content)
+T_HL_LAW5	Device: MSX turboR
+T_HL_ASKQ	Pick a topic
+T_HL_ASK0	Gems not added
+T_HL_ASK1	Refund, please
+T_HL_ASK2	Data was lost
+T_HL_ASK3	Feedback
+T_HL_ASKG	1-4:Pick ESC:Back
+T_HL_SEND	Send this inquiry?
+T_HL_SENT	Sent. A reply may take some time.
+T_HL_QUIT0	Really delete your account?	!
+T_HL_QUIT1	You will lose all your cardsand gems. Are you sure?
+T_HL_QUIT2	Leave your guild behind?
+T_HL_STAY	Thank you! We hope you keep enjoying TurboGuild!
+T_HL_PC	Please use our PC site to   delete your account.	!
 T_RS_TITLE	Members	!
 T_PERSON_N	ppl	!
 T_RS_EMPTY	No one is in the guild	!

@@ -68,6 +68,8 @@ FAR(void, board_mail, (MailList *l))
     u16 s = (u16)(g_save.g_time / BOARD_SLOT_SECS), d = s >> 2;
     u8 k, g;
     l->n = 0;
+    if (g_save.ask_day && d + 1 >= g_save.ask_day)       /* お問い合わせの翌日に、運営の定型の返事（ui/help_ui.c） */
+        mail_add(l, MAIL_OPS, (u16)(g_save.ask_day - 1), (u16)(T_ML_ASK0 + (g_save.ask_kind & 3)));
     if (!g_save.guild || g_save.guild > GUILD_COUNT) return;
     setup(&w);
     if (g_save.memo[MEMO_GUILD]) {                       /* 入った日に、ギルマスからあいさつ */

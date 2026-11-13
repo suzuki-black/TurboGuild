@@ -200,7 +200,7 @@ SCREEN(scr_roster, 0, roster_update, roster_draw, 0)
 /* 本文を写して $ に自分の名前を入れ、32 桁で折り返して描く。次の y */
 static u8 body(u8 y, u16 id, u8 bg)
 {
-    char b[96];
+    char b[144];                                  /* 運営の定型の返事は全角 64 字ほど */
     const char *s = txt_ptr(id);
     u8 n = 0, k;
     for (; *s && n < sizeof(b) - 1; s++) {
@@ -234,9 +234,12 @@ FAR(void, mail_draw, (void))
         vdp_fill(0, y, SCREEN_W, 16, bg);
         cx = txt_num(1, y, l.r[k].day + 1, COL_LGRAY, bg);
         cx = txt_id(cx, y, T_BOARD_DAY, COL_LGRAY, bg);
-        cx = txt_id((u8)(cx + 1), y, T_ML_FROM, COL_LGRAY, bg);   /* 英語は「from 名前」、日本語は「名前さんから」 */
-        cx = name_at(cx, y, l.r[k].npc, COL_CYAN, bg);
-        txt_id(cx, y, T_ML_FROM2, COL_LGRAY, bg);
+        if (l.r[k].npc == MAIL_OPS) txt_id((u8)(cx + 1), y, T_ML_OPS, COL_YELLOW, bg);   /* 運営事務局より */
+        else {
+            cx = txt_id((u8)(cx + 1), y, T_ML_FROM, COL_LGRAY, bg);   /* 英語は「from 名前」、日本語は「名前さんから」 */
+            cx = name_at(cx, y, l.r[k].npc, COL_CYAN, bg);
+            txt_id(cx, y, T_ML_FROM2, COL_LGRAY, bg);
+        }
         y = body((u8)(y + 16), l.r[k].text, bg);
         y = (u8)(y + 2);
     }
@@ -252,3 +255,30 @@ FAR(void, mail_update, (void))
 }
 
 SCREEN(scr_mail, 0, mail_update, mail_draw, 0)
+
+/* ---- ピクトの行（DECISIONS #102）: アンテナ・電池・時計。マイページの最下段の左 8 桁（流れるお知らせはその右） ---- */
+
+#define PICT_Y 196
+
+FAR(void, pict_row, (void))
+{
+    u32 t = g_save.g_time % GSEC_PER_DAY;
+    u16 m = (u16)(t / 60);
+    u8 k, bars = 3, cells;
+    char s[6];
+    u16 h = (u16)((g_save.g_time / 120) * 0x9E37u);
+    vdp_fill(0, PICT_Y, PICT_COLS * 8, 16, COL_BLACK);
+    if ((h >> 11) == 0) bars = 1;                 /* 電波はときどき弱くなる */
+    else if ((h >> 13) == 0) bars = 2;
+    for (k = 0; k < 3; k++)                       /* アンテナ: 3 本の棒 */
+        vdp_fill((u16)(2 + k * 3), (u16)(PICT_Y + 12 - k * 3), 2, (u16)(3 + k * 3), k < bars ? COL_WHITE : COL_DGRAY);
+    cells = (u8)((u16)g_save.ap * 3 / (AP_MAX ? AP_MAX : 1) + (g_save.ap ? 1 : 0));   /* 電池 = AP（0〜3 目盛り） */
+    if (cells > 3) cells = 3;
+    vdp_fill(11, PICT_Y + 5, 10, 7, COL_LGRAY);  /* 電池の枠（x 11〜20、頭は 21） */
+    vdp_fill(21, PICT_Y + 7, 1, 3, COL_LGRAY);
+    vdp_fill(12, PICT_Y + 6, 8, 5, COL_BLACK);
+    for (k = 0; k < cells; k++) vdp_fill((u16)(12 + k * 3), PICT_Y + 7, 2, 3, cells <= 1 ? COL_RED : COL_GREEN);
+    s[0] = (char)('0' + m / 600); s[1] = (char)('0' + m / 60 % 10); s[2] = ':';
+    s[3] = (char)('0' + m % 60 / 10); s[4] = (char)('0' + m % 10); s[5] = 0;
+    txt_draw(3, PICT_Y, s, COL_WHITE, COL_BLACK);
+}

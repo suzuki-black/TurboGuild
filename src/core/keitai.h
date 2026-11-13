@@ -37,4 +37,8 @@ typedef struct {
 } Maint;
 u8   maint_now(Maint *m);               /* いまメンテ中なら 1（m にその回） */
 u16  maint_comp(void);                  /* 終わったメンテのお詫びの石をまだ配っていなければ配る。配った個数（0 = なし） */
+
+/* ピクトの行（DECISIONS #102）: マイページの最下段の左端に、アンテナ・電池（AP）・時計（ゲーム内の時刻） */
+#define PICT_COLS 8
+void pict_row(void);
 #endif

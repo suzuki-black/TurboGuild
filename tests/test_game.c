@@ -1018,6 +1018,15 @@ static void test_letters(void)
         g_save.g_time = 1UL * GSEC_PER_DAY;                  /* 入った次の日: ギルマスのあいさつだけ */
         board_mail(&ml);
         CHECK(ml.n == 1 && ml.r[0].text == T_ML_HELLO && ml.r[0].day == 0);
+        /* お問い合わせ（DECISIONS #103）: 1 日目に送ると、その日はまだ来ず、2 日目に運営から定型の返事 */
+        g_save.ask_day = 1 + 2; g_save.ask_kind = 1;
+        g_save.g_time = 1UL * GSEC_PER_DAY + 23UL * 3600;
+        board_mail(&ml);
+        CHECK(ml.n == 1 && ml.r[0].text == T_ML_HELLO);
+        g_save.g_time = 2UL * GSEC_PER_DAY;
+        board_mail(&ml);
+        CHECK(ml.n == 2 && ml.r[0].npc == MAIL_OPS && ml.r[0].text == T_ML_ASK1 && ml.r[0].day == 2 && ml.r[1].text == T_ML_HELLO);
+        g_save.ask_day = 0; g_save.ask_kind = 0;
         g_save.memo[MEMO_GUILD] = 0;
     }
     CHECK(ny > 3 && bday > 10 && bdre > 0 && newb > 20 && newgone > 10 && off > 3 && offa > 3 && offyou > 0 && quiet_ok);

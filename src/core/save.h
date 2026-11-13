@@ -7,7 +7,7 @@
 #include "memo.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  18
+#define SAVE_VERSION  19
 #define SAVE_MIN_VERSION 5           /* 読めるいちばん古い版（それより前はカードの形が違う） */
 /* ★上位互換の決まり（DECISIONS #78）: 欄は必ず末尾に足し、SAVE_VERSION を 1 上げ、
  *   save.c の save_size[] にその版の大きさを足す。古い版は「その版の大きさ」で検査して読み、
@@ -103,6 +103,9 @@ typedef struct {
     u16 maint_paid;      /* お詫びの石を配ったメンテの日 + 1（0 = まだ） */
     /* v18: 運営の結末（core/opsim.h の OPS_E_*, DECISIONS #100）。見たもののビット */
     u8  ops_ends;
+    /* v19: お問い合わせ（ui/help_ui.c, DECISIONS #103）。運営からの返事が届く日 + 1（0 = 送っていない）と、問い合わせの種類 */
+    u16 ask_day;
+    u8  ask_kind;
 } SaveData;
 
 u16 save_crc(const SaveData *s);           /* その版の大きさで計算する */

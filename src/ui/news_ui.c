@@ -10,8 +10,10 @@
 #include "../core/ranking.h"
 #include "../core/save.h"
 #include "../core/tables.h"
+#include "../core/time.h"
 #include "../core/timeline.h"
 #include "../data/screens.h"
+#include "../data/tables.h"
 #include "../data/text_ids.h"
 #include "../sys/gfx.h"
 #include "../sys/input.h"
@@ -149,6 +151,8 @@ FAR(void, ticker_next, (void))
         post_text(&l.post[0]);
     } else if ((g_ticker_k & 3) == 3 && rival_text((u8)((g_ticker_k >> 2) & 1))) {
         /* ライバル（4 本に 1 本。イベント中は追ってくる人と交互） */
+    } else if ((g_ticker_k & 7) == 5) {               /* 広告（8 本に 1 本, DECISIONS #102）。終了の告知の後は自社の続編 */
+        add_text(time_gday(g_save.g_time) >= SERVICE_END_DAY - 30 ? T_AD_II : (u16)(T_AD0 + (g_ticker_k >> 3) % 4));
     } else {
         feed_line((u16)(g_ticker_k >> 1), &f);
         feed_text(&f);
@@ -191,12 +195,15 @@ FAR(void, news_draw, (void))
     cx = txt_id(18, 100, T_ONLINE, COL_LGRAY, COL_DBLUE);   /* いまつないでいる人数 */
     cx = txt_num(cx, 100, online_now(act), COL_CYAN, COL_DBLUE);
     txt_id(cx, 100, T_PERSON, COL_LGRAY, COL_DBLUE);
-    for (k = 0, y = 118; k < 4; k++) {
+    for (k = 0, y = 118; k < 3; k++) {
         len = 0;
         feed_line(k, &f);
         feed_text(&f);
         y = wrapped(y, COL_WHITE, k & 1 ? COL_BLACK : COL_DGRAY, (u8)(y + 16));   /* 流れは 1 件 1 行 */
     }
+    vdp_fill(0, 168, SCREEN_W, 16, COL_BLACK);       /* 携帯サイトの下のリンク: ヘルプ・規約・お問い合わせ（DECISIONS #103） */
+    ui_key(4, 12, 170);
+    txt_id(3, 168, T_HL_LINK, COL_CYAN, COL_BLACK);
     ui_guide(T_NEWS_GUIDE);
 }
 
@@ -207,6 +214,7 @@ FAR(void, news_update, (void))
     if (input_digit() == 1) { psg_beep(0x80, 4); screen_change(&scr_album); return; }   /* 思い出アルバム */
     if (input_digit() == 2) { psg_beep(0x80, 4); screen_change(&scr_foot); return; }    /* 足あと */
     if (input_digit() == 3) { psg_beep(0x80, 4); screen_change(&scr_mail); return; }    /* メール */
+    if (input_digit() == 4) { psg_beep(0x80, 4); g_cursor = 0; screen_change(&scr_help); return; }   /* ヘルプ・規約・お問い合わせ */
     if (p & BTN_CANCEL) screen_change(&scr_home);
 }
 

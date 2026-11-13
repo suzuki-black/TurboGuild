@@ -136,6 +136,16 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.maint_paid == 7 && s.ops_ends == 0);
+    /* v18 も読め、v19 で足したお問い合わせは 0 から */
+    save_new(&s, 1);
+    s.ops_ends = 0x15;
+    s.ask_day = 12; s.ask_kind = 2;
+    s.magic = SAVE_MAGIC;
+    s.version = 18;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.ops_ends == 0x15 && s.ask_day == 0 && s.ask_kind == 0);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;

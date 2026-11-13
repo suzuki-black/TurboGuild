@@ -36,6 +36,7 @@ void bgm_play(u8 song);
 #define CELL_W   64
 #define CELL_H   43        /* 絵 2〜26・名前 24〜40・枠 41〜42 */
 #define TICK_Y   196       /* 流れるお知らせは画面の最下段（196〜211） */
+#define TICK_X0  PICT_COLS * 8   /* 左端はピクトの行（アンテナ・電池・時計, core/keitai.h）。流すのはその右 */
 
 static const u16 labels[ITEMS] = {
     T_M_QUEST, T_M_GACHA, T_M_CARD, T_M_DECK, T_M_SHOP, T_M_RANK, T_M_SAVE, T_M_NEWS,
@@ -140,7 +141,8 @@ static void ticker(void)
         if (++g_ticker_gap < 6) { c = ' '; } else { ticker_next(); g_ticker = 0; g_ticker_gap = 0; c = (u8)s[0]; }
     }
     w = (c >= 0x81 && c <= 0x9F) || c >= 0xE0 ? 2 : 1;
-    gfx_move((u8)(w * 8), TICK_Y, (u8)(SCREEN_W - w * 8), 16, 0, TICK_Y);
+    gfx_move((u8)(TICK_X0 + w * 8), TICK_Y, (u8)(SCREEN_W - TICK_X0 - w * 8), 16, TICK_X0, TICK_Y);
+    vdp_fill(TICK_X0, TICK_Y, 8, 16, COL_DGRAY);  /* 左端で半分だけ残る全角の字を消す（ピクトの行との境） */
     ch[0] = (char)c;
     ch[1] = w == 2 ? s[g_ticker + 1] : 0;
     ch[2] = 0;
@@ -376,6 +378,7 @@ FAR(void, home_draw, (void))
     banner();
     for (i = 0; i < ITEMS; i++) cell(i);
     vdp_fill(0, TICK_Y, SCREEN_W, 16, COL_DGRAY);
+    pict_row();                                     /* アンテナ・電池・時計（DECISIONS #102） */
     if (!g_ticker_buf[0]) ticker_next();
     g_ticker = 0;
     g_ticker_gap = 0;
@@ -459,6 +462,7 @@ FAR(void, home_update, (void))
         u8 ap = g_save.ap;
         player_ap_update();
         if (g_save.ap != ap) ui_status_block(20);
+        pict_row();
     }
 }
 
