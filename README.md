@@ -2,7 +2,7 @@
 # TurboGuild
 
 <p align="center">
-  <img src="docs/img/title_en.png" width="640" alt="TurboGuild — title screen (English version)">
+  <img src="docs/img/title_en.png" width="640" alt="TurboGuild — title screen with the MSX clock and Set clock at the bottom (English version)">
 </p>
 
 > ⚠️ **This is a prototype** (work in progress), published for feedback and experimentation.
@@ -22,7 +22,7 @@
 **Latest / 最新:** v0.3.1
 
 <p align="center">
-  <img src="docs/img/screens_people_en.png" width="640" alt="Guild board, a theft, going stealing, the ending and the memory album (English version)">
+  <img src="docs/img/screens_events_en.png" width="640" alt="Events: a hunt with help from friends, a raid boss going down, a trial, a duel and a guild war (English version)">
 </p>
 
 **Language / 言語:** [🇬🇧 English](#english) · [🇯🇵 日本語](#japanese)
@@ -38,6 +38,7 @@
 - [The social-game loop](#the-social-game-loop)
 - [Time](#time)
 - [After the end](#after-the-end)
+- [Operator mode](#operator-mode)
 - [Your first hour](#your-first-hour)
 - [Controls](#controls)
 - [Requirements](#requirements)
@@ -103,6 +104,10 @@
 - **1,000 players.** They level up, pull SSRs, climb the rankings and quit in waves along the operations timeline,
   all from formulas. The news marquee shows who pulled an SSR, who leveled up, who logged in.
 
+<p align="center">
+  <img src="docs/img/screens_people_en.png" width="640" alt="The guild board, the member list, a profile, mail, a thief's note and a parting gift (English version)">
+</p>
+
 ### The social-game loop
 - **The feel of the era's phones:** menus picked with number keys, a "My Page" hub, a scrolling marquee,
   auto-battles you watch, and stamina (AP) for exploring.
@@ -128,9 +133,16 @@
 - **Maintenance** every two weeks (13:00–15:00) and some emergency ones on event start days; you can't enter until
   it ends, it is sometimes extended, and apology gems follow. Payday also brings your monthly bill, and News shows
   how many players are online right now.
+- **The clock.** The title shows the MSX's clock with **[9] Set clock**. If the clock looks wrong at boot (before your
+  last save, more than 30 days after it, or out of range), it turns red and time away is not counted until you set
+  it — a turboR without a clock battery comes up with a random date.
 - **The operations timeline:** rate-up campaigns, inflation (newer cards are stronger), apology gems, waves of
   players quitting, **USR** on day 90 and **XUSR** on day 180 (older rarities become common; event bosses are tuned
   for the newest), the end-of-service notice — and the shutdown.
+
+<p align="center">
+  <img src="docs/img/screens_keitai_en.png" width="640" alt="Maintenance, the monthly bill, online players, footprints, writing styles on the board and the red clock (English version)">
+</p>
 
 ### After the end
 - **The last hour:** from 23:00 on the last day, the mates still there post every five minutes; keep the board open
@@ -143,19 +155,31 @@
   Open it any time from News (1), and from the title after the end. After the end, 3 there opens the mates' last
   letters and 4 an encyclopedia-style article about TurboGuild, partly written from your save. The title itself
   ages with real time: refunds, then refunds closed, then a 404, then another company's ad.
-- **Operator mode** (title, 3 — open from the start; history stays hidden as "???" until you finish the main game):
-  run the same 270 days as the operator. Twelve meetings at the timeline's turning points (drop rates, pity, ad
-  budgets with a CVR cutoff, rate-ups, platform promotion, new rarities, apology gems) offer what history did and
-  other options. Every 15 days a **planning meeting** offers five cards: an event (raid boss, East-West guild war,
-  anime collab, ranking), a gacha (step-up, multi-tier box, complete gacha, a rerun), monetization (monthly pass,
-  lucky bag, rewards for payers only) or a squeeze (quietly cut the odds, remove the pity, skimp on apology gems) —
-  or skip. Choose **Fast** (meetings only, ~2 minutes) or **Full**, which adds sixteen daily calls: server trouble,
-  support mails from players in the model, and the CEO's ideas. Watch DAU, new players, the paying rate, quits and
-  sales for 1,000 NPCs (with history drawn as dotted lines once you have finished the game); on day 240, profit
-  and DAU decide whether the service goes on. A report card and one of six operator endings close the run.
 
 <p align="center">
-  <img src="docs/img/screens_ops_en.png" width="640" alt="Operator mode: a meeting, the graph and the results (English version)">
+  <img src="docs/img/screens_end_en.png" width="640" alt="The last hour on the board, the connection dropping at midnight, the aged title, the memory album and the wiki article (English version)">
+</p>
+
+### Operator mode
+Title, 3 — open from the start. Run the same 270 days from the other side.
+- **Fast or Full.** Fast is the meetings only (about 2 minutes). Full adds sixteen daily calls: server trouble (how
+  to announce the maintenance, how many gems to give), support mails from players in the model (missing gems, a
+  child's purchase, a hacked account, a thank-you) and the CEO's sudden ideas. They hit dissatisfaction, logins and
+  sales directly — cold answers earn more and lose players.
+- **Twelve meetings** at the timeline's turning points: drop rates, pity, ad budgets with a CVR cutoff, rate-ups,
+  platform promotion, new rarities, apology gems. Option 1 is what history did; **until you finish the main game,
+  the "history" lines are hidden as "???"**.
+- **Planning meetings** every 15 days, five cards each: skip, an event (raid boss, East-West guild war, anime
+  collab, ranking), a gacha (step-up, multi-tier box, complete gacha, a rerun), monetization (monthly pass, lucky
+  bag, rewards for payers only) or a squeeze (quietly cut the odds, remove the pity, skimp on apology gems).
+  Complete gacha is banned by industry self-regulation on day 200; rigged odds get exposed sooner or later.
+- **A graph of 1,000 NPCs:** DAU, new players, the paying rate, quits and sales. After you finish the main game,
+  history's DAU and sales are drawn as dotted lines. On day 240, profit and DAU decide whether the service goes on.
+- **At the end:** the results, a report card (peak DAU, the worst day for quitting, gems given, who was left) and one
+  of six operator endings. Office chat runs at the bottom of the screen every 15 days.
+
+<p align="center">
+  <img src="docs/img/screens_ops_en.png" width="640" alt="Operator mode: Fast or Full, a planning meeting, a support mail, the graph with history, the report card and an ending (English version)">
 </p>
 
 ### Your first hour
@@ -164,9 +188,11 @@
    During an event or guild war, 9 opens it from the banner.
 3. **Quest (1):** pick an area and press SPACE to advance. 0 switches Normal / Save / All-out; 6 builds a deck
    for the enemy.
-4. **Check the board:** News (8) → SPACE. Come back after a gacha or after the inn and see who noticed.
+4. **Check the board:** News (8) → SPACE. Come back after a gacha or after the inn and see who noticed. On the
+   board, 1 shows the members; on News, 2 shows footprints and 3 your mail.
 5. **Keep cards you care about in a deck** (any of A–C) — those can't be stolen.
 6. **Short on time?** Shop (5) → 4 Inn → wait until the next event or guild war battle.
+7. **On real hardware, check the clock** at the bottom of the title; if it is red or wrong, press 9 to set it.
 
 ### Controls
 | Where | Input | Action |
@@ -184,8 +210,10 @@
 | Guild board | 1 | Members (SPACE: profile) |
 | Memories (after the end) | 1 / 3 / 4 | Cards / last letters / wiki article |
 | Shop | 4 | Inn: 1 sleep till morning, 2 wait for the next plan |
-| Operator mode | 1–5 / ESC | Pick an option (1 is history, or skip in a planning meeting) / stop (asks first) |
+| Operator mode | 1 / 2 | At the start: Fast / Full |
+| | 1–5 / ESC | Pick an option (1 is history, or skip in a planning meeting) / stop (asks first) |
 | Title | 3 / 9 / 0 / ESC | Operator mode / set the clock / license screen / developer diagnostics |
+| Set clock | ←→ / ↑↓ / 0–9 / SPACE | Pick a field / change it / type the digits (it moves to the next field) / write the clock |
 
 After the service ends, the title offers Memories (the album; 1 there shows your cards), Reset memories, the staff
 roll (with the ending), and operator mode.
@@ -244,17 +272,18 @@ When starting openMSX by hand, always pass `-romtype ASCII8`:
 openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild.rom -romtype ASCII8 -diska bin/save.dsk
 ```
 
-On real hardware, write the ROM to an ASCII8-capable flash cartridge with the **ASCII8 mapper type**.
+On real hardware, use an ASCII8-capable cartridge: write the ROM to a flash cartridge with the **ASCII8 mapper
+type**, or load it into a 1 MB RAM cartridge (it has run on an FS-A1ST this way, from an ESERAMair).
 
 ### Automated checks
 | Command | What it checks |
 |---|---|
-| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, guild war, timeline, rival, board, stealing, inn, memories and endings, operator mode, saves, …) |
+| `make test` | PC unit tests for `core/` (gacha, battle, fusion, events, guild war, timeline, rival, the guild board and how mates leave, members and mail, maintenance and footprints, stealing, inn, memories and endings, operator mode with planning meetings and its history table, saves, …) |
 | `make check` | Boot → save → reset → reboot; the RTC difference × 10 is added to in-game time |
 | `make check-nodisk` | Boots without a disk and carries on when you try to save |
 | `make check-msx2` | Shows "turboR only" and stops on an MSX2 |
 | `make play` | Plays automatically for 30 minutes (emulated) from a new game; progress matches across save → reset → load |
-| `make check-offline` | After a week away, "Continue" reaches My Page within 3 seconds (measured: about 2.3 s) |
+| `make check-offline` | After a week away, "Continue" reaches My Page within 3 seconds (measured: 2.3–2.9 s) |
 | `make check-timeline` | Runs days 0–271: 7 events, 2 guild wars, gifts, the end-of-service notice, the ending and the staff roll |
 | `make sim` | Economy simulation: plays 270 days per wallet course and counts cards of SSR or above |
 | `make sim-ops` | Operator mode: runs every combination of meeting choices and shows how many keep the service going (`build/sim_ops single` and `plans` compare the planning-meeting moves) |
@@ -293,19 +322,20 @@ docs/      design documents and records
 | Phase 3 | Operations timeline, 1,000-NPC pseudo-online world, news, FM music, economy simulation |
 | v0.1.0 | Harder gacha (box gacha, no pity), 121 cards, raid and battle events, guild wars, staff roll, FAT12 save disk |
 | v0.2.0 | "People over systems": guild board (replies, lives, reactions to you), rival, stealing, endings and the last mates, memory album, operator mode, inn; also element display, battle styles, leader skill, three decks |
-| v0.3.1 | The MSX clock on the title with a way to set it (for a turboR without a clock battery); first run on a real FS-A1ST |
 | v0.3.0 | How mates leave, the feature-phone air (writing styles, footprints, maintenance, bills), letters and seasons, the last hour and the afterlife of the title, and a much deeper operator mode (planning meetings, full mode, report card, six endings) |
+| v0.3.1 | The MSX clock on the title with a way to set it (for a turboR without a clock battery); first run on a real FS-A1ST |
 
 ### Scope & honest positioning
 This is an **experimental study**.
 
 - **The theme is the atmosphere of social games of that era — above all, the people in them.** Depth as a game
   comes second. The rankings, the news and your guild mates are all "plausibility" generated from formulas.
-- **Most numbers are provisional.** The economy was tuned once by simulation (`make sim`); stealing, the inn and the
-  endings have not been tuned by play yet.
+- **Most numbers are provisional.** The economy was tuned once by simulation (`make sim`); stealing, the inn, the
+  endings and most of v0.3's additions have not been tuned by play yet.
 - Operator mode runs on a small model of 1,000 NPCs tuned with `make sim-ops`, not on real data from any service.
-  Running all 270 days takes about two minutes (emulated turboR).
-- **It has not yet been verified on a real turboR.**
+  Fast mode takes about two minutes for 270 days (emulated turboR); Full mode about twenty.
+- **On a real turboR** it has run on an FS-A1ST, clock included. **Saving to a floppy has not been checked there
+  yet** — use a disk you do not need.
 - A full-screen redraw takes about 0.6 s. Entering a guild war takes about 4 s on My Page (the 16 guilds' strength is
   counted from all 1,000 NPCs once a day).
 - The BGM is driven by the VBLANK interrupt. It pauses only during disk access and resumes where it left off.
@@ -339,8 +369,8 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 ## 日本語
 
 <p align="center">
-  <img src="docs/img/title_ja.png" width="480" alt="TurboGuild 日本語版のタイトル画面">
-  <img src="docs/img/screens_people_ja.png" width="640" alt="日本語版の伝言板・盗まれた知らせ・盗みに行く画面・結末・思い出アルバム">
+  <img src="docs/img/title_ja.png" width="480" alt="TurboGuild 日本語版のタイトル画面（最下行に本体の時計と時刻修正）"><br>
+  <img src="docs/img/screens_events_ja.png" width="640" alt="日本語版のイベント（仲間の応援・レイドボス撃破・試練・対戦・ギルド対抗戦）">
 </p>
 
 - [あらすじ](#あらすじ)
@@ -349,6 +379,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - [ソシャゲの循環](#ソシャゲの循環)
 - [時間](#時間)
 - [終わった後](#終わった後)
+- [運営モード](#運営モード)
 - [はじめの 1 時間](#はじめの-1-時間)
 - [操作](#操作)
 - [動作環境](#動作環境)
@@ -409,6 +440,10 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **1000 人のプレイヤー。** レベルを上げ、SSR を引き当て、ランキングを駆け上がり、運営年表の波に合わせて辞めていきます。
   すべて式から。流れるお知らせには、誰が SSR を引いた、Lv が上がった、ログインした、が流れます。
 
+<p align="center">
+  <img src="docs/img/screens_people_ja.png" width="640" alt="日本語版の伝言板・メンバー一覧・プロフィール・メール・泥棒の置き手紙・置き土産">
+</p>
+
 ### ソシャゲの循環
 - **当時の携帯の手触り。** 数字キーで直接選ぶメニュー、マイページ中心の画面、流れるお知らせ（マーキー）、
   「決定を押したら見ているだけ」の自動戦闘、スタミナ（AP）制の探索。
@@ -432,8 +467,15 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   「最後の 1 時間」まで休めます。
 - **メンテナンス**は 2 週に 1 回（13〜15 時）と、イベント初日の緊急メンテ。終わるまで入れず、ときどき延長し、
   詫び石が届きます。給料日にはご利用料金の明細も。お知らせにはいま冒険中の人数が出ます。
+- **時計。** タイトルに本体の時計と **[9] 時刻修正** があります。起動したときに時計がおかしい（前回の保存より前・
+  30 日より先・範囲外）と赤くなり、合わせるまで留守の間の時間を数えません。時計の電池が無い turboR は、
+  電源を入れるとでたらめな日時になるためです。
 - **運営年表:** 確率アップ・インフレ（新しいカードほど強い）・お詫びの石・引退の波・90 日目に **USR**、
   180 日目に **XUSR**（古いレア度ほど出やすくなり、イベントのボスは最新のレア度の前提に）・終了の告知——そしてサービス終了。
+
+<p align="center">
+  <img src="docs/img/screens_keitai_ja.png" width="640" alt="日本語版のメンテナンス・ご利用料金・冒険中の人数・足あと・書き方の違う書き込み・赤い時計">
+</p>
 
 ### 終わった後
 - **最後の 1 時間。** 最終日の 23:00 からは、残った仲間が 5 分ごとに書き込みます。伝言板を開いたままにすると
@@ -445,17 +487,29 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   いつでもお知らせの 1 から、終了後はタイトルから。終了後はそこで 3 を押すと仲間からの最後の手紙、4 でまとめ記事
   （一部はあなたのセーブから書かれます）。タイトルも現実の時間で古びていきます（払い戻し受付中 → 受付終了 →
   404 → 別の会社の広告）。
-- **運営モード**（タイトルの 3。最初から入れます。本編を終えるまで史実は「？？？」）。同じ 270 日を運営の側から
-  回します。年表の節目で開く 12 回の会議（排出率・天井・広告の予算と打ち切りの CVR・確率アップ・一押し枠と相互送客・
-  新しいレア度・お詫びの石）で、史実とほかの手を選べます。15 日ごとの**企画会議**では 5 枚の札から 1 つ——イベント
-  （レイドボス・東西対抗戦・アニメコラボ・ランキング）・ガチャ（ステップアップ・多段 BOX・コンプガチャ・復刻）・
-  課金（月パス・福袋・報酬を課金者だけに）・締め付け（確率をこっそり絞る・天井を外す・詫び石を渋る）・見送る。
-  **早回し**（会議だけ、2 分ほど）か**じっくり**（障害・プレイヤーからの CS のメール・社長の思いつきが 16 回）を選べます。
-  NPC 1000 人の DAU・新規・課金率・引退・売上を見て（本編を終えた後は史実を点線で重ねます）、240 日目に利益と DAU で
-  サービスを続けるかが決まります。最後に通信簿と、6 通りの運営の結末。
 
 <p align="center">
-  <img src="docs/img/screens_ops_ja.png" width="640" alt="日本語版の運営モード（会議・グラフ・決算）">
+  <img src="docs/img/screens_end_ja.png" width="640" alt="日本語版の最後の 1 時間・0:00 に接続が切れる・古びたタイトル・思い出アルバム・まとめ記事">
+</p>
+
+### 運営モード
+タイトルの 3。最初から入れます。同じ 270 日を、運営の側から回します。
+- **早回しかじっくりか。** 早回しは会議だけ（2 分ほど）。じっくりでは日々の判断が 16 回来ます——サーバー障害（メンテの
+  告知の仕方と詫び石）、模型の中のプレイヤーからの CS のメール（石が減った・子どもの課金・乗っ取り・お礼）、社長の
+  思いつき。不満・ログイン・売上に直接効き、冷たく返すほど儲かって人が減ります。
+- **12 回の会議**（年表の節目）: 排出率・天井・広告の予算と打ち切りの CVR・確率アップ・一押し枠と相互送客・新しいレア度・
+  お詫びの石。選択肢 1 が史実です。**本編を終えるまでは、史実の行は「？？？」で伏せます。**
+- **15 日ごとの企画会議**では 5 枚の札から 1 つ——見送る・イベント（レイドボス・東西対抗戦・アニメコラボ・ランキング）・
+  ガチャ（ステップアップ・多段 BOX・コンプガチャ・復刻）・課金（月パス・福袋・報酬を課金者だけに）・締め付け（確率を
+  こっそり絞る・天井を外す・詫び石を渋る）。コンプガチャは 200 日目に業界の自主規制で廃止になり、絞った確率はいずれ
+  検証班にばれます。
+- **NPC 1000 人のグラフ:** DAU・新規・課金率・引退・売上。本編を終えた後は、史実の DAU と売上を点線で重ねます。
+  240 日目に、利益と DAU でサービスを続けるかが決まります。
+- **終わると:** 決算、通信簿（最大の DAU・いちばん辞めた日・配った石・残った人）、6 通りの運営の結末。
+  15 日ごとに、画面の下に社内チャットが流れます。
+
+<p align="center">
+  <img src="docs/img/screens_ops_ja.png" width="640" alt="日本語版の運営モード（早回しかじっくりか・企画会議・CS のメール・史実を重ねたグラフ・通信簿・結末）">
 </p>
 
 ### はじめの 1 時間
@@ -463,9 +517,11 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 2. **マイページ**が拠点です: 1 冒険・2 ガチャ・3 カード・4 デッキ・5 お店（宿屋も）・6 ランク・7 保存・8 お知らせ。
    イベントや対抗戦の開催中は、9 でバナーから入ります。
 3. **冒険（1）:** エリアを選び、スペースで進みます。0 で通常・節約・全力、6 でその敵向けに編成。
-4. **伝言板をのぞく:** お知らせ（8）→ スペース。ガチャや宿屋の後にのぞくと、誰かが気づいています。
+4. **伝言板をのぞく:** お知らせ（8）→ スペース。ガチャや宿屋の後にのぞくと、誰かが気づいています。伝言板の 1 で
+   メンバー、お知らせの 2 で足あと、3 でメール。
 5. **大事なカードはデッキ（A〜C のどれか）に入れておく。** デッキのカードは盗まれません。
 6. **待てないときは:** お店（5）→ 4 宿屋 → 次のイベントや対抗戦の戦まで休む。
+7. **実機では、タイトルの最下行の時計を見る。** 赤いか、ずれていたら 9 で合わせます。
 
 ### 操作
 | 場所 | 入力 | 動作 |
@@ -483,8 +539,10 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | ギルド伝言板 | 1 | メンバー（スペースでプロフィール） |
 | 思い出（終了後） | 1／3／4 | カード／最後の手紙／まとめ記事 |
 | お店 | 4 | 宿屋: 1 翌朝まで寝る、2 次の予定まで休む |
-| 運営モード | 1〜5／ESC | 選ぶ（1 が史実。企画会議では見送る）／やめる（確かめてから） |
+| 運営モード | 1／2 | 始めるとき: 早回し／じっくり |
+| | 1〜5／ESC | 選ぶ（1 が史実。企画会議では見送る）／やめる（確かめてから） |
 | タイトル | 3／9／0／ESC | 運営モード／時刻修正／ライセンスの画面／開発用の診断画面 |
+| 時刻修正 | ←→／↑↓／0〜9／スペース | 欄を選ぶ／変える／数字を打つ（桁が埋まると次の欄へ）／時計に書く |
 
 サービス終了後のタイトルには「思い出を見る」（アルバム。そこで 1 を押すと手持ちのカード）・「思い出をリセット」・
 「スタッフロール」（結末から）・「運営モード」が出ます。
@@ -542,17 +600,18 @@ make run
 openmsx -machine Panasonic_FS-A1ST -carta bin/TurboGuild_ja.rom -romtype ASCII8 -diska bin/save.dsk
 ```
 
-実機では、ASCII8 対応のフラッシュROMカートリッジに ROM を**マッパ種別 ASCII8** で書き込みます。
+実機では、ASCII8 で動くカートリッジを使います。フラッシュROMカートリッジなら**マッパ種別 ASCII8** で書き込み、
+1MB の RAM カートリッジなら ROM を読み込ませます（ESERAMair から FS-A1ST で動かしました）。
 
 ### 自動確認
 | コマンド | 確認すること |
 |---|---|
-| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・対抗戦・年表・ライバル・伝言板・盗み・宿屋・思い出と結末・運営モード・セーブ など） |
+| `make test` | `core/` の PC 単体テスト（ガチャ・戦闘・合成・イベント・対抗戦・年表・ライバル・伝言板と仲間の去り方・メンバーとメール・メンテと足あと・盗み・宿屋・思い出と結末・企画会議を含む運営モードと史実の表・セーブ など） |
 | `make check` | 起動 → 保存 → リセット → 再起動で、RTC の差分 × 10 がゲーム内時間に足される |
 | `make check-nodisk` | ディスク無しで起動し、保存しようとしても続行できる |
 | `make check-msx2` | MSX2 では「turboR 専用」と出して止まる |
 | `make play` | 新規開始から 30 分（エミュレータ時間）自動で遊び、保存 → リセット → 読み込みで進行が一致する |
-| `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内（実測 約 2.3 秒） |
+| `make check-offline` | 1 週間あけて「つづきから」を選び、マイページが出るまで 3 秒以内（実測 2.3〜2.9 秒） |
 | `make check-timeline` | 0〜271 日目まで進め、イベント 7 本・ギルド対抗戦 2 回・贈り物・終了の告知・結末・スタッフロールまで通す |
 | `make sim` | 経済シミュレーション。課金コースごとに 270 日遊んで SSR 以上の枚数を数える |
 | `make sim-ops` | 運営モード。会議の選び方をすべて回し、サービスを続けられる割合を出す（企画会議の施策の比べは `build/sim_ops single`・`plans`） |
@@ -590,19 +649,20 @@ docs/      企画書・設計の記録
 | フェーズ 3 | 運営年表・NPC 1000 人の疑似オンライン・お知らせ・FM 音源・経済シミュレーション |
 | v0.1.0 | ガチャを難しく（BOX ガチャ・天井撤廃）、カード 121 枚、レイド・バトル、ギルド対抗戦、スタッフロール、FAT12 のセーブディスク |
 | v0.2.0 | 「仕組みより人」: ギルド伝言板（返事・暮らし・自分への反応）・ライバル・盗み・盗まれ・結末と最後まで残った仲間・思い出アルバム・運営モード・宿屋。ほかに属性の表示・戦い方・リーダースキル・デッキ 3 つ |
-| v0.3.1 | タイトルに本体の時計と時刻修正（時計の電池が無い turboR のため）。実機の FS-A1ST で初めて動かした |
 | v0.3.0 | 仲間の去り方、ガラケーの空気（書き方・足あと・メンテ・請求）、便りと年中行事、最後の 1 時間と終了後のタイトル、そして運営モードを深く（企画会議・じっくり・通信簿・6 通りの結末） |
+| v0.3.1 | タイトルに本体の時計と時刻修正（時計の電池が無い turboR のため）。実機の FS-A1ST で初めて動かした |
 
 ### 位置づけ（正直な自己評価）
 本作は**実験的な習作**です。
 
 - **主題は「当時のソシャゲの空気」——とりわけ、そこにいた人たち——の再現**で、ゲームとしての深さは二の次です。
   ランキングもお知らせもギルドの仲間も、すべて式から作った「それっぽさ」です。
-- **数値の多くは仮です。** 経済はシミュレーション（`make sim`）で一度合わせただけで、盗み・宿屋・結末は実際に遊んでの
-  調整がまだです。
+- **数値の多くは仮です。** 経済はシミュレーション（`make sim`）で一度合わせただけで、盗み・宿屋・結末と、v0.3 で
+  足したものの多くは、実際に遊んでの調整がまだです。
 - 運営モードは、`make sim-ops` で合わせた NPC 1000 人の小さな模型で動いています。実在のサービスの数字ではありません。
-  270 日を回すのに 2 分ほどかかります（エミュレータの turboR で）。
-- **フロッピーへの保存は、まだ実機（turboR）で確認していません。**
+  早回しは 270 日を 2 分ほど、じっくりは 20 分ほどで回します（エミュレータの turboR で）。
+- **実機の turboR**（FS-A1ST）で、時計まで動くことを確かめました。**フロッピーへの保存は、まだ実機で確認していません**
+  ——要らないディスクを使ってください。
 - 画面の描き直しは全面で 0.6 秒ほど。対抗戦に入るときは、マイページが出るまで 4 秒ほどかかります（16 ギルドの戦力を
   1000 人ぶんから 1 日 1 回数えるため）。
 - BGM は VBLANK 割り込みで鳴らしています。ディスクの読み書きの間だけ止まり、終わると続きから鳴ります。
