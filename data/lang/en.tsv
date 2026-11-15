@@ -160,7 +160,7 @@ T_M_SAVE	Save
 T_M_TITLE	Quit
 T_GUIDE_HOME	1-8:Menu SPACE:OK
 T_GUIDE_LIST	SPACE:OK ESC:Back
-T_GUIDE_EXPLORE	SPACE:Go ESC:Areas
+T_GUIDE_EXPLORE	SP:Go 7:Helper ESC:Areas
 T_GUIDE_GACHA	1-5:Pick SPACE:Pull ESC:Back
 T_GUIDE_CARD	SPACE:Info 0:Sort
 T_GUIDE_PICK	SPACE:OK 0:Sort
@@ -246,7 +246,7 @@ T_EV_PT	Points
 T_EV_RANK	Rank
 T_EV_NEXT	Next reward
 T_EV_BONUS	Boon
-T_EV_GUIDE	1-3:Fight 4:Rank ESC:Back
+T_EV_GUIDE	1-3:Fight 4:Rank 7:Help ESC:Back
 T_EV_START	Event start!
 T_EV_END	Event over!
 T_EV_FINAL	Final
@@ -1525,7 +1525,23 @@ T_RS_TONE	Tic: 	!
 T_RS_NOTONE	none	!
 T_RS_BDAY	Birthday: 	!
 T_RS_LAST	Last login: 	!
-T_RS_GUIDE	U/D:Pick SPACE:Profile	!
+T_RS_GUIDE	U/D SP:Profile 1:Greet	!
+T_HI_MK_IN	!	!
+T_HI_MK_BACK	*	!
+T_HI_SENT	You greeted everyone!	!
+T_HI_DONE	Already greeted today	!
+T_HI_ST1	Greeted you today	!
+T_HI_ST2	Greeted (no reply yet)	!
+T_HI_ST3	You greeted each other	!
+T_HP_TITLE	Helper	!
+T_HP_HINT	A mate joins your next fight	!
+T_HP_MARK	*	!
+T_HP_USED	used	!
+T_HP_NONE	No guildmates to ask	!
+T_HP_DONE	Already helped today	!
+T_HP_GUIDE	U/D SP:Ask 0:None ESC:Back	!
+T_HP_SET	Helper: 	!
+T_HP_JOIN	 came to help!	!
 T_TH_NOTE0	I'll be taking this card. Bye	!
 T_TH_NOTE1	Should've put it in a deck lol	!
 T_TH_NOTE2	Sorry, it's mine now	!

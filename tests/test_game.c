@@ -1546,6 +1546,71 @@ static void test_thread(void)
     g_save = keep;
 }
 
+/* あいさつと助っ人（DECISIONS #106） */
+static void test_hello_helper(void)
+{
+    SaveData keep = g_save;
+    Roster ro;
+    MateLead m;
+    u8 g, k, n;
+    u16 back = 0, sent = 0, in = 0, ghost_back = 0;
+    u32 a, b;
+    for (g = 1; g <= GUILD_COUNT; g++) {
+        u16 day;
+        g_save.guild = g;
+        g_save.memo[MEMO_GUILD] = 1;
+        for (day = 10; day < 260; day += 23) {
+            g_save.hello_at = 0;
+            g_save.help_day = 0; g_save.help_bits = 0;
+            g_save.g_time = (u32)day * GSEC_PER_DAY + 9UL * 3600;
+            CHECK(!hello_done());
+            board_roster(&ro);
+            for (k = 0; k < ro.n; k++) { CHECK(ro.r[k].hi == HI_NONE || ro.r[k].hi == HI_IN); in += ro.r[k].hi == HI_IN; }
+            n = hello_send();
+            CHECK(n == ro.n);
+            if (!n) continue;
+            CHECK(hello_done() && hello_send() == 0);         /* 1 日 1 回 */
+            board_roster(&ro);
+            for (k = 0; k < ro.n; k++) CHECK(ro.r[k].hi == HI_SENT || ro.r[k].hi == HI_BACK);
+            g_save.g_time += 5UL * 3600;                      /* 4 時間たてば返事はそろう */
+            board_roster(&ro);
+            for (k = 0; k < ro.n; k++) {
+                u16 rd = mate_retire_day(ro.r[k].npc);
+                CHECK(ro.r[k].hi == HI_SENT || ro.r[k].hi == HI_BACK);
+                back += ro.r[k].hi == HI_BACK; sent += ro.r[k].hi == HI_SENT;
+                if (rd != BOARD_NEVER && rd < day && ro.r[k].hi == HI_BACK) ghost_back++;   /* 黙って消えた人は返さない */
+            }
+            g_save.g_time += 20UL * 3600;                     /* 次の日はまた送れる */
+            CHECK(!hello_done());
+            /* 助っ人: 並び順 k の人を 1 日 1 回 */
+            g_save.g_time = (u32)day * GSEC_PER_DAY + 9UL * 3600;
+            board_roster(&ro);
+            k = ro.r[0].k;
+            mate_lead(&ro.r[0], &m);
+            CHECK(m.card >= 1 && m.card <= tbl_card_count() && !m.used && m.lv >= 8);
+            b = help_atk(ro.r[0].npc, 0);
+            g_help = (u8)(k + 1);
+            a = help_take(0);
+            CHECK(a == b && a > 0 && g_help == (HELP_JOINED | k) && help_npc() == ro.r[0].npc);
+            mate_lead(&ro.r[0], &m);
+            CHECK(m.used);
+            g_help = (u8)(k + 1);
+            CHECK(help_take(0) == 0 && g_help == 0);          /* 同じ日にもう一度は借りられない */
+            CHECK(help_take(0) == 0);                         /* 選んでいなければ 0 */
+            g_save.g_time += GSEC_PER_DAY;
+            g_help = (u8)(k + 1);
+            CHECK(help_take(0) > 0);                          /* 次の日はまた借りられる */
+            g_help = 0;
+        }
+    }
+    CHECK(back > sent && sent > 0 && in > 0 && ghost_back == 0);
+    g_save.guild = 0;
+    CHECK(hello_send() == 0);
+    g_help = 1;
+    CHECK(help_take(0) == 0 && g_help == 0);
+    g_save = keep;
+}
+
 int main(void)
 {
     test_timeline();
@@ -1574,6 +1639,7 @@ int main(void)
     test_struct_sizes();
     test_battle();
     test_thread();
+    test_hello_helper();
     test_elem();
     test_auto_for();
     test_ap();

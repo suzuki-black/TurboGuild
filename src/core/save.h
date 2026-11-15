@@ -7,7 +7,7 @@
 #include "memo.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  19
+#define SAVE_VERSION  20
 #define SAVE_MIN_VERSION 5           /* 読めるいちばん古い版（それより前はカードの形が違う） */
 /* ★上位互換の決まり（DECISIONS #78）: 欄は必ず末尾に足し、SAVE_VERSION を 1 上げ、
  *   save.c の save_size[] にその版の大きさを足す。古い版は「その版の大きさ」で検査して読み、
@@ -106,6 +106,10 @@ typedef struct {
     /* v19: お問い合わせ（ui/help_ui.c, DECISIONS #103）。運営からの返事が届く日 + 1（0 = 送っていない）と、問い合わせの種類 */
     u16 ask_day;
     u8  ask_kind;
+    /* v20: あいさつと助っ人（core/mates.c, DECISIONS #106） */
+    u16 hello_at;        /* 最後に全員へあいさつした時刻（g_time / 600）+ 1（0 = まだ） */
+    u8  help_day;        /* help_bits の日（日 % 250 + 1） */
+    u8  help_bits;       /* その日に助っ人を借りた仲間（ギルドの仲間の並び順のビット） */
 } SaveData;
 
 u16 save_crc(const SaveData *s);           /* その版の大きさで計算する */

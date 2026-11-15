@@ -127,4 +127,5 @@
 | 107 | A000h データB | TEXT2 | build/text2.dat | 文字列（溢れ） |
 | 108 | A000h データB | TEXT3 | build/text3.dat | 文字列（溢れ） |
 | 109 | A000h データB | TEXT4 | build/text4.dat | 文字列（溢れ） |
-| 110-127 | - | - | - | 空き |
+| 110 | 6000h コード | UI_HELPER | code: src/ui/helper_ui.c | 助っ人を選ぶ画面と「助けに来た」（探索とイベントのトップの 7） |
+| 111-127 | - | - | - | 空き |

@@ -149,6 +149,7 @@ FAR(void, boss_draw, (void))
     u16 t, shown = 0;
     tbl_card(boss_card(), &c);
     max = boss_hp();
+    ui_helper_say(84);                            /* 助っ人が加勢した（前の画面の上に出してから戦いの画面へ, DECISIONS #106） */
     ui_clear();
     ui_header(g_qr.kind == EV_RAID ? T_RAID_TITLE : g_qr.kind == EV_PVP ? T_PVP_TITLE : T_BOSS_BATTLE);
     gfx_card2x(boss_card(), BOSS_X, BOSS_Y);

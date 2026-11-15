@@ -138,7 +138,8 @@ FAR(void, roster_draw, (void))
         npc_now(o->npc, &n);
         cx = txt_id(16, (u8)(y + 2), T_RS_LV, COL_LGRAY, bg);
         txt_num(cx, (u8)(y + 2), n.level, COL_WHITE, bg);
-        ago(23, (u8)(y + 2), o->last, away ? COL_ORANGE : COL_LGRAY, bg);
+        ago(22, (u8)(y + 2), o->last, away ? COL_ORANGE : COL_LGRAY, bg);
+        if (o->hi == HI_IN || o->hi == HI_BACK) txt_id(30, (u8)(y + 2), o->hi == HI_IN ? T_HI_MK_IN : T_HI_MK_BACK, o->hi == HI_IN ? COL_ORANGE : COL_GREEN, bg);
     }
     ui_guide(T_RS_GUIDE);
 }
@@ -174,6 +175,7 @@ static void profile(const RosterRow *o)
     birthday(cx, (u8)(y + 56), o->bd, COL_DBLUE);
     cx = txt_id(3, (u8)(y + 74), T_RS_LAST, COL_LGRAY, COL_DBLUE);
     ago(cx, (u8)(y + 74), o->last, o->last >= 1440 ? COL_ORANGE : COL_WHITE, COL_DBLUE);
+    if (o->hi) txt_id(3, (u8)(y + 92), (u16)(T_HI_ST1 + o->hi - 1), o->hi == HI_BACK ? COL_GREEN : COL_LGRAY, COL_DBLUE);
     psg_beep(0x80, 4);
     ui_wait_key();
     g_dirty = 1;
@@ -183,6 +185,11 @@ FAR(void, roster_update, (void))
 {
     u8 p = input_pressed();
     Roster r;
+    if (input_digit() == 1) {                    /* 今日のあいさつを全員へ（DECISIONS #106） */
+        ui_msg(hello_send() ? T_HI_SENT : hello_done() ? T_HI_DONE : T_RS_EMPTY);
+        g_dirty = 1;
+        return;
+    }
     if (!(p & (BTN_UP | BTN_DOWN | BTN_OK | BTN_CANCEL))) return;
     if (p & BTN_CANCEL) { screen_change(&scr_board); return; }
     board_roster(&r);

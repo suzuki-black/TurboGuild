@@ -93,6 +93,10 @@
   profile: payment style, verbal tic, birthday). News 2 shows who visited your My Page — a thief leaves footprints too
   — and News 3 opens your mail: the master's welcome, the reason a mate couldn't write on the board, letters after
   the end.
+- **Greetings and helpers.** In the member list, 1 greets everyone once a day. Replies trickle back over the next
+  few hours (◎ in the list), and some mates greet you first. A mate who is about to leave rarely answers, and one
+  who vanished without a word never does. When exploring or on a hunt event, 7 lets you borrow a mate's leader
+  card for your next fight — once a day per mate, and never from someone who has left the guild.
 - **A rival.** The player just above you in the ranking becomes your rival until you pass them. My Page shows the
   gap; they react when you pass them (during an event they may promise to pass you back on the last day), and the
   marquee tells you whether your pace will catch them by the last day.
@@ -214,9 +218,10 @@ Title, 3 — open from the start. Run the same 270 days from the other side.
 | | 9 | The running event or guild war |
 | Explore / event top | 0 | Battle style (Normal → Save → All-out) |
 | | 6 | Build the deck for this enemy |
+| | 7 | Borrow a guildmate as a helper for the next fight (hunt events) |
 | Deck | 7–9 | Switch to deck A–C |
 | News | SPACE / 1 / 2 / 3 / 4 / 5 | Guild board / memory album / footprints / mail / help / guide BBS |
-| Guild board | 1 | Members (SPACE: profile) |
+| Guild board | 1 | Members (SPACE: profile, 1: greet everyone) |
 | Memories (after the end) | 1 / 3 / 4 | Cards / last letters / wiki article |
 | Shop | 4 | Inn: 1 sleep till morning, 2 wait for the next plan |
 | Operator mode | 1 / 2 | At the start: Fast / Full |
@@ -439,6 +444,10 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **メンバー・メール・足あと。** 伝言板の 1 でメンバー一覧（Lv・最終ログイン。SPACE でプロフィール: 課金コース・
   口ぐせ・誕生日）。お知らせの 2 で足あと（泥棒も付けていきます）、3 でメール（ギルマスのあいさつ、
   板には書けなかったわけ、終了後の手紙）。
+- **あいさつと助っ人。** メンバー一覧の 1 で、1 日 1 回みんなにあいさつ。返事は数時間かけてぽつぽつ返ってきて（一覧に ◎）、
+  向こうから先に来る日もあります。去る日が近い人はなかなか返さず、黙って消えた人は二度と返しません。探索と討伐の
+  イベントでは 7 で、仲間のリーダーカードを次の 1 戦だけ借りられます（同じ人からは 1 日 1 回。ギルドを去った人からは
+  借りられません）。
 - **ライバル。** ランキングで自分のすぐ上の人が、抜くまでライバル（宿敵）になります。マイページに差を出し、抜くと
   相手がひとこと言い（イベント中なら「最終日に見てろよ」と返してくることも）、流れるお知らせで「このペースなら
   最終日に届くか」を伝えます。
@@ -552,9 +561,10 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | | 9 | 開催中のイベント・対抗戦 |
 | 探索・イベントのトップ | 0 | 戦い方を替える（通常 → 節約 → 全力） |
 | | 6 | その敵向けにおまかせ編成 |
+| | 7 | 仲間を助っ人に借りる（次の 1 戦。イベントは討伐のみ） |
 | デッキ | 7〜9 | デッキ A〜C に替える |
 | お知らせ | スペース／1／2／3／4／5 | ギルド伝言板／思い出アルバム／足あと／メール／ヘルプ／攻略スレ |
-| ギルド伝言板 | 1 | メンバー（スペースでプロフィール） |
+| ギルド伝言板 | 1 | メンバー（スペースでプロフィール、1 でみんなにあいさつ） |
 | 思い出（終了後） | 1／3／4 | カード／最後の手紙／まとめ記事 |
 | お店 | 4 | 宿屋: 1 翌朝まで寝る、2 次の予定まで休む |
 | 運営モード | 1／2 | 始めるとき: 早回し／じっくり |

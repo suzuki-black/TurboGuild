@@ -194,6 +194,7 @@ FAR(void, evtop_update, (void))
     if (!g_save.event_id || g_save.event_id != event_active()) return;
     if (d == 3 && event_kind() == EV_RAID) { rescue(); return; }
     if (d == 6) { ui_fit_deck(EVENT_STAGE_BASE + 1); return; }
+    if (d == 7 && event_kind() == EV_HUNT) { EventStage es; if (event_stage(1, &es)) ui_helper_pick(es.element); return; }
     if (d == 0) {
         u8 lv;
         ui_stance_next();

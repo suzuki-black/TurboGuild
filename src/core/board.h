@@ -75,7 +75,24 @@ typedef struct {
     u8  tone;            /* 口癖 0..3 */
     u16 bd;              /* 誕生日（2011 年 7 月 1 日からの日数, 0..364） */
     u16 last;            /* 最後にログインしてから何分（65535 で止める） */
+    u8  k;               /* ギルドの仲間の並び順（助っ人のビットと g_help に使う） */
+    u8  hi;              /* 今日のあいさつ（HI_*） */
 } RosterRow;
+/* あいさつ（DECISIONS #106）。1 日 1 回、いる全員へ。返ってくるかと、向こうから来るかは番号と時刻のハッシュ */
+#define HI_NONE  0
+#define HI_IN    1       /* 向こうから来た（まだ返していない） */
+#define HI_SENT  2       /* 送った（返事を待っている） */
+#define HI_BACK  3       /* 返ってきた（または、来ていたのに返した） */
+u8   hello_send(void);               /* 今日のあいさつを送る。送った人数（0 = 今日はもう送った・ギルドにいない） */
+u8   hello_done(void);               /* 今日はもう送った */
+/* 助っ人（DECISIONS #106）。仲間のリーダーカードを次の 1 戦だけ借りる。同じ人からは 1 日 1 回 */
+typedef struct { u16 card; u8 lv; u8 used; } MateLead;
+void mate_lead(const RosterRow *r, MateLead *o);   /* 一覧の仲間 r の今のリーダーカード */
+u32  help_take(u16 enemy);           /* g_help の助っ人の攻撃（属性込み）を出し、借りたことにする（g_help = HELP_JOINED | 並び順）。いなければ 0 */
+u32  help_atk(u16 npc, u16 enemy);   /* 仲間 npc のリーダーカードの攻撃（属性込み）。借りない */
+u16  help_npc(void);                 /* g_help の仲間の NPC 番号（いなければ BOARD_NOREF） */
+#define HELP_JOINED 0x80             /* g_help: 直前の戦いで加勢した（下位 3 ビットが並び順） */
+extern u8 g_help;                    /* 次の戦いの助っ人（仲間の並び順 + 1、0 = なし）。保存しない。静的 RAM が残り少ないので 1 B だけ */
 typedef struct { u8 n; RosterRow r[MATES_MAX_PUB]; } Roster;
 void board_roster(Roster *r);
 

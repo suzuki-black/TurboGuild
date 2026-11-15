@@ -2,6 +2,7 @@
 /* quest.c — 負けても AP は減る（当時風）。報酬とドロップは勝ったときだけ。
  * ドロップはエリアの属性・レアリティ（通常 N / ボス R）の恒常カードから等確率。 */
 #include "quest.h"
+#include "board.h"
 #include "deck.h"
 #include "evfight.h"
 #include "inventory.h"
@@ -145,7 +146,7 @@ FAR(void, quest_run, (u16 stage, QuestResult *r))
     r->event = f.event;
     r->enemy_elem = f.element;
     if (f.kind != EV_HUNT) { event_fight(stage - EVENT_STAGE_BASE, r); return; }   /* レイド・バトル */
-    in.deck_atk = d.atk;
+    in.deck_atk = d.atk + help_take(f.element);   /* 助っ人（仲間のリーダーカード, DECISIONS #106） */
     in.deck_def = d.def;
     in.player_hp = r->player_hp = PLAYER_HP(g_save.level);
     in.enemy_hp = f.st.hp;

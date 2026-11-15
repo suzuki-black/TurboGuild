@@ -208,6 +208,7 @@ FAR(void, explore_draw, (void))
     walker(0);
     bars();
     msg_clear();
+    ui_helper_line(MSG_Y + 4);
     ui_guide(T_GUIDE_EXPLORE);
 }
 
@@ -307,6 +308,7 @@ static void go(void)
     quest_run(stage, &g_qr);
     if (g_qr.status != Q_OK) return;
     g_save_dirty = 1;
+    ui_helper_say(MSG_Y);
     msg_clear();
     walk();
     enemy_sprite(area_elem());
@@ -322,6 +324,7 @@ FAR(void, explore_update, (void))
     u8 p = input_pressed();
     u8 d = input_digit();
     if (d == 6) { ui_fit_deck(next_stage()); return; }
+    if (d == 7) { ui_helper_pick(area_elem()); return; }
     if (d == 0 && !g_dirty) { ui_stance_next(); scene(0); walker(0); return; }
     if (p & BTN_OK) {
         if (g_dirty) return;
