@@ -929,8 +929,8 @@ T_ALB_TITLE	思い出アルバム
 T_ALB_NONE	まだ思い出はない
 T_ALB_DAYP	 
 T_ALB_DAYS	日目
-T_ALB_GUIDE	左右:めくる ESC:戻る
-T_ALB_GUIDE_END	左右 1:カード 3:手紙 4:記事
+T_ALB_GUIDE	左右:めくる 2:称号 ESC:戻る
+T_ALB_GUIDE_END	左右 1:ｶｰﾄﾞ 2:称号 3:手紙 4:記事
 T_MEMO0	冒険を始めた
 T_MEMO1	初めての SSR
 T_MEMO2	ギルドに入った
@@ -1152,6 +1152,45 @@ T_HP_DONE	今日はもう借りた
 T_HP_GUIDE	上下 SP:借りる 0:なし ESC:戻る
 T_HP_SET	助っ人：
 T_HP_JOIN	が助けに来た！
+T_TT_TITLE	称号
+T_TT_L	【
+T_TT_R	】
+T_TT_LOCK	？？？
+T_TT_NOW	いまの称号：
+T_TT_AUTO	おまかせ：
+T_TT_GUIDE	SP:つける 0:おまかせ ESC:戻る
+T_TT_0	かけだし
+T_TT_1	ギルド員
+T_TT_2	盗まれ上手
+T_TT_3	微課金戦士
+T_TT_4	熟練者
+T_TT_5	進化の匠
+T_TT_6	百戦錬磨
+T_TT_7	宿敵キラー
+T_TT_8	無課金の星
+T_TT_9	レイド狩り
+T_TT_10	対抗戦英雄
+T_TT_11	重課金者
+T_TT_12	ランカー
+T_TT_13	石油王
+T_TT_14	頂点十傑
+T_TT_15	看取り人
+T_TT_H0	はじめから持っている
+T_TT_H1	ギルドに入る
+T_TT_H2	カードを盗まれる
+T_TT_H3	課金する
+T_TT_H4	Lv50になる
+T_TT_H5	カードを進化させる
+T_TT_H6	ステージ100を越える
+T_TT_H7	ライバルを抜く
+T_TT_H8	無課金のまま60日目・Lv30
+T_TT_H9	レイドボスを倒す
+T_TT_H10	対抗戦で勝つ
+T_TT_H11	3万円以上課金する
+T_TT_H12	イベントで100位以内
+T_TT_H13	50万円以上課金する
+T_TT_H14	イベントで10位以内
+T_TT_H15	サービス最終日にいる
 T_TH_NOTE0	カードはいただいた。じゃあね
 T_TH_NOTE1	デッキに入れとかないからだよｗ
 T_TH_NOTE2	悪いね、もらってくよ

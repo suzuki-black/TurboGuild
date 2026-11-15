@@ -25,7 +25,8 @@ static const u16 save_size[] = {
     offsetof(SaveData, ops_ends),      /* v17: 請求とメンテのお詫び */
     offsetof(SaveData, ask_day),       /* v18: 運営の結末 */
     offsetof(SaveData, hello_at),      /* v19: お問い合わせ */
-    sizeof(SaveData),                  /* v20: あいさつと助っ人 */
+    offsetof(SaveData, title_sel),     /* v20: あいさつと助っ人 */
+    sizeof(SaveData),                  /* v21: 称号 */
 };
 
 static u16 size_of(u16 version)

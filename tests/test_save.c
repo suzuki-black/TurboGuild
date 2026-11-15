@@ -156,6 +156,15 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.ask_day == 12 && s.hello_at == 0 && s.help_day == 0 && s.help_bits == 0);
+    /* v20 も読め、v21 で足した称号は 0（おまかせ）から */
+    save_new(&s, 1);
+    s.hello_at = 99; s.help_bits = 5; s.title_sel = 7;
+    s.magic = SAVE_MAGIC;
+    s.version = 20;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.hello_at == 99 && s.help_bits == 5 && s.title_sel == 0);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;

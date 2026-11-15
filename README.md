@@ -161,6 +161,10 @@
 - **An ending that depends on how you played:** one of six short endings by total spending, how many kinds of cards
   you own, whether any guild mate stayed, and guild war wins — then the mates who stayed to the end and their last
   words, and the staff roll.
+- **Titles:** sixteen titles earned from what you did — joining a guild, having a card stolen, paying (or 60 days
+  without paying), passing your rival, a top-10 finish, being there on the last day. Press 2 in the memory album to
+  see them (locked ones show only a hint) and pick the one to wear; it replaces "My Page" at the top of My Page.
+  Mates' profiles show their titles too.
 - **A memory album:** sixteen firsts with their day (first SSR, first purchase, first evolution, passing your rival,
   being passed back, a guild war win, a theft, being there on the last day, ...) plus the day a guild mate first left.
   Open it any time from News (1), and from the title after the end. After the end, 3 there opens the mates' last
@@ -222,6 +226,7 @@ Title, 3 — open from the start. Run the same 270 days from the other side.
 | Deck | 7–9 | Switch to deck A–C |
 | News | SPACE / 1 / 2 / 3 / 4 / 5 | Guild board / memory album / footprints / mail / help / guide BBS |
 | Guild board | 1 | Members (SPACE: profile, 1: greet everyone) |
+| Memory album | 2 | Titles (SPACE: wear, 0: auto) |
 | Memories (after the end) | 1 / 3 / 4 | Cards / last letters / wiki article |
 | Shop | 4 | Inn: 1 sleep till morning, 2 wait for the next plan |
 | Operator mode | 1 / 2 | At the start: Fast / Full |
@@ -507,6 +512,9 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   勝手に流れ、0:00 に接続が切れます。
 - **遊び方で変わる結末。** 課金の合計・持っているカードの種類・ギルドの仲間が残ったか・対抗戦の勝ちで 6 通りの
   短い結末が出て、最後まで残った仲間とその別れの言葉、そしてスタッフロールへ。
+- **称号。** ギルドに入った・カードを盗まれた・課金した（または課金せずに 60 日）・ライバルを抜いた・10 位以内・
+  最終日にいた——やってきたことから 16 の称号が付きます。思い出アルバムの 2 で一覧（まだのものはヒントだけ）を見て、
+  つける称号を選べます。マイページの見出しは「マイページ」の代わりにその称号に。仲間のプロフィールにも称号が出ます。
 - **思い出アルバム。** 16 の「初めて」（初めての SSR・初めての課金・初めての進化・ライバルを抜いた・抜き返された・
   対抗戦の勝ち・盗まれた・最終日にいた など）を日付つきで残し、仲間が初めて去った日と並べます。
   いつでもお知らせの 1 から、終了後はタイトルから。終了後はそこで 3 を押すと仲間からの最後の手紙、4 でまとめ記事
@@ -565,6 +573,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | デッキ | 7〜9 | デッキ A〜C に替える |
 | お知らせ | スペース／1／2／3／4／5 | ギルド伝言板／思い出アルバム／足あと／メール／ヘルプ／攻略スレ |
 | ギルド伝言板 | 1 | メンバー（スペースでプロフィール、1 でみんなにあいさつ） |
+| 思い出アルバム | 2 | 称号（スペースでつける、0 でおまかせ） |
 | 思い出（終了後） | 1／3／4 | カード／最後の手紙／まとめ記事 |
 | お店 | 4 | 宿屋: 1 翌朝まで寝る、2 次の予定まで休む |
 | 運営モード | 1／2 | 始めるとき: 早回し／じっくり |

@@ -30,6 +30,7 @@
 #include "data/ops_hist.h"
 #include "data/border.h"
 #include "core/thread.h"
+#include "core/title.h"
 
 
 static void fresh(void) { save_new(&g_save, 1000); }
@@ -1611,6 +1612,37 @@ static void test_hello_helper(void)
     g_save = keep;
 }
 
+/* 称号（DECISIONS #107） */
+static void test_titles(void)
+{
+    SaveData keep = g_save;
+    u16 b, i, seen = 0;
+    save_new(&g_save, 1);
+    CHECK(title_earned() == (1u << TT_ROOKIE) && title_now() == TT_ROOKIE);
+    g_save.memo[MEMO_GUILD] = 3; g_save.memo[MEMO_TOP10] = 40;
+    b = title_earned();
+    CHECK((b & (1u << TT_GUILD)) && (b & (1u << TT_TOP10)) && !(b & (1u << TT_TOP100)) && title_now() == TT_TOP10);
+    g_save.level = TT_FREE_LV; g_save.g_time = (u32)TT_FREE_DAY * GSEC_PER_DAY;
+    CHECK(title_earned() & (1u << TT_FREE));
+    g_save.spent = TT_HEAVY_YEN;                          /* 課金すると無課金の星は外れる */
+    b = title_earned();
+    CHECK(!(b & (1u << TT_FREE)) && (b & (1u << TT_LIGHT)) && (b & (1u << TT_HEAVY)) && !(b & (1u << TT_OIL)));
+    g_save.title_sel = TT_GUILD + 1;
+    CHECK(title_now() == TT_GUILD);
+    g_save.title_sel = TT_OIL + 1;                        /* 持っていない称号はおまかせに戻る */
+    CHECK(title_now() == TT_TOP10);
+    g_save.title_sel = 200;
+    CHECK(title_now() == TT_TOP10);
+    for (i = 3; i < NPC_COUNT; i += 8) {
+        u8 t = title_npc(i, (u16)(i % 150));
+        CHECK(t < TITLE_COUNT && t == title_npc(i, (u16)(i % 150)));
+        seen |= (u16)(1u << t);
+    }
+    CHECK(seen & (1u << TT_HEAVY));
+    CHECK(seen & (1u << TT_ROOKIE));
+    g_save = keep;
+}
+
 int main(void)
 {
     test_timeline();
@@ -1640,6 +1672,7 @@ int main(void)
     test_battle();
     test_thread();
     test_hello_helper();
+    test_titles();
     test_elem();
     test_auto_for();
     test_ap();

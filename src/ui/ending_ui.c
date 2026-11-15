@@ -186,6 +186,7 @@ FAR(void, album_update, (void))
         if (old != g_cursor) { psg_beep(0x100, 2); g_dirty = 1; }
         return;
     }
+    if (d == 2) { psg_beep(0x80, 4); screen_change(&scr_titles); return; }   /* 称号（DECISIONS #107） */
     if (d == 1 && ended()) { psg_beep(0x80, 4); g_viewonly = 1; screen_change(&scr_cardlist); return; }   /* カード一覧（見るだけ） */
     if (d == 3 && ended()) { psg_beep(0x80, 4); screen_change(&scr_mail); return; }   /* 仲間からの最後の手紙 */
     if (d == 4 && ended()) { psg_beep(0x80, 4); screen_change(&scr_wiki); return; }   /* まとめ記事 */

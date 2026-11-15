@@ -38,6 +38,7 @@ u8   ui_weak(u8 cx, u8 y, u8 enemy, u8 bg);         /* [6] 弱点 水（6 キー
 void ui_fit_deck(u16 stage);          /* その面の敵に合わせておまかせ編成して知らせる */
 void ui_helper_pick(u16 enemy);       /* 助っ人を選ぶ画面（ui/helper_ui.c, DECISIONS #106）。終わると g_dirty */
 void ui_helper_line(u16 y);           /* 選んである助っ人の 1 行（濃い青の上に） */
+u8   ui_title_tag(u16 cx, u16 y);     /* つけている称号を見出しの上に（ui/title_ui.c, DECISIONS #107）。次の桁 */
 void ui_helper_say(u16 y);            /* 直前の戦いで加勢していたら知らせる（y から 42 ドットの箱） */
 u8   ui_stance(u8 cx, u8 y, u8 ap, u8 bg);       /* [0] 全力 AP10（ap = 0 なら AP は出さない）。次の桁を返す */
 void ui_stance_next(void);            /* 戦い方を 通常 → 節約 → 全力 → 通常 と替える */

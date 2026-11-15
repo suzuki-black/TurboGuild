@@ -1319,8 +1319,8 @@ T_ALB_TITLE	Memory album
 T_ALB_NONE	No memories yet
 T_ALB_DAYP	Day 	!
 T_ALB_DAYS	 
-T_ALB_GUIDE	L/R:Page ESC:Back
-T_ALB_GUIDE_END	L/R 1:Cards 3:Mail 4:Wiki
+T_ALB_GUIDE	L/R:Page 2:Titles ESC:Back
+T_ALB_GUIDE_END	L/R 1:Card 2:Title 3:Mail 4:Wiki
 T_MEMO0	Adventure began	!
 T_MEMO1	First SSR
 T_MEMO2	Joined a guild
@@ -1542,6 +1542,45 @@ T_HP_DONE	Already helped today	!
 T_HP_GUIDE	U/D SP:Ask 0:None ESC:Back	!
 T_HP_SET	Helper: 	!
 T_HP_JOIN	 came to help!	!
+T_TT_TITLE	Titles	!
+T_TT_L	[	!
+T_TT_R	]	!
+T_TT_LOCK	???	!
+T_TT_NOW	Wearing: 	!
+T_TT_AUTO	Auto: 	!
+T_TT_GUIDE	SP:Wear 0:Auto ESC:Back	!
+T_TT_0	Rookie	!
+T_TT_1	Guildmate	!
+T_TT_2	Easy Mark	!
+T_TT_3	Spender	!
+T_TT_4	Expert	!
+T_TT_5	Evolver	!
+T_TT_6	Veteran	!
+T_TT_7	Rival Bane	!
+T_TT_8	Free Star	!
+T_TT_9	Raider	!
+T_TT_10	War Hero	!
+T_TT_11	Whale	!
+T_TT_12	Ranker	!
+T_TT_13	Oil King	!
+T_TT_14	Top Ten	!
+T_TT_15	Witness	!
+T_TT_H0	You start with this	!
+T_TT_H1	Join a guild	!
+T_TT_H2	Get a card stolen	!
+T_TT_H3	Pay real money	!
+T_TT_H4	Reach Lv 50	!
+T_TT_H5	Evolve a card	!
+T_TT_H6	Clear stage 100	!
+T_TT_H7	Pass your rival	!
+T_TT_H8	Day 60, Lv 30, never paid	!
+T_TT_H9	Defeat a raid boss	!
+T_TT_H10	Win a guild war battle	!
+T_TT_H11	Spend 30,000 yen	!
+T_TT_H12	Top 100 in an event	!
+T_TT_H13	Spend 500,000 yen	!
+T_TT_H14	Top 10 in an event	!
+T_TT_H15	Be there on the last day	!
 T_TH_NOTE0	I'll be taking this card. Bye	!
 T_TH_NOTE1	Should've put it in a deck lol	!
 T_TH_NOTE2	Sorry, it's mine now	!

@@ -3,6 +3,7 @@
 #include "mates_w.h"
 #include "deck.h"
 #include "tables.h"
+#include "title.h"
 #include "../data/text_ids.h"
 #include "../far.h"
 
@@ -228,5 +229,47 @@ FAR(void, board_mail, (MailList *l))
         if (d >= SERVICE_END_DAY && !(f & MF_GHOST) && r != MR_BANNED)
             mail_add(l, w.m[k], SERVICE_END_DAY, (u16)(T_ML_LASTG0 + (h & 1)));   /* もう遊んでいないけれど、終わると聞いて */
     }
+}
+
+/* ---- 称号（title.h, DECISIONS #107） ---- */
+
+FAR(u16, title_earned, (void))
+{
+    static const u8 by_memo[][2] = {
+        { TT_GUILD, MEMO_GUILD }, { TT_STOLEN, MEMO_STOLEN }, { TT_LV50, MEMO_LV50 }, { TT_EVOLVE, MEMO_EVOLVE },
+        { TT_STAGE100, MEMO_STAGE100 }, { TT_RIVAL, MEMO_RIVAL }, { TT_RAID, MEMO_RAID }, { TT_GVG, MEMO_GVGWIN },
+        { TT_TOP100, MEMO_TOP100 }, { TT_TOP10, MEMO_TOP10 }, { TT_LASTDAY, MEMO_LASTDAY },
+    };
+    u16 b = 1u << TT_ROOKIE;
+    u8 i;
+    for (i = 0; i < sizeof(by_memo) / sizeof(by_memo[0]); i++)
+        if (g_save.memo[by_memo[i][1]]) b |= (u16)(1u << by_memo[i][0]);
+    if (g_save.spent) b |= 1u << TT_LIGHT;
+    if (g_save.spent >= TT_HEAVY_YEN) b |= 1u << TT_HEAVY;
+    if (g_save.spent >= TT_OIL_YEN) b |= 1u << TT_OIL;
+    if (!g_save.spent && g_save.level >= TT_FREE_LV && g_save.g_time >= (u32)TT_FREE_DAY * GSEC_PER_DAY) b |= 1u << TT_FREE;
+    return b;
+}
+
+FAR(u8, title_now, (void))
+{
+    u16 b = title_earned();
+    u8 i = (u8)(TITLE_COUNT - 1);
+    if (g_save.title_sel && g_save.title_sel <= TITLE_COUNT && ((b >> (g_save.title_sel - 1)) & 1)) return (u8)(g_save.title_sel - 1);
+    while (i && !((b >> i) & 1)) i--;                 /* 課金をやめた等で外れた称号はおまかせに戻る */
+    return i;
+}
+
+/* 仲間の称号: 重課金の人は課金の称号、Lv の高い人は腕の称号、ほかは番号のハッシュで「よくある」称号から */
+FAR(u8, title_npc, (u16 npc, u16 level))
+{
+    static const u8 common[8] = { TT_ROOKIE, TT_GUILD, TT_STOLEN, TT_EVOLVE, TT_RIVAL, TT_RAID, TT_GVG, TT_GUILD };
+    u16 h = hash(npc, (u16)(SALT_LEAD ^ 0x1111u));
+    u8 course = (u8)((hash(npc, SALT_MATE) >> 2) & 3);
+    if (course == 3 && (h & 1)) return (h & 6) ? TT_HEAVY : TT_OIL;
+    if (course == 0 && level >= TT_FREE_LV && (h & 3) == 0) return TT_FREE;
+    if (level >= 100 && (h & 2)) return (h & 4) ? TT_STAGE100 : TT_TOP100;
+    if (level >= 50 && (h & 8)) return TT_LV50;
+    return common[(h >> 4) & 7];
 }
 

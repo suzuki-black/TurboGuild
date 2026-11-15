@@ -161,16 +161,16 @@ static u8 rival_get(RivalNow *r, u16 npc)
     return 1;
 }
 
-/* 見出しの右: 「宿敵 -1234」（相手までの差） */
-static void rival_header(void)
+/* 見出しの称号の右: 「宿敵 -1234」（相手までの差）。日付（24 桁目）の手前に入る桁数まで */
+static void rival_header(u8 cx)
 {
     RivalNow r;
-    u8 cx;
     u32 d;
     if (!rival_get(&r, RIVAL_OF(RANK_MODE())) || r.retired) return;
     d = r.value >= r.player ? r.value - r.player : r.player - r.value;
-    if (d > 999999UL) d = 999999UL;                  /* 6 桁まで（日付の手前で止める） */
-    cx = (u8)(txt_id_width(T_MYPAGE) + 2);
+    if (d > 9999UL && cx + txt_id_width(T_RIVAL) > 14) d = 9999UL;   /* 称号は 10 桁まで。長いときは 4 桁で止める */
+    if (d > 999999UL) d = 999999UL;
+    cx = (u8)(cx + 1);
     cx = txt_id(cx, 0, T_RIVAL, COL_LGRAY, COL_DBLUE);
     cx = txt_draw(cx, 0, r.value >= r.player ? "-" : "+", COL_WHITE, COL_DBLUE);
     txt_num(cx, 0, d, r.value >= r.player ? COL_ORANGE : COL_CYAN, COL_DBLUE);
@@ -370,9 +370,11 @@ FAR(void, home_draw, (void))
     u8 i, cx;
     ui_clear();
     ui_header(T_MYPAGE);
+    vdp_fill(8, 0, 23 * 8 - 8, 15, COL_DBLUE);      /* 「マイページ」の代わりに、つけている称号（DECISIONS #107） */
+    i = ui_title_tag(1, 0);
     cx = txt_num(24, 0, time_gday(g_save.g_time) + 1, COL_YELLOW, COL_DBLUE);
     txt_id(cx, 0, T_DAY, COL_WHITE, COL_DBLUE);
-    rival_header();
+    rival_header(i);
     leader();
     ui_status_block(20);
     banner();

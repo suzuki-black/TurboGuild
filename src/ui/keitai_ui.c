@@ -10,6 +10,7 @@
 #include "../data/tables.h"
 #include "../core/player.h"
 #include "../core/save.h"
+#include "../core/title.h"
 #include "../core/tables.h"
 #include "../data/screens.h"
 #include "../data/text_ids.h"
@@ -161,7 +162,7 @@ static void profile(const RosterRow *o)
     NpcNow n;
     u8 cx, y = 44;
     npc_now(o->npc, &n);
-    ui_box(16, 40, 224, 118, COL_DBLUE, COL_CYAN);
+    ui_box(16, 40, 224, 136, COL_DBLUE, COL_CYAN);
     cx = 3;
     if (o->gm) cx = txt_id(3, y, T_BOARD_GM, COL_YELLOW, COL_DBLUE);
     cx = name_at(cx, y, o->npc, COL_CYAN, COL_DBLUE);
@@ -175,7 +176,10 @@ static void profile(const RosterRow *o)
     birthday(cx, (u8)(y + 56), o->bd, COL_DBLUE);
     cx = txt_id(3, (u8)(y + 74), T_RS_LAST, COL_LGRAY, COL_DBLUE);
     ago(cx, (u8)(y + 74), o->last, o->last >= 1440 ? COL_ORANGE : COL_WHITE, COL_DBLUE);
-    if (o->hi) txt_id(3, (u8)(y + 92), (u16)(T_HI_ST1 + o->hi - 1), o->hi == HI_BACK ? COL_GREEN : COL_LGRAY, COL_DBLUE);
+    cx = txt_id(3, (u8)(y + 92), T_TT_L, COL_YELLOW, COL_DBLUE);                       /* 称号（DECISIONS #107） */
+    cx = txt_id(cx, (u8)(y + 92), (u16)(T_TT_0 + title_npc(o->npc, n.level)), COL_WHITE, COL_DBLUE);
+    txt_id(cx, (u8)(y + 92), T_TT_R, COL_YELLOW, COL_DBLUE);
+    if (o->hi) txt_id(3, (u8)(y + 110), (u16)(T_HI_ST1 + o->hi - 1), o->hi == HI_BACK ? COL_GREEN : COL_LGRAY, COL_DBLUE);
     psg_beep(0x80, 4);
     ui_wait_key();
     g_dirty = 1;
