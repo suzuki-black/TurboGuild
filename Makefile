@@ -18,6 +18,11 @@ CC       := sdcc
 AS       := sdasz80
 PYTHON   := python3
 OPENMSX  := openmsx
+# 自動の検査は作者の settings.xml のコピーで起動する。openMSX は終了時に設定を書き戻すので、
+# そのまま起動すると作者の環境（音量・samples など）を上書きしてしまう。手で遊ぶ make run だけは本体の設定を使う
+OMSX_SETTINGS = $(abspath $(B))/openmsx_settings.xml
+OMSX_COPY = cp $(HOME)/.openMSX/share/settings.xml $(OMSX_SETTINGS) 2>/dev/null || printf "<!DOCTYPE settings SYSTEM 'settings.dtd'>\n<settings>\n  <settings/>\n</settings>\n" > $(OMSX_SETTINGS)
+OPENMSX_T = $(OPENMSX) -setting $(OMSX_SETTINGS)
 MACHINE  ?= Panasonic_FS-A1ST
 MACHINE_MSX2 ?= C-BIOS_MSX2_JP
 
@@ -178,8 +183,9 @@ check: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run && mkdir -p $(B)/run
 	@cp $(ROM) $(B)/run/TurboGuild.rom
 	@cp $(DSK) $(B)/run/save.dsk
+	@mkdir -p $(B) && $(OMSX_COPY)
 	-OUT=$(abspath $(B))/run/check.txt SHOTDIR=$(abspath $(B))/run timeout 170 \
-	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run/TurboGuild.rom -romtype ASCII8 \
+	  $(OPENMSX_T) -machine $(MACHINE) -carta $(abspath $(B))/run/TurboGuild.rom -romtype ASCII8 \
 	  -diska $(abspath $(B))/run/save.dsk -script $(abspath openmsx/check.tcl) >/dev/null 2>&1
 	@$(KILL_MINE)
 	@cat $(B)/run/check.txt
@@ -187,8 +193,9 @@ check: all $(B)/save_offsets.tcl
 check-nodisk: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run3 && mkdir -p $(B)/run3
 	@cp $(ROM) $(B)/run3/TurboGuild.rom
+	@mkdir -p $(B) && $(OMSX_COPY)
 	-NODISK=1 OUT=$(abspath $(B))/run3/check.txt SHOTDIR=$(abspath $(B))/run3 timeout 90 \
-	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run3/TurboGuild.rom -romtype ASCII8 \
+	  $(OPENMSX_T) -machine $(MACHINE) -carta $(abspath $(B))/run3/TurboGuild.rom -romtype ASCII8 \
 	  -script $(abspath openmsx/check.tcl) >/dev/null 2>&1
 	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run3" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
 	@cat $(B)/run3/check.txt
@@ -199,8 +206,9 @@ play: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run4 && mkdir -p $(B)/run4
 	@cp $(ROM) $(B)/run4/TurboGuild.rom
 	@$(PYTHON) tools/mkblank_dsk.py $(B)/run4/save.dsk >/dev/null
+	@mkdir -p $(B) && $(OMSX_COPY)
 	-OUT=$(abspath $(B))/run4/play.txt MAP=$(abspath $(MAP)) DURATION=$(DURATION) $(if $(TRACE),TRACE=1) timeout 1500 \
-	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run4/TurboGuild.rom -romtype ASCII8 \
+	  $(OPENMSX_T) -machine $(MACHINE) -carta $(abspath $(B))/run4/TurboGuild.rom -romtype ASCII8 \
 	  -diska $(abspath $(B))/run4/save.dsk -script $(abspath openmsx/play.tcl) >/dev/null 2>&1
 	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run4" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
 	@cat $(B)/run4/play.txt
@@ -211,8 +219,9 @@ check-offline: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run5 && mkdir -p $(B)/run5
 	@cp $(ROM) $(B)/run5/TurboGuild.rom
 	@$(PYTHON) tools/mkblank_dsk.py $(B)/run5/save.dsk >/dev/null
+	@mkdir -p $(B) && $(OMSX_COPY)
 	-OUT=$(abspath $(B))/run5/offline.txt MAP=$(abspath $(MAP)) timeout 400 \
-	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run5/TurboGuild.rom -romtype ASCII8 \
+	  $(OPENMSX_T) -machine $(MACHINE) -carta $(abspath $(B))/run5/TurboGuild.rom -romtype ASCII8 \
 	  -diska $(abspath $(B))/run5/save.dsk -script $(abspath openmsx/offline.tcl) >/dev/null 2>&1
 	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run5" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
 	@cat $(B)/run5/offline.txt
@@ -223,8 +232,9 @@ check-timeline: all $(B)/save_offsets.tcl
 	@rm -rf $(B)/run6 && mkdir -p $(B)/run6
 	@cp $(ROM) $(B)/run6/TurboGuild.rom
 	@$(PYTHON) tools/mkblank_dsk.py $(B)/run6/save.dsk >/dev/null
+	@mkdir -p $(B) && $(OMSX_COPY)
 	-OUT=$(abspath $(B))/run6/timeline.txt MAP=$(abspath $(MAP)) SHOTDIR=$(abspath $(B))/run6 timeout 1000 \
-	  $(OPENMSX) -machine $(MACHINE) -carta $(abspath $(B))/run6/TurboGuild.rom -romtype ASCII8 \
+	  $(OPENMSX_T) -machine $(MACHINE) -carta $(abspath $(B))/run6/TurboGuild.rom -romtype ASCII8 \
 	  -diska $(abspath $(B))/run6/save.dsk -script $(abspath openmsx/timeline.tcl) >/dev/null 2>&1
 	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run6" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
 	@cat $(B)/run6/timeline.txt
@@ -233,8 +243,9 @@ check-timeline: all $(B)/save_offsets.tcl
 check-msx2: all
 	@rm -rf $(B)/run2 && mkdir -p $(B)/run2
 	@cp $(ROM) $(B)/run2/TurboGuild.rom
+	@mkdir -p $(B) && $(OMSX_COPY)
 	-OUT=$(abspath $(B))/run2/check.txt SHOTDIR=$(abspath $(B))/run2 timeout 60 \
-	  $(OPENMSX) -machine $(MACHINE_MSX2) -carta $(abspath $(B))/run2/TurboGuild.rom -romtype ASCII8 \
+	  $(OPENMSX_T) -machine $(MACHINE_MSX2) -carta $(abspath $(B))/run2/TurboGuild.rom -romtype ASCII8 \
 	  -script $(abspath openmsx/check_msx2.tcl) >/dev/null 2>&1
 	@for p in `ps -eo pid,args | grep "[o]penmsx" | grep -F "$(abspath $(B))/run2" | awk '{print $$1}'`; do kill -9 $$p 2>/dev/null || true; done
 	@cat $(B)/run2/check.txt
