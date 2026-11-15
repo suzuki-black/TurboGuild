@@ -282,7 +282,7 @@ FAR(void, pict_row, (void))
     cells = (u8)((u16)g_save.ap * 3 / (AP_MAX ? AP_MAX : 1) + (g_save.ap ? 1 : 0));   /* 電池 = AP（0〜3 目盛り） */
     if (cells > 3) cells = 3;
     vdp_fill(11, PICT_Y + 5, 10, 7, COL_LGRAY);  /* 電池の枠（x 11〜20、頭は 21） */
-    vdp_fill(21, PICT_Y + 7, 1, 3, COL_LGRAY);
+    vdp_fill(20, PICT_Y + 7, 2, 3, COL_LGRAY);   /* 頭。HMMV は 2 ドットで 1 バイトなので幅 1 は 0 バイト = 横いっぱいになる（流れるお知らせに線が残っていた） */
     vdp_fill(12, PICT_Y + 6, 8, 5, COL_BLACK);
     for (k = 0; k < cells; k++) vdp_fill((u16)(12 + k * 3), PICT_Y + 7, 2, 3, cells <= 1 ? COL_RED : COL_GREEN);
     s[0] = (char)('0' + m / 600); s[1] = (char)('0' + m / 60 % 10); s[2] = ':';
