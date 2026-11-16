@@ -193,6 +193,7 @@ FAR(void, gacha_pull, (GachaReq *g))
     if (g->status != G_OK) return;
     if (g_save.card_count + g->count > CARD_MAX) { g->status = G_FULL; return; }
     pay(&gr, price);
+    if (gr.currency == CUR_GEMS && timeline_neterr()) { g->status = G_NETERR; return; }   /* 石だけ減る（翌日に年表の GIFT でお詫び） */
     draw_all(g, &gr);
     for (i = 0; i < g->got; i++) inv_add(g->ids[i]);
 }

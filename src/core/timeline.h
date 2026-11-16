@@ -27,4 +27,5 @@ void timeline_state(TlState *s);
 void timeline_update(TlResult *r);       /* マイページに入るたび。新しく来た行を数え、贈り物を配る */
 u8   timeline_news(u16 k, u16 *text_id);  /* k 番目に新しいお知らせ（0 = 最新）。無ければ 0 */
 u16  timeline_drop_day(u8 nth);          /* nth 回目の PLAYER_DROP の日（無ければ 0xFFFF） */
+u8   timeline_neterr(void);              /* いまガチャの通信エラーの 1 時間（年表の NETERR）なら 1 */
 #endif

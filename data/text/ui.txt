@@ -88,6 +88,7 @@ T_GACHA_FREE_USED	本日分は引きました
 T_GACHA_NO_MONEY	足りません
 T_GACHA_FULL	カードがいっぱいです
 T_GACHA_NA	今は引けません
+T_GACHA_NETERR	通信エラー（E503）が発生しました。時間をおいて、もう一度お試しください
 T_GACHA_RESULT	ガチャ結果
 T_GACHA_PITY	天井到達！SSR確定
 T_GACHA_PRICE	消費
@@ -1059,6 +1060,12 @@ T_TH_RE2	kwsk
 T_TH_RE3	釣り乙
 T_TH_RE4	マジかよ…
 T_TH_RE5	乙
+T_TH_NE0	ガチャ回したら石だけ消えたんだが
+T_TH_NE1	E503 俺も
+T_TH_NE2	10連分の石返して
+T_TH_NE3	サーバー増強（笑）
+T_TH_NE4	詫び石はよ
+T_TH_NE5	サポートに問い合わせたらテンプレの返事きた
 T_TH_CHAT0	物欲センサー仕事しすぎ
 T_TH_CHAT1	SSR出ねえ…10連で全部N
 T_TH_CHAT2	無課金だけどランカーになれますか？

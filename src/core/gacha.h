@@ -11,6 +11,7 @@
 #define G_FREE_USED   2     /* 無料は 1 ゲーム日 1 回 */
 #define G_FULL        3     /* 所持カードが満杯 */
 #define G_UNAVAILABLE 4     /* 10 連が無いガチャ、開催していないイベント */
+#define G_NETERR      5     /* 年表の NETERR の 1 時間: 石は払ったのにカードが出ない（DECISIONS #109） */
 
 typedef struct {
     u8  gacha;          /* 入力: gacha.csv の id */

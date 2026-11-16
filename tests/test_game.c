@@ -712,11 +712,11 @@ static void test_timeline(void)
     g_save.g_time = GSEC_PER_DAY * 270;
     timeline_state(&t);
     CHECK(t.ended);
-    /* 贈り物（110 日目の石 500）は 1 回だけ */
+    /* 贈り物（76 日目と 110 日目の石 500）は 1 回だけ */
     fresh();
     g_save.g_time = GSEC_PER_DAY * 111;
     timeline_update(&r);
-    CHECK(r.gift_gems == 500 && g_save.gems == START_GEMS + 500 && r.n_news > 5);
+    CHECK(r.gift_gems == 1000 && g_save.gems == START_GEMS + 1000 && r.n_news > 5);
     timeline_update(&r);
     CHECK(r.gift_gems == 0 && r.n_news == 0);
     { u16 tx; CHECK(timeline_news(0, &tx)); }
@@ -1535,7 +1535,8 @@ static void test_thread(void)
             CHECK(o.ref >= 1 && o.ref < o.no && o.text >= T_TH_RE0 && o.text <= T_TH_RE5);
             break;
         default:
-            CHECK(o.kind == TH_CHAT && !o.ref && o.text >= T_TH_CHAT0 && o.text <= T_TH_END5);
+            CHECK(o.kind == TH_CHAT && !o.ref && ((o.text >= T_TH_CHAT0 && o.text <= T_TH_END5) || (o.text >= T_TH_NE0 && o.text <= T_TH_NE5)));
+            if (o.text >= T_TH_NE0 && o.text <= T_TH_NE5) CHECK(day == 75 || day == 76);   /* 通信エラーの話（DECISIONS #109） */
             if (o.text >= T_TH_END0) { nend++; CHECK(day >= SERVICE_END_DAY - 30); }
             if (o.text >= T_TH_XUSR0 && o.text <= T_TH_XUSR3) CHECK(day >= 180);
             if (o.text >= T_TH_USR0 && o.text <= T_TH_USR3) CHECK(day >= 90);
@@ -1613,6 +1614,76 @@ static void test_hello_helper(void)
 }
 
 /* 称号（DECISIONS #107） */
+/* 年表に足した行（DECISIONS #109）: 75 日目 21 時台はガチャで石だけ減る。翌日に年表の GIFT でお詫び。
+ * v21 のセーブの「読んだ行の数」は、新しい表で同じ行まで読んだ数に読み替える */
+static void test_neterr(void)
+{
+    static const u16 old_day[26] = { 0, 1, 3, 14, 20, 30, 40, 45, 60, 70, 90, 90, 95, 110, 120, 140, 140, 150, 160, 180, 180, 180, 185, 215, 240, 270 };
+    static const u8 old_kind[26] = { TL_SERVICE_START, TL_NEWS, TL_EVENT, TL_GACHA_RATEUP, TL_EVENT, TL_NEWS, TL_INFLATION, TL_EVENT,
+        TL_GACHA_RATEUP, TL_EVENT, TL_NEW_RARITY, TL_INFLATION, TL_EVENT, TL_GIFT, TL_EVENT, TL_GACHA_RATEUP, TL_GUILDWAR, TL_INFLATION,
+        TL_PLAYER_DROP, TL_NEW_RARITY, TL_INFLATION, TL_PLAYER_DROP, TL_EVENT, TL_GUILDWAR, TL_ANNOUNCE_END, TL_SERVICE_END };
+    SaveData keep = g_save;
+    GachaReq g;
+    TimelineRec t;
+    TlResult r;
+    u16 k, n = 0;
+    u32 gems;
+    fresh();
+    g_save.g_time = 75UL * GSEC_PER_DAY + 21UL * 3600 + 1800;
+    CHECK(timeline_neterr());
+    gems = g_save.gems;
+    g.gacha = 3; g.count = 1;
+    gacha_pull(&g);
+    CHECK(g.status == G_NETERR && g_save.gems == gems - 300 && g_save.card_count == 0);
+    g.gacha = 2; g.count = 1;                 /* ゴールドのガチャはふつうに引ける */
+    gacha_pull(&g);
+    CHECK(g.status == G_OK && g_save.card_count == 1);
+    g_save.g_time = 75UL * GSEC_PER_DAY + 21UL * 3600 - 1;  CHECK(!timeline_neterr());
+    g_save.g_time = 75UL * GSEC_PER_DAY + 22UL * 3600;      CHECK(!timeline_neterr());
+    g_save.g_time = 74UL * GSEC_PER_DAY + 21UL * 3600;      CHECK(!timeline_neterr());
+    g_save.g_time = 76UL * GSEC_PER_DAY + 21UL * 3600;      CHECK(!timeline_neterr());
+    /* 75 日目まで読んだ人に、76 日目でお詫びの石が 1 度だけ届く */
+    g_save.g_time = 75UL * GSEC_PER_DAY;
+    timeline_update(&r);
+    g_save.g_time = 76UL * GSEC_PER_DAY;
+    timeline_update(&r);
+    CHECK(r.gift_gems == 500 && r.n_news == 1);
+    timeline_update(&r);
+    CHECK(r.gift_gems == 0 && r.n_news == 0);
+    /* 攻略スレは、エラーの時から翌日の昼まで、その話が多い（前の日には無い） */
+    {
+        ThPost o;
+        u16 p, ne = 0, chat = 0, before = 0;
+        for (p = (u16)((75UL * GSEC_PER_DAY + 21UL * 3600) / TH_SECS); p < (u16)((76UL * GSEC_PER_DAY + 12UL * 3600) / TH_SECS); p++) {
+            thread_post(p, &o);
+            if (o.kind != TH_CHAT) continue;
+            chat++;
+            if (o.text >= T_TH_NE0 && o.text <= T_TH_NE5) ne++;
+        }
+        for (p = (u16)(74UL * GSEC_PER_DAY / TH_SECS); p < (u16)((75UL * GSEC_PER_DAY + 21UL * 3600) / TH_SECS); p++) {
+            thread_post(p, &o);
+            if (o.kind == TH_CHAT && o.text >= T_TH_NE0 && o.text <= T_TH_NE5) before++;
+        }
+        CHECK(chat > 0 && ne * 2 > chat && before == 0);
+    }
+    /* v21 の表（26 行）の k 行まで読んだセーブは、新しい表でも同じ行まで読んだことになる */
+    CHECK(TIMELINE_COUNT == 31);
+    for (k = 1; k <= 26; k++) {
+        fresh();
+        g_save.timeline_cursor = k;
+        g_save.version = 21;
+        save_upgrade(&g_save);
+        tbl_timeline((u8)(g_save.timeline_cursor - 1), &t);
+        if (t.day == old_day[k - 1] && t.kind == old_kind[k - 1]) n++;
+        if (k < 26) {                          /* 次の行は、元の次の行か、足した行 */
+            tbl_timeline((u8)g_save.timeline_cursor, &t);
+            CHECK(t.day <= old_day[k]);
+        }
+    }
+    CHECK(n == 26);
+    g_save = keep;
+}
+
 static void test_titles(void)
 {
     SaveData keep = g_save;
@@ -1673,6 +1744,7 @@ int main(void)
     test_thread();
     test_hello_helper();
     test_titles();
+    test_neterr();
     test_elem();
     test_auto_for();
     test_ap();

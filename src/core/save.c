@@ -27,6 +27,7 @@ static const u16 save_size[] = {
     offsetof(SaveData, hello_at),      /* v19: お問い合わせ */
     offsetof(SaveData, title_sel),     /* v20: あいさつと助っ人 */
     sizeof(SaveData),                  /* v21: 称号 */
+    sizeof(SaveData),                  /* v22: 欄は同じ（年表に 5 行足した） */
 };
 
 static u16 size_of(u16 version)
@@ -81,6 +82,10 @@ FAR(void, save_upgrade, (SaveData *s))
     u8 *p = (u8 *)s;
     u16 i = size_of(s->version);
     if (!i || s->version == SAVE_VERSION) return;
+    if (s->version < 22) {                          /* v22 で年表の 50・75・76・100・200 日目に行を足した（DECISIONS #109）。 */
+        u16 c = s->timeline_cursor;                 /* 読んだ行の数を、新しい表で同じ行まで読んだ数に直す（足した行は前にある分だけ読んだことに） */
+        s->timeline_cursor = (u16)(c + (c >= 24 ? 5 : c >= 14 ? 4 : c >= 11 ? 3 : c >= 9 ? 1 : 0));
+    }
     for (; i < sizeof(SaveData); i++) p[i] = 0;    /* あとから足した欄は 0 から */
     s->version = SAVE_VERSION;                      /* 次に保存するときに今の版で封をする */
 }

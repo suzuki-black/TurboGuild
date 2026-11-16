@@ -158,12 +158,13 @@ static u8 ask_count(void)
 
 static void pull(void)
 {
-    static const u16 errs[5] = { 0, T_GACHA_NO_MONEY, T_GACHA_FREE_USED, T_GACHA_FULL, T_GACHA_NA };
+    static const u16 errs[6] = { 0, T_GACHA_NO_MONEY, T_GACHA_FREE_USED, T_GACHA_FULL, T_GACHA_NA, T_GACHA_NETERR };
     u8 n = ask_count();
     if (!n) return;
     g_gacha.gacha = kinds[g_cursor];
     g_gacha.count = n;
     gacha_pull(&g_gacha);
+    if (g_gacha.status == G_NETERR) g_save_dirty = 1;          /* 石は減った */
     if (g_gacha.status != G_OK) { ui_msg(errs[g_gacha.status]); return; }
     g_save_dirty = 1;
     g_sel_gacha = g_cursor;

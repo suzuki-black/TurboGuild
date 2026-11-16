@@ -14,6 +14,8 @@
 #define N_XUSR   4
 #define N_END    6
 #define N_RE     6
+#define N_NE     6
+#define NE_HOURS 15               /* 通信エラーの話は、起きた時から 15 時間（翌日の昼まで） */
 #define DEMA_BACK 6               /* 突っ込みは 6 レス前までのデマに */
 
 static u16 th_hash(u16 a, u16 b)
@@ -57,6 +59,21 @@ static u8 border_of(u16 p, ThPost *o)
     else o->pct = (u8)(40 + (g >> 3) % 21);               /* 甘すぎ */
     o->text = (u16)(T_TH_BD0 + o->tier * 2 + ((g >> 12) & 1));
     return 1;
+}
+
+/* 時刻 t（ゲーム内の秒）が、年表の NETERR（ガチャの通信エラー, DECISIONS #109）から NE_HOURS 時間のうちなら 1 */
+static u8 neterr_near(u32 t)
+{
+    TimelineRec r;
+    u8 i;
+    u32 s;
+    for (i = 0; i < TIMELINE_COUNT; i++) {
+        tbl_timeline(i, &r);
+        if (r.kind != TL_NETERR) continue;
+        s = (u32)r.day * GSEC_PER_DAY + (u32)r.param * 3600;
+        if (t >= s && t < s + (u32)NE_HOURS * 3600) return 1;
+    }
+    return 0;
 }
 
 /* 関係ないカード（特効のデマ）: 表のどれか、本物と同じなら隣 */
@@ -109,7 +126,8 @@ FAR(void, thread_post, (u16 p, ThPost *o))
         return;
     }
     o->kind = TH_CHAT;
-    if (day >= SERVICE_END_DAY - 30 && (g & 1)) o->text = (u16)(T_TH_END0 + (g >> 1) % N_END);
+    if ((g & 3) && neterr_near((u32)p * TH_SECS)) o->text = (u16)(T_TH_NE0 + (g >> 2) % N_NE);   /* 石だけ減った話でもちきり */
+    else if (day >= SERVICE_END_DAY - 30 && (g & 1)) o->text = (u16)(T_TH_END0 + (g >> 1) % N_END);
     else if (day >= 180 && (g & 6) == 0) o->text = (u16)(T_TH_XUSR0 + (g >> 3) % N_XUSR);
     else if (day >= 90 && (g & 6) == 2) o->text = (u16)(T_TH_USR0 + (g >> 3) % N_USR);
     else if (ev && (g & 8)) o->text = (u16)(T_TH_EV0 + (g >> 4) % N_EV);

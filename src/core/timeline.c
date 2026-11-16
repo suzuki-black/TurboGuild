@@ -36,7 +36,7 @@ FAR(void, timeline_state, (TlState *s))
         case TL_ANNOUNCE_END: s->announce = 1; break;
         case TL_SERVICE_END:  s->ended = 1; break;
         case TL_GUILDWAR:     if (s->day < t.day + GVG_DAYS) { s->gvg = (u8)t.param; s->gvg_start = t.day; } break;
-        default: break;          /* SERVICE_START / NEWS / EVENT / GIFT は状態を持たない */
+        default: break;          /* SERVICE_START / NEWS / EVENT / GIFT / NETERR は状態を持たない */
         }
     }
     s->drop_pct = (u8)(100 - keep);
@@ -79,4 +79,18 @@ FAR(u16, timeline_drop_day, (u8 nth))
         if (t.kind == TL_PLAYER_DROP && nth-- == 0) return t.day;
     }
     return 0xFFFF;
+}
+
+FAR(u8, timeline_neterr, (void))
+{
+    TimelineRec t;
+    u8 i;
+    u16 d = today();
+    u16 h = (u16)(g_save.g_time % GSEC_PER_DAY / 3600);
+    for (i = 0; i < TIMELINE_COUNT; i++) {
+        tbl_timeline(i, &t);
+        if (t.day > d) break;                                   /* 日付順 */
+        if (t.kind == TL_NETERR && t.day == d && h == t.param) return 1;
+    }
+    return 0;
 }

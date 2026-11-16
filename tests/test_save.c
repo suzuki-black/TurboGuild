@@ -165,6 +165,24 @@ int main(void)
     CHECK(save_valid(&s));
     save_upgrade(&s);
     CHECK(s.version == SAVE_VERSION && s.hello_at == 99 && s.help_bits == 5 && s.title_sel == 0);
+    /* v21 も読め、欄はそのまま。年表に足した 5 行のぶん、読んだ行の数を読み替える（行の中身は test_game で比べる） */
+    save_new(&s, 1);
+    s.title_sel = 7; s.timeline_cursor = 13;
+    s.magic = SAVE_MAGIC;
+    s.version = 21;
+    s.crc = save_crc(&s);
+    CHECK(save_valid(&s));
+    save_upgrade(&s);
+    CHECK(s.version == SAVE_VERSION && s.title_sel == 7 && s.timeline_cursor == 16);
+    s.version = 21; s.timeline_cursor = 26;
+    save_upgrade(&s);
+    CHECK(s.timeline_cursor == 31);
+    s.version = 21; s.timeline_cursor = 0;
+    save_upgrade(&s);
+    CHECK(s.timeline_cursor == 0);
+    s.timeline_cursor = 26;             /* 今の版は読み替えない */
+    save_upgrade(&s);
+    CHECK(s.timeline_cursor == 26);
     /* v5（Phase2）も読める。v4 より前は読まない */
     save_new(&s, 1);
     s.magic = SAVE_MAGIC;
