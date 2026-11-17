@@ -148,6 +148,16 @@
   every 1,000 posts. People guess the ranking borders, name the event's boon card, and chat as the timeline moves on.
   About a quarter of the "info" is wrong, and sometimes someone calls it out. The real borders come from the same
   formulas as the rankings, so you can check at the end of the event.
+- **Border forecast** (Ranking, 3, during an event): the points at 10th, 100th and 500th place now, the final borders
+  if everyone keeps their pace, and how many points per hour you would need from here.
+- **Wallpapers & ringtones** (News, 6): your firsts unlock downloads, the way the era's mobile sites gave them out.
+  A wallpaper sets the four cards on the title (your deck, your best four, the USRs, ...), a ringtone sets the title
+  music — five tunes from the game plus two short originals. The page closes with the service; your picks stay.
+- **Your own life.** On the allowance course you are a student: in the week before mid-terms, finals and the
+  end-of-year tests, 20:00–23:00 is for studying, not fighting. On the working course some weekday evenings go to
+  overtime (more in December). Spend 5,000 yen or more of your allowance in one month and your parents see the
+  phone bill: next month's allowance is confiscated. When the MSX's own clock says it's the 25th, the marquee
+  advertises a payday sale.
 - **The clock.** The title shows the MSX's clock with **[9] Set clock**. If the clock looks wrong at boot (before your
   last save, more than 30 days after it, or out of range), it turns red and time away is not counted until you set
   it — a turboR without a clock battery comes up with a random date.
@@ -177,6 +187,9 @@
   Open it any time from News (1), and from the title after the end. After the end, 3 there opens the mates' last
   letters and 4 an encyclopedia-style article about TurboGuild, partly written from your save. The title itself
   ages with real time: refunds, then refunds closed, then a 404, then another company's ad.
+- **"TurboGuild II".** Pre-registration opens on day 250, and on day 262 the carry-over bonus is announced: up to three
+  of your R cards. After the end, 5 in the album shows your transfer code, the three R cards that would make it, and
+  everything that would not (your SR and better, your gems, what you spent). The release date is TBA.
 
 <p align="center">
   <img src="docs/img/screens_end_en.png" width="640" alt="The last hour on the board, the connection dropping at midnight, the aged title, the memory album and the wiki article (English version)">
@@ -231,10 +244,11 @@ Title, 3 — open from the start. Run the same 270 days from the other side.
 | | 6 | Build the deck for this enemy |
 | | 7 | Borrow a guildmate as a helper for the next fight (hunt events) |
 | Deck | 7–9 | Switch to deck A–C |
-| News | SPACE / 1 / 2 / 3 / 4 / 5 | Guild board / memory album / footprints / mail / help / guide BBS |
+| News | SPACE / 1 / 2 / 3 / 4 / 5 / 6 | Guild board / memory album / footprints / mail / help / guide BBS / wallpapers & ringtones |
+| Ranking | 3 | Border forecast (during an event) |
 | Guild board | 1 | Members (SPACE: profile, 1: greet everyone; SPACE again on a profile: diary) |
 | Memory album | 2 | Titles (SPACE: wear, 0: auto) |
-| Memories (after the end) | 1 / 3 / 4 | Cards / last letters / wiki article |
+| Memories (after the end) | 1 / 3 / 4 / 5 | Cards / last letters / wiki article / carry-over to "II" |
 | Shop | 4 | Inn: 1 sleep till morning, 2 wait for the next plan |
 | Operator mode | 1 / 2 | At the start: Fast / Full |
 | | 1–5 / ESC | Pick an option (1 is history, or skip in a planning meeting) / stop (asks first) |
@@ -502,11 +516,19 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   ある夜はガチャのサーバー増強で、その 1 時間に石で引くと、石だけ減ってカードが出ません（E503）。
   攻略スレは文句でもちきりになり、翌日に全員へ詫び石。
 - **携帯の画面の端っこ。** マイページの左下にアンテナ・電池（AP）・時計。流れるお知らせには（架空の）よそのゲームの広告。
-  お知らせの下には「ﾍﾙﾌﾟ・規約・お問い合わせ」: よくある質問、特定商取引法に基づく表記、お問い合わせ（翌日に定型の
+  お知らせの下には「ﾍﾙﾌﾟ」（規約・お問い合わせ）: よくある質問、特定商取引法に基づく表記、お問い合わせ（翌日に定型の
   返事がメールで届く）、そして引き止められる「退会はこちら」。
 - **攻略スレ**（お知らせの 5）。当時の匿名掲示板ふう——レス番・ID・1000 レスで次の Part。ボーダー予想、特効カードの話、
   年表に合わせた雑談が流れます。「情報」の 4 分の 1 ほどはデマで、ときどき誰かが突っ込みます。本当のボーダーは
   ランキングと同じ式から決まるので、イベントの終わりに答え合わせができます。
+- **ボーダー予想**（ランキングの 3、イベントの間）。10 位・100 位・500 位のいまの点、みんながいまのペースで走ったときの
+  最終日のボーダー、そこまでに 1 時間あたり何点要るか。
+- **待ち受け・着うた**（お知らせの 6）。思い出が報酬になり、当時の携帯サイトのように「ダウンロード」できます。
+  待ち受けはタイトルに並ぶ 4 枚（マイデッキ・自慢の 4 枚・USR そろい踏み など）、着うたはタイトルの曲
+  （ゲームの 5 曲と、短いオリジナル 2 曲）。サービスが終わるとページは閉じますが、選んだものは残ります。
+- **自分の暮らし。** おこづかいコースは学生です。2 学期の中間・期末と学年末のテストの前の週は、20〜23 時は勉強で
+  戦に入れません。社会人コースは平日のいくつかの夜が残業（12 月は多め）。おこづかいで 1 か月に 5000 円以上使うと
+  請求書が親に見つかり、次のおこづかいは没収です。本体の時計が 25 日の日は、流れるお知らせに給料日の広告が出ます。
 - **時計。** タイトルに本体の時計と **[9] 時刻修正** があります。起動したときに時計がおかしい（前回の保存より前・
   30 日より先・範囲外）と赤くなり、合わせるまで留守の間の時間を数えません。時計の電池が無い turboR は、
   電源を入れるとでたらめな日時になるためです。
@@ -533,6 +555,9 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
   いつでもお知らせの 1 から、終了後はタイトルから。終了後はそこで 3 を押すと仲間からの最後の手紙、4 でまとめ記事
   （一部はあなたのセーブから書かれます）。タイトルも現実の時間で古びていきます（払い戻し受付中 → 受付終了 →
   404 → 別の会社の広告）。
+- **『TurboGuild II』。** 250 日目に事前登録が始まり、262 日目に引き継ぎ特典が発表されます——お持ちの R のカードを
+  3 枚まで。終了後のアルバムの 5 で、引き継ぎコードと、引き継げる R の 3 枚と、引き継げないもの（SR 以上のカード・
+  石・これまでの課金）が見られます。『II』の配信日は未定です。
 
 <p align="center">
   <img src="docs/img/screens_end_ja.png" width="640" alt="日本語版の最後の 1 時間・0:00 に接続が切れる・古びたタイトル・思い出アルバム・まとめ記事">
@@ -584,10 +609,11 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | | 6 | その敵向けにおまかせ編成 |
 | | 7 | 仲間を助っ人に借りる（次の 1 戦。イベントは討伐のみ） |
 | デッキ | 7〜9 | デッキ A〜C に替える |
-| お知らせ | スペース／1／2／3／4／5 | ギルド伝言板／思い出アルバム／足あと／メール／ヘルプ／攻略スレ |
+| お知らせ | スペース／1／2／3／4／5／6 | ギルド伝言板／思い出アルバム／足あと／メール／ヘルプ／攻略スレ／待ち受け・着うた |
+| ランキング | 3 | ボーダー予想（イベントの間） |
 | ギルド伝言板 | 1 | メンバー（スペースでプロフィール、1 でみんなにあいさつ。プロフィールでもう一度スペースで日記） |
 | 思い出アルバム | 2 | 称号（スペースでつける、0 でおまかせ） |
-| 思い出（終了後） | 1／3／4 | カード／最後の手紙／まとめ記事 |
+| 思い出（終了後） | 1／3／4／5 | カード／最後の手紙／まとめ記事／『II』への引き継ぎ |
 | お店 | 4 | 宿屋: 1 翌朝まで寝る、2 次の予定まで休む |
 | 運営モード | 1／2 | 始めるとき: 早回し／じっくり |
 | | 1〜5／ESC | 選ぶ（1 が史実。企画会議では見送る）／やめる（確かめてから） |

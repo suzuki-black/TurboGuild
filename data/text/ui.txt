@@ -256,8 +256,23 @@ T_EV_GAINED	報酬ライン到達！
 T_RANK_TITLE	ランキング
 T_RANK_EVENT	イベント
 T_RANK_POWER	総戦力
-T_RANK_GUIDE	1:イベント 2:総戦力 0:自分
+T_RANK_GUIDE	1:ｲﾍﾞﾝﾄ 2:戦力 0:自分 3:ﾎﾞｰﾀﾞｰ
 T_RANK_YOU	あなた
+T_BO_TITLE	ボーダー予想
+T_BO_NOEV	開催中のイベントはありません
+T_BO_LEFT	残り
+T_BO_HOURS	時間
+T_BO_RANK	順位
+T_BO_NOW	いま
+T_BO_FINAL	最終日
+T_BO_NEED	必要/時
+T_BO_POS	位
+T_BO_IN	圏内
+T_BO_OUT	終了
+T_BO_YOU	あなた
+T_BO_PT	点
+T_BO_PACE	いまのペースなら最終日
+T_BO_NOTE	※ほかの人もいまのペースなら
 T_I	位
 T_ITEM_5	カード
 T_EV_LV1	初級
@@ -931,7 +946,18 @@ T_ALB_NONE	まだ思い出はない
 T_ALB_DAYP	 
 T_ALB_DAYS	日目
 T_ALB_GUIDE	左右:めくる 2:称号 ESC:戻る
-T_ALB_GUIDE_END	左右 1:ｶｰﾄﾞ 2:称号 3:手紙 4:記事
+T_ALB_GUIDE_END	左右1ｶｰﾄﾞ 2称号 3手紙 4記事 5II
+T_CO_TITLE	『II』への引き継ぎ
+T_CO_CODE	引き継ぎコード
+T_CO_OK	引き継げるもの（R・3枚まで）
+T_CO_NONE	Rのカードがない
+T_CO_NG	引き継げないもの
+T_CO_HIGH	SR以上のカード
+T_CO_MAI	枚
+T_CO_GEMS	石
+T_CO_KO	個
+T_CO_SPENT	これまでの課金
+T_CO_NOTE	※『II』の配信日は未定です
 T_MEMO0	冒険を始めた
 T_MEMO1	初めての SSR
 T_MEMO2	ギルドに入った
@@ -976,6 +1002,12 @@ T_MT_GIFT	メンテのお詫びに石100個を配布しました
 T_BILL_HEAD	【ご利用料金のお知らせ】
 T_BILL_AMT	今月のご利用料金
 T_BILL_NOTE	※パケット代は含みません
+T_LF_TEST	明日からテスト。23時までは勉強しないと…
+T_LF_OVER	今日は残業。21時までは会社を出られない…
+T_LF_BUSY	年末の繁忙期。23時まで残業…
+T_LF_CAUGHT0	親に請求書を見られた！
+T_LF_CAUGHT1	今月のおこづかいは没収…
+T_LF_AD25	【PR】今日は給料日！石の大増量パック販売中
 T_ML_TITLE	メール
 T_ML_COUNT	通
 T_ML_EMPTY	メールはありません
@@ -999,7 +1031,7 @@ T_ML_ASK0	お問い合わせありがとうございます。購入履歴を確�
 T_ML_ASK1	お問い合わせありがとうございます。誠に恐れ入りますが、規約により返金には応じかねます。今後ともよろしくお願いいたします
 T_ML_ASK2	お問い合わせありがとうございます。調査いたしましたが、不正なアクセスは確認できませんでした。今後ともよろしくお願いいたします
 T_ML_ASK3	お問い合わせありがとうございます。貴重なご意見として、今後の運営の参考にさせていただきます。今後ともよろしくお願いいたします
-T_HL_LINK	ﾍﾙﾌﾟ・お問い合わせ
+T_HL_LINK	ﾍﾙﾌﾟ
 T_HL_TITLE	ヘルプ
 T_HL_M0	よくある質問
 T_HL_M1	特定商取引法に基づく表記
@@ -1034,6 +1066,29 @@ T_HL_QUIT2	ギルドの仲間がさみしがりますよ。それでも退会し
 T_HL_STAY	ありがとうございます！これからもTurboGuildをよろしくお願いします
 T_HL_PC	退会のお手続きは、PCサイトからお願いいたします
 T_TH_LINK	攻略ｽﾚ
+T_DC_LINK	待受・着うた
+T_DC_TITLE	待ち受け・着うた
+T_DC_WALL	待ち受け
+T_DC_TONE	着うた
+T_DC_WALL0	看板
+T_DC_WALL1	マイデッキ
+T_DC_WALL2	自慢の4枚
+T_DC_WALL3	イベントの強敵
+T_DC_WALL4	ギルドの英雄
+T_DC_WALL5	USRそろい踏み
+T_DC_WALL6	XUSRの神々
+T_DC_TONE0	マイページ
+T_DC_TONE1	冒険
+T_DC_TONE2	ボス戦
+T_DC_TONE3	ガチャ
+T_DC_TONE4	イベント
+T_DC_TONE5	凱歌
+T_DC_TONE6	最終日
+T_DC_NEED	条件
+T_DC_Q0	「
+T_DC_Q1	」
+T_DC_LISTEN	SPACEで鳴らして、タイトルの曲に
+T_DC_GUIDE	上下左右 SP:設定 ESC:戻る
 T_TH_TITLE	攻略スレ
 T_TH_PART	Part
 T_TH_NANASHI	名無しさん

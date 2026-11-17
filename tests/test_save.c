@@ -176,7 +176,13 @@ int main(void)
     CHECK(s.version == SAVE_VERSION && s.title_sel == 7 && s.timeline_cursor == 16);
     s.version = 21; s.timeline_cursor = 26;
     save_upgrade(&s);
-    CHECK(s.timeline_cursor == 31);
+    CHECK(s.timeline_cursor == 33);           /* v22 で +5、v23 で終了の行の前に +2 */
+    s.version = 22; s.timeline_cursor = 30;   /* v22 から: 告知までは読んだ、終了はまだ → そのまま（足した行は次に読む） */
+    save_upgrade(&s);
+    CHECK(s.timeline_cursor == 30);
+    s.version = 22; s.timeline_cursor = 31;   /* 終了まで読んだ → 足した 2 行も読んだことに */
+    save_upgrade(&s);
+    CHECK(s.timeline_cursor == 33);
     s.version = 21; s.timeline_cursor = 0;
     save_upgrade(&s);
     CHECK(s.timeline_cursor == 0);

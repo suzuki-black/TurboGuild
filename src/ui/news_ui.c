@@ -8,6 +8,7 @@
 #include "../core/board.h"
 #include "../core/keitai.h"
 #include "../core/ranking.h"
+#include "../core/life.h"
 #include "../core/save.h"
 #include "../core/tables.h"
 #include "../core/time.h"
@@ -152,7 +153,7 @@ FAR(void, ticker_next, (void))
     } else if ((g_ticker_k & 3) == 3 && rival_text((u8)((g_ticker_k >> 2) & 1))) {
         /* ライバル（4 本に 1 本。イベント中は追ってくる人と交互） */
     } else if ((g_ticker_k & 7) == 5) {               /* 広告（8 本に 1 本, DECISIONS #102）。終了の告知の後は自社の続編 */
-        add_text(time_gday(g_save.g_time) >= SERVICE_END_DAY - 30 ? T_AD_II : (u16)(T_AD0 + (g_ticker_k >> 3) % 4));
+        add_text(time_gday(g_save.g_time) >= SERVICE_END_DAY - 30 ? T_AD_II : life_ad() ? T_LF_AD25 : (u16)(T_AD0 + (g_ticker_k >> 3) % 4));   /* 本体の時計で 25 日は給料日の広告 */
     } else {
         feed_line((u16)(g_ticker_k >> 1), &f);
         feed_text(&f);
@@ -204,8 +205,10 @@ FAR(void, news_draw, (void))
     vdp_fill(0, 168, SCREEN_W, 16, COL_BLACK);       /* 携帯サイトの下のリンク: ヘルプ・規約・お問い合わせ（DECISIONS #103） */
     ui_key(4, 12, 170);
     txt_id(3, 168, T_HL_LINK, COL_CYAN, COL_BLACK);
-    ui_key(5, 172, 170);                              /* 攻略スレ（DECISIONS #104） */
-    txt_id(23, 168, T_TH_LINK, COL_CYAN, COL_BLACK);
+    ui_key(5, 60, 170);                               /* 攻略スレ（DECISIONS #104） */
+    txt_id(9, 168, T_TH_LINK, COL_CYAN, COL_BLACK);
+    ui_key(6, 148, 170);                              /* 待ち受け・着うた（DECISIONS #113） */
+    txt_id(20, 168, T_DC_LINK, COL_CYAN, COL_BLACK);
     ui_guide(T_NEWS_GUIDE);
 }
 
@@ -217,6 +220,7 @@ FAR(void, news_update, (void))
     if (input_digit() == 2) { psg_beep(0x80, 4); screen_change(&scr_foot); return; }    /* 足あと */
     if (input_digit() == 3) { psg_beep(0x80, 4); screen_change(&scr_mail); return; }    /* メール */
     if (input_digit() == 5) { psg_beep(0x80, 4); g_cursor = 0; screen_change(&scr_thread); return; }   /* 攻略スレ */
+    if (input_digit() == 6) { psg_beep(0x80, 4); screen_change(&scr_deco); return; }   /* 待ち受け・着うた */
     if (input_digit() == 4) { psg_beep(0x80, 4); g_cursor = 0; screen_change(&scr_help); return; }   /* ヘルプ・規約・お問い合わせ */
     if (p & BTN_CANCEL) screen_change(&scr_home);
 }

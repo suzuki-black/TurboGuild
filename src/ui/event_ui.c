@@ -4,6 +4,7 @@
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
+#include "../core/life.h"
 #include "../data/bgm_data.h"
 void bgm_play(u8 song);
 #include "../ram.h"
@@ -205,6 +206,7 @@ FAR(void, evtop_update, (void))
     }
     if (d >= 1 && d <= EVENT_LEVELS) {
         u16 stage = (u16)(EVENT_STAGE_BASE + d);
+        if (life_busy()) { ui_msg(life_busy()); return; }   /* テスト勉強・残業（DECISIONS #114） */
         if (g_save.ap < quest_ap_cost(stage)) { ui_msg(T_AP_SHORT); return; }
         psg_beep(0x080, 4);
         g_sel_stage = stage;

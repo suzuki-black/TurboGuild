@@ -40,6 +40,9 @@ void ui_helper_pick(u16 enemy);       /* 助っ人を選ぶ画面（ui/helper_ui
 void ui_helper_line(u16 y);           /* 選んである助っ人の 1 行（濃い青の上に） */
 u8   ui_title_tag(u16 cx, u16 y);     /* つけている称号を見出しの上に（ui/title_ui.c, DECISIONS #107）。次の桁 */
 void ui_diary(u16 npc);              /* 仲間の日記（ui/diary_ui.c, DECISIONS #110）。閉じるまでここで待つ */
+void deco_cards(u16 wall, u16 *ids); /* 待ち受け wall の 4 枚（ui/deco_ui.c, DECISIONS #113） */
+u8   deco_song(void);                  /* タイトルで流す着うた */
+void ui_payday(void);                /* 給料日の知らせとご利用料金・親バレ（ui/keitai_ui.c） */
 void ui_helper_say(u16 y);            /* 直前の戦いで加勢していたら知らせる（y から 42 ドットの箱） */
 u8   ui_stance(u8 cx, u8 y, u8 ap, u8 bg);       /* [0] 全力 AP10（ap = 0 なら AP は出さない）。次の桁を返す */
 void ui_stance_next(void);            /* 戦い方を 通常 → 節約 → 全力 → 通常 と替える */

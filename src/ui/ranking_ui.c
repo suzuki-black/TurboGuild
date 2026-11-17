@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: MIT */
-/* ranking_ui.c — ランキング。[1] イベント [2] 総戦力 [0] 自分の位置、上下で 1 行、左右で 10 行送る。
+/* ranking_ui.c — ランキング。[1] イベント [2] 総戦力 [0] 自分の位置 [3] ボーダー予想、上下で 1 行、左右で 10 行送る。
  * 上位 3 人は金・銀・銅の印。自分の行は青。NPC の名前は「前半 + 後半」のハンドル名。 */
 #include "screen.h"
 #include "widget.h"
@@ -98,6 +98,7 @@ FAR(void, ranking_update, (void))
     u16 f = g_rank.first;
     if (d == 1 || d == 2) { g_rank.mode = (u8)(d - 1); g_rank.first = 0; psg_beep(0x100, 2); tabs(); list(); return; }
     if (d == 0) { g_rank.first = 0; list(); return; }
+    if (d == 3 && g_save.event_id) { psg_beep(0x80, 4); screen_change(&scr_border); return; }   /* ボーダー予想（DECISIONS #112） */
     if ((p & BTN_UP) && f > 1) f--;
     if (p & BTN_DOWN) f++;
     if (p & BTN_LEFT) f = f > RANK_ROWS ? (u16)(f - RANK_ROWS) : 1;

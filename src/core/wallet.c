@@ -53,6 +53,11 @@ FAR(u8, wallet_payday, (void))
     tbl_course(g_save.course, &c);
     n = (u8)(now - g_save.payday_month > 255 ? 255 : now - g_save.payday_month);
     g_save.funds += c.monthly * n;
+    g_save.flags &= (u8)~SF_CAUGHT;
+    if (g_save.course == COURSE_KID && g_save.spent - g_save.bill_base >= PARENT_LIMIT) {   /* 親に請求書を見られた: 1 か月ぶん没収 */
+        g_save.funds -= c.monthly;                 /* 今月のぶん（n >= 1） */
+        g_save.flags |= SF_CAUGHT;                 /* 給料日の知らせで言う（ui/home.c） */
+    }
     g_save.payday_month = now;
     return n;
 }

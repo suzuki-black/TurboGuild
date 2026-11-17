@@ -257,8 +257,23 @@ T_EV_GAINED	Reward reached!
 T_RANK_TITLE	Ranking
 T_RANK_EVENT	Event
 T_RANK_POWER	Power
-T_RANK_GUIDE	1:Event 2:Power 0:You
+T_RANK_GUIDE	1:Event 2:Power 0:You 3:Border
 T_RANK_YOU	you
+T_BO_TITLE	Border guess	!
+T_BO_NOEV	No event running right now
+T_BO_LEFT	Left
+T_BO_HOURS	h
+T_BO_RANK	Rank
+T_BO_NOW	Now
+T_BO_FINAL	Final
+T_BO_NEED	Per hr
+T_BO_POS	
+T_BO_IN	In!
+T_BO_OUT	Over
+T_BO_YOU	You
+T_BO_PT	pt
+T_BO_PACE	At this pace, final
+T_BO_NOTE	* If everyone keeps their pace	!
 T_I	 
 T_ITEM_5	Card
 T_EV_LV1	Easy
@@ -682,6 +697,8 @@ T_LEAD_UP	 ATK+20%
 【イベント】最終イベント「最後の竜」開催！	[Event] Final event: The Last Dragon!
 【ギルド】第2回ギルド対抗戦、開戦！昼と夜の戦に集え	[Guild] Guild War #2 begins! Fight noon & night
 【重要】サービス終了のお知らせ	[!] Notice of service end
+【お知らせ】新作『TurboGuild II』の事前登録を始めました！	[News] "TurboGuild II": pre-registration is open!
+【お知らせ】『II』への引き継ぎ特典：お持ちのRのカードを3枚まで	[News] Carry-over to "II": up to 3 of your R cards
 【重要】サービスは終了しました。ありがとうございました	[!] The service has ended. Thank you so much
 
 # ---- カード（data/cards.csv）。14 桁まで ----
@@ -1326,7 +1343,18 @@ T_ALB_NONE	No memories yet
 T_ALB_DAYP	Day 	!
 T_ALB_DAYS	 
 T_ALB_GUIDE	L/R:Page 2:Titles ESC:Back
-T_ALB_GUIDE_END	L/R 1:Card 2:Title 3:Mail 4:Wiki
+T_ALB_GUIDE_END	LR 1Card 2Title 3Mail 4Wiki 5II
+T_CO_TITLE	Carry over to "II"
+T_CO_CODE	Transfer code
+T_CO_OK	You can bring (R only, max 3)	!
+T_CO_NONE	No R cards
+T_CO_NG	You can't bring
+T_CO_HIGH	SR or better
+T_CO_MAI	 cards	!
+T_CO_GEMS	Gems	!
+T_CO_KO	 
+T_CO_SPENT	Total spent
+T_CO_NOTE	* Release date of "II": TBA	!
 T_MEMO0	Adventure began	!
 T_MEMO1	First SSR
 T_MEMO2	Joined a guild
@@ -1371,6 +1399,12 @@ T_MT_GIFT	Sorry for the maintenance: 100 gems sent	!
 T_BILL_HEAD	[Your monthly bill]	!
 T_BILL_AMT	This month:	!
 T_BILL_NOTE	*Data charges not included	!
+T_LF_TEST	Tests tomorrow! Gotta study until 11 PM...	!
+T_LF_OVER	Overtime today. Can't leave work until 9 PM...	!
+T_LF_BUSY	Busy season. Overtime again until 11 PM...	!
+T_LF_CAUGHT0	Mom saw the phone bill!	!
+T_LF_CAUGHT1	No allowance this month...	!
+T_LF_AD25	[AD] Payday! Mega gem packs on sale now
 T_ML_TITLE	Mail	!
 T_ML_COUNT	mails	!
 T_ML_EMPTY	No mail	!
@@ -1394,7 +1428,7 @@ T_ML_ASK0	Thank you for contacting us.   We checked your history: your  gems wer
 T_ML_ASK1	Thank you for contacting us.   We are sorry, but under our    terms we cannot give refunds.  Thank you for playing.
 T_ML_ASK2	Thank you for contacting us.   We looked into it but found no sign of unauthorized access.   Thank you for playing.
 T_ML_ASK3	Thank you for contacting us.   We value your feedback and willuse it to improve the service. Thank you for playing.
-T_HL_LINK	Help/Contact
+T_HL_LINK	Help
 T_HL_TITLE	Help
 T_HL_M0	FAQ
 T_HL_M1	Legal notice
@@ -1429,6 +1463,29 @@ T_HL_QUIT2	Leave your guild behind?
 T_HL_STAY	Thank you! We hope you keep enjoying TurboGuild!
 T_HL_PC	Please use our PC site to   delete your account.	!
 T_TH_LINK	Guide BBS	!
+T_DC_LINK	Downloads	!
+T_DC_TITLE	Wallpapers & tones	!
+T_DC_WALL	Wallpaper	!
+T_DC_TONE	Ringtone	!
+T_DC_WALL0	Classic	!
+T_DC_WALL1	My deck	!
+T_DC_WALL2	Best four	!
+T_DC_WALL3	Event foes	!
+T_DC_WALL4	Guild heroes	!
+T_DC_WALL5	USR lineup	!
+T_DC_WALL6	XUSR gods	!
+T_DC_TONE0	My page	!
+T_DC_TONE1	Quest	!
+T_DC_TONE2	Boss	!
+T_DC_TONE3	Gacha	!
+T_DC_TONE4	Event	!
+T_DC_TONE5	Triumph	!
+T_DC_TONE6	Last day	!
+T_DC_NEED	Get by	!
+T_DC_Q0	 "	!
+T_DC_Q1	"	!
+T_DC_LISTEN	SPACE plays it on the title	!
+T_DC_GUIDE	Arrows SP:Set ESC:Back	!
 T_TH_TITLE	Guide BBS	!
 T_TH_PART	Part	!
 T_TH_NANASHI	Anonymous	!

@@ -26,8 +26,6 @@ static u8 can_continue(void)
     return (u8)(g_save.flags & SF_STARTED);
 }
 
-/* 看板のカード（SSR と SR を並べて見せる） */
-static const u8 parade[4] = { 39, 33, 34, 40 };
 
 static u8 ended(void)
 {
@@ -67,7 +65,7 @@ static void draw_menu(void)
 FAR(void, title_init, (void))
 {
     g_cursor = (u8)(can_continue() && !ended());
-    bgm_play(BGM_HOME);
+    bgm_play(can_continue() ? deco_song() : BGM_HOME);   /* 着うた（DECISIONS #113） */
     g_viewonly = 0;
     if (ended() && !g_save.credits_seen) screen_change(&scr_ending);    /* 終了後はじめて: 結末とスタッフロール */
 }
@@ -75,12 +73,14 @@ FAR(void, title_init, (void))
 FAR(void, title_draw, (void))
 {
     u8 i, k;
+    u16 wall[4];
     ui_clear();
     for (k = 0; k < 6; k++) vdp_fill(0, (u16)(k * 4), SCREEN_W, 4, (u8)(k & 1 ? COL_RED : COL_DRED));
     vdp_fill(0, 24, SCREEN_W, 2, COL_YELLOW);
     txt_draw(1, 4, "TurboGuild", COL_YELLOW, COL_DRED);
     txt_draw(12, 4, "(C)2026 suzuki-black", COL_WHITE, COL_DRED);               /* 著作権表示（仕様 §11.5）。下の行は時計に使う */
-    for (i = 0; i < 4; i++) gfx_card(parade[i], (u8)(10 + i * 60), (u8)(ended() ? 28 : 32 + (i & 1) * 6));   /* 終了後はメニューが 4 つなので詰める */
+    deco_cards(can_continue() ? (u16)(g_save.flags >> 4) : 0, wall);              /* 待ち受け（DECISIONS #113）。元は看板の 4 枚 */
+    for (i = 0; i < 4; i++) gfx_card(wall[i], (u8)(10 + i * 60), (u8)(ended() ? 28 : 32 + (i & 1) * 6));   /* 終了後はメニューが 4 つなので詰める */
     if (!ended() && !can_continue()) {          /* ディスクが無ければ副題の代わりに知らせる（下に出すと 3 つ目の運営モードの欄に重なった） */
         if (g_save_status == SD_NODISK) txt_id(2, 116, T_TITLE_NOSAVE, COL_LGRAY, COL_BLACK);
         else txt_id(5, 116, T_TITLE_SUB, COL_WHITE, COL_BLACK);

@@ -294,3 +294,23 @@ FAR(void, pict_row, (void))
     s[3] = (char)('0' + m % 60 / 10); s[4] = (char)('0' + m % 10); s[5] = 0;
     txt_draw(3, PICT_Y, s, COL_WHITE, COL_BLACK);
 }
+
+/* 給料日: 軍資金が入ったことと、前の給料日からのご利用料金（課金した額）。マイページから（バンク 3 が埋まったのでここへ） */
+FAR(void, ui_payday, (void))
+{
+    u32 b = g_save.spent - g_save.bill_base;
+    u8 cx;
+    if (g_save.spent <= g_save.bill_base) { g_save.bill_base = g_save.spent; ui_msg(T_PAYDAY); return; }
+    g_save.bill_base = g_save.spent;
+    g_save_dirty = 1;
+    ui_box(16, 56, 224, 96, COL_DBLUE, COL_WHITE);
+    txt_id(3, 60, g_save.flags & SF_CAUGHT ? T_LF_CAUGHT0 : T_PAYDAY, COL_YELLOW, COL_DBLUE);   /* 親バレ（DECISIONS #114） */
+    txt_id(3, 84, T_BILL_HEAD, COL_CYAN, COL_DBLUE);
+    cx = txt_id(3, 102, T_BILL_AMT, COL_WHITE, COL_DBLUE);
+    cx = txt_num((u8)(cx + 1), 102, b, COL_ORANGE, COL_DBLUE);
+    txt_id(cx, 102, T_YEN, COL_WHITE, COL_DBLUE);
+    txt_id(3, 126, g_save.flags & SF_CAUGHT ? T_LF_CAUGHT1 : T_BILL_NOTE, COL_LGRAY, COL_DBLUE);
+    psg_beep(0x200, 8);
+    ui_wait_key();
+    g_dirty = 1;
+}

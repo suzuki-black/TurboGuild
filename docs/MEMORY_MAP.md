@@ -121,11 +121,12 @@
 | 101 | 6000h コード | CORE11 | code: src/core/board_fix.c | 伝言板の決まった時刻の書き込み（バンク 98 が埋まったので分けた） |
 | 102 | 6000h コード | UI_WIKI | code: src/ui/wiki_ui.c src/ui/clock_ui.c | サービス終了後のまとめ記事、時計を合わせる画面とタイトルの時計（バンク 2 が埋まったので） |
 | 103 | 6000h コード | UI_HELP | code: src/ui/help_ui.c | ヘルプ・規約・お問い合わせ・退会（お知らせの 4） |
-| 104 | 6000h コード | UI_THREAD | code: src/ui/thread_ui.c src/core/thread.c | 攻略スレ（お知らせの 5）。ボーダーの正解は data/border.h |
+| 104 | 6000h コード | UI_THREAD | code: src/ui/thread_ui.c src/core/thread.c src/ui/border_ui.c | 攻略スレ（お知らせの 5）とボーダー予想（ランキングの 3）。ボーダーの正解は data/border.h |
 | 105 | A000h データB | TEXT0 | build/text0.dat | 文字列の目次と本体（文字列のページは続いていること。text.c は TEXT0 + n を開く） |
 | 106 | A000h データB | TEXT1 | build/text1.dat | 文字列（溢れ） |
 | 107 | A000h データB | TEXT2 | build/text2.dat | 文字列（溢れ） |
 | 108 | A000h データB | TEXT3 | build/text3.dat | 文字列（溢れ） |
 | 109 | A000h データB | TEXT4 | build/text4.dat | 文字列（溢れ） |
-| 110 | 6000h コード | UI_HELPER | code: src/ui/helper_ui.c src/ui/title_ui.c src/ui/diary_ui.c | 助っ人を選ぶ画面と「助けに来た」（探索とイベントのトップの 7）、称号の一覧（アルバムの 2）とマイページの見出しの称号 |
-| 111-127 | - | - | - | 空き |
+| 110 | 6000h コード | UI_HELPER | code: src/ui/helper_ui.c src/ui/title_ui.c src/ui/diary_ui.c src/ui/deco_ui.c | 助っ人を選ぶ画面と「助けに来た」（探索とイベントのトップの 7）、称号の一覧（アルバムの 2）とマイページの見出しの称号、仲間の日記、待ち受け・着うた（お知らせの 6）とタイトルの絵と曲 |
+| 111 | 6000h コード | CORE12 | code: src/core/life.c | 自分の側の暮らし（テスト期間・残業・給料日の広告） |
+| 112-127 | - | - | - | 空き |

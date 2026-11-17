@@ -235,6 +235,7 @@ int main(int argc, char **argv)
         if (tl.ended) break;
         login_check(&lr);
         wallet_payday();
+        g_save.bill_base = g_save.spent;   /* 給料日の知らせ（ui/home.c）と同じく、請求の区切りを進める */
         event_update(&er);
         { GvgResult gr; gvg_update(&gr); if (gr.ended) fprintf(stderr, "guildwar: rank %u\n", gr.rank); }
         if (er.ended) fprintf(stderr, "event %u: pt %lu rank %u\n", er.id, (unsigned long)er.points, er.rank);

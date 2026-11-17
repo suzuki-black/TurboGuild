@@ -8,6 +8,11 @@
 
 SaveData g_save;
 
+/* 本体の時計（RTC）の PC 版。テストが g_pc_rtc に日時を入れる */
+#include "sys/rtc.h"
+DateTime g_pc_rtc;
+void rtc_read(DateTime *dt) { *dt = g_pc_rtc; }
+
 /* セーブディスクの PC 版: g_pc_disk（2DD のイメージ）に読み書きする。NULL ならディスク無し */
 #include "sys/disk.h"
 #include "core/fat12.h"

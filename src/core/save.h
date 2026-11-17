@@ -7,7 +7,7 @@
 #include "memo.h"
 
 #define SAVE_MAGIC    0x54475356UL   /* "TGSV" */
-#define SAVE_VERSION  22   /* v22: 欄は同じ。年表に行を足したので timeline_cursor を読み替える（save_upgrade） */
+#define SAVE_VERSION  23   /* v22・v23: 欄は同じ。年表に行を足したので timeline_cursor を読み替える（save_upgrade） */
 #define SAVE_MIN_VERSION 5           /* 読めるいちばん古い版（それより前はカードの形が違う） */
 /* ★上位互換の決まり（DECISIONS #78）: 欄は必ず末尾に足し、SAVE_VERSION を 1 上げ、
  *   save.c の save_size[] にその版の大きさを足す。古い版は「その版の大きさ」で検査して読み、
@@ -15,6 +15,9 @@
 
 #define DECK_EMPTY    0xFF
 #define SF_STARTED    0x01   /* 名前と最初の 10 連が済んだ */
+#define SF_CAUGHT     0x02   /* この給料日に、おこづかいを親に没収された（core/wallet.c, DECISIONS #114） */
+/* flags の上の 4 ビットは待ち受け、ops_flags の上の 4 ビットは着うた（ui/deco_ui.c, DECISIONS #113）。
+ * 前の版ではどちらも 0 だったので、欄を足さずに使える（静的 RAM が残り 1 B のため） */
 #define DAY_NEVER     0xFFFFFFFFUL
 
 typedef struct { u16 id; u8 lv; u8 flags; u16 exp; } OwnedCard;

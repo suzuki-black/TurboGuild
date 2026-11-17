@@ -5,6 +5,7 @@
 #include "screen.h"
 #include "widget.h"
 #include "../far.h"
+#include "../core/life.h"
 #include "../data/bgm_data.h"
 void bgm_play(u8 song);
 #include "../ram.h"
@@ -297,6 +298,10 @@ static u8 ensure_ap(u16 stage)
 static void go(void)
 {
     u16 stage = next_stage();
+    {
+        u16 t = life_busy();                     /* テスト勉強・残業（DECISIONS #114） */
+        if (t) { ui_msg(t); return; }
+    }
     player_ap_update();
     if (!ensure_ap(stage)) return;
     if (stage % STAGES_PER_AREA == 0) {          /* 最後はボス */

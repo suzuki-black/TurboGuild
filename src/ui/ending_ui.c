@@ -14,6 +14,7 @@
 #include "../core/save.h"
 #include "../core/tables.h"
 #include "../core/timeline.h"
+#include "../data/cards.h"
 #include "../data/screens.h"
 #include "../data/tables.h"
 #include "../data/text_ids.h"
@@ -190,7 +191,71 @@ FAR(void, album_update, (void))
     if (d == 1 && ended()) { psg_beep(0x80, 4); g_viewonly = 1; screen_change(&scr_cardlist); return; }   /* カード一覧（見るだけ） */
     if (d == 3 && ended()) { psg_beep(0x80, 4); screen_change(&scr_mail); return; }   /* 仲間からの最後の手紙 */
     if (d == 4 && ended()) { psg_beep(0x80, 4); screen_change(&scr_wiki); return; }   /* まとめ記事 */
+    if (d == 5 && ended()) { psg_beep(0x80, 4); screen_change(&scr_carry); return; }  /* 『II』への引き継ぎ */
     if (p & (BTN_CANCEL | BTN_OK)) screen_change(ended() ? &scr_title : &scr_news);
 }
 
 SCREEN(scr_album, album_init, album_update, album_draw, 0)
+
+/* ---- 『TurboGuild II』への引き継ぎ（DECISIONS #111）。終了後のアルバムの 5 から。
+ * 引き継げるのは R を 3 枚だけ（Lv の高い順）。SR 以上・石・課金は数えて見せるだけ。コードはセーブから決める ---- */
+
+static void co_num(u8 y, u16 label, u32 v, u16 unit)
+{
+    u8 cx = txt_id(3, y, label, COL_LGRAY, COL_BLACK);
+    cx = txt_num((u8)(cx + 1), y, v, COL_WHITE, COL_BLACK);
+    txt_id(cx, y, unit, COL_LGRAY, COL_BLACK);
+}
+
+FAR(void, carry_init, (void)) { }
+
+FAR(void, carry_draw, (void))
+{
+    CardRec c;
+    u16 best[3], i, high = 0;
+    u8 lv[3], n = 0, k, j, cx;
+    u32 h = g_save.rng_sim ^ g_save.spent ^ ((u32)g_save.card_count << 16);
+    char code[10];
+    ui_clear();
+    ui_header(T_CO_TITLE);
+    for (i = 0; i < g_save.card_count && i < CARD_MAX; i++) {
+        const OwnedCard *o = &g_save.cards[i];
+        if (!tbl_card(o->id, &c)) continue;
+        h = h * 33 + o->id + o->lv;
+        if (c.rarity >= RARITY_SR) { high++; continue; }
+        if (c.rarity != RARITY_R) continue;
+        for (k = n; k && lv[k - 1] < o->lv; k--) if (k < 3) { lv[k] = lv[k - 1]; best[k] = best[k - 1]; }   /* Lv の高い順に 3 枚 */
+        if (k < 3) { lv[k] = o->lv; best[k] = o->id; if (n < 3) n++; }
+    }
+    for (k = 0, j = 0; k < 9; k++) {                       /* 「A1B2-C3D4」 */
+        if (k == 4) { code[k] = '-'; continue; }
+        code[k] = "ACEFHJKLMNPRTUWXY3456789"[(u8)(h % 24)];
+        h = h / 24 + (u32)(j++) * 0x9E37UL;
+    }
+    code[9] = 0;
+    cx = txt_id(1, 20, T_CO_CODE, COL_LGRAY, COL_BLACK);
+    txt_draw((u8)(cx + 1), 20, code, COL_YELLOW, COL_BLACK);
+    txt_id(1, 38, T_CO_OK, COL_CYAN, COL_BLACK);
+    if (!n) txt_id(3, 54, T_CO_NONE, COL_LGRAY, COL_BLACK);
+    for (k = 0; k < n; k++) {
+        tbl_card(best[k], &c);
+        cx = txt_id(3, (u8)(54 + k * 16), c.name_text, COL_WHITE, COL_BLACK);
+        cx = txt_id((u8)(cx + 1), (u8)(54 + k * 16), T_LV, COL_LGRAY, COL_BLACK);
+        txt_num(cx, (u8)(54 + k * 16), lv[k], COL_WHITE, COL_BLACK);
+    }
+    txt_id(1, 104, T_CO_NG, COL_ORANGE, COL_BLACK);
+    co_num(120, T_CO_HIGH, high, T_CO_MAI);
+    co_num(136, T_CO_GEMS, g_save.gems, T_CO_KO);
+    co_num(152, T_CO_SPENT, g_save.spent, T_YEN);
+    txt_id(1, 172, T_CO_NOTE, COL_DGRAY, COL_BLACK);
+    ui_guide(T_HELP_BACK);
+}
+
+FAR(void, carry_update, (void))
+{
+    u8 p = input_pressed();
+    g_ui_state = UIS_WAITKEY;
+    if (p & (BTN_CANCEL | BTN_OK)) { psg_beep(0x80, 4); screen_change(&scr_album); }
+}
+
+SCREEN(scr_carry, carry_init, carry_update, carry_draw, 0)

@@ -10,6 +10,7 @@
 #include "core/login.h"
 #include "core/player.h"
 #include "core/quest.h"
+#include "core/life.h"
 #include "core/save.h"
 #include "core/tables.h"
 #include "core/time.h"
@@ -1476,6 +1477,101 @@ static void test_memo_ending(void)
     CHECK(e.kinds == 2 && e.kinds_all == CARD_COUNT_BUILT && e.spent == 0 && e.kind == (stay ? END_FREE : END_ALONE));
 }
 
+/* ボーダー予想（DECISIONS #112, ui/border_ui.c）: 開催中の 10・100・500 位の点は「終了の日のボーダー × 経過割合」。
+ * ランキングの式で、その 1% 上なら圏内、1% 下なら圏外になる（順位が開催中に入れ替わらない） */
+static void test_border(void)
+{
+    static const u16 tiers[3] = { 10, 100, 500 };
+    SaveData keep = g_save;
+    EventRec e;
+    RankList l;
+    u8 ev, t, q;
+    u16 n = 0;
+    for (ev = 1; ev <= EVENT_COUNT; ev++) {
+        tbl_event(ev, &e);
+        g_save.event_id = ev;
+        for (q = 1; q <= 3; q++) {
+            u32 start = (u32)e.start_day * GSEC_PER_DAY, len = (u32)e.duration * GSEC_PER_DAY;
+            u16 prog;
+            g_save.g_time = start + len / 4 * q + 777;
+            prog = (u16)((g_save.g_time - start) / (len / 256));
+            for (t = 0; t < 3; t++) {
+                u32 b = th_border[ev - 1][t], now = (b >> 8) * prog + (((b & 255) * prog) >> 8);
+                if (now < 2000) continue;                   /* 小さすぎると 1% が丸めに埋もれる */
+                l.mode = RANK_EVENT; l.first = RANK_VIEW_AROUND;
+                g_save.event_pt = now + now / 100; ranking_list(&l); CHECK(l.player_rank <= tiers[t]);
+                g_save.event_pt = now - now / 100; ranking_list(&l); CHECK(l.player_rank > tiers[t]);
+                n++;
+            }
+        }
+    }
+    CHECK(n >= 40);
+    g_save = keep;
+}
+
+/* 自分の側の暮らし（DECISIONS #114）: テスト期間・残業・親バレ・給料日の広告 */
+extern DateTime g_pc_rtc;
+static void test_life(void)
+{
+    SaveData keep = g_save;
+    u16 d, over = 0, wdays = 0, dec = 0, decdays = 0;
+    u8 h;
+    fresh();
+    wallet_start(COURSE_KID);
+    g_save.g_time = 103UL * GSEC_PER_DAY + 21UL * 3600; CHECK(life_busy() == T_LF_TEST);
+    g_save.g_time = 103UL * GSEC_PER_DAY + 19UL * 3600; CHECK(life_busy() == 0);
+    g_save.g_time = 103UL * GSEC_PER_DAY + 23UL * 3600; CHECK(life_busy() == 0);
+    g_save.g_time = 100UL * GSEC_PER_DAY + 21UL * 3600; CHECK(life_busy() == 0);
+    g_save.g_time = 108UL * GSEC_PER_DAY + 21UL * 3600; CHECK(life_busy() == 0);
+    g_save.g_time = 236UL * GSEC_PER_DAY + 22UL * 3600; CHECK(life_busy() == T_LF_TEST);
+    for (d = 0; d < SERVICE_END_DAY; d++) {                /* 学生は残業しない。テストは年に 3 回 x 7 日 */
+        g_save.g_time = (u32)d * GSEC_PER_DAY + 21UL * 3600;
+        if (life_busy()) over++;
+    }
+    CHECK(over == 21);
+    over = 0;
+    wallet_start(COURSE_WORK);
+    for (d = 0; d < SERVICE_END_DAY; d++) {
+        u8 wd = (u8)((d + 5) % 7), any = 0;
+        for (h = 0; h < 24; h++) {
+            u16 t;
+            g_save.g_time = (u32)d * GSEC_PER_DAY + (u32)h * 3600 + 1800;
+            t = life_busy();
+            if (!t) continue;
+            any = 1;
+            CHECK(wd != 0 && wd != 6 && h >= 18);           /* 平日の夜だけ */
+            CHECK(t == (d >= 153 && d < 184 ? T_LF_BUSY : T_LF_OVER));
+            CHECK(h < (t == T_LF_BUSY ? 23 : 21));
+        }
+        if (wd == 0 || wd == 6) continue;
+        if (d >= 153 && d < 184) { decdays++; dec = (u16)(dec + any); }
+        else { wdays++; over = (u16)(over + any); }
+    }
+    CHECK(over * 100 >= wdays * 15 && over * 100 <= wdays * 35);    /* 4 日に 1 日ほど */
+    CHECK(dec * 100 >= decdays * 30 && dec * 100 <= decdays * 70);  /* 年末は 2 日に 1 日ほど */
+    wallet_start(3);                                                 /* 石油王は縛られない */
+    for (d = 0; d < SERVICE_END_DAY; d++) { g_save.g_time = (u32)d * GSEC_PER_DAY + 20UL * 3600; CHECK(life_busy() == 0); }
+    /* 親バレ: おこづかいで 1 か月に 5000 円以上使うと、次のおこづかいは入らない。次の月はまた入る */
+    fresh();
+    wallet_start(COURSE_KID);
+    g_save.funds = 20000;                                            /* 貯めていた */
+    g_save.spent = 6000; g_save.funds -= 6000;
+    g_save.g_time += GSEC_PER_DAY * 30;
+    CHECK(wallet_payday() == 1 && g_save.funds == 14000 && (g_save.flags & SF_CAUGHT));
+    g_save.bill_base = g_save.spent;                                 /* 給料日の知らせが区切りを進める */
+    g_save.spent += 4999;
+    g_save.g_time += GSEC_PER_DAY * 30;
+    CHECK(wallet_payday() == 1 && g_save.funds == 17000 && !(g_save.flags & SF_CAUGHT));
+    wallet_start(COURSE_WORK);                                       /* 社会人は親にばれない */
+    g_save.spent = 50000; g_save.bill_base = 0;
+    g_save.g_time += GSEC_PER_DAY * 30;
+    CHECK(wallet_payday() == 1 && !(g_save.flags & SF_CAUGHT));
+    /* 給料日の広告は本体の時計の 25 日だけ */
+    g_pc_rtc.day = 25; CHECK(life_ad() == T_LF_AD25);
+    g_pc_rtc.day = 24; CHECK(life_ad() == 0);
+    g_save = keep;
+}
+
 /* 攻略スレ（DECISIONS #104）: 正解の表がランキングの式と合い、デマと突っ込みの関係が正しい */
 static void test_thread(void)
 {
@@ -1667,8 +1763,8 @@ static void test_neterr(void)
         }
         CHECK(chat > 0 && ne * 2 > chat && before == 0);
     }
-    /* v21 の表（26 行）の k 行まで読んだセーブは、新しい表でも同じ行まで読んだことになる */
-    CHECK(TIMELINE_COUNT == 31);
+    /* v21 の表（26 行）の k 行まで読んだセーブは、新しい表でも同じ行まで読んだことになる（v22・v23 の読み替えを続けて） */
+    CHECK(TIMELINE_COUNT == 33);
     for (k = 1; k <= 26; k++) {
         fresh();
         g_save.timeline_cursor = k;
@@ -1811,6 +1907,8 @@ int main(void)
     test_struct_sizes();
     test_battle();
     test_thread();
+    test_border();
+    test_life();
     test_hello_helper();
     test_titles();
     test_neterr();

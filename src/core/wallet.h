@@ -9,6 +9,9 @@
 #define DAYS_PER_MONTH 30
 #define W_OK        0
 #define W_NO_FUNDS  1
+#define COURSE_KID  1        /* おこづかい（学生）: テスト期間と親バレ（DECISIONS #114） */
+#define COURSE_WORK 2        /* 社会人: 残業 */
+#define PARENT_LIMIT 5000UL  /* おこづかいで 1 か月にこれだけ使うと、請求書が親に見つかる */
 
 void wallet_start(u8 course);        /* コースを決めて最初の軍資金を入れる */
 u8   wallet_buy_gems(u8 pack);       /* 石のパックを買う（W_OK / W_NO_FUNDS） */
