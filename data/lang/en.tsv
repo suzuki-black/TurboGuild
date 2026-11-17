@@ -1561,6 +1561,70 @@ T_TT_LOCK	???	!
 T_TT_NOW	Wearing: 	!
 T_TT_AUTO	Auto: 	!
 T_TT_GUIDE	SP:Wear 0:Auto ESC:Back	!
+T_DY_TITLE	's diary	!
+T_DY_NONE	No diary entries yet	!
+T_DY_GUIDE	U/D:Page ESC:Back	!
+T_DY_OPEN	SP:Diary	!
+T_DY_LIFE0	Logged in after club. Sleepy	!
+T_DY_LIFE1	Used my AP in class. Shh	!
+T_DY_LIFE2	Exams soon and I'm still grinding	!
+T_DY_LIFE3	Fun chatting with the guild today	!
+T_DY_LIFE4	What to buy with my part-time pay?	!
+T_DY_LIFE5	Battery almost died. Panicked	!
+T_DY_LIFE6	Gacha at the shop after cram school	!
+T_DY_LIFE7	Logged in under the covers	!
+T_DY_LIFE8	Overtime. Missed the event run	!
+T_DY_LIFE9	Grinding on the train. Almost missed my stop	!
+T_DY_LIFE10	Gacha at lunch. Afternoon ruined	!
+T_DY_LIFE11	Left the party early for the boss	!
+T_DY_LIFE12	Tired again. Just the login bonus	!
+T_DY_LIFE13	Seeing the guild is the best part of my day	!
+T_DY_LIFE14	Almost had my phone ring in a meeting	!
+T_DY_LIFE15	Logged in on the last train. Early day tomorrow	!
+T_DY_WKND0	Day off, so I grinded all day	!
+T_DY_WKND1	Slept all day. AP overflowed	!
+T_DY_WKND2	Out with friends, eyes on my phone	!
+T_DY_WKND3	Sunday nights feel lonely	!
+T_DY_SEASON0	Grinding at my folks'. Weak signal	!
+T_DY_SEASON1	Christmas. Gacha, alone	!
+T_DY_SEASON2	New Year's Eve with the guild	!
+T_DY_SEASON3	New Year money went to gems	!
+T_DY_EV0	%: almost at the reward line	!
+T_DY_EV1	The % boss is way too strong	!
+T_DY_EV2	Fell asleep during %...	!
+T_DY_EV3	%: taking it easy this time	!
+T_DY_GACHA0	Rate up. F2P can only watch	!
+T_DY_GACHA1	10-pull with my allowance. Nothing	!
+T_DY_GACHA2	Payday's not here and I still pulled	!
+T_DY_GACHA3	Pulled until it came. No regrets	!
+T_DY_NEW0	% now? I can't keep up	!
+T_DY_NEW1	I want a %...	!
+T_DY_END0	Saw the shutdown notice. No way	!
+T_DY_END1	I know it's ending, but I log in	!
+T_DY_END2	Glad I played in this guild	!
+T_DY_END3	I'll be here till the last day	!
+T_DY_WEAK0	Mock exam was bad. Time to get serious	!
+T_DY_WEAK1	Guess I'll wait till exams are over	!
+T_DY_WEAK2	Job hunting. No time to log in	!
+T_DY_WEAK3	Got the job. Training far away next month	!
+T_DY_WEAK4	My girlfriend says I only play games	!
+T_DY_WEAK5	Wedding prep. No time for games	!
+T_DY_WEAK6	My parents saw the bill...	!
+T_DY_WEAK7	They might cut off my phone	!
+T_DY_WEAK8	Logging in feels like a chore	!
+T_DY_WEAK9	Bored lately. Why do I still play?	!
+T_DY_WEAK10	A friend got me into another game	!
+T_DY_WEAK11	That other game might be more fun	!
+T_DY_WEAK12	Found a handy tool. Nobody will know	!
+T_DY_WEAK13	My rank went up thanks to the tool	!
+T_DY_WEAK14	My new phone comes next week!	!
+T_DY_WEAK15	New phone tomorrow. Hope the transfer works	!
+T_DY_LAST0	Bye till exams are over. Take care	!
+T_DY_LAST1	Quitting today. Off to work	!
+T_DY_LAST2	Retiring today. Thank you all	!
+T_DY_LAST3	Phone's getting cut. Last login	!
+T_DY_LAST4	I think I'm done. Good job, me	!
+T_DY_LAST5	Moving to the other game. Thanks	!
 T_TT_0	Rookie	!
 T_TT_1	Guildmate	!
 T_TT_2	Easy Mark	!

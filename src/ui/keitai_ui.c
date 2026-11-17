@@ -162,7 +162,7 @@ static void profile(const RosterRow *o)
     NpcNow n;
     u8 cx, y = 44;
     npc_now(o->npc, &n);
-    ui_box(16, 40, 224, 136, COL_DBLUE, COL_CYAN);
+    ui_box(16, 40, 224, 154, COL_DBLUE, COL_CYAN);
     cx = 3;
     if (o->gm) cx = txt_id(3, y, T_BOARD_GM, COL_YELLOW, COL_DBLUE);
     cx = name_at(cx, y, o->npc, COL_CYAN, COL_DBLUE);
@@ -180,8 +180,9 @@ static void profile(const RosterRow *o)
     cx = txt_id(cx, (u8)(y + 92), (u16)(T_TT_0 + title_npc(o->npc, n.level)), COL_WHITE, COL_DBLUE);
     txt_id(cx, (u8)(y + 92), T_TT_R, COL_YELLOW, COL_DBLUE);
     if (o->hi) txt_id(3, (u8)(y + 110), (u16)(T_HI_ST1 + o->hi - 1), o->hi == HI_BACK ? COL_GREEN : COL_LGRAY, COL_DBLUE);
+    txt_id(3, (u8)(y + 128), T_DY_OPEN, COL_CYAN, COL_DBLUE);                         /* 日記（DECISIONS #110） */
     psg_beep(0x80, 4);
-    ui_wait_key();
+    if (ui_wait_key() & BTN_OK) ui_diary(o->npc);
     g_dirty = 1;
 }
 

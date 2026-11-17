@@ -31,6 +31,7 @@
 #include "data/border.h"
 #include "core/thread.h"
 #include "core/title.h"
+#define DY_WEAK_T 4               /* core/mates.c の DY_WEAK */
 
 
 static void fresh(void) { save_new(&g_save, 1000); }
@@ -1684,6 +1685,74 @@ static void test_neterr(void)
     g_save = keep;
 }
 
+/* 仲間の日記（DECISIONS #110）: 去った後は書かない。去る前は本音、最後の日は一言（黙って消える人・凍結・機種変は無し）。
+ * 夜 20 時より前は、その日の分はまだ無い */
+static void test_diary(void)
+{
+    SaveData keep = g_save;
+    DiaryRow o;
+    u16 i, d, rd, f, written = 0, days = 0, weak = 0, last = 0, ghosts = 0;
+    fresh();
+    g_save.g_time = (u32)SERVICE_END_DAY * GSEC_PER_DAY;
+    for (i = 3; i < NPC_COUNT; i += 8) {
+        rd = mate_retire_day(i);
+        f = mate_fate(i);
+        o.npc = i;
+        for (d = 0; d < SERVICE_END_DAY; d++) {
+            u8 has;
+            o.day = d;
+            has = diary_at(&o);
+            if (rd == BOARD_NEVER || d < rd - DY_WEAK_T) { days++; written += has; }
+            if (!has) continue;
+            CHECK(o.text >= T_DY_LIFE0 && o.text <= T_DY_LAST5);
+            CHECK(!o.param == !((o.text >= T_DY_EV0 && o.text <= T_DY_EV3) || (o.text >= T_DY_NEW0 && o.text <= T_DY_NEW1)));
+            if (o.text >= T_DY_END0 && o.text <= T_DY_END3) CHECK(d >= 240);
+            if (rd == BOARD_NEVER) { CHECK(o.text < T_DY_WEAK0); continue; }
+            CHECK(d <= rd);
+            if (d == rd) { last++; CHECK(o.text == T_DY_LAST0 + MF_REASON(f) && !(f & MF_GHOST) && MF_REASON(f) < MR_BANNED); continue; }
+            if (rd - d <= DY_WEAK_T && (!(f & MF_GHOST) || MF_REASON(f) == MR_PHONE)) { weak++; CHECK(o.text >= T_DY_WEAK0 + MF_REASON(f) * 2 && o.text <= T_DY_WEAK0 + MF_REASON(f) * 2 + 1); }
+            else CHECK(o.text < T_DY_WEAK0);
+        }
+        if (rd != BOARD_NEVER && (f & MF_GHOST) && MF_REASON(f) != MR_PHONE) {
+            ghosts++;
+            for (d = rd - DY_WEAK_T; d <= rd; d++) { o.day = d; if (diary_at(&o)) CHECK(o.text < T_DY_WEAK0); }
+        }
+    }
+    CHECK(written * 100 > days * 40 && written * 100 < days * 70);   /* ふだんは半分ほどの日に書く */
+    CHECK(weak > 20 && last > 5 && ghosts > 0);
+    /* 暮らしの文は、続けて書いた 2 日で同じにならない（8 日の区切りをまたぐときを除く） */
+    {
+        DiaryRow a;
+        u16 same = 0, pairs = 0;
+        for (i = 3; i < NPC_COUNT; i += 8) {
+            o.npc = a.npc = i;
+            for (d = 1; d < 200; d++) {
+                o.day = d; a.day = (u16)(d - 1);
+                if ((d & 7) == 0 || !diary_at(&o) || !diary_at(&a)) continue;
+                if (o.text < T_DY_LIFE0 || o.text > T_DY_LIFE15 || a.text < T_DY_LIFE0 || a.text > T_DY_LIFE15) continue;
+                pairs++;
+                same += o.text == a.text;
+            }
+        }
+        CHECK(pairs > 100 && same == 0);
+    }
+    /* その日の分は夜まで無い */
+    o.npc = 3; o.day = 10;
+    g_save.g_time = 10UL * GSEC_PER_DAY + 19UL * 3600;
+    CHECK(!diary_at(&o));
+    /* 最後の一言は、去る日の朝に書かれ、昼（一覧から消える前）に読める */
+    for (i = 3; i < NPC_COUNT; i += 8) {
+        rd = mate_retire_day(i); f = mate_fate(i);
+        if (rd == BOARD_NEVER || (f & MF_GHOST) || MF_REASON(f) >= MR_BANNED) continue;
+        o.npc = i; o.day = rd;
+        g_save.g_time = (u32)rd * GSEC_PER_DAY + 11UL * 3600 + 3599;
+        CHECK(diary_at(&o) && o.text == T_DY_LAST0 + MF_REASON(f));
+        g_save.g_time = (u32)rd * GSEC_PER_DAY + 7UL * 3600;
+        CHECK(!diary_at(&o));
+    }
+    g_save = keep;
+}
+
 static void test_titles(void)
 {
     SaveData keep = g_save;
@@ -1745,6 +1814,7 @@ int main(void)
     test_hello_helper();
     test_titles();
     test_neterr();
+    test_diary();
     test_elem();
     test_auto_for();
     test_ap();

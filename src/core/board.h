@@ -104,5 +104,9 @@ typedef struct { u8 n; MailRow r[MAIL_MAX]; } MailList;
 void board_mail(MailList *l);
 
 u16  mate_fate(u16 npc);              /* 仲間の去り方（MR_* と MF_*）。board.c にあり、別のバンクからも呼べる */
+/* 仲間の日記（DECISIONS #110）。1 日 1 件まで、夜に書く。書くかどうかと中身は番号と日付のハッシュ・年表・去り方で決まり、保存しない */
+typedef struct { u16 npc; u16 day; u16 text; u16 param; } DiaryRow;   /* npc と day を入れて渡す。param は文の % に入れる文言 id（0 = なし） */
+u8   diary_at(DiaryRow *o);           /* その日の日記があり、もう書かれていれば 1（text・param を埋める） */
+#define DIARY_BACK 60                 /* さかのぼって読める日数 */
 void board_list(BoardList *l);
 #endif

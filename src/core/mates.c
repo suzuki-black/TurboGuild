@@ -3,6 +3,7 @@
 #include "mates_w.h"
 #include "deck.h"
 #include "tables.h"
+#include "timeline.h"
 #include "title.h"
 #include "../data/text_ids.h"
 #include "../far.h"
@@ -273,3 +274,76 @@ FAR(u8, title_npc, (u16 npc, u16 level))
     return common[(h >> 4) & 7];
 }
 
+
+/* ---- 仲間の日記（DECISIONS #110） ---- */
+
+#define SALT_DY    0x3F27u
+#define SALT_DY2   0x58E3u
+#define DY_PCT     55             /* ふだん書く日の割合 */
+#define DY_WEAK    4              /* 去る日の何日前から本音を書くか（その間は毎日） */
+#define DY_LIFE    8              /* 暮らしの文の数（学生・社会人のそれぞれ） */
+
+/* 季節の日（0 日目 = 2011 年 7 月 1 日） */
+static const u16 dy_season[4] = { 44, 175, 183, 184 };    /* お盆・クリスマス・大みそか・元日 */
+
+/* 年表の種類 kind が、d 日目に「その日から days 日以内」なら、その行の param + 1（無ければ 0） */
+static u16 tl_within(u16 d, u8 kind, u16 days)
+{
+    TimelineRec r;
+    u8 i;
+    u16 got = 0;
+    for (i = 0; i < TIMELINE_COUNT; i++) {
+        tbl_timeline(i, &r);
+        if (r.day > d) break;
+        if (r.kind == kind && d < r.day + days) got = (u16)(r.param + 1);
+    }
+    return got;
+}
+
+FAR(u8, diary_at, (DiaryRow *o))
+{
+    u16 i = o->npc, d = o->day, f = fate_of(i), rd = retire_day(i), h = hash(i ^ SALT_DY, d), g = hash(d, (u16)(i ^ SALT_DY2)), x;
+    u8 r = MF_REASON(f), c = MF_COURSE(f), k;
+    EventRec e;
+    o->param = 0;
+    x = (u16)((i >> 3) & 3);                                /* 書く時刻のずれ（仲間は i % 8 == 3 なので上のビットで） */
+    if (d >= SERVICE_END_DAY) return 0;
+    if (rd != BOARD_NEVER) {
+        if (d > rd) return 0;                                                       /* 去った後は書かない（戻ってくる日も一覧には載らないので書かない） */
+        if (d == rd) {                                                              /* 最後の一言は朝に（昼には一覧から消える） */
+            if ((f & MF_GHOST) || r >= MR_BANNED) return 0;                          /* 黙って消える・凍結・機種変は最後の一言も無い */
+            if ((u32)d * GSEC_PER_DAY + (8UL + x) * 3600 > g_save.g_time) return 0;
+            o->text = (u16)(T_DY_LAST0 + r);
+            return 1;
+        }
+    }
+    if ((u32)d * GSEC_PER_DAY + (20UL + x) * 3600 > g_save.g_time) return 0;      /* ふだんは夜の 20〜23 時に書く */
+    if (rd != BOARD_NEVER) {
+        if (rd - d <= DY_WEAK && (!(f & MF_GHOST) || r == MR_PHONE)) {                 /* 去る前の本音（機種変の人は「明日機種変」） */
+            o->text = (u16)(T_DY_WEAK0 + r * 2 + ((rd - d) & 1));                    /* 1 日おきに替える */
+            return 1;
+        }
+        if ((f & MF_GHOST) && rd - d <= 10 && (h & 3)) return 0;                     /* 黙って消える人は、少し前から書かなくなる */
+    }
+    if ((u8)h >= (u8)(DY_PCT * 256u / 100)) return 0;
+    if (tl_within(d, TL_ANNOUNCE_END, 0xFFFF) && (g & 1)) { o->text = (u16)(T_DY_END0 + (g >> 1) % 4); return 1; }
+    for (k = 0; k < 4; k++) if (d == dy_season[k]) { o->text = (u16)(T_DY_SEASON0 + k); return 1; }
+    switch ((g >> 2) & 7) {
+    case 0: case 1:                                         /* 開催中のイベント */
+        for (k = 1; k <= EVENT_COUNT; k++) {
+            tbl_event(k, &e);
+            if (d >= e.start_day && d < e.start_day + e.duration) { o->text = (u16)(T_DY_EV0 + (g >> 5) % 4); o->param = e.name_text; return 1; }
+        }
+        break;
+    case 2:                                                 /* 確率アップ（課金コースで違う） */
+        if (tl_within(d, TL_GACHA_RATEUP, RATEUP_DAYS)) { o->text = (u16)(T_DY_GACHA0 + c); return 1; }
+        break;
+    case 3:                                                 /* 新しいレア度 */
+        if ((x = tl_within(d, TL_NEW_RARITY, NEW_DAYS)) != 0) { o->text = (u16)(T_DY_NEW0 + ((g >> 5) & 1)); o->param = (u16)(T_RAR_0 + x - 1); return 1; }
+        break;
+    default: break;
+    }
+    if (d % 7 >= 5 && (g & 0x200)) { o->text = (u16)(T_DY_WKND0 + (g >> 10) % 4); return 1; }   /* 休日 */
+    o->text = (u16)(T_DY_LIFE0 + (c >= 2 ? DY_LIFE : 0) + (u8)(hash(i ^ SALT_DY2, d >> 3) + d) % DY_LIFE);   /* 学生（無課金・微課金）か社会人か。8 日の中では続けて同じ文にしない */
+    return 1;
+}
