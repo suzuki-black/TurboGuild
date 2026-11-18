@@ -195,6 +195,10 @@
 - **"TurboGuild II".** Pre-registration opens on day 250, and on day 262 the carry-over bonus is announced: up to three
   of your R cards. After the end, 5 in the album shows your transfer code, the three R cards that would make it, and
   everything that would not (your SR and better, your gems, what you spent). The release date is TBA.
+- **The 10th anniversary.** Game time keeps running after the end. Ten years after launch (July 1, 2021 — about eleven
+  months of real time after the end, if you keep coming back at least once a month), the title announces a revival
+  for 30 real days. Choose "10th anniversary" there: some old players are back, and the guild mates who return say
+  a line about the ten years since — what became of the exam kid, the overtime, the phone bill.
 
 <p align="center">
   <img src="docs/img/screens_end_en.png" width="640" alt="The last hour on the board, the connection dropping at midnight, the aged title, the memory album and the wiki article (English version)">
@@ -567,6 +571,10 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **『TurboGuild II』。** 250 日目に事前登録が始まり、262 日目に引き継ぎ特典が発表されます——お持ちの R のカードを
   3 枚まで。終了後のアルバムの 5 で、引き継ぎコードと、引き継げる R の 3 枚と、引き継げないもの（SR 以上のカード・
   石・これまでの課金）が見られます。『II』の配信日は未定です。
+- **10 周年の復刻。** 終了の後もゲーム内の時間は進みます。開始から 10 年（2021 年 7 月 1 日。月に 1 度は起動していれば、
+  終了から現実のおよそ 11 か月後）から現実の 30 日間、タイトルに復刻版の知らせが出ます。「10周年 復刻版」を選ぶと、
+  昔のプレイヤーが何人か戻っていて、戻ってきたギルドの仲間が 10 年後の一言を言います——受験生だったあの人、残業、
+  あの請求書。
 
 <p align="center">
   <img src="docs/img/screens_end_ja.png" width="640" alt="日本語版の最後の 1 時間・0:00 に接続が切れる・古びたタイトル・思い出アルバム・まとめ記事">

@@ -1355,6 +1355,25 @@ T_CO_GEMS	Gems	!
 T_CO_KO	 
 T_CO_SPENT	Total spent
 T_CO_NOTE	* Release date of "II": TBA	!
+T_RV10_LINE	10th anniversary revival is on!	!
+T_RV10_MENU	10th anniversary	!
+T_RV10_TITLE	TurboGuild 10th anniversary	!
+T_RV10_INTRO	10 years on: back for 30 days!	!
+T_RV10_BACK0	Old players back:	!
+T_RV10_BACK1	 
+T_RV10_NONE	None of your guild mates came back	!
+T_RV10_NOGUILD	You never joined a guild
+T_RV10_GUIDE	1:Your old cards ESC:Back
+T_RV10_STAY	Ten years! Good to see you.	!
+T_RV10_GHOST	Sorry I left without a word	!
+T_RV10_WHY0	That exam kid is a teacher now	!
+T_RV10_WHY1	10 years on. Still overtime.	!
+T_RV10_WHY2	Kids are asleep, so I'm here	!
+T_RV10_WHY3	That phone bill? Funny now.	!
+T_RV10_WHY4	Got bored... yet here I am.	!
+T_RV10_WHY5	That other game shut down too	!
+T_RV10_WHY6	Still banned. Just looking.	!
+T_RV10_WHY7	Still looking for my lost data	!
 T_MEMO0	Adventure began	!
 T_MEMO1	First SSR
 T_MEMO2	Joined a guild

@@ -958,6 +958,25 @@ T_CO_GEMS	石
 T_CO_KO	個
 T_CO_SPENT	これまでの課金
 T_CO_NOTE	※『II』の配信日は未定です
+T_RV10_LINE	10周年記念！復刻版を配信中
+T_RV10_MENU	10周年 復刻版
+T_RV10_TITLE	TurboGuild 10周年 復刻版
+T_RV10_INTRO	開始から10年。30日間だけ復刻！
+T_RV10_BACK0	昔のプレイヤー
+T_RV10_BACK1	人が戻った
+T_RV10_NONE	ギルドの仲間は、誰も戻ってこなかった
+T_RV10_NOGUILD	どのギルドにも入っていなかった
+T_RV10_GUIDE	1:10年前のカード ESC:戻る
+T_RV10_STAY	10年ぶり！また会えたね
+T_RV10_GHOST	何も言わずに消えてごめん
+T_RV10_WHY0	受験生だった私も、もう先生
+T_RV10_WHY1	10年たっても、まだ残業中
+T_RV10_WHY2	子どもが寝たので来てみた
+T_RV10_WHY3	あの請求書も、今は笑い話
+T_RV10_WHY4	飽きたはずなのに来ちゃった
+T_RV10_WHY5	あっちのゲームも終わった
+T_RV10_WHY6	凍結は解けないけど見に来た
+T_RV10_WHY7	消えたデータ、まだ探してる
 T_MEMO0	冒険を始めた
 T_MEMO1	初めての SSR
 T_MEMO2	ギルドに入った

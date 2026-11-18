@@ -10,6 +10,8 @@ void bgm_play(u8 song);
 #include "../ram.h"
 #include "../core/time.h"
 #include "../core/timeline.h"
+#include "../core/ending.h"
+#include "../core/save.h"
 #include "../config.h"
 #include "../data/screens.h"
 #include "../data/tables.h"
@@ -36,14 +38,16 @@ static u8 ended(void)
 }
 
 /* 終了後に来続けると、跡地が古びていく（DECISIONS #97）。現実の経過で: 翌日から払い戻しの受付、
- * 30 日で受付終了、半年でページが無くなり、1 年で別の会社の広告になる */
+ * 30 日で受付終了、半年でページが無くなる。
+ * 開始から 10 年（2021/7/1）からの 30 日は復刻版（DECISIONS #116）、その後は別の会社の広告になる */
 static u16 ended_line(void)
 {
     u32 e = g_save.g_time - (u32)SERVICE_END_DAY * GSEC_PER_DAY, d = e / (GSEC_PER_DAY * TIME_SCALE);   /* 現実の日数 */
     if (g_save.g_time < (u32)SERVICE_END_DAY * GSEC_PER_DAY || d < 1) return T_ENDED_TITLE;
     if (d < 30) return T_ENDED_REFUND;
     if (d < 182) return T_ENDED_REFUND_END;
-    if (d < 365) return T_ENDED_404;
+    if (REVIVAL_ON()) return T_RV10_LINE;                                  /* 10 周年の復刻版（DECISIONS #116） */
+    if ((u16)(g_save.g_time / GSEC_PER_DAY) < REVIVAL_DAY) return T_ENDED_404;
     return T_ENDED_AD;
 }
 
@@ -53,12 +57,15 @@ static void draw_menu(void)
     static const u16 after[4] = { T_MEMORIES, T_RESET, T_STAFFROLL, T_OPS_MENU };   /* サービス終了後 */
     const u16 *items = ended() ? after : normal;
     u8 i, n = ended() ? 4 : 3;
+    u16 t;
     for (i = 0; i < n; i++) {
         u8 y = (u8)(ended() ? 120 + i * 19 : 138 + i * 19), on = (u8)(i == g_cursor);
         u8 off = (u8)(!ended() && i == 1 && !can_continue());   /* セーブが無ければ「つづきから」は選べない */
         ui_box(48, y, 160, 19, on ? COL_BLUE : COL_DBLUE, on ? COL_YELLOW : COL_DGRAY);   /* 「思い出をリセット」が入る幅 */
         ui_key((u8)(i + 1), 52, (u8)(y + 4));
-        txt_id(9, (u8)(y + 2), items[i], off ? COL_DGRAY : on ? COL_YELLOW : COL_WHITE, on ? COL_BLUE : COL_DBLUE);
+        t = items[i];
+        if (ended() && i == 2 && REVIVAL_ON()) t = T_RV10_MENU;          /* 復刻の間はスタッフロールの代わりに */
+        txt_id(9, (u8)(y + 2), t, off ? COL_DGRAY : on ? COL_YELLOW : COL_WHITE, on ? COL_BLUE : COL_DBLUE);
     }
 }
 
@@ -122,7 +129,7 @@ FAR(void, title_update, (void))
         psg_beep(0x80, 4);
         if (ended()) {
             if (g_cursor == 0) screen_change(&scr_album);                        /* 思い出を見る（アルバム） */
-            else if (g_cursor == 2) screen_change(&scr_ending);                  /* 結末からスタッフロール */
+            else if (g_cursor == 2) screen_change(REVIVAL_ON() ? &scr_revival : &scr_ending);   /* 結末からスタッフロール（復刻の間は復刻版） */
             else if (g_cursor == 3) screen_change(&scr_ops);              /* 運営モード（裏面） */
             else if (ui_confirm(T_RESET_CONFIRM)) { save_new(&g_save, rtc_now_secs()); g_time_status = TIME_OK; screen_change(&scr_name); }
             else g_dirty = 1;

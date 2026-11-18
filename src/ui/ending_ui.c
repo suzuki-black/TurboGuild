@@ -259,3 +259,40 @@ FAR(void, carry_update, (void))
 }
 
 SCREEN(scr_carry, carry_init, carry_update, carry_draw, 0)
+
+/* ---- 10 周年の復刻版（DECISIONS #116）。期間中のタイトルの 3 から。戻ってきた仲間と、その 10 年後の一言 ---- */
+
+FAR(void, revival_init, (void)) { }
+
+FAR(void, revival_draw, (void))
+{
+    u16 npc[REVIVAL_SHOW], text[REVIVAL_SHOW];
+    u8 n = revival_mates(npc, text), k, y, cx, bg;
+    ui_clear();
+    ui_header(T_RV10_TITLE);
+    txt_id(1, 18, T_RV10_INTRO, COL_YELLOW, COL_BLACK);
+    cx = txt_id(1, 36, T_RV10_BACK0, COL_LGRAY, COL_BLACK);
+    cx = txt_num((u8)(cx + 1), 36, revival_count(), COL_WHITE, COL_BLACK);
+    txt_id(cx, 36, T_RV10_BACK1, COL_LGRAY, COL_BLACK);
+    if (!n) txt_id(2, 60, g_save.guild ? T_RV10_NONE : T_RV10_NOGUILD, COL_LGRAY, COL_BLACK);
+    for (k = 0; k < n; k++) {
+        y = (u8)(56 + k * 32);
+        bg = (u8)(k & 1 ? COL_BLACK : COL_DGRAY);
+        vdp_fill(0, y, SCREEN_W, 32, bg);
+        npc_name(1, y, npc[k], COL_CYAN, bg);
+        cx = txt_id(2, (u8)(y + 15), T_RV_Q0, COL_WHITE, bg);
+        cx = txt_id(cx, (u8)(y + 15), text[k], COL_WHITE, bg);
+        txt_id(cx, (u8)(y + 15), T_RV_Q1, COL_WHITE, bg);
+    }
+    ui_guide(T_RV10_GUIDE);
+}
+
+FAR(void, revival_update, (void))
+{
+    u8 p = input_pressed(), d = input_digit();
+    g_ui_state = UIS_WAITKEY;
+    if (d == 1) { psg_beep(0x80, 4); g_viewonly = 1; screen_change(&scr_cardlist); return; }   /* 10 年前のカード（見るだけ） */
+    if (p & (BTN_CANCEL | BTN_OK)) { psg_beep(0x80, 4); screen_change(&scr_title); }
+}
+
+SCREEN(scr_revival, revival_init, revival_update, revival_draw, 0)

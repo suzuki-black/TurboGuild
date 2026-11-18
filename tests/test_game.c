@@ -1623,6 +1623,40 @@ static void test_trade(void)
     g_save = keep;
 }
 
+/* 10 周年の復刻（DECISIONS #116）: 期間は 2021/7/1 から 300 日（現実の 30 日）。凍結された人は戻らず、一言は去り方に合う */
+static void test_revival(void)
+{
+    SaveData keep = g_save;
+    u16 npc[REVIVAL_SHOW], text[REVIVAL_SHOW], c;
+    u8 gd, n, k, total = 0, guilds = 0;
+    fresh();
+    g_save.g_time = (u32)REVIVAL_DAY * GSEC_PER_DAY - 1;         CHECK(!REVIVAL_ON());
+    g_save.g_time = (u32)REVIVAL_DAY * GSEC_PER_DAY;             CHECK(REVIVAL_ON());
+    g_save.g_time = (u32)(REVIVAL_DAY + REVIVAL_DAYS) * GSEC_PER_DAY - 1; CHECK(REVIVAL_ON());
+    g_save.g_time = (u32)(REVIVAL_DAY + REVIVAL_DAYS) * GSEC_PER_DAY;     CHECK(!REVIVAL_ON());
+    g_save.guild = 0;
+    CHECK(revival_mates(npc, text) == 0);
+    for (gd = 1; gd <= GUILD_COUNT; gd++) {
+        g_save.guild = gd;
+        n = revival_mates(npc, text);
+        CHECK(n <= REVIVAL_SHOW);
+        total = (u8)(total + n);
+        guilds = (u8)(guilds + (n > 0));
+        for (k = 0; k < n; k++) {
+            u16 f = mate_fate(npc[k]);
+            CHECK(npc[k] % 128 == (u16)((gd - 1) * 8 + 3) % 128);
+            CHECK(MF_REASON(f) != MR_BANNED);
+            if ((u8)mate_info(npc[k]) == MATE_STAYS) CHECK(text[k] == T_RV10_STAY);
+            else if (f & MF_GHOST) CHECK(text[k] == T_RV10_GHOST);
+            else CHECK(text[k] == T_RV10_WHY0 + MF_REASON(f));
+        }
+        c = revival_count();
+        CHECK(c >= 20 && c <= 60);
+    }
+    CHECK(total >= GUILD_COUNT && total <= GUILD_COUNT * 3 && guilds >= GUILD_COUNT / 2);   /* 3 人に 1 人ほど */
+    g_save = keep;
+}
+
 /* 攻略スレ（DECISIONS #104）: 正解の表がランキングの式と合い、デマと突っ込みの関係が正しい */
 static void test_thread(void)
 {
@@ -1961,6 +1995,7 @@ int main(void)
     test_border();
     test_life();
     test_trade();
+    test_revival();
     test_hello_helper();
     test_titles();
     test_neterr();

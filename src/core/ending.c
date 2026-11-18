@@ -5,6 +5,8 @@
 #include "save.h"
 #include "../data/cards.h"
 #include "../data/tables.h"
+#include "../data/text_ids.h"
+#include "../config.h"
 #include "../far.h"
 
 u8 ending_kind(const EndingStats *e)
@@ -42,4 +44,36 @@ FAR(void, ending_stats, (EndingStats *e))
         }
     }
     e->kind = ending_kind(e);
+}
+
+/* ---- 10 周年の復刻（DECISIONS #116）。保存せず、ギルドの仲間の番号と去り方から決める ---- */
+
+static u16 rv_mix(u16 i)
+{
+    u16 h = (u16)(i * 0x9E37u + g_save.guild * 0x3B1u);
+    h ^= h >> 7;
+    return (u16)(h * 0x2B5u);
+}
+
+/* ギルドの仲間のうち 3 人に 1 人ほどが戻る。凍結された人は戻れない。一言は去り方で決まる（最後まで残った人は別の一言） */
+FAR(u8, revival_mates, (u16 *npc, u16 *text))
+{
+    u16 i, f;
+    u8 n = 0, k = 0;
+    if (!g_save.guild) return 0;
+    for (i = (u16)((g_save.guild - 1) * 8 + 3); i < NPC_COUNT && k < END_MATES_MAX && n < REVIVAL_SHOW; i += 128, k++) {
+        f = mate_fate(i);
+        if ((rv_mix(i) >> 8) % 3 || MF_REASON(f) == MR_BANNED) continue;
+        npc[n] = i;
+        if ((u8)mate_info(i) == MATE_STAYS) text[n] = T_RV10_STAY;
+        else if (f & MF_GHOST) text[n] = T_RV10_GHOST;
+        else text[n] = (u16)(T_RV10_WHY0 + MF_REASON(f));
+        n++;
+    }
+    return n;
+}
+
+FAR(u16, revival_count, (void))
+{
+    return (u16)(20 + (rv_mix((u16)g_save.rng_sim) >> 4) % 41);
 }

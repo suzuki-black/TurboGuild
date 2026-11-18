@@ -36,4 +36,12 @@ typedef struct {
 
 void ending_stats(EndingStats *e);        /* g_save から集めて結末を決める */
 u8   ending_kind(const EndingStats *e);   /* 集めた数字から結末を決める（ending_stats が呼ぶ。同じバンクから直接） */
+
+/* 10 周年の復刻（DECISIONS #116）。サービス開始（0 日目 = 2011/7/1）から 10 年の 2021/7/1 から、現実の 30 日間 */
+#define REVIVAL_DAY   3653u
+#define REVIVAL_DAYS  300u
+#define REVIVAL_SHOW  4          /* 復刻版の画面に出す、戻ってきた仲間 */
+#define REVIVAL_ON()  ((u16)(g_save.g_time / GSEC_PER_DAY) >= REVIVAL_DAY && (u16)(g_save.g_time / GSEC_PER_DAY) < REVIVAL_DAY + REVIVAL_DAYS)
+u8   revival_mates(u16 *npc, u16 *text);  /* 戻ってきたギルドの仲間（REVIVAL_SHOW 人まで）とその一言。人数 */
+u16  revival_count(void);                 /* 戻ってきた、かつてのプレイヤーの数（数十人） */
 #endif
