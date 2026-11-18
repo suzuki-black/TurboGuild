@@ -153,6 +153,11 @@
 - **Wallpapers & ringtones** (News, 6): your firsts unlock downloads, the way the era's mobile sites gave them out.
   A wallpaper sets the four cards on the title (your deck, your best four, the USRs, ...), a ringtone sets the title
   music — five tunes from the game plus two short originals. The page closes with the service; your picks stay.
+- **The trade board** (Guild board, 2): other players list cards for gems, and ask for cards you can give up for
+  gems (never one in your deck). Prices follow the market: an SSR goes for about what the premium gacha costs you,
+  then halves with every newer rarity, and everything is dumped after the end is announced. One listing in eight is
+  "cheap", and many of those are scams — you pay and the seller vanishes — until the staff start checking listings
+  on day 135. The board changes every six hours and after every deal.
 - **Your own life.** On the allowance course you are a student: in the week before mid-terms, finals and the
   end-of-year tests, 20:00–23:00 is for studying, not fighting. On the working course some weekday evenings go to
   overtime (more in December). Spend 5,000 yen or more of your allowance in one month and your parents see the
@@ -246,7 +251,7 @@ Title, 3 — open from the start. Run the same 270 days from the other side.
 | Deck | 7–9 | Switch to deck A–C |
 | News | SPACE / 1 / 2 / 3 / 4 / 5 / 6 | Guild board / memory album / footprints / mail / help / guide BBS / wallpapers & ringtones |
 | Ranking | 3 | Border forecast (during an event) |
-| Guild board | 1 | Members (SPACE: profile, 1: greet everyone; SPACE again on a profile: diary) |
+| Guild board | 1 / 2 | Members (SPACE: profile, 1: greet everyone; SPACE again on a profile: diary) / trade board |
 | Memory album | 2 | Titles (SPACE: wear, 0: auto) |
 | Memories (after the end) | 1 / 3 / 4 / 5 | Cards / last letters / wiki article / carry-over to "II" |
 | Shop | 4 | Inn: 1 sleep till morning, 2 wait for the next plan |
@@ -526,6 +531,10 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 - **待ち受け・着うた**（お知らせの 6）。思い出が報酬になり、当時の携帯サイトのように「ダウンロード」できます。
   待ち受けはタイトルに並ぶ 4 枚（マイデッキ・自慢の 4 枚・USR そろい踏み など）、着うたはタイトルの曲
   （ゲームの 5 曲と、短いオリジナル 2 曲）。サービスが終わるとページは閉じますが、選んだものは残ります。
+- **トレード掲示板**（ギルド伝言板の 2）。ほかのプレイヤーが石でカードを出品し、求めるカードを買い取ってくれます
+  （デッキのカードは売れません）。値段は相場どおり——SSR はプレミアガチャで引くのとだいたい同じ、新しいレア度が出るたびに
+  半分になり、終了の告知の後は投げ売り。8 本に 1 本は「格安」で、その多くは詐欺です（払ったら出品者と連絡が取れなくなる）。
+  135 日目に運営が出品の審査を始めると減ります。掲示板は 6 時間ごとと、取引のたびに入れ替わります。
 - **自分の暮らし。** おこづかいコースは学生です。2 学期の中間・期末と学年末のテストの前の週は、20〜23 時は勉強で
   戦に入れません。社会人コースは平日のいくつかの夜が残業（12 月は多め）。おこづかいで 1 か月に 5000 円以上使うと
   請求書が親に見つかり、次のおこづかいは没収です。本体の時計が 25 日の日は、流れるお知らせに給料日の広告が出ます。
@@ -611,7 +620,7 @@ The ROM contains the SDCC runtime library (GPL with a linking exception, so dist
 | デッキ | 7〜9 | デッキ A〜C に替える |
 | お知らせ | スペース／1／2／3／4／5／6 | ギルド伝言板／思い出アルバム／足あと／メール／ヘルプ／攻略スレ／待ち受け・着うた |
 | ランキング | 3 | ボーダー予想（イベントの間） |
-| ギルド伝言板 | 1 | メンバー（スペースでプロフィール、1 でみんなにあいさつ。プロフィールでもう一度スペースで日記） |
+| ギルド伝言板 | 1／2 | メンバー（スペースでプロフィール、1 でみんなにあいさつ。プロフィールでもう一度スペースで日記）／トレード掲示板 |
 | 思い出アルバム | 2 | 称号（スペースでつける、0 でおまかせ） |
 | 思い出（終了後） | 1／3／4／5 | カード／最後の手紙／まとめ記事／『II』への引き継ぎ |
 | お店 | 4 | 宿屋: 1 翌朝まで寝る、2 次の予定まで休む |

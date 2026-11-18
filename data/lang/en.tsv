@@ -375,7 +375,7 @@ T_TO_TITLE	Return to the title?
 T_GUIDE_HOME2	1-8:Menu ESC:Title
 T_BOARD_TITLE	Guild Board
 T_NEWS_GUIDE	SP:Board 1:Album 2:Visit 3:Mail	!
-T_BOARD_GUIDE	U/D:More 1:Members ESC:Back	!
+T_BOARD_GUIDE	U/D 1:Members 2:Trade ESC:Back	!
 T_BOARD_EMPTY	No posts yet.
 T_BOARD_HEAD	[Guild] 
 T_AD0	[AD] New RPG "Starsong Ark": pre-register now!	!
@@ -1486,6 +1486,24 @@ T_DC_Q0	 "	!
 T_DC_Q1	"	!
 T_DC_LISTEN	SPACE plays it on the title	!
 T_DC_GUIDE	Arrows SP:Set ESC:Back	!
+T_TR_TITLE0	Trade: for sale	!
+T_TR_TITLE1	Trade: wanted	!
+T_TR_GUIDE	L/R:Tab U/D SP:Deal ESC:Back
+T_TR_CLOSED	The service has ended. No trading.
+T_TR_WARN	* Cheap listings may be scams!	!
+T_TR_AUDIT	* Staff now check listings
+T_TR_WANTHEAD	Sell what people ask for
+T_TR_BY	 sells
+T_TR_WANTS	 wants it
+T_TR_CHEAP	Cheap!
+T_TR_HAVE	Have
+T_TR_FULL	Your card box is full
+T_TR_BUYQ	Buy this listing with gems?	!
+T_TR_SCAM	The seller vanished... The gems are gone.
+T_TR_GOT	The card arrived!	!
+T_TR_NOHAVE	No spare copy (deck cards can't be sold)
+T_TR_SELLQ	Give up this card for gems?
+T_TR_SOLD	Deal done! You got the gems.
 T_TH_TITLE	Guide BBS	!
 T_TH_PART	Part	!
 T_TH_NANASHI	Anonymous	!

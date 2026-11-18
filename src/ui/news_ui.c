@@ -300,6 +300,7 @@ FAR(void, board_update, (void))
     if ((p & BTN_UP) && g_cursor) { g_cursor--; psg_beep(0x100, 2); g_dirty = 1; }
     if ((p & BTN_DOWN) && board_shown > 1) { g_cursor++; psg_beep(0x100, 2); g_dirty = 1; }
     if (input_digit() == 1) { psg_beep(0x80, 4); screen_change(&scr_roster); return; }   /* メンバー */
+    if (input_digit() == 2) { psg_beep(0x80, 4); screen_change(&scr_trade); return; }    /* トレード掲示板（DECISIONS #115） */
     if (p & (BTN_OK | BTN_CANCEL)) screen_change(&scr_news);
 }
 

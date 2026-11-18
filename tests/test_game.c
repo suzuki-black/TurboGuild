@@ -11,6 +11,7 @@
 #include "core/player.h"
 #include "core/quest.h"
 #include "core/life.h"
+#include "core/trade.h"
 #include "core/save.h"
 #include "core/tables.h"
 #include "core/time.h"
@@ -1572,6 +1573,56 @@ static void test_life(void)
     g_save = keep;
 }
 
+/* トレード掲示板（DECISIONS #115）: 出ていないカードは並ばない、値段は相場の幅、詐欺は格安だけで審査の後は減る */
+static void test_trade(void)
+{
+    SaveData keep = g_save;
+    TradeRow o, q;
+    CardRec c;
+    TlState tl;
+    u32 m;
+    u16 d, cheap0 = 0, scam0 = 0, cheap1 = 0, scam1 = 0, rows = 0, diff = 0;
+    u8 tab, k, h;
+    fresh();
+    g_save.g_time = 10UL * GSEC_PER_DAY;
+    CHECK(trade_market(RARITY_SSR) == 24000);
+    g_save.g_time = 100UL * GSEC_PER_DAY;  CHECK(trade_market(RARITY_SSR) == 12000 && trade_market(RARITY_USR) == 60000);
+    g_save.g_time = 200UL * GSEC_PER_DAY;  CHECK(trade_market(RARITY_SSR) == 6000);
+    g_save.g_time = 250UL * GSEC_PER_DAY;  CHECK(trade_market(RARITY_SSR) == 1500);   /* 終了の告知の後は投げ売り */
+    for (d = 0; d < SERVICE_END_DAY; d += 3)
+        for (h = 0; h < 24; h += 6) {
+            g_save.g_time = (u32)d * GSEC_PER_DAY + (u32)h * 3600 + 60;
+            timeline_state(&tl);
+            for (tab = 0; tab < 2; tab++)
+                for (k = 0; k < TRADE_ROWS; k++) {
+                    CHECK(trade_row(TRADE_TK(tab, k), &o));
+                    CHECK(tbl_card(o.card, &c) && c.rarity == o.rarity && c.release_day <= d && o.rarity <= tl.top_rarity);
+                    CHECK(o.npc < NPC_COUNT);
+                    m = trade_market(o.rarity);
+                    if (tab == TRADE_WANT) { CHECK(o.price * 100 <= m * 15 + 100 && !o.cheap && !o.scam); continue; }
+                    rows++;
+                    CHECK(!o.scam || o.cheap);
+                    if (o.cheap) CHECK(o.price * 100 <= m * 31 + 100);
+                    else CHECK(o.price * 100 + 1000 >= m * 84 && o.price * 100 <= m * 125 + 100);   /* 端数を 10 で落とすぶんの余裕 */
+                    if (d < TRADE_AUDIT_DAY) { cheap0 += o.cheap; scam0 += o.scam; } else { cheap1 += o.cheap; scam1 += o.scam; }
+                }
+        }
+    CHECK(rows > 1000 && cheap0 > 20 && cheap1 > 20);
+    CHECK(scam0 * 100 >= cheap0 * 50 && scam1 * 100 <= cheap1 * 40);   /* 審査の前は 3 本に 2 本、後は 4 本に 1 本ほど */
+    /* 売り買いのたびに入れ替わり、4 回で元に戻る */
+    g_save.g_time = 50UL * GSEC_PER_DAY;
+    trade_row(TRADE_TK(0, 0), &o);
+    for (k = 0; k < 4; k++) {
+        trade_next();
+        trade_row(TRADE_TK(0, 0), &q);
+        if (k < 3 && (q.card != o.card || q.price != o.price || q.npc != o.npc)) diff++;
+    }
+    CHECK(diff >= 2 && q.card == o.card && q.price == o.price && q.npc == o.npc);
+    g_save.g_time = (u32)SERVICE_END_DAY * GSEC_PER_DAY + 10;
+    CHECK(!trade_row(0, &o));                                     /* 終わったら閉じる */
+    g_save = keep;
+}
+
 /* 攻略スレ（DECISIONS #104）: 正解の表がランキングの式と合い、デマと突っ込みの関係が正しい */
 static void test_thread(void)
 {
@@ -1909,6 +1960,7 @@ int main(void)
     test_thread();
     test_border();
     test_life();
+    test_trade();
     test_hello_helper();
     test_titles();
     test_neterr();

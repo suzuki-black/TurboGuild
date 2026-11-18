@@ -128,5 +128,6 @@
 | 108 | A000h データB | TEXT3 | build/text3.dat | 文字列（溢れ） |
 | 109 | A000h データB | TEXT4 | build/text4.dat | 文字列（溢れ） |
 | 110 | 6000h コード | UI_HELPER | code: src/ui/helper_ui.c src/ui/title_ui.c src/ui/diary_ui.c src/ui/deco_ui.c | 助っ人を選ぶ画面と「助けに来た」（探索とイベントのトップの 7）、称号の一覧（アルバムの 2）とマイページの見出しの称号、仲間の日記、待ち受け・着うた（お知らせの 6）とタイトルの絵と曲 |
-| 111 | 6000h コード | CORE12 | code: src/core/life.c | 自分の側の暮らし（テスト期間・残業・給料日の広告） |
-| 112-127 | - | - | - | 空き |
+| 111 | 6000h コード | CORE12 | code: src/core/life.c src/core/trade.c | 自分の側の暮らし（テスト期間・残業・給料日の広告）、トレード掲示板の出品と相場 |
+| 112 | 6000h コード | UI_TRADE | code: src/ui/trade_ui.c | トレード掲示板（ギルド伝言板の 2） |
+| 113-127 | - | - | - | 空き |

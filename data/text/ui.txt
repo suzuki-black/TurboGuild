@@ -375,7 +375,7 @@ T_TO_TITLE	タイトルへ戻りますか？
 T_GUIDE_HOME2	1〜8:メニュー ESC:タイトル
 T_BOARD_TITLE	ギルド伝言板
 T_NEWS_GUIDE	SP:板 1:思い出 2:足あと 3:ﾒｰﾙ
-T_BOARD_GUIDE	上下:前後 1:メンバー ESC:戻る
+T_BOARD_GUIDE	上下 1:ﾒﾝﾊﾞｰ 2:ﾄﾚｰﾄﾞ ESC:戻る
 T_BOARD_EMPTY	まだ書き込みはありません
 T_BOARD_HEAD	【ギルド】
 T_AD0	【PR】新作『星詠みのアーク』事前登録受付中！
@@ -1089,6 +1089,24 @@ T_DC_Q0	「
 T_DC_Q1	」
 T_DC_LISTEN	SPACEで鳴らして、タイトルの曲に
 T_DC_GUIDE	上下左右 SP:設定 ESC:戻る
+T_TR_TITLE0	トレード（売ります）
+T_TR_TITLE1	トレード（買います）
+T_TR_GUIDE	左右:切替 上下 SP:取引 ESC:戻る
+T_TR_CLOSED	サービス終了のため、取引はできません
+T_TR_WARN	※格安の出品は詐欺に注意！
+T_TR_AUDIT	※出品は運営が審査しています
+T_TR_WANTHEAD	求められたカードを石で売る
+T_TR_BY	さんの出品
+T_TR_WANTS	さんが求む
+T_TR_CHEAP	格安！
+T_TR_HAVE	所持
+T_TR_FULL	カードがいっぱいで受け取れない
+T_TR_BUYQ	この出品を石で買いますか？
+T_TR_SCAM	出品者と連絡が取れなくなった…石は戻らない
+T_TR_GOT	カードが届いた！
+T_TR_NOHAVE	手放せるカードが無い（デッキのカードは売れない）
+T_TR_SELLQ	このカードを手放して石を受け取りますか？
+T_TR_SOLD	取引が成立した！石を受け取った
 T_TH_TITLE	攻略スレ
 T_TH_PART	Part
 T_TH_NANASHI	名無しさん

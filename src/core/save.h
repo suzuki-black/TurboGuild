@@ -16,6 +16,7 @@
 #define DECK_EMPTY    0xFF
 #define SF_STARTED    0x01   /* 名前と最初の 10 連が済んだ */
 #define SF_CAUGHT     0x02   /* この給料日に、おこづかいを親に没収された（core/wallet.c, DECISIONS #114） */
+/* flags の 2〜3 ビットはトレード掲示板の売り買いの回数（core/trade.h の TRADE_SEQ, DECISIONS #115） */
 /* flags の上の 4 ビットは待ち受け、ops_flags の上の 4 ビットは着うた（ui/deco_ui.c, DECISIONS #113）。
  * 前の版ではどちらも 0 だったので、欄を足さずに使える（静的 RAM が残り 1 B のため） */
 #define DAY_NEVER     0xFFFFFFFFUL
